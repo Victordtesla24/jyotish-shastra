@@ -4,8 +4,9 @@ describe('Refactored Chart Generation Workflow', () => {
   });
 
   it('should allow a user to fill out the form, submit, and see the analysis', function() {
-    // Mock the API response
+    // Mock the API response with delay to capture loading state
     cy.intercept('POST', '/api/chart/generate/comprehensive', {
+      delay: 1000, // Add 1 second delay to ensure loading state is visible
       body: {
         success: true,
         data: this.birthData.testCases[0]
@@ -16,13 +17,13 @@ describe('Refactored Chart Generation Workflow', () => {
 
     const birthData = this.birthData.testCases[0].birthData;
 
-    // Fill out the form
-    cy.get('#name').type(this.birthData.testCases[0].name);
-    cy.get('#dateOfBirth').type(birthData.dateOfBirth);
-    cy.get('#timeOfBirth').type(birthData.timeOfBirth);
+    // Fill out the form - using correct field names
+    cy.get('input[name="name"]').type(this.birthData.testCases[0].name);
+    cy.get('input[name="date"]').type(birthData.dateOfBirth);
+    cy.get('input[name="time"]').type(birthData.timeOfBirth);
     cy.get('#placeOfBirth').type(birthData.placeOfBirth.name);
-    cy.get('#timeZone').type(birthData.placeOfBirth.timezone);
-    cy.get('#gender').select('male');
+    cy.get('select[name="timezone"]').select(birthData.placeOfBirth.timezone);
+    cy.get('select[name="gender"]').select('male');
 
     // Submit the form
     cy.get('button[type="submit"]').click();

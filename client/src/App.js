@@ -22,6 +22,7 @@ function App() {
             <Route path="/chart" element={<ChartPage />} />
             <Route path="/analysis" element={<AnalysisPage />} />
             <Route path="/report" element={<ReportPage />} />
+            <Route path="/report/:id" element={<ReportPage />} />
           </Routes>
         </main>
         <Footer />

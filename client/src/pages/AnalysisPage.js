@@ -10,7 +10,7 @@ const AnalysisPage = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [analysisData, setAnalysisData] = useState(null);
+  const [analysisData] = useState(null);
 
   const handleSubmit = (formData) => {
     setIsLoading(true);
