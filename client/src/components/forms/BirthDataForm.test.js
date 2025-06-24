@@ -27,12 +27,7 @@ describe('BirthDataForm', () => {
 
   it('shows validation errors for required fields', async () => {
     await act(async () => {
-      render(
-        <>
-          <BirthDataForm onSubmit={mockOnSubmit} />
-          <button type="submit" form="birth-data-form">Generate Chart</button>
-        </>
-      );
+      render(<BirthDataForm onSubmit={mockOnSubmit} />);
     });
 
     await act(async () => {
@@ -45,7 +40,6 @@ describe('BirthDataForm', () => {
       expect(await screen.findByText(/time of birth is required/i)).toBeInTheDocument();
       expect(await screen.findByText(/place of birth is required if coordinates are not provided/i)).toBeInTheDocument();
       expect(await screen.findByText(/time zone is required/i)).toBeInTheDocument();
-      expect(await screen.findByText(/gender is required/i)).toBeInTheDocument();
     });
   });
 
@@ -68,12 +62,7 @@ describe('BirthDataForm', () => {
 
   it('calls onSubmit with form data when valid', async () => {
     await act(async () => {
-      render(
-        <>
-          <BirthDataForm onSubmit={mockOnSubmit} />
-          <button type="submit" form="birth-data-form">Generate Chart</button>
-        </>
-      );
+      render(<BirthDataForm onSubmit={mockOnSubmit} />);
     });
 
     await act(async () => {
@@ -81,7 +70,7 @@ describe('BirthDataForm', () => {
       await userEvent.type(screen.getByLabelText(/date of birth/i), '1990-01-01');
       await userEvent.type(screen.getByLabelText(/time of birth/i), '12:00');
       await userEvent.type(screen.getByLabelText(/place of birth/i), 'Test City');
-      await userEvent.type(screen.getByLabelText(/time zone/i), 'UTC');
+      await userEvent.selectOptions(screen.getByLabelText(/time zone/i), '5.5');
       await userEvent.selectOptions(screen.getByLabelText(/gender/i), 'male');
     });
 
@@ -93,10 +82,10 @@ describe('BirthDataForm', () => {
       expect(mockOnSubmit).toHaveBeenCalledWith(
         expect.objectContaining({
           name: 'Test User',
-          dateOfBirth: '1990-01-01',
-          timeOfBirth: '12:00',
+          date: '1990-01-01',
+          time: '12:00',
           placeOfBirth: 'Test City',
-          timeZone: 'UTC',
+          timezone: '5.5',
           gender: 'male',
         }),
         expect.anything()

@@ -805,7 +805,10 @@ class UserAuthenticationService {
    */
   fallbackLog(message) {
     const logEntry = `[${new Date().toISOString()}] SECURITY_LOG: ${message}`;
-    console.log(logEntry);
+            // Only log in development mode to avoid cluttering test output
+        if (process.env.NODE_ENV === 'development') {
+            console.log(logEntry);
+        }
 
     // In production, you might also want to write to a file or send to an external service
     try {
@@ -831,7 +834,10 @@ class UserAuthenticationService {
   async storeInBlacklist(blacklistEntry) {
     // Implementation would depend on your caching/database strategy
     // Could be Redis, database table, or in-memory cache
-    console.log('Token blacklisted:', blacklistEntry.token.slice(0, 20) + '...');
+            // Only log in development mode to avoid cluttering test output
+        if (process.env.NODE_ENV === 'development') {
+            console.log('Token blacklisted:', blacklistEntry.token.slice(0, 20) + '...');
+        }
   }
 
   /**
@@ -840,7 +846,10 @@ class UserAuthenticationService {
    */
   async clearActiveSessions(userId) {
     // Implementation would clear session data from your session store
-    console.log(`Cleared active sessions for user: ${userId}`);
+    // Only log in development mode to avoid cluttering test output
+    if (process.env.NODE_ENV === 'development') {
+        console.log(`Cleared active sessions for user: ${userId}`);
+    }
   }
 
   /**
@@ -849,7 +858,10 @@ class UserAuthenticationService {
    */
   async invalidateRefreshTokens(userId) {
     // Implementation would invalidate stored refresh tokens
-    console.log(`Invalidated refresh tokens for user: ${userId}`);
+    // Only log in development mode to avoid cluttering test output
+    if (process.env.NODE_ENV === 'development') {
+        console.log(`Invalidated refresh tokens for user: ${userId}`);
+    }
   }
 
   /**
@@ -1037,12 +1049,18 @@ class UserAuthenticationService {
   }
 
   async lockAccount(userId, reason) {
-    console.log(`Account locked for user ${userId}, reason: ${reason}`);
+    // Only log in development mode to avoid cluttering test output
+    if (process.env.NODE_ENV === 'development') {
+        console.log(`Account locked for user ${userId}, reason: ${reason}`);
+    }
     // Implementation would lock the account
   }
 
   async flagSuspiciousActivity(userId, ipAddress, type) {
-    console.log(`Suspicious activity flagged: ${type} for user ${userId} from IP ${ipAddress}`);
+    // Only log in development mode to avoid cluttering test output
+    if (process.env.NODE_ENV === 'development') {
+        console.log(`Suspicious activity flagged: ${type} for user ${userId} from IP ${ipAddress}`);
+    }
     // Implementation would flag for security review
   }
 
@@ -1076,7 +1094,10 @@ class UserAuthenticationService {
 
   async updateUserActivityMetrics(userId) {
     // Update user activity analytics
-    console.log(`Updated activity metrics for user: ${userId}`);
+    // Only log in development mode to avoid cluttering test output
+    if (process.env.NODE_ENV === 'development') {
+        console.log(`Updated activity metrics for user: ${userId}`);
+    }
   }
 
   /**

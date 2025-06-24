@@ -291,7 +291,10 @@ class UserProfileService {
       }
 
       // Log deactivation
-      console.log(`Account deactivated: User ${userId}, Reason: ${reason}, Time: ${new Date()}`);
+              // Only log in development mode to avoid cluttering test output
+        if (process.env.NODE_ENV === 'development') {
+            console.log(`Account deactivated: User ${userId}, Reason: ${reason}, Time: ${new Date()}`);
+        }
 
       return {
         success: true,
@@ -316,7 +319,10 @@ class UserProfileService {
       }
 
       // Log reactivation
-      console.log(`Account reactivated: User ${userId}, Time: ${new Date()}`);
+              // Only log in development mode to avoid cluttering test output
+        if (process.env.NODE_ENV === 'development') {
+            console.log(`Account reactivated: User ${userId}, Time: ${new Date()}`);
+        }
 
       return {
         success: true,

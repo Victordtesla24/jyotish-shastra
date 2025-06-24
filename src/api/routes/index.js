@@ -16,7 +16,7 @@ const API_VERSION = '/v1';
 router.use(`${API_VERSION}/chart`, chartRoutes);
 
 // Comprehensive Analysis routes
-router.use(`${API_VERSION}`, comprehensiveAnalysisRoutes);
+router.use(`${API_VERSION}/analysis`, comprehensiveAnalysisRoutes);
 
 // Health check endpoint
 router.get('/health', (req, res) => {

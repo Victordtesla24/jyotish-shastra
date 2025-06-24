@@ -4,17 +4,21 @@
  */
 
 const request = require('supertest');
-const app = require('../../src/index');
+// Remove direct import that causes port conflicts
+// const app = require('../../src/index');
 const { testCases } = require('../fixtures/sample-birth-data.json');
 const sampleBirthData = testCases[0].birthData;
 const invalidBirthData = { ...sampleBirthData, dateOfBirth: '' };
+
+// Use the running server URL instead of importing app directly
+const baseURL = process.env.TEST_BASE_URL || 'http://localhost:3001';
 
 describe('E2E: Complete Astrology Analysis Workflow', () => {
   let chartId;
 
   it('should process birth data through chart generation to comprehensive analysis', async () => {
     // Step 1: Generate Chart
-    const chartResponse = await request(app)
+    const chartResponse = await request(baseURL)
       .post('/api/v1/chart/generate')
       .send(sampleBirthData)
       .expect(200);
@@ -24,7 +28,7 @@ describe('E2E: Complete Astrology Analysis Workflow', () => {
     chartId = chartResponse.body.data.chartId;
 
     // Step 2: Request Comprehensive Analysis
-    const analysisResponse = await request(app)
+    const analysisResponse = await request(baseURL)
       .post('/api/v1/analysis/comprehensive')
       .send({ chartId })
       .expect(200);
@@ -34,7 +38,7 @@ describe('E2E: Complete Astrology Analysis Workflow', () => {
     const analysisId = analysisResponse.body.data.analysisId;
 
     // Retrieve the analysis results
-    const resultsResponse = await request(app)
+    const resultsResponse = await request(baseURL)
       .get(`/api/v1/analysis/${analysisId}`)
       .expect(200);
 
@@ -42,7 +46,7 @@ describe('E2E: Complete Astrology Analysis Workflow', () => {
   }, 30000); // Increased timeout for long-running process
 
   it('should handle invalid birth data gracefully', async () => {
-    const chartResponse = await request(app)
+    const chartResponse = await request(baseURL)
       .post('/api/v1/chart/generate')
       .send(invalidBirthData)
       .expect(400);
@@ -53,7 +57,7 @@ describe('E2E: Complete Astrology Analysis Workflow', () => {
   describe('Data Validation and Error Handling', () => {
     it('should validate required fields in birth data', async () => {
       const incompleteData = { ...sampleBirthData, dateOfBirth: '' };
-      const response = await request(app)
+      const response = await request(baseURL)
         .post('/api/v1/chart/generate')
         .send(incompleteData)
         .expect(400);
@@ -64,7 +68,7 @@ describe('E2E: Complete Astrology Analysis Workflow', () => {
 
     it('should handle geographic coordinate validation', async () => {
       const invalidCoordinates = { ...sampleBirthData, latitude: 'invalid' };
-      const response = await request(app)
+      const response = await request(baseURL)
         .post('/api/v1/chart/generate')
         .send(invalidCoordinates)
         .expect(400);
@@ -74,7 +78,7 @@ describe('E2E: Complete Astrology Analysis Workflow', () => {
 
     it('should validate date and time formats', async () => {
       const invalidDateTime = { ...sampleBirthData, timeOfBirth: '99:99' };
-      const response = await request(app)
+      const response = await request(baseURL)
         .post('/api/v1/chart/generate')
         .send(invalidDateTime)
         .expect(400);
@@ -87,7 +91,7 @@ describe('E2E: Complete Astrology Analysis Workflow', () => {
     it('should complete full analysis within reasonable time', async () => {
       const startTime = Date.now();
 
-      const response = await request(app)
+      const response = await request(baseURL)
         .post('/api/v1/chart/generate')
         .send(sampleBirthData)
         .expect(200);
@@ -102,7 +106,7 @@ describe('E2E: Complete Astrology Analysis Workflow', () => {
 
     it('should handle concurrent requests without errors', async () => {
       const requests = Array(5).fill(null).map(() =>
-        request(app)
+        request(baseURL)
           .post('/api/v1/chart/generate')
           .send(sampleBirthData)
       );

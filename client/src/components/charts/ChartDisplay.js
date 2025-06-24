@@ -4,23 +4,30 @@ import ComprehensiveAnalysisDisplay from '../reports/ComprehensiveAnalysisDispla
 import BasicAnalysisDisplay from '../reports/BasicAnalysisDisplay';
 
 const ChartDisplay = ({ chartData, analysisType, useComprehensive }) => {
-  if (!chartData) {
-    return null;
-  }
+  // Always render the wrapper with chart-display class for E2E test consistency
+  return (
+    <div className="chart-display">
+      {(() => {
+        if (!chartData) {
+          return null;
+        }
 
-  const { data } = chartData;
+        const { data } = chartData;
 
-  if (analysisType === 'birth-data' && data.birthDataAnalysis) {
-    return <BirthDataAnalysis analysis={data.birthDataAnalysis} />;
-  }
+        if (analysisType === 'birth-data' && data.birthDataAnalysis) {
+          return <BirthDataAnalysis analysis={data.birthDataAnalysis} />;
+        }
 
-  if (useComprehensive && data?.analysis) {
-    return <ComprehensiveAnalysisDisplay data={data} />;
-  } else if (data) {
-    return <BasicAnalysisDisplay data={data} />;
-  }
+        if (useComprehensive && data?.analysis) {
+          return <ComprehensiveAnalysisDisplay data={data} />;
+        } else if (data) {
+          return <BasicAnalysisDisplay data={data} />;
+        }
 
-  return null;
+        return null;
+      })()}
+    </div>
+  );
 };
 
 export default ChartDisplay;

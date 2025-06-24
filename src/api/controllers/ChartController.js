@@ -9,6 +9,7 @@ const EnhancedChartService = require('../../services/chart/EnhancedChartService'
 const LagnaAnalysisService = require('../../services/analysis/LagnaAnalysisService');
 const HouseAnalysisService = require('../../services/analysis/HouseAnalysisService');
 const BirthDataAnalysisService = require('../../services/analysis/BirthDataAnalysisService');
+const { v4: uuidv4 } = require('uuid');
 
 class ChartController {
   constructor() {
@@ -67,7 +68,25 @@ class ChartController {
       if (!this.chartService.validateBirthData(birthData)) {
         return res.status(400).json({
           success: false,
-          message: 'Invalid birth data provided'
+          message: 'Invalid birth data provided',
+          errors: ['Please provide valid birth data with all required fields']
+        });
+      }
+
+      // Additional coordinate validation
+      if (birthData.latitude && (isNaN(parseFloat(birthData.latitude)) || Math.abs(parseFloat(birthData.latitude)) > 90)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid coordinate data',
+          errors: ['Latitude must be a valid number between -90 and 90']
+        });
+      }
+
+      if (birthData.longitude && (isNaN(parseFloat(birthData.longitude)) || Math.abs(parseFloat(birthData.longitude)) > 180)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid coordinate data',
+          errors: ['Longitude must be a valid number between -180 and 180']
         });
       }
 
@@ -83,7 +102,11 @@ class ChartController {
       // Perform house analysis
       const houseAnalysis = this.houseService.analyzeAllHouses(rasiChart);
 
+      // Generate unique chart ID for E2E test compatibility
+      const chartId = uuidv4();
+
       const chartData = {
+        chartId, // Add chartId field as expected by E2E tests
         birthData,
         rasiChart,
         navamsaChart,

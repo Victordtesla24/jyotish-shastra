@@ -5,7 +5,7 @@ const ComprehensiveAnalysisDisplay = ({ data }) => {
   const [activeTab, setActiveTab] = useState('personality');
 
   return (
-    <div className="chart-display comprehensive">
+    <div className="comprehensive-analysis-display">
       <h1>Comprehensive Vedic Astrology Report for {processedBirthData.name}</h1>
 
       {/* Navigation Tabs */}
@@ -46,7 +46,7 @@ const ComprehensiveAnalysisDisplay = ({ data }) => {
         <p><strong>Name:</strong> {processedBirthData.name}</p>
         <p><strong>Date:</strong> {processedBirthData.dateOfBirth}</p>
         <p><strong>Time:</strong> {processedBirthData.timeOfBirth}</p>
-        <p><strong>Place:</strong> {processedBirthData.geocodingInfo?.formattedAddress || processedBirthData.placeOfBirth}</p>
+        <p><strong>Place:</strong> {processedBirthData.geocodingInfo?.formattedAddress || processedBirthData.placeOfBirth?.name || processedBirthData.placeOfBirth}</p>
         {processedBirthData.geocodingInfo && (
           <p><strong>Coordinates:</strong> {processedBirthData.latitude}, {processedBirthData.longitude} (via {processedBirthData.geocodingInfo.service})</p>
         )}
