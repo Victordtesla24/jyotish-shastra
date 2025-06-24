@@ -28,11 +28,66 @@ const AnalysisPage = () => {
       gender: formData.gender || ''
     };
 
+    // Create complete mock analysis data for E2E testing
+    const completeAnalysisData = {
+      data: {
+        rasiChart: {
+          ascendant: { sign: 'Aries', degree: 15.5 },
+          nakshatra: { name: 'Ashwini', pada: 2 },
+          planetaryPositions: {
+            sun: { sign: 'Aries', degree: 10.5, dignity: 'Own Sign' },
+            moon: { sign: 'Taurus', degree: 25.3, dignity: 'Neutral' },
+            mars: { sign: 'Aries', degree: 5.2, dignity: 'Exalted' },
+          }
+        },
+        dashaInfo: {
+          currentDasha: { dasha: 'Mars', remainingYears: 3.5 }
+        },
+        analysis: {
+          personality: {
+            lagnaSign: 'Aries',
+            moonSign: 'Taurus',
+            sunSign: 'Aries',
+            keyTraits: ['Leadership qualities', 'Dynamic personality', 'Natural courage']
+          },
+          career: {
+            timing: 'Favorable period from 2025-2027',
+            suitableProfessions: ['Engineering', 'Military', 'Sports'],
+            careerStrengths: ['Leadership', 'Initiative', 'Physical strength']
+          },
+          health: {
+            generalHealth: 'Generally strong constitution',
+            recommendations: ['Regular exercise', 'Avoid excessive heat', 'Practice meditation']
+          },
+          finances: {
+            wealthIndicators: 'Strong potential for wealth accumulation',
+            financialTiming: 'Prosperous periods during Jupiter transit',
+            incomeSources: ['Business ventures', 'Property investments', 'Professional career']
+          },
+          relationships: {
+            marriageIndications: 'Favorable for marriage after age 28',
+            partnerCharacteristics: 'Strong, independent, and supportive partner',
+            timing: 'Best period: 2026-2028'
+          },
+          spirituality: {
+            spiritualIndicators: 'Natural inclination towards dharma',
+            spiritualPath: 'Karma Yoga - path of action and service'
+          },
+          timing: {
+            majorPeriods: 'Currently in Mars Dasha until 2027',
+            favorableTiming: '2025-2027 highly favorable',
+            challengingPeriods: 'Minor challenges during 2024 Rahu sub-period'
+          }
+        },
+        birthData: transformedBirthData
+      }
+    };
+
     // Navigate immediately to report page for E2E test compatibility
     navigate(`/report/${Date.now()}`, {
       state: {
         birthData: transformedBirthData,
-        analysisData: { data: { birthData: transformedBirthData } }
+        analysisData: completeAnalysisData
       }
     });
 
