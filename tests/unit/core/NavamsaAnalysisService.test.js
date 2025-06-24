@@ -86,31 +86,17 @@ describe('NavamsaAnalysisService', () => {
       d1Chart.planets.find(p => p.name === 'Sun').sign = 'Leo';
       d9Chart.planets.find(p => p.name === 'Sun').sign = 'Leo';
 
-      // Debug: Check the chart data
-      console.log('D1 Sun after modification:', d1Chart.planets.find(p => p.name === 'Sun'));
-      console.log('D9 Sun after modification:', d9Chart.planets.find(p => p.name === 'Sun'));
-
       // Create service AFTER chart modifications
       const testService = new NavamsaAnalysisService(d1Chart, d9Chart);
 
-            // Debug: Check service chart data
-      console.log('Service D1 Sun:', testService.d1Chart.planets.find(p => p.name === 'Sun'));
-      console.log('Service D9 Sun:', testService.d9Chart.planets.find(p => p.name === 'Sun'));
-
-      // Debug the isVargottama method step by step
+      // Verify Vargottama detection
       const d1Planet = testService.d1Chart.planets.find(p => p.name === 'Sun');
       const d9Planet = testService.d9Chart.planets.find(p => p.name === 'Sun');
       const d1Sign = d1Planet.sign || testService.getSignFromLongitude(d1Planet.longitude);
       const d9Sign = d9Planet.sign || testService.getSignFromLongitude(d9Planet.longitude);
 
-      console.log('D1 sign from method:', d1Sign);
-      console.log('D9 sign from method:', d9Sign);
-      console.log('Signs equal after normalization:', d1Sign?.toUpperCase?.() === d9Sign?.toUpperCase?.());
-
       const isVargottama = testService.isVargottama('Sun');
       const analysis = testService.comparePlanetaryStrength('Sun');
-
-      console.log('Vargottama result:', isVargottama);
 
       expect(isVargottama).toBe(true);
       expect(analysis).toContain('is Vargottama, which gives it special strength');

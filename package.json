@@ -55,6 +55,12 @@
     "supertest": "^6.3.3",
     "wtfnode": "^0.10.0"
   },
+  "overrides": {
+    "util": ">=0.12.5",
+    "extend": ">=3.0.2",
+    "http-proxy": ">=1.18.1",
+    "strong-log-transformer": ">=2.1.0"
+  },
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=8.0.0"

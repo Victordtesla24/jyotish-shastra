@@ -95,4 +95,5 @@ class AnalysisService {
   }
 }
 
-export default new AnalysisService();
+const analysisService = new AnalysisService();
+export default analysisService;

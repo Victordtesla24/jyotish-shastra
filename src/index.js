@@ -1,3 +1,6 @@
+// Load polyfills first to ensure compatibility with modern Node.js
+require('./utils/polyfills');
+
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -5,7 +8,7 @@ const morgan = require('morgan');
 require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(helmet());

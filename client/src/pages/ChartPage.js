@@ -30,13 +30,6 @@ const ChartPage = () => {
           setUseComprehensive={setUseComprehensive}
         />
 
-        <button type="submit" form="birth-data-form" className="submit-btn" disabled={isLoading}>
-          {isLoading
-            ? (analysisType === 'birth-data' ? 'Analyzing Birth Data...' : 'Generating Chart...')
-            : (analysisType === 'birth-data' ? 'Analyze Birth Data' : 'Generate Birth Chart')
-          }
-        </button>
-
         {isLoading && <LoadingSpinner />}
         <ErrorMessage message={error?.message} />
 

@@ -10,7 +10,7 @@ describe('End-to-End Test: Full Kundli Analysis', () => {
 
   it('should allow a user to enter birth data, generate a report, and view the analysis', () => {
     // 1. Navigate to the analysis page and fill out the form
-    cy.get('a[href="/analysis"]').click();
+    cy.get('nav .nav-link[href="/analysis"]').click();
     cy.get('input[name="name"]').type('John Doe');
     cy.get('input[name="date"]').type('1990-05-15');
     cy.get('input[name="time"]').type('10:30');
@@ -52,7 +52,7 @@ describe('End-to-End Test: Full Kundli Analysis', () => {
   });
 
   it('should display an error message for invalid birth data submission', () => {
-    cy.get('a[href="/analysis"]').click();
+    cy.get('nav .nav-link[href="/analysis"]').click();
 
     // Submit form with missing data
     cy.get('button[type="submit"]').click();

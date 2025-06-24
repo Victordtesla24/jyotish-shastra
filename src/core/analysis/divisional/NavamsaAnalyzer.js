@@ -6316,7 +6316,7 @@ class NavamsaAnalyzer {
 
      // Add defensive null checking for timing structure
      if (!timing || !timing.spiritualPhases) {
-       console.warn('Invalid timing structure for spiritual recommendations');
+       // Return default spiritual timing recommendations when detailed timing unavailable
        return [
          'Begin serious spiritual practice by age 35 for optimal results',
          'Consult spiritual teacher during favorable dharma periods'

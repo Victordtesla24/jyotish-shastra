@@ -58,4 +58,5 @@ class ChartService {
   }
 }
 
-export default new ChartService();
+const chartService = new ChartService();
+export default chartService;

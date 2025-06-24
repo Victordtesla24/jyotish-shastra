@@ -9,11 +9,17 @@ describe('UI Smoke Tests', () => {
         cy.get('footer').should('be.visible');
     });
 
-    it('should display the birth data form', () => {
-        cy.get('form').should('be.visible');
-        cy.get('input[name="dateOfBirth"]').should('be.visible');
-        cy.get('input[name="timeOfBirth"]').should('be.visible');
-        cy.get('input[name="placeOfBirth"]').should('be.visible');
-        cy.get('button[type="submit"]').should('be.visible');
+    it('should display the homepage content and navigation', () => {
+        // Check for hero section
+        cy.get('.hero').should('be.visible');
+        cy.get('h1').should('contain', 'Expert-Level Vedic Kundli Analysis');
+
+        // Check for navigation buttons
+        cy.get('a[href="/chart"]').should('be.visible').and('contain', 'Generate Birth Chart');
+        cy.get('a[href="/analysis"]').should('be.visible').and('contain', 'Learn More');
+
+        // Check for features section
+        cy.get('.features').should('be.visible');
+        cy.get('.feature-card').should('have.length', 6);
     });
 });

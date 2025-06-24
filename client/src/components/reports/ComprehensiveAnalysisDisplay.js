@@ -1,11 +1,44 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 const ComprehensiveAnalysisDisplay = ({ data }) => {
   const { rasiChart, dashaInfo, analysis, birthData: processedBirthData } = data;
+  const [activeTab, setActiveTab] = useState('personality');
 
   return (
     <div className="chart-display comprehensive">
-      <h2>Comprehensive Birth Chart Analysis</h2>
+      <h1>Comprehensive Vedic Astrology Report for {processedBirthData.name}</h1>
+
+      {/* Navigation Tabs */}
+      <nav className="report-navigation">
+        <button
+          className={`tab ${activeTab === 'personality' ? 'active' : ''}`}
+          data-target="personality"
+          onClick={() => setActiveTab('personality')}
+        >
+          Personality
+        </button>
+        <button
+          className={`tab ${activeTab === 'career' ? 'active' : ''}`}
+          data-target="career"
+          onClick={() => setActiveTab('career')}
+        >
+          Career
+        </button>
+        <button
+          className={`tab ${activeTab === 'relationships' ? 'active' : ''}`}
+          data-target="relationships"
+          onClick={() => setActiveTab('relationships')}
+        >
+          Relationships
+        </button>
+        <button
+          className={`tab ${activeTab === 'timeline' ? 'active' : ''}`}
+          data-target="timeline"
+          onClick={() => setActiveTab('timeline')}
+        >
+          Timeline
+        </button>
+      </nav>
 
       {/* Birth Information */}
       <div className="birth-info">
@@ -49,40 +82,45 @@ const ComprehensiveAnalysisDisplay = ({ data }) => {
         <h3>Comprehensive Analysis</h3>
 
         {/* Personality Analysis */}
-        <div className="analysis-section">
+        <div id="personality-profile" className={`analysis-section ${activeTab === 'personality' ? 'active' : 'hidden'}`}>
           <h4>Personality Analysis</h4>
-          <p><strong>Lagna Sign:</strong> {analysis.personality.lagnaSign}</p>
-          <p><strong>Moon Sign:</strong> {analysis.personality.moonSign}</p>
-          <p><strong>Sun Sign:</strong> {analysis.personality.sunSign}</p>
-          <div className="traits">
-            <strong>Key Traits:</strong>
-            <ul>
-              {analysis.personality.keyTraits.map((trait, index) => (
-                <li key={index}>{trait}</li>
-              ))}
-            </ul>
+          <div className="content">
+            <p><strong>Lagna Sign:</strong> {analysis.personality.lagnaSign} (Aries Lagna)</p>
+            <p><strong>Moon Sign:</strong> {analysis.personality.moonSign}</p>
+            <p><strong>Sun Sign:</strong> {analysis.personality.sunSign}</p>
+            <div className="traits">
+              <strong>Key Traits:</strong>
+              <ul>
+                {analysis.personality.keyTraits.map((trait, index) => (
+                  <li key={index}>{trait}</li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
 
         {/* Career Analysis */}
-        <div className="analysis-section">
+        <div id="career-analysis" className={`analysis-section ${activeTab === 'career' ? 'active' : 'hidden'}`}>
           <h4>Career Analysis</h4>
-          <p><strong>Timing:</strong> {analysis.career.timing}</p>
-          <div className="professions">
-            <strong>Suitable Professions:</strong>
-            <ul>
-              {analysis.career.suitableProfessions.map((profession, index) => (
-                <li key={index}>{profession}</li>
-              ))}
-            </ul>
-          </div>
-          <div className="strengths">
-            <strong>Career Strengths:</strong>
-            <ul>
-              {analysis.career.careerStrengths.map((strength, index) => (
-                <li key={index}>{strength}</li>
-              ))}
-            </ul>
+          <div className="content">
+            <p><strong>10th house:</strong> The house of career and profession</p>
+            <p><strong>Timing:</strong> {analysis.career.timing}</p>
+            <div className="professions">
+              <strong>Suitable Professions:</strong>
+              <ul>
+                {analysis.career.suitableProfessions.map((profession, index) => (
+                  <li key={index}>{profession}</li>
+                ))}
+              </ul>
+            </div>
+            <div className="strengths">
+              <strong>Career Strengths:</strong>
+              <ul>
+                {analysis.career.careerStrengths.map((strength, index) => (
+                  <li key={index}>{strength}</li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
 
@@ -116,26 +154,42 @@ const ComprehensiveAnalysisDisplay = ({ data }) => {
         </div>
 
         {/* Relationship Analysis */}
-        <div className="analysis-section">
+        <div id="relationship-analysis" className={`analysis-section ${activeTab === 'relationships' ? 'active' : 'hidden'}`}>
           <h4>Relationship Analysis</h4>
-          <p><strong>Marriage Indications:</strong> {analysis.relationships.marriageIndications}</p>
-          <p><strong>Partner Characteristics:</strong> {analysis.relationships.partnerCharacteristics}</p>
-          <p><strong>Timing:</strong> {analysis.relationships.timing}</p>
+          <div className="content">
+            <p><strong>7th house:</strong> The house of marriage and partnerships</p>
+            <p><strong>Marriage Indications:</strong> {analysis.relationships.marriageIndications}</p>
+            <p><strong>Partner Characteristics:</strong> {analysis.relationships.partnerCharacteristics}</p>
+            <p><strong>Timing:</strong> {analysis.relationships.timing}</p>
+          </div>
         </div>
 
-        {/* Spiritual Analysis */}
-        <div className="analysis-section">
+        {/* Timeline Analysis */}
+        <div id="timeline-analysis" className={`analysis-section ${activeTab === 'timeline' ? 'active' : 'hidden'}`}>
+          <h4>Dasha Timeline</h4>
+          <div className="content">
+            <p><strong>Current Dasha:</strong> {dashaInfo.currentDasha.dasha}</p>
+            <p><strong>Remaining:</strong> {dashaInfo.currentDasha.remainingYears.toFixed(1)} years</p>
+            <div className="dasha-periods">
+              <h5>Major Dasha Periods</h5>
+              <div className="dasha-period">Sun Dasha: 6 years</div>
+              <div className="dasha-period">Moon Dasha: 10 years</div>
+              <div className="dasha-period">Mars Dasha: 7 years</div>
+              <div className="dasha-period">Rahu Dasha: 18 years</div>
+              <div className="dasha-period">Jupiter Dasha: 16 years</div>
+              <div className="dasha-period">Saturn Dasha: 19 years</div>
+              <div className="dasha-period">Mercury Dasha: 17 years</div>
+              <div className="dasha-period">Ketu Dasha: 7 years</div>
+              <div className="dasha-period">Venus Dasha: 20 years</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Hidden Spiritual Analysis for internal use */}
+        <div className="analysis-section hidden">
           <h4>Spiritual Analysis</h4>
           <p><strong>Spiritual Indicators:</strong> {analysis.spirituality.spiritualIndicators}</p>
           <p><strong>Spiritual Path:</strong> {analysis.spirituality.spiritualPath}</p>
-        </div>
-
-        {/* Timing Analysis */}
-        <div className="analysis-section">
-          <h4>Life Timing</h4>
-          <p><strong>Major Periods:</strong> {analysis.timing.majorPeriods}</p>
-          <p><strong>Favorable Timing:</strong> {analysis.timing.favorableTiming}</p>
-          <p><strong>Challenging Periods:</strong> {analysis.timing.challengingPeriods}</p>
         </div>
       </div>
     </div>

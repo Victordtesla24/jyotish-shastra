@@ -1,34 +1,50 @@
 import React from 'react';
 
 const BasicAnalysisDisplay = ({ data }) => {
+  // Add defensive checks for data structure
+  if (!data) {
+    return <div>Loading chart analysis...</div>;
+  }
+
   const { rasiChart, analysis } = data;
+
+  // Ensure required data exists
+  if (!rasiChart) {
+    return <div>Chart data not available</div>;
+  }
 
   return (
     <div className="chart-display">
       <h2>Birth Chart Analysis</h2>
 
       {/* Basic Chart Info */}
-      <div className="chart-info">
-        <h3>Chart Details</h3>
-        <p><strong>Ascendant:</strong> {rasiChart.ascendant.sign} ({rasiChart.ascendant.degree.toFixed(2)}°)</p>
-        <p><strong>Nakshatra:</strong> {rasiChart.nakshatra.name} (Pada {rasiChart.nakshatra.pada})</p>
-      </div>
+      {rasiChart.ascendant && (
+        <div className="chart-info">
+          <h3>Chart Details</h3>
+          <p><strong>Ascendant:</strong> {rasiChart.ascendant.sign} ({rasiChart.ascendant.degree?.toFixed(2) || 'N/A'}°)</p>
+          {rasiChart.nakshatra && (
+            <p><strong>Nakshatra:</strong> {rasiChart.nakshatra.name} (Pada {rasiChart.nakshatra.pada})</p>
+          )}
+        </div>
+      )}
 
       {/* Planetary Positions */}
-      <div className="planetary-positions">
-        <h3>Planetary Positions</h3>
-        <div className="planets-grid">
-          {Object.entries(rasiChart.planetaryPositions).map(([planet, position]) => (
-            <div key={planet} className="planet-card">
-              <h4>{planet.charAt(0).toUpperCase() + planet.slice(1)}</h4>
-              <p><strong>Sign:</strong> {position.sign}</p>
-              <p><strong>Degree:</strong> {position.degree.toFixed(2)}°</p>
-              {position.isRetrograde && <p className="retrograde">Retrograde</p>}
-              {position.isCombust && <p className="combust">Combust</p>}
-            </div>
-          ))}
+      {rasiChart.planetaryPositions && (
+        <div className="planetary-positions">
+          <h3>Planetary Positions</h3>
+          <div className="planets-grid">
+            {Object.entries(rasiChart.planetaryPositions).map(([planet, position]) => (
+              <div key={planet} className="planet-card">
+                <h4>{planet.charAt(0).toUpperCase() + planet.slice(1)}</h4>
+                <p><strong>Sign:</strong> {position.sign || 'N/A'}</p>
+                <p><strong>Degree:</strong> {position.degree?.toFixed(2) || 'N/A'}°</p>
+                {position.isRetrograde && <p className="retrograde">Retrograde</p>}
+                {position.isCombust && <p className="combust">Combust</p>}
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Lagna Analysis */}
       {analysis.lagna && (

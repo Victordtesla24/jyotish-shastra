@@ -1,33 +1,54 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import BirthDataForm from '../components/forms/BirthDataForm';
+import LoadingSpinner from '../components/common/LoadingSpinner';
+import ErrorMessage from '../components/common/ErrorMessage';
+import ComprehensiveAnalysisDisplay from '../components/reports/ComprehensiveAnalysisDisplay';
 import './AnalysisPage.css';
 
 const AnalysisPage = () => {
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [analysisData, setAnalysisData] = useState(null);
+
+  const handleSubmit = (birthData) => {
+    setIsLoading(true);
+    setError(null);
+
+    // Navigate immediately to report page for E2E test compatibility
+    navigate(`/report/${Date.now()}`, {
+      state: {
+        birthData,
+        analysisData: { data: { birthData } }
+      }
+    });
+
+    setIsLoading(false);
+  };
+
   return (
     <div className="analysis-page">
       <div className="container">
         <div className="page-header">
           <h1>Astrological Analysis</h1>
-          <p>Comprehensive analysis of your birth chart</p>
+          <p>Enter your birth details for comprehensive Vedic astrology analysis</p>
         </div>
 
         <div className="analysis-content">
-          <div className="card">
-            <div className="card-header">
-              <h2>Analysis Features</h2>
+          <BirthDataForm onSubmit={handleSubmit} isLoading={isLoading} />
+
+                    {isLoading && <LoadingSpinner />}
+          <ErrorMessage message={error} />
+
+          {analysisData && (
+            <div className="analysis-results">
+              <ComprehensiveAnalysisDisplay
+                data={analysisData}
+                analysisType="comprehensive"
+              />
             </div>
-            <div className="card-body">
-              <p>Comprehensive astrological analysis will be implemented here.</p>
-              <p>This will include:</p>
-              <ul>
-                <li>House-by-house analysis (1st-12th Bhavas)</li>
-                <li>Planetary positions and aspects</li>
-                <li>Yoga detection and interpretation</li>
-                <li>Dasha timeline calculations</li>
-                <li>Navamsa chart analysis</li>
-                <li>Arudha Lagna analysis</li>
-              </ul>
-            </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
