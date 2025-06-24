@@ -1,0 +1,409 @@
+{
+  "testCases": [
+    {
+      "id": "test_case_1",
+      "name": "Mumbai Birth - Evening",
+      "description": "Standard test case with Pune birth in the afternoon",
+      "birthData": {
+        "dateOfBirth": "1985-10-24",
+        "timeOfBirth": "14:30:00",
+        "placeOfBirth": {
+          "name": "Pune, Maharashtra, India",
+          "latitude": 18.5204,
+          "longitude": 73.8567,
+          "timezone": "Asia/Kolkata",
+          "country": "India",
+          "state": "Maharashtra"
+        }
+      },
+      "expectedResults": {
+        "lagnaSign": "Aquarius",
+        "moonSign": "Aquarius",
+        "sunSign": "Scorpio",
+        "lagnaLord": "Saturn",
+        "expectedYogas": [""],
+        "expectedStrengths": {
+          "lagna": "Good",
+          "moon": "Strong",
+          "sun": "Average"
+        }
+      }
+    },
+    {
+      "id": "test_case_2",
+      "name": "Delhi Birth - Morning",
+      "description": "Test case with Delhi birth in morning",
+      "birthData": {
+        "dateOfBirth": "1985-07-22",
+        "timeOfBirth": "06:45:00",
+        "placeOfBirth": {
+          "name": "New Delhi, Delhi, India",
+          "latitude": 28.6139,
+          "longitude": 77.2090,
+          "timezone": "Asia/Kolkata",
+          "country": "India",
+          "state": "Delhi"
+        }
+      },
+      "expectedResults": {
+        "lagnaSign": "Cancer",
+        "moonSign": "Gemini",
+        "sunSign": "Cancer",
+        "lagnaLord": "Moon",
+        "expectedYogas": [],
+        "expectedStrengths": {
+          "lagna": "Strong",
+          "moon": "Good",
+          "sun": "Strong"
+        }
+      }
+    },
+    {
+      "id": "test_case_3",
+      "name": "Bangalore Birth - Midnight",
+      "description": "Test case with Bangalore birth at midnight",
+      "birthData": {
+        "dateOfBirth": "1992-11-08",
+        "timeOfBirth": "00:15:00",
+        "placeOfBirth": {
+          "name": "Bangalore, Karnataka, India",
+          "latitude": 12.9716,
+          "longitude": 77.5946,
+          "timezone": "Asia/Kolkata",
+          "country": "India",
+          "state": "Karnataka"
+        }
+      },
+      "expectedResults": {
+        "lagnaSign": "Virgo",
+        "moonSign": "Libra",
+        "sunSign": "Scorpio",
+        "lagnaLord": "Mercury",
+        "expectedYogas": [],
+        "expectedStrengths": {
+          "lagna": "Average",
+          "moon": "Good",
+          "sun": "Strong"
+        }
+      }
+    },
+    {
+      "id": "test_case_4",
+      "name": "Chennai Birth - Noon",
+      "description": "Test case with Chennai birth at noon",
+      "birthData": {
+        "dateOfBirth": "1988-05-03",
+        "timeOfBirth": "12:00:00",
+        "placeOfBirth": {
+          "name": "Chennai, Tamil Nadu, India",
+          "latitude": 13.0827,
+          "longitude": 80.2707,
+          "timezone": "Asia/Kolkata",
+          "country": "India",
+          "state": "Tamil Nadu"
+        }
+      },
+      "expectedResults": {
+        "lagnaSign": "Leo",
+        "moonSign": "Aries",
+        "sunSign": "Aries",
+        "lagnaLord": "Sun",
+        "expectedYogas": [],
+        "expectedStrengths": {
+          "lagna": "Strong",
+          "moon": "Strong",
+          "sun": "Excellent"
+        }
+      }
+    },
+    {
+      "id": "test_case_5",
+      "name": "Kolkata Birth - Early Morning",
+      "description": "Test case with Kolkata birth in early morning",
+      "birthData": {
+        "dateOfBirth": "1995-12-25",
+        "timeOfBirth": "04:30:00",
+        "placeOfBirth": {
+          "name": "Kolkata, West Bengal, India",
+          "latitude": 22.5726,
+          "longitude": 88.3639,
+          "timezone": "Asia/Kolkata",
+          "country": "India",
+          "state": "West Bengal"
+        }
+      },
+      "expectedResults": {
+        "lagnaSign": "Scorpio",
+        "moonSign": "Aquarius",
+        "sunSign": "Sagittarius",
+        "lagnaLord": "Mars",
+        "expectedYogas": [],
+        "expectedStrengths": {
+          "lagna": "Good",
+          "moon": "Average",
+          "sun": "Good"
+        }
+      }
+    },
+    {
+      "id": "test_case_6",
+      "name": "International Birth - New York",
+      "description": "Test case with international birth location",
+      "birthData": {
+        "dateOfBirth": "1987-09-14",
+        "timeOfBirth": "15:20:00",
+        "placeOfBirth": {
+          "name": "New York, NY, USA",
+          "latitude": 40.7128,
+          "longitude": -74.0060,
+          "timezone": "America/New_York",
+          "country": "USA",
+          "state": "New York"
+        }
+      },
+      "expectedResults": {
+        "lagnaSign": "Capricorn",
+        "moonSign": "Taurus",
+        "sunSign": "Virgo",
+        "lagnaLord": "Saturn",
+        "expectedYogas": [],
+        "expectedStrengths": {
+          "lagna": "Good",
+          "moon": "Strong",
+          "sun": "Excellent"
+        }
+      }
+    },
+    {
+      "id": "test_case_7",
+      "name": "Edge Case - Leap Year",
+      "description": "Test case for leap year birth",
+      "birthData": {
+        "dateOfBirth": "1996-02-29",
+        "timeOfBirth": "08:45:00",
+        "placeOfBirth": {
+          "name": "Pune, Maharashtra, India",
+          "latitude": 18.5204,
+          "longitude": 73.8567,
+          "timezone": "Asia/Kolkata",
+          "country": "India",
+          "state": "Maharashtra"
+        }
+      },
+      "expectedResults": {
+        "lagnaSign": "Aries",
+        "moonSign": "Capricorn",
+        "sunSign": "Pisces",
+        "lagnaLord": "Mars",
+        "expectedYogas": [],
+        "expectedStrengths": {
+          "lagna": "Strong",
+          "moon": "Average",
+          "sun": "Good"
+        }
+      }
+    },
+    {
+      "id": "test_case_8",
+      "name": "Extreme North Location",
+      "description": "Test case with extreme northern latitude",
+      "birthData": {
+        "dateOfBirth": "1989-06-21",
+        "timeOfBirth": "20:30:00",
+        "placeOfBirth": {
+          "name": "Srinagar, Jammu and Kashmir, India",
+          "latitude": 34.0837,
+          "longitude": 74.7973,
+          "timezone": "Asia/Kolkata",
+          "country": "India",
+          "state": "Jammu and Kashmir"
+        }
+      },
+      "expectedResults": {
+        "lagnaSign": "Sagittarius",
+        "moonSign": "Leo",
+        "sunSign": "Gemini",
+        "lagnaLord": "Jupiter",
+        "expectedYogas": [],
+        "expectedStrengths": {
+          "lagna": "Strong",
+          "moon": "Strong",
+          "sun": "Good"
+        }
+      }
+    },
+    {
+      "id": "test_case_9",
+      "name": "Southern India Birth",
+      "description": "Test case with southern India location",
+      "birthData": {
+        "dateOfBirth": "1993-01-10",
+        "timeOfBirth": "16:15:00",
+        "placeOfBirth": {
+          "name": "Kochi, Kerala, India",
+          "latitude": 9.9312,
+          "longitude": 76.2673,
+          "timezone": "Asia/Kolkata",
+          "country": "India",
+          "state": "Kerala"
+        }
+      },
+      "expectedResults": {
+        "lagnaSign": "Gemini",
+        "moonSign": "Scorpio",
+        "sunSign": "Capricorn",
+        "lagnaLord": "Mercury",
+        "expectedYogas": [],
+        "expectedStrengths": {
+          "lagna": "Good",
+          "moon": "Strong",
+          "sun": "Strong"
+        }
+      }
+    },
+    {
+      "id": "test_case_10",
+      "name": "Western India Birth",
+      "description": "Test case with western India location",
+      "birthData": {
+        "dateOfBirth": "1991-08-17",
+        "timeOfBirth": "11:30:00",
+        "placeOfBirth": {
+          "name": "Ahmedabad, Gujarat, India",
+          "latitude": 23.0225,
+          "longitude": 72.5714,
+          "timezone": "Asia/Kolkata",
+          "country": "India",
+          "state": "Gujarat"
+        }
+      },
+      "expectedResults": {
+        "lagnaSign": "Libra",
+        "moonSign": "Virgo",
+        "sunSign": "Leo",
+        "lagnaLord": "Venus",
+        "expectedYogas": [],
+        "expectedStrengths": {
+          "lagna": "Good",
+          "moon": "Good",
+          "sun": "Excellent"
+        }
+      }
+    }
+  ],
+  "validationRules": {
+    "dateRange": {
+      "minimum": "1900-01-01",
+      "maximum": "2100-12-31"
+    },
+    "timeFormat": "HH:MM:SS",
+    "coordinateRanges": {
+      "latitude": {
+        "minimum": -90,
+        "maximum": 90
+      },
+      "longitude": {
+        "minimum": -180,
+        "maximum": 180
+      }
+    },
+    "requiredFields": [
+      "dateOfBirth",
+      "timeOfBirth",
+      "placeOfBirth.name",
+      "placeOfBirth.latitude",
+      "placeOfBirth.longitude",
+      "placeOfBirth.timezone"
+    ]
+  },
+  "testScenarios": {
+    "basic_chart_generation": {
+      "description": "Test basic chart generation functionality",
+      "testCases": ["test_case_1", "test_case_2", "test_case_3"],
+      "expectedOutputs": [
+        "rasiChart",
+        "navamsaChart",
+        "planetaryPositions",
+        "housePositions",
+        "ascendantDegree"
+      ]
+    },
+    "yoga_detection": {
+      "description": "Test yoga detection algorithms",
+      "testCases": ["test_case_1"],
+      "expectedOutputs": [
+        "gajaKesariYoga",
+        "rajaYogas",
+        "dhanaYogas",
+        "arishtaYogas"
+      ]
+    },
+    "strength_calculation": {
+      "description": "Test planetary strength calculations",
+      "testCases": ["test_case_1", "test_case_4", "test_case_6"],
+      "expectedOutputs": [
+        "shadbala",
+        "ashtakavarga",
+        "vargottama",
+        "dignityStrength"
+      ]
+    },
+    "dasha_calculation": {
+      "description": "Test dasha period calculations",
+      "testCases": ["test_case_1", "test_case_5"],
+      "expectedOutputs": [
+        "vimshottariDasha",
+        "currentMahadasha",
+        "currentAntardasha",
+        "dashaTimeline"
+      ]
+    },
+    "international_locations": {
+      "description": "Test charts for international locations",
+      "testCases": ["test_case_6"],
+      "expectedOutputs": [
+        "timezoneHandling",
+        "coordinateConversion",
+        "siderealTimeCalculation"
+      ]
+    },
+    "edge_cases": {
+      "description": "Test edge cases and boundary conditions",
+      "testCases": ["test_case_7", "test_case_8"],
+      "expectedOutputs": [
+        "leapYearHandling",
+        "extremeLatitudes",
+        "midnightBirth",
+        "noonBirth"
+      ]
+    }
+  },
+  "performance_benchmarks": {
+    "chart_generation_time": {
+      "target": "< 2 seconds",
+      "description": "Time to generate complete birth chart"
+    },
+    "analysis_completion_time": {
+      "target": "< 5 seconds",
+      "description": "Time to complete full astrological analysis"
+    },
+    "concurrent_requests": {
+      "target": "50 simultaneous users",
+      "description": "System should handle multiple concurrent chart generations"
+    }
+  },
+  "data_quality_checks": {
+    "coordinate_precision": {
+      "decimal_places": 4,
+      "description": "Latitude/longitude should have at least 4 decimal places"
+    },
+    "time_precision": {
+      "format": "HH:MM:SS",
+      "description": "Time should include seconds for accuracy"
+    },
+    "timezone_validation": {
+      "format": "IANA timezone identifier",
+      "examples": ["Asia/Kolkata", "America/New_York", "Europe/London"]
+    }
+  }
+}

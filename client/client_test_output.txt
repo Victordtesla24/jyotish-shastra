@@ -1,0 +1,50 @@
+Project Root: /Users/Shared/cursor/jyotish-shastra/client
+
+=== JYOTISH SHASTRA - FAKE CODE DETECTION REPORT ===
+Project: /Users/Shared/cursor/jyotish-shastra/client
+Scan Date: 2025-06-23 14:56:16
+
+FILE INVENTORY:
+├── JavaScript/TypeScript: 20 files
+├── CSS/HTML: 11 files
+├── JSON: 2 files
+└── Total: 33 files
+
+SCANNING PROGRESS:
+[░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░]   3% (1/33)[█░░░░░░░░░░░░░░░░░░░░░░░░░░░░░]   6% (2/33)[██░░░░░░░░░░░░░░░░░░░░░░░░░░░░]   9% (3/33)[███░░░░░░░░░░░░░░░░░░░░░░░░░░░]  12% (4/33)[████░░░░░░░░░░░░░░░░░░░░░░░░░░]  15% (5/33)[█████░░░░░░░░░░░░░░░░░░░░░░░░░]  18% (6/33)[██████░░░░░░░░░░░░░░░░░░░░░░░░]  21% (7/33)[███████░░░░░░░░░░░░░░░░░░░░░░░]  24% (8/33)[████████░░░░░░░░░░░░░░░░░░░░░░]  27% (9/33)[█████████░░░░░░░░░░░░░░░░░░░░░]  30% (10/33)[█████████░░░░░░░░░░░░░░░░░░░░░]  33% (11/33)[██████████░░░░░░░░░░░░░░░░░░░░]  36% (12/33)[███████████░░░░░░░░░░░░░░░░░░░]  39% (13/33)[████████████░░░░░░░░░░░░░░░░░░]  42% (14/33)[█████████████░░░░░░░░░░░░░░░░░]  45% (15/33)[██████████████░░░░░░░░░░░░░░░░]  48% (16/33)[███████████████░░░░░░░░░░░░░░░]  51% (17/33)[████████████████░░░░░░░░░░░░░░]  54% (18/33)[█████████████████░░░░░░░░░░░░░]  57% (19/33)[██████████████████░░░░░░░░░░░░]  60% (20/33)[██████████████████░░░░░░░░░░░░]  63% (21/33)[███████████████████░░░░░░░░░░░]  66% (22/33)[████████████████████░░░░░░░░░░]  69% (23/33)[█████████████████████░░░░░░░░░]  72% (24/33)[██████████████████████░░░░░░░░]  75% (25/33)[███████████████████████░░░░░░░]  78% (26/33)[████████████████████████░░░░░░]  81% (27/33)[█████████████████████████░░░░░]  84% (28/33)[██████████████████████████░░░░]  87% (29/33)[███████████████████████████░░░]  90% (30/33)[███████████████████████████░░░]  93% (31/33)[████████████████████████████░░]  96% (32/33)[██████████████████████████████] 100% (33/33)
+✓ Scan completed: 33 files processed
+
+DETECTION RESULTS:
+┌─ High Priority Issues (19 detections across 2 files)
+├─ ./package-lock.json:2810 [json:XXX] "integrity"
+├─ ./package-lock.json:16224 [json:XXX] "integrity"
+├─ ./package-lock.json:2883 [json:mock] "jest-mock"
+├─ ./package-lock.json:2900 [json:mock] "jest-mock"
+├─ ./package-lock.json:11219 [json:mock] "jest-mock"
+├─ ./package-lock.json:11238 [json:mock] "jest-mock"
+├─ ./package-lock.json:11362 [json:mock] "node_modules/jest-mock"
+├─ ./package-lock.json:11364 [//registry.npmjs.org/jest-mock/-/jest-mock-27.5.1.tgz",:json:mock] "resolved"
+├─ ./package-lock.json:11496 [json:mock] "jest-mock"
+├─ ./package-lock.json:2880 [json:fake] "@jest/fake-timers"
+└─ ... and 9 more detections
+
+PATTERN FREQUENCY ANALYSIS:
+├── fake: 9 occurrences
+├── mock: 7 occurrences
+├── XXX: 2 occurrences
+├── return 0: 1 occurrences
+
+FILES WITH MOST ISSUES:
+├── ./package-lock.json: 18 issues
+├── ./src/utils/dateUtils.js: 1 issues
+
+RECOMMENDATIONS:
+✓ Review 19 fake code instances across 2 files
+✓ Priority: Address mock implementations in core modules
+../test.sh: line 193: [: : integer expression expected
+../test.sh: line 193: [: : integer expression expected
+../test.sh: line 196: [: : integer expression expected
+../test.sh: line 196: [: : integer expression expected
+✓ Estimated cleanup time: 1-2 hours
+
+=== SCAN COMPLETE ===
