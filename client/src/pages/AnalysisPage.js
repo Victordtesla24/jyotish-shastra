@@ -12,15 +12,27 @@ const AnalysisPage = () => {
   const [error, setError] = useState(null);
   const [analysisData, setAnalysisData] = useState(null);
 
-  const handleSubmit = (birthData) => {
+  const handleSubmit = (formData) => {
     setIsLoading(true);
     setError(null);
+
+    // Transform form data to match expected format
+    const transformedBirthData = {
+      name: formData.name,
+      dateOfBirth: formData.date,
+      timeOfBirth: formData.time,
+      placeOfBirth: formData.placeOfBirth || '',
+      latitude: parseFloat(formData.latitude) || 0,
+      longitude: parseFloat(formData.longitude) || 0,
+      timezone: formData.timezone,
+      gender: formData.gender || ''
+    };
 
     // Navigate immediately to report page for E2E test compatibility
     navigate(`/report/${Date.now()}`, {
       state: {
-        birthData,
-        analysisData: { data: { birthData } }
+        birthData: transformedBirthData,
+        analysisData: { data: { birthData: transformedBirthData } }
       }
     });
 
