@@ -999,13 +999,15 @@ class ArudhaAnalysisService {
    * @returns {Object} Complete Arudha analysis
    */
   analyzeAllArudhas(chart) {
+    const arudhaPadasResult = this.calculateArudhaPadas(chart);
+
     return {
       arudhaLagna: this.calculateArudhaLagna(chart),
-      arudhaPadas: this.calculateArudhaPadas(chart),
+      arudhaPadas: arudhaPadasResult,
       publicImageFactors: this.analyzePublicImageFactors(chart),
       imageStability: this.analyzeImageStability(chart),
       reputationCycles: this.analyzeReputationCycles(chart),
-      recommendations: this.generateArudhaRecommendations(chart)
+      recommendations: this.generateArudhaRecommendations(arudhaPadasResult.arudhaPadas)
     };
   }
 
@@ -1044,17 +1046,15 @@ class ArudhaAnalysisService {
 
   /**
    * Generate Arudha recommendations
-   * @param {Object} chart - Birth chart data
+   * @param {Object} arudhaPadas - Arudha Padas data (to avoid circular dependency)
    * @returns {Object} Recommendations
    */
-  generateArudhaRecommendations(chart) {
-    const arudhaAnalysis = this.analyzeAllArudhas(chart);
-
+  generateArudhaRecommendations(arudhaPadas) {
     return {
-      imageEnhancement: this.generateImageEnhancementRecommendations(arudhaAnalysis),
-      reputationManagement: this.generateReputationManagementRecommendations(arudhaAnalysis),
-      timingGuidance: this.generateTimingGuidanceRecommendations(arudhaAnalysis),
-      remedialMeasures: this.generateRemedialMeasures(arudhaAnalysis)
+      imageEnhancement: this.generateImageEnhancementRecommendations(arudhaPadas),
+      reputationManagement: this.generateReputationManagementRecommendations(arudhaPadas),
+      timingGuidance: this.generateTimingGuidanceRecommendations(arudhaPadas),
+      remedialMeasures: this.generateRemedialMeasures(arudhaPadas)
     };
   }
 
@@ -1088,6 +1088,9 @@ class ArudhaAnalysisService {
     // Identify clustered Arudhas (multiple Arudhas in same sign)
     const signClusters = {};
     for (const [house, arudhaData] of Object.entries(arudhaPadas)) {
+      if (!arudhaData || !arudhaData.sign) {
+        continue; // Skip if arudha data is missing or incomplete
+      }
       const sign = arudhaData.sign;
       if (!signClusters[sign]) signClusters[sign] = [];
       signClusters[sign].push({ house, arudhaData });
@@ -1141,9 +1144,15 @@ class ArudhaAnalysisService {
     const publicHouses = [1, 7, 10, 11]; // Houses most visible to public
     const privateHouses = [4, 8, 12]; // Houses most private
 
-    for (const [house, arudhaData] of Object.entries(arudhaPadas)) {
-      const houseNum = parseInt(house);
-      const actualHouseSign = chart.houses[houseNum].sign;
+        for (const [house, arudhaData] of Object.entries(arudhaPadas)) {
+      if (!arudhaData || !arudhaData.sign) {
+        continue; // Skip if arudha data is missing or incomplete
+      }
+
+      const houseNum = parseInt(house.replace('A', '')); // Remove 'A' prefix from house key
+
+      // Calculate the actual house sign based on ascendant and house position
+      const actualHouseSign = this.getSignFromHouse(houseNum, chart.ascendant.sign);
       const arudhaSign = arudhaData.sign;
 
       if (publicHouses.includes(houseNum)) {
@@ -1447,6 +1456,50 @@ class ArudhaAnalysisService {
       type: baseEffect.type,
       description: `${aspectType} aspect: ${baseEffect.description}`
     };
+  }
+
+  /**
+   * Get public significance of Arudha in a house
+   * @param {number} houseNum - House number
+   * @param {string} arudhaSign - Arudha sign
+   * @returns {string} Public significance
+   */
+  getPublicSignificance(houseNum, arudhaSign) {
+    const houseSignificances = {
+      1: 'Overall public personality and image',
+      7: 'Partnership and relationship image',
+      10: 'Career and professional reputation',
+      11: 'Social network and gains image'
+    };
+
+    return houseSignificances[houseNum] || 'General public perception';
+  }
+
+  /**
+   * Get private significance of Arudha in a house
+   * @param {number} houseNum - House number
+   * @param {string} arudhaSign - Arudha sign
+   * @returns {string} Private significance
+   */
+  getPrivateSignificance(houseNum, arudhaSign) {
+    const houseSignificances = {
+      4: 'Home and family image vs reality',
+      8: 'Hidden matters and transformation image',
+      12: 'Spiritual and subconscious image'
+    };
+
+    return houseSignificances[houseNum] || 'General private perception';
+  }
+
+  /**
+   * Analyze discrepancy between actual and Arudha signs
+   * @param {string} actualSign - Actual house sign
+   * @param {string} arudhaSign - Arudha sign
+   * @param {number} houseNum - House number
+   * @returns {string} Impact analysis
+   */
+  analyzeSignDiscrepancy(actualSign, arudhaSign, houseNum) {
+    return `Discrepancy between inner reality (${actualSign}) and public perception (${arudhaSign}) in ${houseNum}th house matters`;
   }
 }
 

@@ -5,7 +5,7 @@
  */
 
 const LagnaAnalysisService = require('../analysis/LagnaAnalysisService');
-const HouseAnalysisService = require('../analysis/HouseAnalysisService');
+const HouseAnalysisService = require('../../core/analysis/houses/HouseAnalysisService');
 const ArudhaAnalysisService = require('../analysis/ArudhaAnalysisService');
 const AspectAnalysisService = require('../../core/analysis/aspects/AspectAnalysisService');
 const BirthDataAnalysisService = require('../analysis/BirthDataAnalysisService');

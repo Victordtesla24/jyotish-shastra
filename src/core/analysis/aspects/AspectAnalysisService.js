@@ -76,6 +76,15 @@ class AspectAnalysisService {
   }
 
   /**
+   * Analyzes all aspects in a chart (required by MasterAnalysisOrchestrator)
+   * @param {Object} chart - Birth chart data
+   * @returns {Object} Complete aspect analysis
+   */
+  analyzeAllAspects(chart) {
+    return this.analyzeAspects(chart);
+  }
+
+  /**
    * Calculates all aspects between planets
    * @param {Array} planets - Array of planet objects (optional, uses chart planets if not provided)
    * @returns {Array} Array of aspect objects

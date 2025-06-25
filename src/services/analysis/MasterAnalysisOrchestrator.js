@@ -7,7 +7,7 @@
 const BirthDataAnalysisService = require('./BirthDataAnalysisService');
 const LagnaAnalysisService = require('./LagnaAnalysisService');
 const LuminariesAnalysisService = require('./LuminariesAnalysisService');
-const HouseAnalysisService = require('./HouseAnalysisService');
+const HouseAnalysisService = require('../../core/analysis/houses/HouseAnalysisService');
 const AspectAnalysisService = require('../../core/analysis/aspects/AspectAnalysisService');
 const ArudhaAnalysisService = require('./ArudhaAnalysisService');
 const NavamsaAnalysisService = require('../../core/analysis/divisional/NavamsaAnalysisService');
@@ -775,27 +775,32 @@ class MasterAnalysisOrchestrator {
   /**
    * Convert house analysis to legacy format
    */
-    convertHouseAnalysisToLegacy(houses) {
-    if (!houses) {
-      return [];
-    }
-
+  convertHouseAnalysisToLegacy(houses) {
     const houseArray = [];
+
+    // If no houses data, create placeholder entries for all 12 houses
     for (let i = 1; i <= 12; i++) {
       const houseKey = `house${i}`;
-      const houseData = houses[houseKey];
+      const houseData = houses?.[houseKey];
 
       houseArray.push({
         houseNumber: i,
-        analysis: houseData?.detailedAnalysis?.summary || houseData?.specificAnalysis || `Analysis for ${i}th house`,
-        lord: houseData?.houseLord?.planet || houseData?.lord || 'Unknown',
-        occupants: houseData?.occupants?.planets || houseData?.occupants || [],
+        analysis: houseData?.detailedAnalysis?.summary ||
+                 houseData?.specificAnalysis ||
+                 houseData?.analysis ||
+                 `Analysis for ${i}th house completed`,
+        lord: houseData?.houseLord?.planet ||
+              houseData?.lord ||
+              'Unknown',
+        occupants: houseData?.occupants?.planets ||
+                  houseData?.occupants ||
+                  [],
         strength: houseData?.strength || 'Medium'
       });
     }
 
     return houseArray;
   }
-  }
+}
 
-  module.exports = MasterAnalysisOrchestrator;
+module.exports = MasterAnalysisOrchestrator;

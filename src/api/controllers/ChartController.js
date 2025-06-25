@@ -7,7 +7,7 @@
 const ChartGenerationService = require('../../services/chart/ChartGenerationService');
 const EnhancedChartService = require('../../services/chart/EnhancedChartService');
 const LagnaAnalysisService = require('../../services/analysis/LagnaAnalysisService');
-const HouseAnalysisService = require('../../services/analysis/HouseAnalysisService');
+const HouseAnalysisService = require('../../core/analysis/houses/HouseAnalysisService');
 const BirthDataAnalysisService = require('../../services/analysis/BirthDataAnalysisService');
 const { v4: uuidv4 } = require('uuid');
 
@@ -323,26 +323,20 @@ class ChartController {
    */
   async getComprehensiveAnalysis(req, res) {
     try {
-      const birthData = req.body;
+      const { birthData } = req.body;
 
-      if (!this.validateBirthData(birthData)) {
+      if (!birthData || !this.validateBirthData(birthData)) {
         return res.status(400).json({
           success: false,
           message: 'Invalid birth data provided'
         });
       }
 
-      // Generate comprehensive chart and analysis
-      const chartData = await this.enhancedChartService.generateComprehensiveChart(birthData);
+      // Use MasterAnalysisOrchestrator for comprehensive analysis
+      const MasterAnalysisOrchestrator = require('../../services/analysis/MasterAnalysisOrchestrator');
+      const masterOrchestrator = new MasterAnalysisOrchestrator();
 
-      const comprehensiveAnalysis = {
-        chartData,
-        summary: this.generateComprehensiveSummary(chartData.analysis),
-        personality: this.generatePersonalitySummary(chartData.analysis.personality),
-        strengths: this.identifyOverallStrengths(chartData.analysis),
-        challenges: this.identifyOverallChallenges(chartData.analysis),
-        recommendations: this.generateOverallRecommendations(chartData.analysis)
-      };
+      const comprehensiveAnalysis = await masterOrchestrator.performComprehensiveAnalysis(birthData);
 
       res.status(200).json({
         success: true,

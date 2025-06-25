@@ -3,13 +3,13 @@ const TestChartFactory = require('../../utils/TestChartFactory');
 
 // Mock dependent services
 jest.mock('../../../src/services/analysis/LagnaAnalysisService.js');
-jest.mock('../../../src/core/analysis/houses/HouseAnalysisService.js');
+jest.mock('../../../src/core/analysis/houses/HouseAnalysisService');
 jest.mock('../../../src/services/analysis/ArudhaAnalysisService.js');
 jest.mock('../../../src/core/analysis/aspects/AspectAnalysisService.js');
 jest.mock('../../../src/services/analysis/BirthDataAnalysisService.js');
 
 const LagnaAnalysisService = require('../../../src/services/analysis/LagnaAnalysisService.js');
-const HouseAnalysisService = require('../../../src/core/analysis/houses/HouseAnalysisService.js');
+const HouseAnalysisService = require('../../../src/core/analysis/houses/HouseAnalysisService');
 const ArudhaAnalysisService = require('../../../src/services/analysis/ArudhaAnalysisService.js');
 const AspectAnalysisService = require('../../../src/core/analysis/aspects/AspectAnalysisService.js');
 const BirthDataAnalysisService = require('../../../src/services/analysis/BirthDataAnalysisService.js');

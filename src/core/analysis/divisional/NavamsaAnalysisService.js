@@ -71,6 +71,24 @@ class NavamsaAnalysisService {
   }
 
   /**
+   * Performs comprehensive Navamsa chart analysis (required by MasterAnalysisOrchestrator)
+   * @param {Object} rasiChart - D1 chart
+   * @param {Object} navamsaChart - D9 chart
+   * @param {string} gender - Gender for marriage analysis
+   * @returns {Object} Complete Navamsa analysis
+   */
+  analyzeNavamsaComprehensive(rasiChart, navamsaChart, gender = 'male') {
+    // Create a combined chart object for the existing method
+    const combinedChart = {
+      ...rasiChart,
+      d9: navamsaChart,
+      gender: gender
+    };
+
+    return this.analyzeNavamsa(combinedChart);
+  }
+
+  /**
    * Provides basic information about Navamsa chart
    * @returns {Object} Navamsa chart information
    */
@@ -525,8 +543,6 @@ class NavamsaAnalysisService {
     return friendshipStatus;
   }
 
-
-
   /**
    * Gets house position of planet in chart
    * @param {Object} planet - Planet object
@@ -646,7 +662,7 @@ class NavamsaAnalysisService {
     const ownSigns = {
       'Sun': ['Leo'], 'Moon': ['Cancer'], 'Mars': ['Aries', 'Scorpio'],
       'Mercury': ['Gemini', 'Virgo'], 'Jupiter': ['Sagittarius', 'Pisces'],
-      'Venus': ['Taurus', 'Libra'], 'Saturn': ['Capricorn', 'Aquarius']
+      'Venus': ['Taurus', 'Libra'], 'Saturn': ['Capricorn', 'AQUARIUS']
     };
 
     const debilitationSigns = {

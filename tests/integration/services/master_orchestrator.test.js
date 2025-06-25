@@ -5,7 +5,7 @@ const sampleBirthData = require('../../fixtures/sample-birth-data.json');
 jest.mock('../../../src/services/analysis/BirthDataAnalysisService');
 jest.mock('../../../src/services/analysis/LagnaAnalysisService');
 jest.mock('../../../src/services/analysis/LuminariesAnalysisService');
-jest.mock('../../../src/services/analysis/HouseAnalysisService');
+jest.mock('../../../src/core/analysis/houses/HouseAnalysisService');
 jest.mock('../../../src/core/analysis/aspects/AspectAnalysisService');
 jest.mock('../../../src/services/analysis/ArudhaAnalysisService');
 jest.mock('../../../src/core/analysis/divisional/NavamsaAnalysisService');
@@ -107,7 +107,7 @@ const mockChartService = {
 // Setup the mocks to return the mock instances
 require('../../../src/services/analysis/BirthDataAnalysisService').mockImplementation(() => mockBirthDataService);
 require('../../../src/services/analysis/LagnaAnalysisService').mockImplementation(() => mockLagnaService);
-require('../../../src/services/analysis/HouseAnalysisService').mockImplementation(() => mockHouseService);
+require('../../../src/core/analysis/houses/HouseAnalysisService').mockImplementation(() => mockHouseService);
 require('../../../src/services/analysis/LuminariesAnalysisService').mockImplementation(() => mockLuminariesService);
 require('../../../src/services/analysis/YogaDetectionService').mockImplementation(() => mockYogaService);
 require('../../../src/core/analysis/aspects/AspectAnalysisService').mockImplementation(() => mockAspectService);

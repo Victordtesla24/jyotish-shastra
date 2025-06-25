@@ -1,4 +1,4 @@
-const ArudhaAnalysisService = require('../../../src/services/analysis/ArudhaAnalysisService');
+const ArudhaAnalysisService = require('../../../../src/services/analysis/ArudhaAnalysisService');
 
 describe('ArudhaAnalysisService', () => {
   let service;

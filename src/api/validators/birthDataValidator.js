@@ -17,14 +17,16 @@ const dateSchema = Joi.date()
     'any.required': 'Birth date is required'
   });
 
-// Time validation schema (HH:MM format)
-const timeSchema = Joi.string()
-  .pattern(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)
-  .required()
-  .messages({
-    'string.pattern.base': 'Time must be in HH:MM format (24-hour)',
-    'any.required': 'Birth time is required'
-  });
+// Time validation schema - Updated to accept HH:MM and HH:MM:SS formats
+const timeSchema = Joi.alternatives().try(
+  // HH:MM:SS format
+  Joi.string().pattern(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/),
+  // HH:MM format
+  Joi.string().pattern(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)
+).required().messages({
+  'alternatives.match': 'Time must be in HH:MM or HH:MM:SS format (24-hour)',
+  'any.required': 'Birth time is required'
+});
 
 // Latitude validation schema
 const latitudeSchema = Joi.number()
@@ -52,14 +54,18 @@ const longitudeSchema = Joi.number()
     'any.required': 'Longitude is required'
   });
 
-// Timezone validation schema
-const timezoneSchema = Joi.string()
-  .pattern(/^[+-]([0-9]|1[0-4]):[0-5][0-9]$|^UTC$|^GMT$/)
-  .required()
-  .messages({
-    'string.pattern.base': 'Timezone must be in format ±HH:MM or UTC/GMT',
-    'any.required': 'Timezone is required'
-  });
+// Timezone validation schema - Updated to accept IANA timezones and UTC offsets
+const timezoneSchema = Joi.alternatives().try(
+  // IANA timezone format (e.g., "Asia/Kolkata", "America/New_York")
+  Joi.string().pattern(/^[A-Za-z_]+\/[A-Za-z_]+$/),
+  // UTC offset format (e.g., "+05:30", "-08:00")
+  Joi.string().pattern(/^[+-]([0-9]|1[0-4]):[0-5][0-9]$/),
+  // UTC/GMT
+  Joi.string().valid('UTC', 'GMT')
+).required().messages({
+  'alternatives.match': 'Timezone must be in IANA format (e.g., Asia/Kolkata) or UTC offset format (±HH:MM) or UTC/GMT',
+  'any.required': 'Timezone is required'
+});
 
 // Place name validation schema
 const placeNameSchema = Joi.string()

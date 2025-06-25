@@ -1,4 +1,4 @@
-const AspectAnalysisService = require('../../../src/core/analysis/aspects/AspectAnalysisService');
+const AspectAnalysisService = require('../../../../../src/core/analysis/aspects/AspectAnalysisService');
 
 describe('AspectAnalysisService', () => {
   let service;
