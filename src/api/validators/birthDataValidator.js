@@ -765,12 +765,15 @@ function validateComprehensiveAnalysis(data, requireName = true) {
 /**
  * Validate house analysis data (name required for analysis endpoints)
  * @param {Object} data - Analysis data to validate
+ * @param {boolean} requireName - Whether name is required (defaults to true for analysis endpoints)
  * @returns {Object} Validation result
  */
-function validateHouseAnalysis(data) {
+function validateHouseAnalysis(data, requireName = true) {
   const birthData = data.birthData || data;
 
-  const { error, value } = analysisRequiredSchema.validate(birthData, {
+  const schema = requireName ? analysisRequiredSchema : comprehensiveAnalysisSchema;
+
+  const { error, value } = schema.validate(birthData, {
     abortEarly: false,
     allowUnknown: true,
     stripUnknown: false
@@ -798,11 +801,15 @@ function validateHouseAnalysis(data) {
       }
     });
 
+    const helpText = requireName
+      ? 'House analysis requires complete birth data including name, date, time, and location.'
+      : 'House analysis requires birth date, time, and location information. All fields are required for accurate analysis.';
+
     return {
       isValid: false,
       errors,
       suggestions: generateValidationSuggestions(error.details),
-      helpText: 'House analysis requires complete birth data including name, date, time, and location.',
+      helpText,
       data: null
     };
   }

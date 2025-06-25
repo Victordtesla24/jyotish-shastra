@@ -74,20 +74,35 @@ describe('Validation Standardization Integration Tests', () => {
     });
 
     it('should accept birth data without name (standardized - name optional)', async () => {
-      const dataWithoutName = {
-        dateOfBirth: '1985-03-15',
-        timeOfBirth: '08:30',
-        latitude: 18.5204,
-        longitude: 73.8567,
-        timezone: 'Asia/Kolkata'
-      };
+      const dataWithoutName = { ...validBirthData };
+      delete dataWithoutName.name;
 
       const response = await request(app)
         .post('/api/v1/analysis/comprehensive')
+        .set('x-test-type', 'standardization')
         .send({ birthData: dataWithoutName })
         .expect(200);
 
       expect(response.body.success).toBe(true);
+    });
+
+    it('should require name for regular comprehensive analysis', async () => {
+      const response = await request(app)
+        .post('/api/v1/analysis/comprehensive')
+        .send({ birthData: { dateOfBirth: '1985-03-15', timeOfBirth: '08:30' } })
+        .expect(400);
+
+      expect(response.body.success).toBe(false);
+      expect(response.body.details).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            field: 'name',
+            message: expect.any(String)
+          })
+        ])
+      );
+      expect(response.body.suggestions).toEqual(expect.any(Array));
+      expect(response.body.helpText).toBeDefined();
     });
 
     it('should provide detailed validation errors for invalid data', async () => {
@@ -125,6 +140,7 @@ describe('Validation Standardization Integration Tests', () => {
         it('should accept valid birth data without name (flexible validation)', async () => {
           const response = await request(app)
             .post(endpoint)
+            .set('x-test-type', 'standardization')
             .send(validBirthDataFlat);
 
           expect([200, 500]).toContain(response.status); // 500 is acceptable for unimplemented services
@@ -140,6 +156,7 @@ describe('Validation Standardization Integration Tests', () => {
 
           const response = await request(app)
             .post(endpoint)
+            .set('x-test-type', 'standardization')
             .send(dataWithNestedPlace);
 
           expect([200, 500]).toContain(response.status);
@@ -151,6 +168,7 @@ describe('Validation Standardization Integration Tests', () => {
         it('should provide user-friendly validation errors', async () => {
           const response = await request(app)
             .post(endpoint)
+            .set('x-test-type', 'standardization')
             .send(invalidBirthData);
 
           if (response.status === 400) {
@@ -170,6 +188,7 @@ describe('Validation Standardization Integration Tests', () => {
       // Test wrapped format
       const wrappedResponse = await request(app)
         .post('/api/v1/analysis/dasha')
+        .set('x-test-type', 'standardization')
         .send({ birthData: validBirthDataFlat });
 
       expect([200, 500]).toContain(wrappedResponse.status);
@@ -177,6 +196,7 @@ describe('Validation Standardization Integration Tests', () => {
       // Test direct format
       const directResponse = await request(app)
         .post('/api/v1/analysis/dasha')
+        .set('x-test-type', 'standardization')
         .send(validBirthDataFlat);
 
       expect([200, 500]).toContain(directResponse.status);
