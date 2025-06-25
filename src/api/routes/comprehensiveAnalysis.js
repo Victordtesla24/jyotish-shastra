@@ -341,7 +341,16 @@ router.post('/navamsa', rateLimiter, async (req, res) => {
 
         const finalBirthData = validationResult.data.birthData || validationResult.data;
         const charts = await orchestrator.generateCharts(finalBirthData);
-        const analysis = await orchestrator.executeSection6Analysis(charts, {});
+
+        // Initialize proper analysis object structure
+        const analysisContext = {
+            errors: [],
+            warnings: [],
+            birthData: finalBirthData,
+            sections: {}
+        };
+
+        const analysis = await orchestrator.executeSection6Analysis(charts, analysisContext);
 
         return res.status(200).json({
             success: true,
@@ -380,7 +389,16 @@ router.post('/dasha', rateLimiter, async (req, res) => {
 
         const finalBirthData = validationResult.data.birthData || validationResult.data;
         const charts = await orchestrator.generateCharts(finalBirthData);
-        const section7Analysis = await orchestrator.executeSection7Analysis(charts, { errors: [], warnings: [] });
+
+        // Initialize proper analysis object structure
+        const analysisContext = {
+            errors: [],
+            warnings: [],
+            birthData: finalBirthData,
+            sections: {}
+        };
+
+        const section7Analysis = await orchestrator.executeSection7Analysis(charts, finalBirthData, analysisContext);
 
         return res.status(200).json({
             success: true,
