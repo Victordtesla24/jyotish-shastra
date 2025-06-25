@@ -770,7 +770,7 @@ function validateComprehensiveAnalysis(data, requireName = true) {
 function validateHouseAnalysis(data) {
   const birthData = data.birthData || data;
 
-  const { error, value } = comprehensiveAnalysisSchema.validate(birthData, {
+  const { error, value } = analysisRequiredSchema.validate(birthData, {
     abortEarly: false,
     allowUnknown: true,
     stripUnknown: false
