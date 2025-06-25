@@ -82,19 +82,36 @@ class ChartGenerationService {
    * @returns {Object} Processed birth data with coordinates
    */
   async processLocationData(birthData) {
-    const { placeOfBirth, city, state, country, latitude, longitude } = birthData;
+    const { placeOfBirth, city, state, country } = birthData;
+
+    // Extract coordinates from nested placeOfBirth or direct properties
+    const latitude = birthData.latitude || birthData.placeOfBirth?.latitude;
+    const longitude = birthData.longitude || birthData.placeOfBirth?.longitude;
 
     // If coordinates are provided, validate them
     if (latitude && longitude) {
       if (!this.geocodingService.validateCoordinates(latitude, longitude)) {
         throw new Error('Invalid coordinates provided');
       }
+
+      // Format address from nested placeOfBirth or components
+      let formattedAddress;
+      if (placeOfBirth && typeof placeOfBirth === 'object' && placeOfBirth.name) {
+        formattedAddress = placeOfBirth.name;
+      } else if (placeOfBirth && typeof placeOfBirth === 'string') {
+        formattedAddress = placeOfBirth;
+      } else {
+        formattedAddress = `${city}, ${state}, ${country}`.replace(/,\s*,/g, ',').replace(/^,\s*/, '').replace(/,\s*$/, '');
+      }
+
       return {
         ...birthData,
+        latitude,
+        longitude,
         geocodingInfo: {
           service: 'user_provided',
           accuracy: 'high',
-          formattedAddress: placeOfBirth || `${city}, ${state}, ${country}`.replace(/,\s*,/g, ',').replace(/^,\s*/, '').replace(/,\s*$/, '')
+          formattedAddress
         }
       };
     }

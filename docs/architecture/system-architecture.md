@@ -35,10 +35,10 @@ This document outlines the comprehensive system architecture for the Vedic astro
 ├─────────────────────────────────────────────────────────────────────────────┤
 │  Core Analysis Services                                                     │
 │  ├── ChartGenerationService                                                 │
+│  ├── GeocodingService                                                       │
 │  ├── LagnaAnalysisService                                                   │
 │  ├── HouseAnalysisService                                                   │
 │  ├── AspectAnalysisService                                                  │
-│  ├── ArudhaAnalysisService                                                  │
 │  ├── NavamsaAnalysisService                                                 │
 │  ├── DashaAnalysisService                                                   │
 │  └── ReportGenerationService                                                │
@@ -51,7 +51,7 @@ This document outlines the comprehensive system architecture for the Vedic astro
 ├─────────────────────────────────────────────────────────────────────────────┤
 │  Data Sources                                                               │
 │  ├── Swiss Ephemeris (Astronomical Calculations)                            │
-│  ├── PostgreSQL/MongoDB (User Data & Charts)                                │
+│  ├── MongoDB (User Data & Charts)                                           │
 │  ├── Redis (Calculation Cache)                                              │
 │  └── File System (Ephemeris Data)                                           │
 └─────────────────────────────────────────────────────────────────────────────┘
@@ -60,24 +60,25 @@ This document outlines the comprehensive system architecture for the Vedic astro
 ## 2. Data Flow Architecture
 
 ```
-┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
-│   Birth     │    │   Chart     │    │  Analysis   │    │   Report    │
-│   Data      │───▶│ Generation  │───▶│   Engine    │───▶│ Generation  │
-│  Collection │    │   Engine    │    │             │    │   Engine    │
-└─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘
-       │                   │                   │                   │
-       ▼                   ▼                   ▼                   ▼
-┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
-│ Validation  │    │ Swiss       │    │ Rule        │    │ Template    │
-│ & Storage   │    │ Ephemeris   │    │ Engine      │    │ Engine      │
-└─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘
-       │                   │                   │                   │
-       ▼                   ▼                   ▼                   ▼
-┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
-│ Database    │    │ Calculations│    │ Analysis    │    │ PDF/HTML    │
-│ (User Data) │    │ (Planetary  │    │ Results     │    │ Output      │
-│             │    │ Positions)  │    │             │    │             │
-└─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘
+┌─────────────┐    ┌────────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+│   Birth     │    │   Geocoding    │    │   Chart     │    │  Analysis   │    │   Report    │
+│   Data      │───▶│    Service     │───▶│ Generation  │───▶│   Engine    │───▶│ Generation  │
+│  Collection │    │ (Optional)     │    │   Engine    │    │             │    │   Engine    │
+└─────────────┘    └────────────────┘    └─────────────┘    └─────────────┘    └─────────────┘
+       │                   │                   │                   │                   │
+       ▼                   ▼                   ▼                   ▼                   ▼
+┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+│ Validation  │    │ External API│    │ Swiss       │    │ Rule        │    │ Template    │
+│ & Storage   │    │   (e.g.      │    │ Ephemeris   │    │ Engine      │    │ Engine      │
+│             │    │  Google Maps)│    │             │    │             │    │             │
+└─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘
+       │                   │                   │                   │                   │
+       ▼                   ▼                   ▼                   ▼                   ▼
+┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+│ Database    │    │ Coordinates │    │ Calculations│    │ Analysis    │    │ PDF/HTML    │
+│ (User Data) │    │ (Lat/Lon)   │    │ (Planetary  │    │ Results     │    │ Output      │
+│             │    │             │    │ Positions)  │    │             │    │             │
+└─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘
 ```
 
 ## 3. Service Layer Architecture
@@ -113,10 +114,13 @@ This document outlines the comprehensive system architecture for the Vedic astro
 ├─────────────────────────────────────────────────────────────────────────────┤
 │  Core Services                                                              │
 │  ├── ChartGenerationService                                                 │
+│  │   ├── generateComprehensiveChart(birthData)                              │
 │  │   ├── generateRasiChart(birthData)                                       │
 │  │   ├── generateNavamsaChart(birthData)                                    │
-│  │   ├── calculateAscendant(birthData)                                      │
-│  │   └── getPlanetaryPositions(birthData)                                   │
+│  │   ├── calculateAscendant(jd, place)                                      │
+│  │   └── getPlanetaryPositions(jd)                                          │
+│  ├── GeocodingService                                                       │
+│  │   └── geocodeLocation(locationData)                                      │
 │  ├── LagnaAnalysisService                                                   │
 │  │   ├── analyzeLagnaSign(lagnaSign)                                        │
 │  │   ├── analyzeLagnaLord(lagnaLord, placement)                             │
@@ -127,68 +131,55 @@ This document outlines the comprehensive system architecture for the Vedic astro
 │  │   └── analyzeHouseOccupants(houseNumber, chart)                          │
 │  ├── AspectAnalysisService                                                  │
 │  │   ├── calculatePlanetaryAspects(chart)                                   │
-│  │   ├── analyzeAspectEffects(aspectingPlanet, aspectedHouse)               │
-│  │   └── detectMutualAspects(chart)                                         │
-│  ├── ArudhaAnalysisService                                                  │
-│  │   ├── calculateArudhaLagna(lagna, lagnaLord)                             │
-│  │   └── analyzeArudhaInfluence(arudhaSign)                                 │
-│  ├── NavamsaAnalysisService                                                 │
-│  │   ├── generateNavamsaChart(birthData)                                    │
-│  │   ├── comparePlanetaryStrength(d1Chart, d9Chart)                         │
-│  │   └── analyzeMarriageIndications(d9Chart)                                │
+│  │   └── analyzeAspectEffects(aspectingPlanet, aspectedHouse)               │
 │  ├── DashaAnalysisService                                                   │
 │  │   ├── calculateVimshottariDasha(birthData)                               │
-│  │   ├── determineCurrentDasha(birthData, currentDate)                      │
-│  │   └── generateDashaTimeline(birthData)                                   │
+│  │   └── determineCurrentDasha(birthData, currentDate)                      │
 │  └── ReportGenerationService                                                │
 │      ├── generatePersonalityProfile(analysis)                               │
-│      ├── generateHealthAnalysis(analysis)                                   │
-│      ├── generateCareerAnalysis(analysis)                                   │
-│      ├── generateFinancialAnalysis(analysis)                                │
-│      ├── generateRelationshipAnalysis(analysis)                             │
 │      └── generateLifePredictions(analysis)                                  │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-## 4. Database Schema Architecture
+## 4. Database Schema Architecture (MongoDB)
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                           DATABASE SCHEMA                                   │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│  Users Collection/Table                                                     │
-│  ├── _id (Primary Key)                                                      │
-│  ├── email (Unique)                                                         │
-│  ├── password (Hashed)                                                      │
-│  ├── name                                                                   │
-│  ├── createdAt                                                              │
-│  └── updatedAt                                                              │
+│  Users Collection                                                           │
+│  ├── _id (ObjectId, Primary Key)                                            │
+│  ├── email (String, Unique, Required)                                       │
+│  ├── password (String, Required)                                            │
+│  ├── name (String)                                                          │
+│  └── createdAt, updatedAt (Date)                                            │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│  Charts Collection/Table                                                    │
-│  ├── _id (Primary Key)                                                      │
-│  ├── userId (Foreign Key)                                                   │
-│  ├── name                                                                   │
+│  Charts Collection                                                          │
+│  ├── _id (ObjectId, Primary Key)                                            │
+│  ├── userId (ObjectId, Ref: 'User')                                         │
+│  ├── name (String)                                                          │
 │  ├── birthData                                                              │
-│  │   ├── dateOfBirth                                                        │
-│  │   ├── timeOfBirth                                                        │
-│  │   ├── placeOfBirth                                                       │
-│  │   └── gender                                                             │
+│  │   ├── dateOfBirth (String, 'YYYY-MM-DD')                                 │
+│  │   ├── timeOfBirth (String, 'HH:MM:SS')                                   │
+│  │   ├── placeOfBirth (String)                                              │
+│  │   ├── latitude (Number)                                                  │
+│  │   ├── longitude (Number)                                                 │
+│  │   └── timezone (String)                                                  │
 │  ├── rasiChart                                                              │
-│  │   ├── ascendant                                                          │
-│  │   ├── planetaryPositions                                                 │
-│  │   └── housePositions                                                     │
-│  ├── navamsaChart                                                           │
-│  ├── analysis                                                               │
-│  └── createdAt                                                              │
+│  │   ├── ascendant (Object)                                                 │
+│  │   ├── planetaryPositions (Object)                                        │
+│  │   └── housePositions (Array)                                             │
+│  ├── navamsaChart (Object)                                                  │
+│  ├── analysis (Object)                                                      │
+│  └── createdAt, updatedAt (Date)                                            │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│  Reports Collection/Table                                                   │
-│  ├── _id (Primary Key)                                                      │
-│  ├── chartId (Foreign Key)                                                  │
-│  ├── userId (Foreign Key)                                                   │
-│  ├── reportType                                                             │
-│  ├── content                                                                │
-│  ├── generatedAt                                                            │
-│  └── expiresAt                                                              │
+│  Reports Collection                                                         │
+│  ├── _id (ObjectId, Primary Key)                                            │
+│  ├── chartId (ObjectId, Ref: 'Chart')                                       │
+│  ├── userId (ObjectId, Ref: 'User')                                         │
+│  ├── reportType (String)                                                    │
+│  ├── content (String)                                                       │
+│  └── generatedAt (Date)                                                     │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -198,33 +189,30 @@ This document outlines the comprehensive system architecture for the Vedic astro
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                           ANALYSIS ENGINE                                   │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│  Input: Birth Chart Data                                                    │
-│  └── Planetary Positions, Houses, Aspects                                   │
+│  Input: Rasi & Navamsa Chart Data                                           │
+│  └── Planetary Positions, Houses, Aspects, Dignities                        │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │  Analysis Pipeline                                                          │
-│  ├── Phase 1: Basic Analysis                                                │
-│  │   ├── Lagna Analysis                                                     │
-│  │   ├── Luminary Analysis                                                  │
-│  │   └── Planetary Dignity Analysis                                         │
-│  ├── Phase 2: House Analysis                                                │
-│  │   ├── House-by-House Examination                                         │
-│  │   ├── House Lord Analysis                                                │
-│  │   └── House Occupant Analysis                                            │
+│  ├── Phase 1: Foundational Analysis                                         │
+│  │   ├── Lagna & Lagna Lord Analysis                                        │
+│  │   ├── Sun & Moon Analysis (Luminaries)                                   │
+│  │   └── Planetary Dignity (Exaltation, Debilitation, etc.)                 │
+│  ├── Phase 2: House-by-House Analysis                                       │
+│  │   ├── Examination of each of the 12 houses                               │
+│  │   ├── House Lord Placement & Condition                                   │
+│  │   └── Planets Occupying each House                                       │
 │  ├── Phase 3: Aspect Analysis                                               │
-│  │   ├── Planetary Aspects                                                  │
-│  │   ├── Special Aspects                                                    │
-│  │   └── Mutual Aspects                                                     │
-│  ├── Phase 4: Advanced Analysis                                             │
-│  │   ├── Yoga Detection                                                     │
-│  │   ├── Arudha Lagna                                                       │
-│  │   └── Navamsa Analysis                                                   │
-│  └── Phase 5: Timing Analysis                                               │
-│      ├── Dasha Calculations                                                 │
-│      ├── Antardasha Calculations                                            │
-│      └── Transit Analysis                                                   │
+│  │   ├── Conjunctions, Oppositions, Trines, Squares                         │
+│  │   └── Special Aspects (Mars, Jupiter, Saturn)                            │
+│  ├── Phase 4: Divisional Chart Analysis                                     │
+│  │   ├── Navamsa (D9) for marriage and inner strength                       │
+│  │   └── Other divisional charts (D10 for career, etc.)                     │
+│  └── Phase 5: Timing & Prediction                                           │
+│      ├── Vimshottari Dasha Calculations                                     │
+│      ├── Antardasha & Pratyantardasha                                       │
+│      └── Transit Analysis (Gochar)                                          │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│  Output: Comprehensive Analysis Results                                     │
-│  └── Structured data for report generation                                  │
+│  Output: Structured JSON with comprehensive analysis                        │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -234,28 +222,26 @@ This document outlines the comprehensive system architecture for the Vedic astro
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                        SWISS EPHEMERIS INTEGRATION                          │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│  Node.js Swiss Ephemeris Wrapper                                            │
-│  ├── Planetary Position Calculations                                        │
-│  │   ├── Sun, Moon, Mercury, Venus, Mars                                    │
-│  │   ├── Jupiter, Saturn, Rahu, Ketu                                        │
-│  │   └── Retrograde and Combust Detection                                   │
-│  ├── Ascendant Calculations                                                 │
+│  Node.js `swisseph` Library Wrapper                                         │
+│  ├── Planetary Position Calculations (swe_calc_ut)                          │
+│  │   ├── Sun, Moon, Mars, Mercury, Jupiter, Venus, Saturn                   │
+│  │   ├── Mean Node (Rahu), True Node                                        │
+│  │   └── Ketu calculated as 180° opposite Rahu                              │
+│  ├── Ascendant & House Cusp Calculations (swe_houses)                       │
 │  │   ├── Sidereal Time Calculation                                          │
-│  │   ├── Ayanamsa Adjustment                                                │
-│  │   └── House Cusp Calculations                                            │
-│  ├── Nakshatra Calculations                                                 │
-│  │   ├── Lunar Position in Nakshatra                                        │
-│  │   ├── Nakshatra Lord Determination                                       │
-│  │   └── Pada Calculations                                                  │
-│  └── Divisional Chart Calculations                                          │
-│      ├── Navamsa (D9)                                                       │
-│      ├── Saptamsa (D7)                                                      │
-│      └── Dashamsa (D10)                                                     │
+│  │   ├── Ayanamsa: Lahiri (SE_SIDM_LAHIRI)                                  │
+│  │   └── House System: Placidus ('P') or Whole Sign as fallback             │
+│  ├── Nakshatra & Dasha Calculations                                         │
+│  │   ├── Based on Moon's longitude                                          │
+│  │   └── Vimshottari Dasha system                                           │
+│  └── Configuration                                                          │
+│      ├── Ephemeris file path set via `swe_set_ephe_path`                     │
+│      └── Sidereal mode set via `swe_set_sid_mode`                           │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │  Ephemeris Data Management                                                  │
-│  ├── Local Ephemeris Files                                                  │
-│  ├── Data Validation                                                        │
-│  └── Cache Management                                                       │
+│  ├── Local ephemeris files stored in `/ephemeris` directory                 │
+│  ├── Data files are loaded on service initialization                        │
+│  └── Caching of calculations managed by Redis                               │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -265,29 +251,22 @@ This document outlines the comprehensive system architecture for the Vedic astro
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                           REPORT GENERATION                                 │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│  Analysis Data Input                                                        │
-│  ├── Lagna Analysis Results                                                 │
-│  ├── House Analysis Results                                                 │
-│  ├── Aspect Analysis Results                                                │
-│  ├── Dasha Analysis Results                                                 │
-│  └── Advanced Analysis Results                                              │
+│  Analysis Data Input (Structured JSON)                                      │
+│  ├── Personality, Career, Health, Finance, Relationship analysis            │
+│  ├── Dasha predictions and timelines                                        │
+│  └── Yoga analysis and interpretations                                      │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │  Report Generation Pipeline                                                 │
-│  ├── Template Engine                                                        │
-│  │   ├── Personality Profile Template                                       │
-│  │   ├── Health Analysis Template                                           │
-│  │   ├── Career Analysis Template                                           │
-│  │   ├── Financial Analysis Template                                        │
-│  │   ├── Relationship Analysis Template                                     │
-│  │   └── Life Predictions Template                                          │
+│  ├── Template Engine (e.g., EJS or Handlebars if generating HTML)           │
+│  │   ├── Dynamic templates for different report sections                    │
+│  │   └── Placeholders for analysis data                                     │
 │  ├── Content Synthesis                                                      │
-│  │   ├── Data Aggregation                                                   │
-│  │   ├── Content Prioritization                                             │
-│  │   └── Consistency Checking                                               │
+│  │   ├── Aggregates analysis data into narrative text                       │
+│  │   └── Prioritizes key findings                                           │
 │  └── Output Generation                                                      │
-│      ├── HTML Report                                                        │
-│      ├── PDF Report                                                         │
-│      └── JSON API Response                                                  │
+│      ├── JSON API Response (Primary)                                        │
+│      ├── PDF Report (Using a library like PDFKit or Puppeteer)              │
+│      └── HTML Report for web view                                           │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -297,23 +276,23 @@ This document outlines the comprehensive system architecture for the Vedic astro
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                           SECURITY LAYERS                                   │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│  Application Security                                                       │
-│  ├── Input Validation & Sanitization                                        │
-│  ├── SQL Injection Prevention                                               │
-│  ├── XSS Protection                                                         │
-│  └── CSRF Protection                                                        │
+│  Application Security (via Express Middleware)                              │
+│  ├── Input Validation (Joi)                                                 │
+│  ├── SQL/NoSQL Injection Prevention (Mongoose validation)                   │
+│  ├── XSS Protection (Helmet)                                                │
+│  └── CSRF Protection (if using sessions)                                    │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │  Authentication & Authorization                                             │
-│  ├── JWT Token Management                                                   │
-│  ├── Password Hashing (bcrypt)                                              │
-│  ├── Role-Based Access Control                                              │
-│  └── Session Management                                                     │
+│  ├── JWT for stateless authentication                                       │
+│  ├── Password Hashing (bcryptjs)                                            │
+│  ├── Role-Based Access Control (RBAC) middleware                            │
+│  └── Secure token storage (HTTP-only cookies or secure storage)             │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │  Infrastructure Security                                                    │
-│  ├── HTTPS/TLS Encryption                                                   │
-│  ├── Rate Limiting                                                          │
-│  ├── CORS Configuration                                                     │
-│  └── Security Headers                                                       │
+│  ├── HTTPS/TLS for data in transit                                          │
+│  ├── Rate Limiting (express-rate-limit)                                     │
+│  ├── CORS Configuration (cors middleware)                                   │
+│  └── Security Headers (Helmet)                                              │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -325,25 +304,24 @@ This document outlines the comprehensive system architecture for the Vedic astro
 ├─────────────────────────────────────────────────────────────────────────────┤
 │  Caching Strategy                                                           │
 │  ├── Redis Cache Layer                                                      │
-│  │   ├── Chart Calculation Results                                          │
-│  │   ├── Analysis Results                                                   │
-│  │   └── Report Templates                                                   │
-│  ├── Memory Cache                                                           │
-│  │   ├── Configuration Data                                                 │
-│  │   └── Frequently Used Calculations                                       │
-│  └── CDN for Static Assets                                                  │
+│  │   ├── Caching of expensive calculations (chart generation)               │
+│  │   ├── Session storage (if applicable)                                    │
+│  │   └── Caching API responses for identical requests                       │
+│  ├── In-Memory Cache (Node.js)                                              │
+│  │   ├── Caching configuration data                                         │
+│  │   └── Caching ephemeris data pointers                                    │
+│  └── CDN for Frontend Assets (e.g., Cloudflare, AWS CloudFront)             │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│  Database Optimization                                                      │
-│  ├── Indexing Strategy                                                      │
-│  ├── Query Optimization                                                     │
-│  ├── Connection Pooling                                                     │
-│  └── Read Replicas                                                          │
+│  Database Optimization (MongoDB)                                            │
+│  ├── Indexing on frequently queried fields (e.g., `userId`, `email`)        │
+│  ├── Query optimization and projection                                      │
+│  ├── Connection Pooling (managed by Mongoose)                               │
+│  └── Read Replicas for scaling read operations                              │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │  Application Optimization                                                   │
-│  ├── Async Processing                                                       │
-│  ├── Batch Processing                                                       │
-│  ├── Lazy Loading                                                           │
-│  └── Code Splitting                                                         │
+│  ├── Asynchronous operations for all I/O tasks (DB, file system)            │
+│  ├── Use of Node.js cluster module for multi-core processing                │
+│  └── Code Splitting and Lazy Loading on the frontend                        │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -353,52 +331,27 @@ This document outlines the comprehensive system architecture for the Vedic astro
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                           DEPLOYMENT ARCHITECTURE                           │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│  Production Environment                                                     │
-│  ├── Load Balancer (Nginx)                                                  │
-│  ├── Application Servers (Node.js)                                          │
-│  ├── Database Cluster (PostgreSQL/MongoDB)                                  │
-│  ├── Cache Layer (Redis)                                                    │
-│  ├── File Storage (AWS S3/Google Cloud Storage)                             │
-│  └── CDN (CloudFront/Cloud CDN)                                             │
+│  Production Environment (e.g., AWS, GCP, Vercel)                            │
+│  ├── Load Balancer (e.g., Nginx, ELB)                                       │
+│  ├── Application Servers (Node.js in Docker containers)                     │
+│  ├── Database Cluster (MongoDB Atlas, self-hosted replica set)              │
+│  ├── Cache Layer (Redis ElastiCache, Upstash)                               │
+│  ├── File Storage (AWS S3 for reports/assets)                               │
+│  └── CDN (CloudFront/Cloudflare)                                            │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │  Development Environment                                                    │
-│  ├── Local Development Server                                               │
-│  ├── Docker Containers                                                      │
-│  ├── Local Database                                                         │
-│  └── Hot Reloading                                                          │
+│  ├── `nodemon` for local development with hot-reloading                     │
+│  ├── Docker Compose for containerized services (DB, Redis)                  │
+│  ├── Local MongoDB instance                                                 │
+│  └── Local file system for ephemeris data                                   │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│  CI/CD Pipeline                                                             │
-│  ├── Code Repository (Git)                                                  │
-│  ├── Automated Testing                                                      │
-│  ├── Build Process                                                          │
-│  └── Deployment Automation                                                  │
+│  CI/CD Pipeline (e.g., GitHub Actions, Jenkins)                             │
+│  ├── Git Repository (GitHub, GitLab)                                        │
+│  ├── Automated Testing (Jest, Cypress) on each push/PR                      │
+│  ├── Linting and Code Formatting checks                                     │
+│  ├── Docker image build and push to registry                                │
+│  └── Automated deployment to staging and production environments            │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
-
-## Implementation Guidelines
-
-### Phase 1: Core Infrastructure
-1. Set up Swiss Ephemeris integration
-2. Implement basic chart generation
-3. Create database schema
-4. Set up authentication system
-
-### Phase 2: Analysis Services
-1. Implement Lagna analysis service
-2. Implement house analysis service
-3. Implement aspect analysis service
-4. Implement dasha calculation service
-
-### Phase 3: Advanced Features
-1. Implement Navamsa analysis
-2. Implement Arudha Lagna analysis
-3. Implement yoga detection
-4. Implement comprehensive report generation
-
-### Phase 4: Optimization
-1. Implement caching strategy
-2. Optimize database queries
-3. Implement performance monitoring
-4. Set up production deployment
 
 This architecture provides a scalable, maintainable, and secure foundation for the expert-level Vedic astrology analysis system.
