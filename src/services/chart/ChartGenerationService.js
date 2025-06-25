@@ -138,7 +138,9 @@ class ChartGenerationService {
    */
   async generateRasiChart(birthData) {
     try {
-      const { dateOfBirth, timeOfBirth, timeZone } = birthData;
+      const { dateOfBirth, timeOfBirth } = birthData;
+      // Handle both 'timezone' and 'timeZone' properties, with fallback to placeOfBirth.timezone
+      const timeZone = birthData.timezone || birthData.timeZone || birthData.placeOfBirth?.timezone;
       const latitude = birthData.latitude || birthData.placeOfBirth?.latitude;
       const longitude = birthData.longitude || birthData.placeOfBirth?.longitude;
 
@@ -819,9 +821,9 @@ class ChartGenerationService {
   }
 
   /**
-   * Calculate Julian Day
-   * @param {string} dateOfBirth - Date of birth (YYYY-MM-DD format)
-   * @param {string} timeOfBirth - Time of birth (HH:MM or HH:MM:SS format)
+   * Calculate Julian Day Number for given date, time and timezone
+   * @param {string} dateOfBirth - Date in YYYY-MM-DD format
+   * @param {string} timeOfBirth - Time in HH:MM or HH:MM:SS format
    * @param {string} timeZone - Time zone identifier
    * @returns {number} Julian Day Number
    */
@@ -832,15 +834,47 @@ class ChartGenerationService {
         throw new Error('Date and time of birth are required for Julian Day calculation');
       }
 
+      // Convert Date object to string if necessary
+      let dateString = dateOfBirth;
+      if (dateOfBirth instanceof Date) {
+        // If it's a Date object, convert to YYYY-MM-DD format
+        dateString = dateOfBirth.toISOString().split('T')[0];
+      } else if (typeof dateOfBirth !== 'string') {
+        throw new Error(`Invalid date format: expected string or Date object, got ${typeof dateOfBirth}`);
+      }
+
       // Ensure time format consistency - pad seconds if not provided
       let formattedTime = timeOfBirth;
       if (!/\d{2}:\d{2}:\d{2}/.test(timeOfBirth)) {
         formattedTime = `${timeOfBirth}:00`;
       }
 
+      // Convert timezone format if needed
+      const convertedTimeZone = this.convertTimezoneToIANA(timeZone);
+
       // Use explicit format for moment parsing to avoid deprecation warnings
-      const dateTimeString = `${dateOfBirth} ${formattedTime}`;
-      const dateTime = moment.tz(dateTimeString, 'YYYY-MM-DD HH:mm:ss', timeZone || 'UTC');
+      const dateTimeString = `${dateString} ${formattedTime}`;
+
+      // First try to parse with timezone
+      let dateTime;
+      try {
+        dateTime = moment.tz(dateTimeString, 'YYYY-MM-DD HH:mm:ss', convertedTimeZone || 'UTC');
+      } catch (timezoneError) {
+        // If timezone parsing fails, try with UTC offset
+        if (timeZone && timeZone.match(/^[+-]\d{2}:\d{2}$/)) {
+          // Handle UTC offset format directly
+          const offsetDateTime = moment(`${dateTimeString} ${timeZone}`, 'YYYY-MM-DD HH:mm:ss Z');
+          if (offsetDateTime.isValid()) {
+            dateTime = offsetDateTime;
+          } else {
+            // Fallback to UTC
+            dateTime = moment.utc(dateTimeString, 'YYYY-MM-DD HH:mm:ss');
+          }
+        } else {
+          // Fallback to UTC
+          dateTime = moment.utc(dateTimeString, 'YYYY-MM-DD HH:mm:ss');
+        }
+      }
 
       if (!dateTime.isValid()) {
         throw new Error(`Invalid date/time format: ${dateTimeString}`);
@@ -859,6 +893,37 @@ class ChartGenerationService {
     } catch (error) {
       throw new Error(`Failed to calculate Julian Day: ${error.message}`);
     }
+  }
+
+  /**
+   * Convert timezone format from +05:30 to IANA format
+   * @param {string} timezone - Timezone string
+   * @returns {string} Converted timezone
+   */
+  convertTimezoneToIANA(timezone) {
+    if (!timezone) return 'UTC';
+
+    // Common UTC offset to IANA timezone mappings
+    const offsetToTimezone = {
+      '+05:30': 'Asia/Kolkata',
+      '+05:45': 'Asia/Kathmandu',
+      '+06:00': 'Asia/Dhaka',
+      '+08:00': 'Asia/Shanghai',
+      '+09:00': 'Asia/Tokyo',
+      '-05:00': 'America/New_York',
+      '-08:00': 'America/Los_Angeles',
+      '+00:00': 'UTC',
+      '+01:00': 'Europe/London',
+      '+02:00': 'Europe/Berlin'
+    };
+
+    // If it's already an IANA format or UTC/GMT, return as is
+    if (timezone.includes('/') || timezone === 'UTC' || timezone === 'GMT') {
+      return timezone;
+    }
+
+    // Convert common UTC offsets to IANA timezones
+    return offsetToTimezone[timezone] || 'Asia/Kolkata'; // Default to India timezone
   }
 
   /**

@@ -1,0 +1,31 @@
+{
+  "testCase": {
+    "id": "comprehensive_test_pune_1985",
+    "name": "Test Data - Pune Birth 1985",
+    "description": "Main test case for comprehensive system validation",
+    "birthData": {
+      "dateOfBirth": "1985-10-24",
+      "timeOfBirth": "14:30:00",
+      "placeOfBirth": {
+        "name": "Pune, Maharashtra, India",
+        "latitude": 18.5204,
+        "longitude": 73.8567,
+        "timezone": "Asia/Kolkata",
+        "country": "India",
+        "state": "Maharashtra"
+      }
+    },
+    "expectedResults": {
+      "lagnaSign": "Aquarius",
+      "moonSign": "Aquarius",
+      "sunSign": "Scorpio",
+      "lagnaLord": "Saturn",
+      "expectedYogas": ["Gaja Kesari Yoga"],
+      "expectedStrengths": {
+        "lagna": "Good",
+        "moon": "Strong",
+        "sun": "Average"
+      }
+    }
+  }
+}

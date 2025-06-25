@@ -1,0 +1,14 @@
+{
+  "success": false,
+  "error": "Missing required data",
+  "details": [
+    {
+      "field": "birthData",
+      "message": "Either birthData or chartId is required"
+    }
+  ],
+  "suggestions": [
+    "Provide birth data object with name, date, time, and location information"
+  ],
+  "helpText": "Comprehensive analysis requires either birth data or an existing chart ID."
+}

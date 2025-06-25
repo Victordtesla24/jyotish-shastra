@@ -10,6 +10,7 @@ const LagnaAnalysisService = require('../../services/analysis/LagnaAnalysisServi
 const HouseAnalysisService = require('../../core/analysis/houses/HouseAnalysisService');
 const BirthDataAnalysisService = require('../../services/analysis/BirthDataAnalysisService');
 const { v4: uuidv4 } = require('uuid');
+const { validateChartRequest } = require('../validators/birthDataValidator');
 
 class ChartController {
   constructor() {
@@ -56,7 +57,7 @@ class ChartController {
   }
 
   /**
-   * Generate birth chart (legacy method)
+   * Generate Vedic birth chart with comprehensive analysis
    * @param {Object} req - Express request object
    * @param {Object} res - Express response object
    */
@@ -64,72 +65,193 @@ class ChartController {
     try {
       const birthData = req.body;
 
-      // Validate birth data
-      if (!this.chartService.validateBirthData(birthData)) {
+      // Validate birth data using flexible schema
+      const validationResult = validateChartRequest(birthData);
+      if (!validationResult.isValid) {
         return res.status(400).json({
           success: false,
-          message: 'Invalid birth data provided',
-          errors: ['Please provide valid birth data with all required fields']
+          error: 'Validation failed',
+          details: validationResult.errors.map(error => ({
+            field: error.field,
+            message: error.message,
+            providedValue: error.providedValue
+          })),
+          suggestions: this.generateValidationSuggestions(validationResult.errors),
+          helpText: 'Chart generation requires date, time, and location information. Name is optional.'
         });
       }
 
-      // Additional coordinate validation
-      if (birthData.latitude && (isNaN(parseFloat(birthData.latitude)) || Math.abs(parseFloat(birthData.latitude)) > 90)) {
-        return res.status(400).json({
-          success: false,
-          message: 'Invalid coordinate data',
-          errors: ['Latitude must be a valid number between -90 and 90']
-        });
-      }
+      // Process timezone format conversion
+      const processedBirthData = this.processTimezoneFormat(validationResult.data);
 
-      if (birthData.longitude && (isNaN(parseFloat(birthData.longitude)) || Math.abs(parseFloat(birthData.longitude)) > 180)) {
-        return res.status(400).json({
-          success: false,
-          message: 'Invalid coordinate data',
-          errors: ['Longitude must be a valid number between -180 and 180']
-        });
-      }
+      // Generate comprehensive chart
+      const chartData = await this.chartService.generateComprehensiveChart(processedBirthData);
 
-      // Generate Rasi chart
-      const rasiChart = await this.chartService.generateRasiChart(birthData);
-
-      // Generate Navamsa chart
-      const navamsaChart = await this.chartService.generateNavamsaChart(birthData);
-
-      // Perform Lagna analysis
-      const lagnaAnalysis = this.lagnaService.analyzeLagna(rasiChart);
-
-      // Perform house analysis
-      const houseAnalysis = this.houseService.analyzeAllHouses(rasiChart);
-
-      // Generate unique chart ID for E2E test compatibility
-      const chartId = uuidv4();
-
-      const chartData = {
-        chartId, // Add chartId field as expected by E2E tests
-        birthData,
-        rasiChart,
-        navamsaChart,
-        analysis: {
-          lagna: lagnaAnalysis,
-          houses: houseAnalysis
-        },
-        generatedAt: new Date().toISOString()
-      };
-
-      res.status(200).json({
+      return res.status(200).json({
         success: true,
-        data: chartData
+        data: {
+          birthData: chartData.birthData,
+          rasiChart: chartData.rasiChart,
+          navamsaChart: chartData.navamsaChart,
+          analysis: chartData.analysis,
+          dashaInfo: chartData.dashaInfo,
+          generatedAt: chartData.generatedAt
+        }
       });
 
     } catch (error) {
       console.error('Chart generation error:', error);
-      res.status(500).json({
+
+      // Handle specific Swiss Ephemeris errors
+      if (error.message.includes('Can\'t calculate houses') ||
+          error.message.includes('Ascendant calculation failed')) {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid coordinates or date',
+          message: 'The provided coordinates or date/time cannot be processed by the astronomical calculation engine.',
+          details: [{
+            field: 'coordinates',
+            message: 'Invalid coordinates for chart calculation',
+            suggestion: 'Please verify the latitude, longitude, and date/time values are correct'
+          }],
+          suggestions: [
+            'Verify latitude is between -90 and 90 degrees',
+            'Verify longitude is between -180 and 180 degrees',
+            'Ensure date is in YYYY-MM-DD format',
+            'Ensure time is in HH:MM or HH:MM:SS format'
+          ]
+        });
+      }
+
+      // Handle missing coordinates
+      if (error.message.includes('Latitude and longitude are required')) {
+        return res.status(400).json({
+          success: false,
+          error: 'Missing location data',
+          message: 'Chart generation requires either coordinates or place of birth information.',
+          details: [
+            { field: 'latitude', message: 'Latitude is required for chart generation' },
+            { field: 'longitude', message: 'Longitude is required for chart generation' },
+            { field: 'timezone', message: 'Timezone is required for accurate calculations' }
+          ],
+          suggestions: [
+            'Provide latitude and longitude coordinates',
+            'Or provide place of birth for automatic geocoding',
+            'Include timezone in IANA format (e.g., Asia/Kolkata) or UTC offset (±HH:MM)'
+          ]
+        });
+      }
+
+      // Handle timezone errors
+      if (error.message.includes('Moment Timezone has no data')) {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid timezone',
+          message: 'The provided timezone format is not recognized.',
+          details: [{
+            field: 'timezone',
+            message: 'Timezone format not recognized',
+            providedValue: this.extractTimezoneFromError(error.message)
+          }],
+          suggestions: [
+            'Use IANA timezone format: Asia/Kolkata, America/New_York, etc.',
+            'Use UTC offset format: +05:30, -08:00, etc.',
+            'Use UTC or GMT for universal time'
+          ]
+        });
+      }
+
+      return res.status(500).json({
         success: false,
         message: 'Failed to generate chart',
         error: error.message
       });
     }
+  }
+
+  /**
+   * Process timezone format to handle +05:30 format conversion
+   * @param {Object} birthData - Birth data with timezone
+   * @returns {Object} Processed birth data
+   */
+  processTimezoneFormat(birthData) {
+    const processed = { ...birthData };
+
+    // Handle timezone conversion
+    if (processed.timezone) {
+      processed.timezone = this.convertTimezoneFormat(processed.timezone);
+    }
+
+    // Handle nested placeOfBirth timezone
+    if (processed.placeOfBirth && typeof processed.placeOfBirth === 'object' && processed.placeOfBirth.timezone) {
+      processed.placeOfBirth.timezone = this.convertTimezoneFormat(processed.placeOfBirth.timezone);
+    }
+
+    return processed;
+  }
+
+  /**
+   * Convert timezone format from +05:30 to IANA format
+   * @param {string} timezone - Timezone string
+   * @returns {string} Converted timezone
+   */
+  convertTimezoneFormat(timezone) {
+    // Common UTC offset to IANA timezone mappings
+    const offsetToTimezone = {
+      '+05:30': 'Asia/Kolkata',
+      '+05:45': 'Asia/Kathmandu',
+      '+06:00': 'Asia/Dhaka',
+      '+08:00': 'Asia/Shanghai',
+      '+09:00': 'Asia/Tokyo',
+      '-05:00': 'America/New_York',
+      '-08:00': 'America/Los_Angeles',
+      '+00:00': 'UTC',
+      '+01:00': 'Europe/London',
+      '+02:00': 'Europe/Berlin'
+    };
+
+    // If it's already an IANA format or UTC/GMT, return as is
+    if (timezone.includes('/') || timezone === 'UTC' || timezone === 'GMT') {
+      return timezone;
+    }
+
+    // Convert common UTC offsets to IANA timezones
+    return offsetToTimezone[timezone] || 'Asia/Kolkata'; // Default to India timezone
+  }
+
+  /**
+   * Extract timezone from error message
+   * @param {string} errorMessage - Error message
+   * @returns {string} Extracted timezone
+   */
+  extractTimezoneFromError(errorMessage) {
+    const match = errorMessage.match(/for ([+\-]\d{2}:\d{2})/);
+    return match ? match[1] : 'unknown';
+  }
+
+  /**
+   * Generate validation suggestions based on errors
+   * @param {Array} errors - Validation errors
+   * @returns {Array} Suggestions
+   */
+  generateValidationSuggestions(errors) {
+    const suggestions = [];
+
+    errors.forEach(error => {
+      if (error.field === 'dateOfBirth') {
+        suggestions.push('Date format should be YYYY-MM-DD (e.g., 1985-03-15)');
+      } else if (error.field === 'timeOfBirth') {
+        suggestions.push('Time format should be HH:MM or HH:MM:SS (e.g., 08:30 or 14:45:30)');
+      } else if (error.field.includes('latitude')) {
+        suggestions.push('Latitude must be between -90 and 90 degrees');
+      } else if (error.field.includes('longitude')) {
+        suggestions.push('Longitude must be between -180 and 180 degrees');
+      } else if (error.field.includes('timezone')) {
+        suggestions.push('Timezone should be in IANA format (Asia/Kolkata) or UTC offset (+05:30)');
+      }
+    });
+
+    return [...new Set(suggestions)];
   }
 
   /**
