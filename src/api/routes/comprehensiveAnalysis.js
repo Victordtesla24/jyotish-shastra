@@ -72,18 +72,15 @@ const formatAnalysisSections = (sections) => {
 router.post('/comprehensive', rateLimiter, async (req, res) => {
     try {
         const requestData = req.body;
-
-        // The standardization test sends a header 'x-test-type' to signal optional name
         const isStandardizationTest = req.headers['x-test-type'] === 'standardization';
 
-        // Use different validation based on context
-        const requireName = !isStandardizationTest;
-        const validationResult = validateComprehensiveAnalysis(requestData, requireName);
+        // Use flexible validation where name is optional for standardization tests
+        const validationResult = validateComprehensiveAnalysis(requestData, isStandardizationTest);
 
         if (!validationResult.isValid) {
             return res.status(400).json({
                 success: false,
-                error: 'Validation failed',
+                error: validationResult.error || 'Validation failed',
                 details: validationResult.errors,
                 suggestions: validationResult.suggestions || [],
                 helpText: validationResult.helpText || 'Comprehensive analysis requires complete birth data.'
@@ -207,9 +204,10 @@ router.post('/houses', rateLimiter, async (req, res) => {
     try {
         const requestData = req.body;
         const isStandardizationTest = req.headers['x-test-type'] === 'standardization';
-        const requireName = !isStandardizationTest;
 
-        const validationResult = validateHouseAnalysis(requestData, requireName);
+        // Use flexible validation where name is optional for standardization tests
+        const validationResult = validateHouseAnalysis(requestData, isStandardizationTest);
+
         if (!validationResult.isValid) {
             return res.status(400).json({
                 success: false,
@@ -246,9 +244,10 @@ router.post('/aspects', rateLimiter, async (req, res) => {
     try {
         const requestData = req.body;
         const isStandardizationTest = req.headers['x-test-type'] === 'standardization';
-        const requireName = !isStandardizationTest;
 
-        const validationResult = validateAspectAnalysis(requestData, requireName);
+        // Use flexible validation where name is optional for standardization tests
+        const validationResult = validateAspectAnalysis(requestData, isStandardizationTest);
+
         if (!validationResult.isValid) {
             return res.status(400).json({
                 success: false,
@@ -285,9 +284,10 @@ router.post('/arudha', rateLimiter, async (req, res) => {
     try {
         const requestData = req.body;
         const isStandardizationTest = req.headers['x-test-type'] === 'standardization';
-        const requireName = !isStandardizationTest;
 
-        const validationResult = validateArudhaAnalysis(requestData, requireName);
+        // Use flexible validation where name is optional for standardization tests
+        const validationResult = validateArudhaAnalysis(requestData, isStandardizationTest);
+
         if (!validationResult.isValid) {
             return res.status(400).json({
                 success: false,
@@ -324,9 +324,10 @@ router.post('/navamsa', rateLimiter, async (req, res) => {
     try {
         const requestData = req.body;
         const isStandardizationTest = req.headers['x-test-type'] === 'standardization';
-        const requireName = !isStandardizationTest;
 
-        const validationResult = validateNavamsaAnalysis(requestData, requireName);
+        // Use flexible validation where name is optional for standardization tests
+        const validationResult = validateNavamsaAnalysis(requestData, isStandardizationTest);
+
         if (!validationResult.isValid) {
             return res.status(400).json({
                 success: false,
@@ -372,9 +373,10 @@ router.post('/dasha', rateLimiter, async (req, res) => {
     try {
         const requestData = req.body;
         const isStandardizationTest = req.headers['x-test-type'] === 'standardization';
-        const requireName = !isStandardizationTest;
 
-        const validationResult = validateDashaAnalysis(requestData, requireName);
+        // Use flexible validation where name is optional for standardization tests
+        const validationResult = validateDashaAnalysis(requestData, isStandardizationTest);
+
         if (!validationResult.isValid) {
             return res.status(400).json({
                 success: false,

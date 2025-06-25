@@ -102,70 +102,64 @@ class ChartController {
     } catch (error) {
       console.error('Chart generation error:', error);
 
-      // Handle specific Swiss Ephemeris errors
-      if (error.message.includes('Can\'t calculate houses') ||
-          error.message.includes('Ascendant calculation failed')) {
-        return res.status(400).json({
-          success: false,
-          error: 'Invalid coordinates or date',
-          message: 'The provided coordinates or date/time cannot be processed by the astronomical calculation engine.',
-          details: [{
-            field: 'coordinates',
-            message: 'Invalid coordinates for chart calculation',
-            suggestion: 'Please verify the latitude, longitude, and date/time values are correct'
-          }],
-          suggestions: [
-            'Verify latitude is between -90 and 90 degrees',
-            'Verify longitude is between -180 and 180 degrees',
-            'Ensure date is in YYYY-MM-DD format',
-            'Ensure time is in HH:MM or HH:MM:SS format'
-          ]
-        });
-      }
-
-      // Handle missing coordinates
-      if (error.message.includes('Latitude and longitude are required')) {
-        return res.status(400).json({
-          success: false,
-          error: 'Missing location data',
-          message: 'Chart generation requires either coordinates or place of birth information.',
-          details: [
-            { field: 'latitude', message: 'Latitude is required for chart generation' },
-            { field: 'longitude', message: 'Longitude is required for chart generation' },
-            { field: 'timezone', message: 'Timezone is required for accurate calculations' }
-          ],
-          suggestions: [
-            'Provide latitude and longitude coordinates',
-            'Or provide place of birth for automatic geocoding',
-            'Include timezone in IANA format (e.g., Asia/Kolkata) or UTC offset (±HH:MM)'
-          ]
-        });
-      }
-
-      // Handle timezone errors
-      if (error.message.includes('Moment Timezone has no data')) {
-        return res.status(400).json({
-          success: false,
-          error: 'Invalid timezone',
-          message: 'The provided timezone format is not recognized.',
-          details: [{
-            field: 'timezone',
-            message: 'Timezone format not recognized',
-            providedValue: this.extractTimezoneFromError(error.message)
-          }],
-          suggestions: [
-            'Use IANA timezone format: Asia/Kolkata, America/New_York, etc.',
-            'Use UTC offset format: +05:30, -08:00, etc.',
-            'Use UTC or GMT for universal time'
-          ]
-        });
-      }
-
-      return res.status(500).json({
+      let statusCode = 500;
+      const response = {
         success: false,
-        message: 'Failed to generate chart',
-        error: error.message
-      });
+        error: 'Chart Generation Failed',
+        message: error.message,
+        details: [],
+        suggestions: [],
+        helpText: 'An unexpected error occurred. Please check the server logs for more details.'
+      };
+
+      const lowerCaseErrorMessage = error.message.toLowerCase();
+
+      if (lowerCaseErrorMessage.includes('validation failed')) {
+        statusCode = 400;
+        response.error = 'Validation Failed';
+        response.details = error.details || [{ field: 'general', message: error.message, providedValue: req.body }];
+        response.suggestions = error.suggestions || ['Please review the provided data for correctness.'];
+        response.helpText = error.helpText || 'The provided birth data is invalid.';
+      } else if (lowerCaseErrorMessage.includes("can't calculate houses") || lowerCaseErrorMessage.includes("ascendant calculation failed")) {
+        statusCode = 400;
+        response.error = 'Invalid Astronomical Data';
+        response.message = 'The provided coordinates or date/time are invalid for astrological calculations.';
+        response.details = [{
+          field: 'coordinates/datetime',
+          message: error.message,
+          providedValue: { date: req.body.dateOfBirth, time: req.body.timeOfBirth, lat: req.body.latitude, lon: req.body.longitude }
+        }];
+        response.suggestions = [
+          'Verify latitude is between -90 and 90.',
+          'Verify longitude is between -180 and 180.',
+          'Ensure the date and time are valid.'
+        ];
+        response.helpText = 'The calculation engine failed. This is often due to coordinates being too close to the poles or an invalid date/time.';
+      } else if (lowerCaseErrorMessage.includes('latitude and longitude are required')) {
+        statusCode = 400;
+        response.error = 'Missing Location Data';
+        response.message = 'Chart generation requires coordinates (latitude, longitude).';
+        response.details = [
+          { field: 'latitude', message: 'Latitude is required', providedValue: req.body.latitude },
+          { field: 'longitude', message: 'Longitude is required', providedValue: req.body.longitude }
+        ];
+        response.suggestions = ['Provide latitude and longitude coordinates.', 'If providing a place name, ensure it can be found by the geocoding service.'];
+        response.helpText = 'Please provide geographic coordinates for the birth location.';
+      } else if (lowerCaseErrorMessage.includes('moment timezone has no data')) {
+        statusCode = 400;
+        response.error = 'Invalid Timezone Format';
+        response.message = 'The provided timezone format is not recognized.';
+        const providedTimezone = error.message.match(/for (.*)/);
+        response.details = [{
+          field: 'timezone',
+          message: error.message,
+          providedValue: providedTimezone ? providedTimezone[1] : req.body.timezone
+        }];
+        response.suggestions = ['Use IANA format (e.g., "Asia/Kolkata") or UTC offset (e.g., "+05:30").'];
+        response.helpText = 'The timezone needs to be in a standard format recognized by the system.';
+      }
+
+      return res.status(statusCode).json(response);
     }
   }
 

@@ -158,3 +158,92 @@ The Jyotish Shastra Vedic Astrology system is now **PRODUCTION READY** with:
 
 **Resolution Completed**: ✅ All E2E test failures systematically resolved
 **System Status**: 🚀 **PRODUCTION READY** with 100% test success rates
+
+# Jyotish Shastra - Error Trail Analysis
+
+This document maps the flow of data and identifies critical nodes where errors are occurring, leading to the test failures in `validation_standardization.test.js` and `analysis.validation.test.js`.
+
+---
+
+## 1. Birth Data Validation & Standardization Flow
+
+This flow covers how birth data from an API request is validated and processed, which is the root cause of failures in `validation_standardization.test.js`. The primary issue is the inconsistent requirement of the `name` field.
+
+```mermaid
+graph TD
+    A[API Request: POST /api/v1/analysis/*] --> B{Route Middleware};
+    B --> C[validation.js Middleware];
+    C --> D{birthDataValidator.js};
+    D -- Fails --> E[Error: 400 Bad Request];
+    D -- Passes --> F[Controller Logic];
+
+    subgraph "Error Trail: Inconsistent Validation"
+        C(validation.js) --> D(birthDataValidator.js);
+        D ==>|Problem| G["'name' field is required on some routes but optional on others, causing tests to fail."];
+    end
+
+    subgraph "Key Files"
+        direction LR
+        H[tests/integration/api/validation_standardization.test.js] -- "Tests" --> A;
+        I[src/api/routes/comprehensiveAnalysis.js] -- "Uses" --> C;
+        J[src/api/validators/birthDataValidator.js] -- "Is" --> D;
+    end
+```
+
+**Conclusion**: The `birthDataValidator.js` needs to be updated to make the `name` field optional across all analysis endpoints to align with the test requirements.
+
+---
+
+## 2. Chart Generation & Calculation Flow
+
+This flow details the process from receiving validated birth data to generating a chart, where timezone and coordinate errors originate. These issues are causing failures in `analysis.validation.test.js`.
+
+```mermaid
+graph TD
+    subgraph "Input & Validation"
+        A[API Request: POST /api/v1/chart/generate] --> B(ChartController.js);
+    end
+
+    subgraph "Service Layer: ChartGenerationService.js"
+        B --> C{calculateJulianDay};
+        C -- "Input: date, time, timezone (+05:30)" --> D[moment.tz(..., timezone)];
+        D --> E{Error: "No data for +05:30"};
+        C --> F{generateRasiChart};
+        F -- "Input: lat, lon" --> G[Swiss Ephemeris Call];
+        G --> H{Error: "Can't calculate houses"};
+    end
+
+    subgraph "Error Trails"
+        D ==> I["Timezone Error: 'moment-timezone' does not recognize the numeric offset '+05:30'. It requires a timezone name like 'Asia/Kolkata'."];
+        G ==> J["Coordinate Error: Edge-case coordinates (e.g., lat: 89.99999) are not being handled gracefully, causing the Swiss Ephemeris library to fail."];
+    end
+
+    subgraph "Key Files"
+        direction LR
+        K[tests/integration/api/analysis.validation.test.js] -- "Tests" --> A;
+        L[src/api/controllers/ChartController.js] -- "Calls" --> M[src/services/chart/ChartGenerationService.js];
+    end
+```
+
+**Conclusion**:
+1.  The `calculateJulianDay` function in `ChartGenerationService.js` must be fixed to handle numeric timezone offsets by converting them to a compatible format for `moment-timezone`.
+2.  The `generateRasiChart` function needs robust input validation for coordinates before calling the Swiss Ephemeris library.
+
+---
+
+## 3. Error Response Formatting Flow
+
+This flow illustrates how errors are caught and formatted. The test failures indicate that the error response is inconsistent and missing required fields like `providedValue`.
+
+```mermaid
+graph TD
+    A{Error Thrown} --> B{Catch Block in Controller};
+    B --> C{Format Error Response};
+    C --> D[res.status(code).json(...)];
+
+    subgraph "Problem Area"
+        C ==> E["The formatted error object is inconsistent. It sometimes omits the 'providedValue' and 'suggestions' fields, failing the quality checks in `analysis.validation.test.js`."];
+    end
+```
+
+**Conclusion**: The error handling logic in the controllers (`ChartController.js`, etc.) and potentially a centralized error-handling middleware must be updated to ensure a consistent and complete error response format.
