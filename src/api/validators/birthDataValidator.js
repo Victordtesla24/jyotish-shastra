@@ -592,8 +592,12 @@ function performCustomValidations(data) {
   if (data.placeOfBirth?.timezone) {
     const timezone = data.placeOfBirth.timezone;
     if (timezone !== 'UTC' && timezone !== 'GMT') {
-      const match = timezone.match(/^([+-])([0-9]|1[0-4]):([0-5][0-9])$/);
-      if (!match) {
+      // Check for UTC offset format (e.g., "+05:30", "-08:00")
+      const utcOffsetMatch = timezone.match(/^([+-])([0-9]|1[0-4]):([0-5][0-9])$/);
+      // Check for IANA timezone format (e.g., "Asia/Kolkata", "America/New_York")
+      const ianaMatch = timezone.match(/^[A-Za-z_]+\/[A-Za-z_]+$/);
+
+      if (!utcOffsetMatch && !ianaMatch) {
         errors.push({
           field: 'placeOfBirth.timezone',
           message: 'Invalid timezone format',
@@ -683,6 +687,7 @@ function sanitizeBirthData(data) {
  */
 function validateComprehensiveAnalysis(data, isStandardization = false) {
   const birthData = data.birthData || data;
+  const isWrapped = !!data.birthData; // Track if data came in wrapped format
 
   if (data.chartId && !data.birthData) {
     return { isValid: true, errors: [], data: { chartId: data.chartId } };
@@ -703,7 +708,7 @@ function validateComprehensiveAnalysis(data, isStandardization = false) {
 
   // For backwards compatibility - require name when not in standardization mode
   if (!isStandardization) {
-    return validateWithNameRequired(birthData, 'Comprehensive analysis requires name, birth date, time, and location information.');
+    return validateWithNameRequired(birthData, 'Comprehensive analysis requires complete birth data including name, birth date, time, and location information.', isWrapped);
   }
 
   // Use analysisRequiredSchema which has name as optional by default
@@ -755,9 +760,10 @@ function validateComprehensiveAnalysis(data, isStandardization = false) {
  * PRODUCTION-GRADE: Validate data with name field required (for backwards compatibility)
  * @param {Object} data - Analysis data to validate
  * @param {string} helpText - Custom help text for validation
+ * @param {boolean} isWrapped - Whether the original data was wrapped in birthData
  * @returns {Object} Validation result
  */
-function validateWithNameRequired(data, helpText = 'Analysis requires name, birth date, time, and location information.') {
+function validateWithNameRequired(data, helpText = 'Analysis requires name, birth date, time, and location information.', isWrapped = false) {
   // Create schema with name required
   const schemaWithNameRequired = analysisRequiredSchema.keys({
     name: nameSchema.required()
@@ -775,17 +781,21 @@ function validateWithNameRequired(data, helpText = 'Analysis requires name, birt
     error.details.forEach(detail => {
       if (detail.type === 'custom.multifield' && detail.context?.errors) {
         detail.context.errors.forEach(customError => {
+          const fieldName = isWrapped ? `birthData.${customError.field}` : customError.field;
+          // For custom errors, try to get the provided value from the original data
+          const providedValue = data[customError.field] !== undefined ? data[customError.field] : null;
           errors.push({
-            field: customError.field,
+            field: fieldName,
             message: customError.message,
-            providedValue: undefined
+            providedValue: providedValue
           });
         });
       } else {
+        const fieldName = isWrapped ? `birthData.${detail.path.join('.')}` : detail.path.join('.');
         errors.push({
-          field: detail.path.join('.'),
+          field: fieldName,
           message: detail.message,
-          providedValue: detail.context?.value
+          providedValue: detail.context?.value !== undefined ? detail.context.value : null
         });
       }
     });
@@ -814,10 +824,11 @@ function validateWithNameRequired(data, helpText = 'Analysis requires name, birt
  */
 function validateHouseAnalysis(data, isStandardization = false) {
   const birthData = data.birthData || data;
+  const isWrapped = !!data.birthData; // Track if data came in wrapped format
 
   if (!isStandardization) {
     // For backwards compatibility - require name when not in standardization mode
-    return validateWithNameRequired(birthData, 'House analysis requires name, birth date, time, and location information.');
+    return validateWithNameRequired(birthData, 'House analysis requires complete birth data including name, birth date, time, and location information.', isWrapped);
   }
 
   // Use analysisRequiredSchema which has name as optional by default
@@ -874,7 +885,9 @@ function validateHouseAnalysis(data, isStandardization = false) {
 function validateAspectAnalysis(data, isStandardization = false) {
   if (!isStandardization) {
     // For backwards compatibility - require name when not in standardization mode
-    return validateWithNameRequired(data, 'Aspect analysis requires name, birth date, time, and location information.');
+    const birthData = data.birthData || data;
+    const isWrapped = !!data.birthData; // Track if data came in wrapped format
+    return validateWithNameRequired(birthData, 'Aspect analysis requires complete birth data including name, birth date, time, and location information.', isWrapped);
   }
   return validateHouseAnalysis(data, isStandardization);
 }
@@ -888,7 +901,9 @@ function validateAspectAnalysis(data, isStandardization = false) {
 function validateArudhaAnalysis(data, isStandardization = false) {
   if (!isStandardization) {
     // For backwards compatibility - require name when not in standardization mode
-    return validateWithNameRequired(data, 'Arudha analysis requires name, birth date, time, and location information.');
+    const birthData = data.birthData || data;
+    const isWrapped = !!data.birthData; // Track if data came in wrapped format
+    return validateWithNameRequired(birthData, 'Arudha analysis requires complete birth data including name, birth date, time, and location information.', isWrapped);
   }
   return validateHouseAnalysis(data, isStandardization);
 }
@@ -902,7 +917,9 @@ function validateArudhaAnalysis(data, isStandardization = false) {
 function validateNavamsaAnalysis(data, isStandardization = false) {
   if (!isStandardization) {
     // For backwards compatibility - require name when not in standardization mode
-    return validateWithNameRequired(data, 'Navamsa analysis requires name, birth date, time, and location information.');
+    const birthData = data.birthData || data;
+    const isWrapped = !!data.birthData; // Track if data came in wrapped format
+    return validateWithNameRequired(birthData, 'Navamsa analysis requires complete birth data including name, birth date, time, and location information.', isWrapped);
   }
 
   // Use analysisRequiredSchema which has name as optional by default
@@ -947,7 +964,9 @@ function validateNavamsaAnalysis(data, isStandardization = false) {
 function validateDashaAnalysis(data, isStandardization = false) {
   if (!isStandardization) {
     // For backwards compatibility - require name when not in standardization mode
-    return validateWithNameRequired(data, 'Dasha analysis requires name, birth date, time, and location information.');
+    const birthData = data.birthData || data;
+    const isWrapped = !!data.birthData; // Track if data came in wrapped format
+    return validateWithNameRequired(birthData, 'Dasha analysis requires complete birth data including name, birth date, time, and location information.', isWrapped);
   }
 
   // Use analysisRequiredSchema which has name as optional by default
