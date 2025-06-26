@@ -1,0 +1,41 @@
+{
+  "watch": [
+    "src/"
+  ],
+  "ignore": [
+    "node_modules/",
+    "logs/",
+    "coverage/",
+    "tests/",
+    "client/",
+    "cypress/",
+    "docs/",
+    "scripts/",
+    "user-docs/",
+    "ephemeris/",
+    "*.log",
+    "*.pid",
+    "*.seed",
+    "*.pid.lock",
+    ".DS_Store",
+    "*.env",
+    ".git/",
+    ".cursor/",
+    ".vscode/",
+    "package-lock.json",
+    "tsconfig.json",
+    "jest.config.js",
+    "cypress.config.js",
+    "test-*.js",
+    "validation-test.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "ext": "js,json",
+  "env": {
+    "NODE_ENV": "development"
+  },
+  "delay": 1000,
+  "legacyWatch": false,
+  "verbose": false
+}

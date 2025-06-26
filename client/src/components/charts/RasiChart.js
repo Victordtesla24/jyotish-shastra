@@ -1,5 +1,4 @@
 import React from 'react';
-import './RasiChart.css';
 
 const RasiChart = ({ chartData, style = 'south-indian' }) => {
   if (!chartData || !chartData.houses) {

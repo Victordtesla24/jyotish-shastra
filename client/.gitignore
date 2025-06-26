@@ -1,0 +1,318 @@
+# =============================================================================
+# COMPREHENSIVE .GITIGNORE - INDUSTRY STANDARDS & BEST PRACTICES
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# ENVIRONMENT & CONFIGURATION FILES
+# -----------------------------------------------------------------------------
+# Environment variables and secrets
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.env.staging
+.env.*
+*.env
+
+# Configuration files with sensitive data
+config.local.*
+secrets.*
+credentials.*
+*.key
+*.pem
+*.p12
+*.pfx
+
+# -----------------------------------------------------------------------------
+# LOGS & RUNTIME FILES
+# -----------------------------------------------------------------------------
+# Log directories and files
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+.nyc_output/
+
+# -----------------------------------------------------------------------------
+# OPERATING SYSTEM FILES
+# -----------------------------------------------------------------------------
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# -----------------------------------------------------------------------------
+# EDITORS & IDEs
+# -----------------------------------------------------------------------------
+# Visual Studio Code / Cursor
+.vscode/
+.cursor/
+*.code-workspace
+
+# JetBrains IDEs
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# Vim
+*.swp
+*.swo
+*~
+.vimrc.local
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# Atom
+.atom/
+
+# -----------------------------------------------------------------------------
+# DEPENDENCY DIRECTORIES
+# -----------------------------------------------------------------------------
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.yarn-integrity
+.npm
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+.venv/
+venv/
+ENV/
+env/
+.env/
+
+# Ruby
+/.bundle/
+/vendor/bundle/
+/log/*
+/tmp/*
+!/log/.keep
+!/tmp/.keep
+*.gem
+
+# -----------------------------------------------------------------------------
+# BUILD ARTIFACTS & COMPILED FILES
+# -----------------------------------------------------------------------------
+# Compiled source
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+
+# Archives
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# Build directories
+build/
+dist/
+out/
+target/
+bin/
+obj/
+
+# -----------------------------------------------------------------------------
+# CACHE & TEMPORARY FILES
+# -----------------------------------------------------------------------------
+# Cache directories
+.cache/
+.parcel-cache/
+.eslintcache
+.stylelintcache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Temporary directories
+tmp/
+temp/
+.tmp/
+.temp/
+
+# Backup files
+*.bak
+*.backup
+*.swp
+*.tmp
+
+# -----------------------------------------------------------------------------
+# DATABASE FILES
+# -----------------------------------------------------------------------------
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+
+# -----------------------------------------------------------------------------
+# MEDIA & BINARY FILES (OPTIONAL - UNCOMMENT IF NEEDED)
+# -----------------------------------------------------------------------------
+# Images
+# *.jpg
+# *.jpeg
+# *.png
+# *.gif
+# *.bmp
+# *.tiff
+# *.ico
+
+# Audio
+# *.mp3
+# *.wav
+# *.flac
+# *.aac
+
+# Video
+# *.mp4
+# *.avi
+# *.mov
+# *.wmv
+
+# -----------------------------------------------------------------------------
+# DEVELOPMENT & TESTING
+# -----------------------------------------------------------------------------
+# Test coverage
+coverage/
+*.lcov
+.nyc_output
+
+# Jest
+jest_coverage/
+
+# Cypress
+cypress/videos/
+cypress/screenshots/
+cypress/downloads/
+
+# -----------------------------------------------------------------------------
+# CLOUD & DEPLOYMENT
+# -----------------------------------------------------------------------------
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
+# Docker
+.dockerignore
+
+# Serverless
+.serverless/
+
+# -----------------------------------------------------------------------------
+# MISCELLANEOUS
+# -----------------------------------------------------------------------------
+# Lock files (uncomment if you want to ignore them)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# Editor directories and files
+.history/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# -----------------------------------------------------------------------------
+# PROJECT SPECIFIC (ADD YOUR CUSTOM PATTERNS BELOW)
+# -----------------------------------------------------------------------------
+# Add any project-specific patterns here

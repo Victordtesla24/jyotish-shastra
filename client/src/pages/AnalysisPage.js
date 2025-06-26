@@ -4,6 +4,7 @@ import BirthDataForm from '../components/forms/BirthDataForm';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import ErrorMessage from '../components/common/ErrorMessage';
 import ComprehensiveAnalysisDisplay from '../components/reports/ComprehensiveAnalysisDisplay';
+import { PlanetaryStrengthChart, HouseStrengthChart, DashaTimelineChart } from '../components/charts/VedicRechartsWrapper';
 import './AnalysisPage.css';
 
 const AnalysisPage = () => {
@@ -116,6 +117,91 @@ const AnalysisPage = () => {
               />
             </div>
           )}
+
+          {/* Enhanced Charts Demo Section */}
+          <div className="mt-12">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-cinzel font-bold text-vedic-text mb-2">
+                Enhanced Vedic Chart Analysis
+              </h2>
+              <p className="text-vedic-text-light">
+                Interactive visualizations powered by modern charting technology
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+              <PlanetaryStrengthChart
+                data={[
+                  { name: 'Sun', value: 85, planet: 'सूर्य' },
+                  { name: 'Moon', value: 72, planet: 'चन्द्र' },
+                  { name: 'Mars', value: 90, planet: 'मंगल' },
+                  { name: 'Mercury', value: 65, planet: 'बुध' },
+                  { name: 'Jupiter', value: 78, planet: 'गुरु' },
+                  { name: 'Venus', value: 82, planet: 'शुक्र' },
+                  { name: 'Saturn', value: 68, planet: 'शनि' }
+                ]}
+                title="Planetary Strength Analysis"
+              />
+
+              <HouseStrengthChart
+                data={[
+                  { name: '1st', strength: 85 },
+                  { name: '2nd', strength: 72 },
+                  { name: '3rd', strength: 65 },
+                  { name: '4th', strength: 78 },
+                  { name: '5th', strength: 90 },
+                  { name: '6th', strength: 55 },
+                  { name: '7th', strength: 82 },
+                  { name: '8th', strength: 45 },
+                  { name: '9th', strength: 88 },
+                  { name: '10th', strength: 92 },
+                  { name: '11th', strength: 75 },
+                  { name: '12th', strength: 62 }
+                ]}
+                title="House Strength Distribution"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 gap-8">
+              <DashaTimelineChart
+                data={[
+                  { planet: 'Venus', duration: 20, years: '2000-2020' },
+                  { planet: 'Sun', duration: 6, years: '2020-2026' },
+                  { planet: 'Moon', duration: 10, years: '2026-2036' },
+                  { planet: 'Mars', duration: 7, years: '2036-2043' },
+                  { planet: 'Rahu', duration: 18, years: '2043-2061' },
+                  { planet: 'Jupiter', duration: 16, years: '2061-2077' },
+                  { planet: 'Saturn', duration: 19, years: '2077-2096' }
+                ]}
+                title="Vimshottari Dasha Timeline"
+              />
+            </div>
+
+            <div className="mt-8 p-6 bg-gradient-to-r from-vedic-background to-saffron-subtle rounded-2xl">
+              <div className="text-center">
+                <h3 className="text-lg font-cinzel font-bold text-vedic-text mb-2">
+                  🚀 Enhanced Chart Features
+                </h3>
+                <p className="text-vedic-text-light text-sm mb-4">
+                  Experience modern interactive charts with authentic Vedic styling
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                  <div className="flex items-center justify-center space-x-2">
+                    <span>📊</span>
+                    <span>Interactive tooltips</span>
+                  </div>
+                  <div className="flex items-center justify-center space-x-2">
+                    <span>🎨</span>
+                    <span>Vedic color schemes</span>
+                  </div>
+                  <div className="flex items-center justify-center space-x-2">
+                    <span>📱</span>
+                    <span>Mobile optimized</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

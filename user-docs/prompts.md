@@ -12,6 +12,7 @@
   You are working on the Jyotish Shastra project - a comprehensive Vedic astrology analysis system that combines ancient wisdom with modern AI technology. The project provides expert-level Vedic Kundli (birth chart) analysis, detailed interpretations, planetary analysis, and life predictions.
 
 ## **Current Technology Stack:**
+
   - **Frontend:** React 18.2.0, React Router DOM 6.20.1, React Hook Form 7.48.2
   - **Styling:** Pure CSS with custom utilities (no framework currently)
   - **harts:** Recharts 2.8.0 for visualization
@@ -20,6 +21,7 @@
   - **Date/Time:** Moment.js 2.29.4 with timezone support
 
 ## **Current Project Structure:**
+
   ```bash
     client/src/
     ├── App.js/css              # Main application
@@ -41,6 +43,7 @@
   ```
 
 ## **Prerequisites:**
+
   1. Deep understanding of React 18+ best practices and modern hooks
   2. Expertise in responsive design and mobile-first development
   3. Knowledge of Vedic astrology terminology and cultural sensitivity
@@ -303,3 +306,214 @@
   - User testing with target audience for cultural authenticity feedback
 
 **Remember: You are creating a digital bridge between ancient Vedic wisdom and modern technology. Every design decision should honor the sacred nature of Jyotish Shastra while providing an exceptional, accessible, and engaging user experience. Focus on creating something that feels both timeless and cutting-edge, respectful yet innovative.**
+
+
+
+
+
+
+## **Role**
+
+  You are a Senior Frontend Architect specializing in design systems, CSS architecture, and modern frontend development with expertise in creating production-ready utility systems and implementing complex UI frameworks from scratch.
+
+## **Objective**
+
+  Implement a comprehensive CSS utility system for a Vedic astrology application to replace missing Tailwind classes, ensuring zero visual regressions while maintaining design system consistency, optimal performance, and scalability. Create a complete utility-first CSS architecture that supports all existing component requirements and future extensibility.
+
+## **Prerequisites**
+
+  - Deep understanding of CSS utility frameworks (Tailwind CSS methodology)
+  - Experience with design system architecture and theming
+  - Knowledge of Vedic astrology UI/UX patterns and cosmic design aesthetics
+  - Proficiency in CSS Grid, Flexbox, and modern CSS features
+  - Understanding of PostCSS, CRACO, and build tool configurations
+
+## **Analysis & Research Instructions**
+
+  1.  **Comprehensive CSS Audit**
+
+    * Scan all React components to identify every missing utility class
+    * Categorize missing utilities by type: layout, spacing, colors, effects, states
+    * Document current working classes vs. missing classes with complete inventory
+    * Analyze design patterns and spacing scale requirements
+    * Identify cosmic/vedic design themes and color palettes needed
+
+  2.  **Component Dependency Mapping**
+
+    * Map each component to its required utility classes
+    * Identify critical path components (HomePage, Charts, Forms)
+    * Document state variations (hover, focus, active) for all interactive elements
+    * Catalog gradient patterns, shadow styles, and animation requirements
+    * Create priority matrix for implementation order
+
+  3. **Design System Architecture Research**
+
+    * Study existing index.css structure and working utility patterns
+    * Define comprehensive design token system (colors, spacing, typography)
+    * Research optimal utility naming conventions and responsive breakpoints
+    * Analyze browser compatibility requirements and fallback strategies
+    * Plan modular CSS architecture for maintainability
+
+## **Core Instructions & Tasks**
+
+  1. **Complete CSS Utility System Implementation**
+
+    - Create a comprehensive utility-first CSS system that includes:
+
+      A.  **Layout & Structure Utilities**
+
+        ```css
+          /* Layout utilities for component structure */
+          .min-h-screen, .overflow-hidden, .relative, .absolute
+          /* Flexbox and Grid systems */
+          .flex, .grid, .justify-center, .items-center, .gap-*
+          /* Display and positioning utilities */
+          .block, .inline-block, .hidden, .fixed, .sticky
+        ```
+
+      B. **Vedic Design Color System**
+
+        ```css
+          /* Cosmic color palette with CSS custom properties */
+          :root { --vedic-primary, --cosmic-purple, --vedic-background }
+          /* Background utilities with gradient support */
+          .bg-vedic-*, .bg-gradient-to-*, .from-*, .via-*, .to-*
+          /* Text color utilities */
+          .text-vedic-*, .text-cosmic-*
+        ```
+
+      C. **Spacing & Sizing System**
+
+        ```css
+          /* Comprehensive spacing scale (padding, margin) */
+          .p-*, .m-*, .px-*, .py-*, .mx-*, .my-*
+          /* Width and height utilities */
+          .w-*, .h-*, .max-w-*, .min-h-*
+          /* Gap utilities for flex/grid */
+          .gap-*, .gap-x-*, .gap-y-*
+        ```
+      D. **Effects & Interactions**
+
+        ```css
+          /* Shadow system for depth and elevation */
+          .shadow-vedic, .shadow-cosmic, .shadow-lg, .shadow-none
+          /* Focus and hover states */
+          .focus:ring-*, .hover:*, .active:*
+          /* Transform and transition utilities */
+          .transform, .scale-*, .rotate-*, .transition-*
+        ```
+
+    2. **Responsive Design System**
+
+      * **Implement mobile-first responsive utilities:**
+
+        - Breakpoint system (sm:, md:, lg:, xl:, 2xl:)
+        - Responsive spacing, typography, and layout classes
+        - Container utilities for content width management
+        - Responsive grid and flexbox utilities
+
+    3. **Performance Optimization**
+
+      * Implement CSS custom properties for dynamic theming
+      * Create modular CSS architecture with logical imports
+      * Optimize selector specificity and cascade order
+      * Implement CSS purging strategy for unused utilities
+      * Ensure minimal bundle size impact
+
+    4. **Integration & Testing**
+
+      * Verify all existing components render correctly with new utilities
+      * Test responsive behavior across all breakpoints
+      * Validate design consistency across component library
+      * Ensure no conflicts with existing CSS rules
+      * Test performance impact and load times
+
+## **Deliverables & Outcomes**
+
+  1. **Complete Utility System Files**
+
+    - Enhanced index.css: Comprehensive utility system with all missing classes
+    - Design tokens: CSS custom properties for consistent theming
+    - Component-specific utilities: Specialized classes for astrology UI patterns
+    - Responsive utilities: Complete breakpoint system implementation
+
+  2. **Documentation Package**
+
+    - Utility class reference: Complete documentation of all available utilities
+    - Design system guide: Color palette, spacing scale, typography system
+    - Component migration guide: Step-by-step component update instructions
+    - Browser compatibility matrix: Supported features and fallbacks
+
+  3. **Quality Assurance Assets**
+
+    - Visual regression test suite: Automated screenshot comparisons
+    - Performance benchmarks: Bundle size and load time measurements
+    - Accessibility audit: WCAG compliance verification for all utilities
+    - Cross-browser test results: Compatibility verification across major browsers
+
+## **Constraints**
+
+  * **Strict Limitations**
+
+    - *Zero functionality changes:* Only add missing CSS utilities, never modify component logic
+    - *No external dependencies:* Implement utilities using pure CSS without additional libraries
+    - *Maintain existing classes:* All currently working utilities must remain functional
+    - *Performance budget:* CSS additions must not exceed 50KB gzipped
+    - *Browser support:* Must support all browsers currently supported by the application
+
+##  **Implementation Rules**
+
+  1. Follow existing naming conventions and patterns in current index.css
+  2. Use CSS custom properties for themeable values
+  3. Implement mobile-first responsive design methodology
+  4. Maintain logical CSS organization and commenting
+  5. Ensure cascade order prevents specificity conflicts
+
+##  **Success Criteria**
+
+  * **[ ] Functional Requirements ✅**
+
+      - [ ] All components render without missing CSS class errors
+      - [ ] Visual output matches original Tailwind-based design intentions
+      - [ ] All interactive states (hover, focus, active) function correctly
+      - [ ] Responsive behavior works across all breakpoints
+      - [ ] No console errors related to missing CSS classes
+
+  * **[ ] Quality Standards ✅**
+
+      - [ ] CSS validates without errors or warnings
+      - [ ] Performance impact < 50KB additional CSS
+      - [ ] 100% design system consistency across components
+      - [ ] Complete accessibility compliance (ARIA, contrast ratios)
+      - [ ] Cross-browser compatibility verified on 5+ major browsers
+
+  * **[ ] Maintainability Goals ✅**
+
+      - [ ] Modular CSS architecture with clear organization
+      - [ ] Comprehensive documentation for future developers
+      - [ ] Design token system supports easy theme modifications
+      - [ ] Utility classes follow predictable naming patterns
+      - [ ] CSS structure supports future utility additions
+
+##  **Additional Notes**
+
+  1.  **Technical Considerations**
+
+      - Implement CSS custom properties for dynamic theming support
+      - Use CSS Grid and Flexbox for modern layout capabilities
+      - Include CSS logical properties for international text support
+      - Plan for dark mode support through CSS custom property toggles
+      - Vedic Astrology UI Patterns
+      - Cosmic gradients and celestial color schemes
+      - Sacred geometry-inspired spacing and proportions
+      - Mystical shadow and glow effects for chart elements
+      - Traditional astronomical symbol and iconography support
+
+  2.  **Future Extensibility**
+
+      - Modular architecture supports easy utility additions
+      - Design token system enables quick theme variations
+      - Component-specific utility classes for specialized astrology widgets
+      - Animation utilities for planetary movement and chart interactions
+
+***Remember:*** **You are creating a digital bridge between ancient Vedic wisdom and modern technology. Every design decision should honor the sacred nature of Jyotish Shastra while providing an exceptional, accessible, and engaging user experience. Focus on creating something that feels both timeless and cutting-edge, respectful yet innovative.**

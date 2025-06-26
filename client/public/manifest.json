@@ -1,16 +1,116 @@
 {
-  "short_name": "Jyotish Shastra",
+  "short_name": "Jyotish",
   "name": "Jyotish Shastra - Vedic Astrology Analysis",
   "description": "Expert-level Vedic Kundli Analysis and Birth Chart Generation",
-  "icons": [
-    {
-      "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
-    }
-  ],
   "start_url": ".",
   "display": "standalone",
   "theme_color": "#FF6B35",
-  "background_color": "#FFF8DC"
+  "background_color": "#FFFEF7",
+  "orientation": "portrait-primary",
+  "categories": ["lifestyle", "spirituality", "education"],
+  "lang": "en-US",
+  "dir": "ltr",
+  "prefer_related_applications": false,
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/home.png",
+      "sizes": "1280x720",
+      "type": "image/png"
+    },
+    {
+      "src": "/screenshots/chart.png",
+      "sizes": "1280x720",
+      "type": "image/png"
+    },
+    {
+      "src": "/screenshots/analysis.png",
+      "sizes": "1280x720",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Generate Birth Chart",
+      "short_name": "Chart",
+      "description": "Create your personalized Vedic birth chart",
+      "url": "/chart",
+      "icons": [{ "src": "/icons/chart.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Daily Horoscope",
+      "short_name": "Horoscope",
+      "description": "View your daily Vedic horoscope",
+      "url": "/horoscope",
+      "icons": [{ "src": "/icons/horoscope.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Compatibility Analysis",
+      "short_name": "Match",
+      "description": "Check astrological compatibility",
+      "url": "/compatibility",
+      "icons": [{ "src": "/icons/compatibility.png", "sizes": "96x96" }]
+    }
+  ],
+  "related_applications": [],
+  "share_target": {
+    "action": "/share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
 }
