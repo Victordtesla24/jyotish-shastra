@@ -1,1 +1,210 @@
- 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Google Fonts Import */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@300;400;500;600;700&display=swap');
+
+/* Base Layer Customizations */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply font-sans antialiased;
+    background-color: #f8fafc;
+  }
+
+  /* Remove default margins from headings for better Tailwind control */
+  h1, h2, h3, h4, h5, h6 {
+    @apply m-0;
+  }
+}
+
+/* Component Layer - Reusable patterns */
+@layer components {
+  /* Vedic Button Styles */
+  .btn-vedic-primary {
+    @apply bg-gradient-vedic text-white px-6 py-3 rounded-vedic font-medium;
+    @apply shadow-vedic-medium hover:shadow-vedic-strong;
+    @apply transform transition-all duration-300 hover:scale-105;
+    @apply focus:outline-none focus:ring-2 focus:ring-saffron focus:ring-opacity-50;
+  }
+
+  .btn-vedic-secondary {
+    @apply bg-transparent border-2 border-white text-white px-6 py-3 rounded-vedic font-medium;
+    @apply hover:bg-white hover:text-navy transition-colors duration-300;
+    @apply focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50;
+  }
+
+  .btn-cosmic {
+    @apply bg-gradient-cosmic text-white px-6 py-3 rounded-vedic font-medium;
+    @apply shadow-cosmic hover:shadow-celestial;
+    @apply transform transition-all duration-300 hover:scale-105;
+  }
+
+  /* Card Components */
+  .card-vedic {
+    @apply bg-white rounded-2xl shadow-vedic-soft p-6;
+    @apply border border-gray-100 hover:shadow-vedic-medium;
+    @apply transition-shadow duration-300;
+  }
+
+  .card-cosmic {
+    @apply bg-gradient-cosmic text-white rounded-2xl p-6;
+    @apply shadow-cosmic backdrop-blur-sm;
+  }
+
+  /* Navigation Styles */
+  .nav-link-vedic {
+    @apply font-medium py-2 border-b-2 transition-all duration-200;
+    @apply hover:opacity-80 hover:border-white;
+  }
+
+  .nav-link-active {
+    @apply border-vedic-gold text-vedic-gold;
+  }
+
+  .nav-link-inactive {
+    @apply border-transparent;
+  }
+
+  /* Hero Section */
+  .hero-vedic {
+    @apply bg-gradient-to-br from-stellar-blue to-cosmic-purple;
+    @apply text-white p-12 md:p-20 text-center rounded-2xl;
+  }
+
+  /* Loading Spinner */
+  .spinner-vedic {
+    @apply inline-block w-8 h-8 border-4 border-saffron border-r-transparent;
+    @apply rounded-full animate-spin;
+  }
+
+  .spinner-cosmic {
+    @apply inline-block w-12 h-12 border-4 border-cosmic-purple border-r-transparent;
+    @apply rounded-full animate-mandala-rotate;
+  }
+
+  /* Form Elements Enhancement */
+  .input-vedic {
+    @apply w-full px-4 py-3 border border-gray-300 rounded-vedic;
+    @apply focus:outline-none focus:ring-2 focus:ring-saffron focus:border-saffron;
+    @apply transition-all duration-200;
+  }
+
+  .input-vedic:focus {
+    @apply shadow-vedic-soft;
+  }
+
+  /* Alert/Message Components */
+  .alert-success {
+    @apply bg-green-50 border border-green-200 text-green-800 p-4 rounded-vedic;
+  }
+
+  .alert-error {
+    @apply bg-red-50 border border-red-200 text-red-800 p-4 rounded-vedic;
+  }
+
+  .alert-warning {
+    @apply bg-yellow-50 border border-yellow-200 text-yellow-800 p-4 rounded-vedic;
+  }
+
+  /* Astrology-specific patterns */
+  .planet-card {
+    @apply bg-white rounded-lg p-4 shadow-vedic-soft border border-gray-200;
+    @apply hover:shadow-vedic-medium transition-shadow duration-300;
+  }
+
+  .house-section {
+    @apply border-2 border-gray-300 rounded-lg p-3;
+    @apply hover:border-saffron transition-colors duration-200;
+  }
+
+  .yoga-highlight {
+    @apply bg-gradient-to-r from-gold to-saffron text-white px-3 py-1 rounded-full;
+    @apply text-sm font-medium shadow-golden;
+  }
+
+  .dasha-timeline {
+    @apply relative pl-6 pb-6 border-l-2 border-cosmic-purple;
+  }
+
+  .dasha-timeline::before {
+    @apply absolute -left-2 top-0 w-4 h-4 bg-cosmic-purple rounded-full;
+    content: '';
+  }
+}
+
+/* Utility Layer - Project-specific utilities */
+@layer utilities {
+  /* Vedic-specific text effects */
+  .text-vedic-gradient {
+    background: linear-gradient(135deg, #FF9933 0%, #800000 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-cosmic-gradient {
+    background: linear-gradient(135deg, #6B46C1 0%, #1E40AF 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Scroll behavior utilities */
+  .scroll-smooth {
+    scroll-behavior: smooth;
+  }
+
+  /* Animation utilities */
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.6s ease-out;
+  }
+
+  /* Container utilities for consistent spacing */
+  .container-vedic {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .section-spacing {
+    @apply py-12 md:py-16 lg:py-20;
+  }
+
+  /* Responsive text sizes with proper line heights */
+  .text-responsive-xl {
+    @apply text-xl md:text-2xl lg:text-3xl;
+  }
+
+  .text-responsive-2xl {
+    @apply text-2xl md:text-3xl lg:text-4xl;
+  }
+
+  .text-responsive-3xl {
+    @apply text-3xl md:text-4xl lg:text-5xl;
+  }
+}
+
+/* Critical CSS for immediate load */
+.no-js-fallback {
+  display: none;
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

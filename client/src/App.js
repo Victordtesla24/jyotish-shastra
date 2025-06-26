@@ -1,7 +1,6 @@
 import React from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { Routes, Route } from 'react-router-dom';
-import './index.css'; // Import utility CSS first
 import Header from './components/Header';
 import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
