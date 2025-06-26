@@ -1,0 +1,588 @@
+/* PersonalityProfile.css */
+
+.personality-profile {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
+}
+
+/* Header Styles */
+.profile-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding: 2rem;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.profile-header h2 {
+  color: #2c3e50;
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.profile-subtitle {
+  color: #7f8c8d;
+  font-size: 1.1rem;
+  margin: 0;
+  font-style: italic;
+}
+
+/* Loading State */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #ecf0f1;
+  border-top: 3px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Analysis Section Styles */
+.analysis-section {
+  background: white;
+  border-radius: 15px;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.analysis-section:hover {
+  transform: translateY(-2px);
+}
+
+.section-header {
+  padding: 1.5rem 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  justify-content: between;
+  align-items: center;
+  transition: background 0.3s ease;
+}
+
+.section-header:hover {
+  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+}
+
+.section-header h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 500;
+  flex-grow: 1;
+}
+
+.expand-icon {
+  font-size: 1rem;
+  transition: transform 0.3s ease;
+  margin-left: 1rem;
+}
+
+.expand-icon.expanded {
+  transform: rotate(180deg);
+}
+
+.section-content {
+  padding: 2rem;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Overview Sections */
+.lagna-overview,
+.moon-overview,
+.sun-overview,
+.arudha-overview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 10px;
+  border-left: 4px solid #3498db;
+}
+
+.lagna-info,
+.moon-info,
+.sun-info,
+.arudha-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  font-size: 0.9rem;
+  color: #7f8c8d;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.value {
+  font-size: 1.1rem;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+/* Strength Indicators */
+.strength-excellent {
+  color: #27ae60 !important;
+}
+
+.strength-very.good {
+  color: #2ecc71 !important;
+}
+
+.strength-good {
+  color: #f39c12 !important;
+}
+
+.strength-average {
+  color: #e67e22 !important;
+}
+
+.strength-below.average,
+.strength-weak,
+.strength-very.weak {
+  color: #e74c3c !important;
+}
+
+/* Personality Traits */
+.personality-traits {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.trait-item {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  background: #ecf0f1;
+  border-radius: 8px;
+  transition: background 0.3s ease;
+}
+
+.trait-item:hover {
+  background: #d5dbdb;
+}
+
+.trait-icon {
+  color: #3498db;
+  font-weight: bold;
+  margin-right: 0.75rem;
+  font-size: 1.2rem;
+}
+
+.trait-text {
+  color: #2c3e50;
+  font-size: 0.95rem;
+}
+
+/* Strengths and Weaknesses */
+.strengths-weaknesses {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.strengths-section,
+.weaknesses-section {
+  padding: 1.5rem;
+  border-radius: 10px;
+}
+
+.strengths-section {
+  background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+  border-left: 4px solid #28a745;
+}
+
+.weaknesses-section {
+  background: linear-gradient(135deg, #f8d7da 0%, #f1c2c7 100%);
+  border-left: 4px solid #dc3545;
+}
+
+.strengths-section h4,
+.weaknesses-section h4 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #2c3e50;
+}
+
+.strength-item,
+.weakness-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 6px;
+}
+
+.strength-icon {
+  color: #28a745;
+  font-weight: bold;
+  margin-right: 0.75rem;
+}
+
+.weakness-icon {
+  color: #dc3545;
+  font-weight: bold;
+  margin-right: 0.75rem;
+}
+
+/* Description Sections */
+.lagna-description,
+.moon-description,
+.sun-description,
+.arudha-description {
+  margin-bottom: 2rem;
+}
+
+.lagna-description h4,
+.moon-description h4,
+.sun-description h4,
+.arudha-description h4 {
+  color: #2c3e50;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
+.lagna-description p,
+.moon-description p,
+.sun-description p,
+.arudha-description p {
+  color: #34495e;
+  line-height: 1.6;
+  font-size: 1rem;
+}
+
+/* Lord Placement */
+.lord-placement {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: #fff3cd;
+  border-radius: 10px;
+  border-left: 4px solid #ffc107;
+}
+
+.placement-effects {
+  margin-top: 1rem;
+}
+
+.effect-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 6px;
+}
+
+.effect-icon {
+  color: #ffc107;
+  margin-right: 0.75rem;
+  font-weight: bold;
+}
+
+/* Leadership Qualities */
+.leadership-qualities {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: #e1f5fe;
+  border-radius: 10px;
+  border-left: 4px solid #03a9f4;
+}
+
+.leadership-traits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.leadership-trait {
+  padding: 0.4rem 0.8rem;
+  background: #03a9f4;
+  color: white;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* Image vs Reality */
+.image-vs-reality {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: #f3e5f5;
+  border-radius: 10px;
+  border-left: 4px solid #9c27b0;
+}
+
+.comparison {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin: 1rem 0;
+}
+
+.reality-side,
+.image-side {
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
+}
+
+.reality-side h5,
+.image-side h5 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  color: #2c3e50;
+}
+
+.alignment-note {
+  display: flex;
+  align-items: center;
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 8px;
+}
+
+.alignment-icon {
+  margin-right: 0.75rem;
+  font-size: 1.2rem;
+}
+
+/* Personality Layers */
+.personality-layers {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.layer {
+  padding: 1.5rem;
+  border-radius: 10px;
+  border-left: 4px solid;
+}
+
+.body-layer {
+  background: #fff8e1;
+  border-left-color: #ff9800;
+}
+
+.mind-layer {
+  background: #e8f5e8;
+  border-left-color: #4caf50;
+}
+
+.soul-layer {
+  background: #fff3e0;
+  border-left-color: #ff5722;
+}
+
+.image-layer {
+  background: #f3e5f5;
+  border-left-color: #9c27b0;
+}
+
+.layer h5 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #2c3e50;
+}
+
+.layer p {
+  margin: 0;
+  color: #34495e;
+  line-height: 1.5;
+}
+
+/* Evolution Path */
+.evolution-path {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: #e3f2fd;
+  border-radius: 10px;
+  border-left: 4px solid #2196f3;
+}
+
+.evolution-stages {
+  margin-top: 1rem;
+}
+
+.evolution-stage {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
+}
+
+.stage-number {
+  width: 30px;
+  height: 30px;
+  background: #2196f3;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  margin-right: 1rem;
+  flex-shrink: 0;
+}
+
+.stage-description {
+  color: #2c3e50;
+  line-height: 1.5;
+}
+
+/* Recommendations */
+.recommendations-section {
+  margin-top: 3rem;
+  padding: 2rem;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.recommendations-section h3 {
+  color: #2c3e50;
+  margin-bottom: 2rem;
+  text-align: center;
+  font-size: 1.5rem;
+}
+
+.recommendations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.recommendation-card {
+  padding: 1.5rem;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.recommendation-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.rec-icon {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.rec-content h4 {
+  margin: 0 0 1rem 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.rec-content p {
+  margin: 0 0 1rem 0;
+  line-height: 1.5;
+  opacity: 0.9;
+}
+
+.rec-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.detail-item {
+  padding: 0.3rem 0.6rem;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+  font-size: 0.85rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .personality-profile {
+    padding: 1rem;
+  }
+
+  .profile-header {
+    padding: 1.5rem;
+  }
+
+  .profile-header h2 {
+    font-size: 2rem;
+  }
+
+  .section-content {
+    padding: 1.5rem;
+  }
+
+  .strengths-weaknesses {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .comparison {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .personality-layers {
+    grid-template-columns: 1fr;
+  }
+
+  .recommendations-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .lagna-overview,
+  .moon-overview,
+  .sun-overview,
+  .arudha-overview {
+    grid-template-columns: 1fr;
+  }
+}

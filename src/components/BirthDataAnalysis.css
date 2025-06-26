@@ -1,0 +1,257 @@
+.birth-data-analysis {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+}
+
+.analysis-header {
+  text-align: center;
+  margin-bottom: 30px;
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 10px;
+}
+
+.analysis-header h2 {
+  margin: 0 0 10px 0;
+  font-size: 2.2em;
+  font-weight: 300;
+}
+
+.timestamp {
+  margin: 0;
+  opacity: 0.9;
+  font-size: 0.9em;
+}
+
+.summary-section {
+  margin-bottom: 30px;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  border-left: 4px solid #667eea;
+}
+
+.summary-section h3 {
+  margin: 0 0 20px 0;
+  color: #333;
+  font-size: 1.5em;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+.summary-item {
+  padding: 15px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.status {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 0.8em;
+}
+
+.status.complete {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status.incomplete {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.analyses-section {
+  margin-bottom: 30px;
+}
+
+.analyses-section h3 {
+  margin: 0 0 20px 0;
+  color: #333;
+  font-size: 1.5em;
+  border-bottom: 2px solid #667eea;
+  padding-bottom: 10px;
+}
+
+.analysis-item {
+  margin-bottom: 30px;
+  padding: 25px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  border-left: 4px solid #667eea;
+}
+
+.question {
+  color: #2c3e50;
+  font-size: 1.3em;
+  margin: 0 0 15px 0;
+  font-weight: 600;
+}
+
+.answer {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border-left: 3px solid #28a745;
+  font-size: 1.1em;
+  line-height: 1.7;
+}
+
+.details {
+  margin-top: 20px;
+}
+
+.details h4 {
+  color: #495057;
+  margin: 0 0 10px 0;
+  font-size: 1.1em;
+}
+
+.details ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.details li {
+  padding: 8px 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.details li:last-child {
+  border-bottom: none;
+}
+
+.planetary-positions {
+  margin-top: 20px;
+}
+
+.planetary-positions h4 {
+  color: #495057;
+  margin: 0 0 15px 0;
+  font-size: 1.1em;
+}
+
+.planets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 10px;
+}
+
+.planet-position {
+  padding: 10px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border-left: 3px solid #17a2b8;
+  font-size: 0.95em;
+}
+
+.retrograde {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.combust {
+  color: #fd7e14;
+  font-weight: bold;
+}
+
+.dasha-sequence {
+  margin-top: 20px;
+}
+
+.dasha-sequence h4 {
+  color: #495057;
+  margin: 0 0 15px 0;
+  font-size: 1.1em;
+}
+
+.dasha-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dasha-item {
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border-left: 3px solid #6f42c1;
+  font-size: 0.95em;
+  transition: all 0.3s ease;
+}
+
+.dasha-item.current {
+  background: #e3f2fd;
+  border-left-color: #2196f3;
+  box-shadow: 0 2px 4px rgba(33, 150, 243, 0.2);
+}
+
+.current-indicator {
+  color: #2196f3;
+  font-weight: bold;
+}
+
+.remaining {
+  color: #6c757d;
+  font-style: italic;
+}
+
+.conclusion {
+  padding: 25px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.conclusion h3 {
+  margin: 0 0 15px 0;
+  font-size: 1.5em;
+}
+
+.conclusion p {
+  margin: 0;
+  font-size: 1.1em;
+  line-height: 1.6;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .birth-data-analysis {
+    padding: 15px;
+  }
+
+  .analysis-header h2 {
+    font-size: 1.8em;
+  }
+
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .planets-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .analysis-item {
+    padding: 20px;
+  }
+
+  .question {
+    font-size: 1.2em;
+  }
+}
