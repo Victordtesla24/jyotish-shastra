@@ -1,13 +1,14 @@
 import React from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { Routes, Route } from 'react-router-dom';
+import './index.css'; // Import utility CSS first
+import './App.css';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
 import ChartPage from './pages/ChartPage';
 import AnalysisPage from './pages/AnalysisPage';
 import ReportPage from './pages/ReportPage';
-import './App.css';
 
 const queryClient = new QueryClient();
 

@@ -26,7 +26,6 @@ const useCountUp = (end, duration = 2000) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting && !hasAnimated.current) {
           hasAnimated.current = true;
-          let start = 0;
           const startTime = Date.now();
 
           const animate = () => {
