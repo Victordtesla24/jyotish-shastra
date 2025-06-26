@@ -676,7 +676,7 @@ function sanitizeBirthData(data) {
 }
 
 /**
- * Validate comprehensive analysis data. Name is optional for validation standardization.
+ * Validate comprehensive analysis data. Name is required by default for backwards compatibility.
  * @param {Object} data - Analysis data to validate
  * @param {boolean} isStandardization - Whether this is a standardization test (name optional)
  * @returns {Object} Validation result
@@ -701,19 +701,13 @@ function validateComprehensiveAnalysis(data, isStandardization = false) {
     };
   }
 
-  // Choose schema based on standardization mode
-  let schema;
-  if (isStandardization) {
-    // For standardization tests, name is optional
-    schema = comprehensiveAnalysisSchema;
-  } else {
-    // For regular analysis, name is required - create modified schema
-    schema = comprehensiveAnalysisSchema.keys({
-      name: nameSchema.required()  // Make name required for non-standardization mode
-    });
+  // For backwards compatibility - require name when not in standardization mode
+  if (!isStandardization) {
+    return validateWithNameRequired(birthData, 'Comprehensive analysis requires name, birth date, time, and location information.');
   }
 
-  const { error, value } = schema.validate(birthData, {
+  // Use analysisRequiredSchema which has name as optional by default
+  const { error, value } = analysisRequiredSchema.validate(birthData, {
     abortEarly: false,
     allowUnknown: true,
     stripUnknown: false
@@ -733,16 +727,8 @@ function validateComprehensiveAnalysis(data, isStandardization = false) {
           });
         });
       } else {
-        // For comprehensive analysis, handle field naming based on context
-        let fieldName;
-        if (data.birthData && !isStandardization) {
-          // Only add birthData prefix for non-standardization tests when data is wrapped
-          fieldName = `birthData.${detail.path.join('.')}`;
-        } else {
-          fieldName = detail.path.join('.');
-        }
         errors.push({
-          field: fieldName,
+          field: detail.path.join('.'),
           message: detail.message,
           providedValue: detail.context?.value
         });
@@ -753,9 +739,7 @@ function validateComprehensiveAnalysis(data, isStandardization = false) {
       isValid: false,
       errors,
       suggestions: generateValidationSuggestions(error.details),
-            helpText: isStandardization
-        ? 'Comprehensive analysis requires birth date, time, and location information.'
-        : 'All required fields must be provided: name, birth date, time, and location information.',
+      helpText: 'Comprehensive analysis requires birth date, time, and location information.',
       data: null
     };
   }
@@ -768,7 +752,62 @@ function validateComprehensiveAnalysis(data, isStandardization = false) {
 }
 
 /**
- * Validate house analysis data. Name is optional for validation standardization.
+ * PRODUCTION-GRADE: Validate data with name field required (for backwards compatibility)
+ * @param {Object} data - Analysis data to validate
+ * @param {string} helpText - Custom help text for validation
+ * @returns {Object} Validation result
+ */
+function validateWithNameRequired(data, helpText = 'Analysis requires name, birth date, time, and location information.') {
+  // Create schema with name required
+  const schemaWithNameRequired = analysisRequiredSchema.keys({
+    name: nameSchema.required()
+  });
+
+  const { error, value } = schemaWithNameRequired.validate(data, {
+    abortEarly: false,
+    allowUnknown: true,
+    stripUnknown: false
+  });
+
+  if (error) {
+    const errors = [];
+
+    error.details.forEach(detail => {
+      if (detail.type === 'custom.multifield' && detail.context?.errors) {
+        detail.context.errors.forEach(customError => {
+          errors.push({
+            field: customError.field,
+            message: customError.message,
+            providedValue: undefined
+          });
+        });
+      } else {
+        errors.push({
+          field: detail.path.join('.'),
+          message: detail.message,
+          providedValue: detail.context?.value
+        });
+      }
+    });
+
+    return {
+      isValid: false,
+      errors,
+      suggestions: generateValidationSuggestions(error.details),
+      helpText,
+      data: null
+    };
+  }
+
+  return {
+    isValid: true,
+    errors: [],
+    data: value
+  };
+}
+
+/**
+ * Validate house analysis data. Name is required by default for backwards compatibility.
  * @param {Object} data - Analysis data to validate
  * @param {boolean} isStandardization - Whether this is a standardization test (name optional)
  * @returns {Object} Validation result
@@ -776,19 +815,13 @@ function validateComprehensiveAnalysis(data, isStandardization = false) {
 function validateHouseAnalysis(data, isStandardization = false) {
   const birthData = data.birthData || data;
 
-  // Choose schema based on standardization mode
-  let schema;
-  if (isStandardization) {
-    // For standardization tests, name is optional
-    schema = comprehensiveAnalysisSchema;
-  } else {
-    // For regular analysis, name is required
-    schema = comprehensiveAnalysisSchema.keys({
-      name: nameSchema.required()  // Make name required for non-standardization mode
-    });
+  if (!isStandardization) {
+    // For backwards compatibility - require name when not in standardization mode
+    return validateWithNameRequired(birthData, 'House analysis requires name, birth date, time, and location information.');
   }
 
-  const { error, value } = schema.validate(birthData, {
+  // Use analysisRequiredSchema which has name as optional by default
+  const { error, value } = analysisRequiredSchema.validate(birthData, {
     abortEarly: false,
     allowUnknown: true,
     stripUnknown: false
@@ -833,32 +866,45 @@ function validateHouseAnalysis(data, isStandardization = false) {
 }
 
 /**
- * Validate aspect analysis data (name optional for standardization)
+ * Validate aspect analysis data (name required by default for backwards compatibility)
  * @param {Object} data - Analysis data to validate
  * @param {boolean} isStandardization - Whether this is a standardization test (name optional)
  * @returns {Object} Validation result
  */
 function validateAspectAnalysis(data, isStandardization = false) {
-  return validateHouseAnalysis(data, isStandardization); // Same logic for now
+  if (!isStandardization) {
+    // For backwards compatibility - require name when not in standardization mode
+    return validateWithNameRequired(data, 'Aspect analysis requires name, birth date, time, and location information.');
+  }
+  return validateHouseAnalysis(data, isStandardization);
 }
 
 /**
- * Validate arudha analysis data (name optional for standardization)
+ * Validate arudha analysis data (name required by default for backwards compatibility)
  * @param {Object} data - Analysis data to validate
  * @param {boolean} isStandardization - Whether this is a standardization test (name optional)
  * @returns {Object} Validation result
  */
 function validateArudhaAnalysis(data, isStandardization = false) {
-  return validateHouseAnalysis(data, isStandardization); // Same logic for now
+  if (!isStandardization) {
+    // For backwards compatibility - require name when not in standardization mode
+    return validateWithNameRequired(data, 'Arudha analysis requires name, birth date, time, and location information.');
+  }
+  return validateHouseAnalysis(data, isStandardization);
 }
 
 /**
- * Validate navamsa analysis data (name optional for standardization)
+ * Validate navamsa analysis data (name required by default for backwards compatibility)
  * @param {Object} data - Analysis data to validate
  * @param {boolean} isStandardization - Whether this is a standardization test (name optional)
  * @returns {Object} Validation result
  */
-function validateNavamsaAnalysis(data, isStandardization = true) {
+function validateNavamsaAnalysis(data, isStandardization = false) {
+  if (!isStandardization) {
+    // For backwards compatibility - require name when not in standardization mode
+    return validateWithNameRequired(data, 'Navamsa analysis requires name, birth date, time, and location information.');
+  }
+
   // Use analysisRequiredSchema which has name as optional by default
   const { error, value } = analysisRequiredSchema.validate(data, {
     abortEarly: false,
@@ -893,12 +939,17 @@ function validateNavamsaAnalysis(data, isStandardization = true) {
 }
 
 /**
- * Validate dasha analysis data (name optional for standardization)
+ * Validate dasha analysis data (name required by default for backwards compatibility)
  * @param {Object} data - Analysis data to validate
  * @param {boolean} isStandardization - Whether this is a standardization test (name optional)
  * @returns {Object} Validation result
  */
-function validateDashaAnalysis(data, isStandardization = true) {
+function validateDashaAnalysis(data, isStandardization = false) {
+  if (!isStandardization) {
+    // For backwards compatibility - require name when not in standardization mode
+    return validateWithNameRequired(data, 'Dasha analysis requires name, birth date, time, and location information.');
+  }
+
   // Use analysisRequiredSchema which has name as optional by default
   const { error, value } = analysisRequiredSchema.validate(data, {
     abortEarly: false,
@@ -1047,6 +1098,26 @@ const analysisRequiredSchema = Joi.object({
       .valid('tropical', 'sidereal')
       .default('sidereal')
   }).optional()
+}).custom((value, helpers) => {
+  // PRODUCTION-GRADE: Ensure either coordinates or place information is provided
+  const hasCoordinates = value.latitude && value.longitude;
+  const hasPlaceInfo = value.placeOfBirth &&
+    (typeof value.placeOfBirth === 'string' ||
+     (typeof value.placeOfBirth === 'object' && (value.placeOfBirth.latitude && value.placeOfBirth.longitude)));
+
+  if (!hasCoordinates && !hasPlaceInfo) {
+    return helpers.error('custom.multifield', {
+      errors: [
+        { field: 'latitude', message: 'Latitude is required when place information is not provided' },
+        { field: 'longitude', message: 'Longitude is required when place information is not provided' },
+        { field: 'timezone', message: 'Timezone is required for accurate calculations' }
+      ]
+    });
+  }
+
+  return value;
+}).messages({
+  'custom.multifield': 'Either coordinates (latitude, longitude) or place of birth information must be provided'
 });
 
 module.exports = {

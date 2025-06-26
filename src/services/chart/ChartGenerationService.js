@@ -503,36 +503,38 @@ class ChartGenerationService {
   }
 
   /**
-   * Calculate Dasha information
+   * Calculate Dasha information using DetailedDashaAnalysisService for consistency
    * @param {Object} rasiChart - Rasi chart data
    * @returns {Object} Dasha information
    */
   calculateDashaInfo(rasiChart) {
-    const moonNakshatra = rasiChart.nakshatra;
-    const birthDate = new Date(rasiChart.birthData.dateOfBirth);
+    // Use DetailedDashaAnalysisService for consistent Dasha calculations
+    const DetailedDashaAnalysisService = require('../analysis/DetailedDashaAnalysisService');
+    const dashaService = new DetailedDashaAnalysisService();
 
-    // Calculate Vimshottari Dasha periods
+    // Calculate comprehensive Dasha analysis
+    const dashaAnalysis = dashaService.analyzeAllDashas(rasiChart);
+
+    // Extract birth Dasha from the sequence
+    const birthDasha = dashaAnalysis.dasha_sequence[0]?.planet || 'moon';
+
+    // Legacy format for backward compatibility
     const dashaPeriods = {
       sun: 6, moon: 10, mars: 7, mercury: 17, jupiter: 16,
       venus: 20, saturn: 19, rahu: 18, ketu: 7
     };
 
-    // Determine birth Dasha based on Moon's Nakshatra
+    const moonNakshatra = rasiChart.nakshatra;
     const nakshatraLord = this.getNakshatraLord(moonNakshatra.name);
-    const birthDasha = nakshatraLord;
-
-    // Calculate current Dasha
-    const currentDate = new Date();
-    const ageInYears = (currentDate - birthDate) / (1000 * 60 * 60 * 24 * 365.25);
-
-    // Calculate current Dasha (simplified calculation)
-    const currentDasha = this.calculateCurrentDasha(birthDasha, ageInYears, dashaPeriods);
 
     return {
       birthDasha,
-      currentDasha,
+      currentDasha: dashaAnalysis.current_dasha,
       dashaPeriods,
-      nakshatraLord
+      nakshatraLord,
+      // Include full analysis for enhanced data
+      dashaSequence: dashaAnalysis.dasha_sequence,
+      summary: dashaAnalysis.summary
     };
   }
 
@@ -557,39 +559,7 @@ class ChartGenerationService {
     return nakshatraLords[nakshatraName] || 'moon';
   }
 
-  /**
-   * Calculate current Dasha
-   * @param {string} birthDasha - Birth Dasha
-   * @param {number} ageInYears - Age in years
-   * @param {Object} dashaPeriods - Dasha periods
-   * @returns {Object} Current Dasha information
-   */
-  calculateCurrentDasha(birthDasha, ageInYears, dashaPeriods) {
-    const dashaOrder = ['sun', 'moon', 'mars', 'rahu', 'jupiter', 'saturn', 'mercury', 'ketu', 'venus'];
-    let currentAge = 0;
-    let currentDasha = birthDasha;
-    let dashaStartAge = 0;
-
-    // Find current Dasha
-    for (let i = 0; i < dashaOrder.length; i++) {
-      const dasha = dashaOrder[i];
-      const period = dashaPeriods[dasha];
-
-      if (currentAge + period > ageInYears) {
-        currentDasha = dasha;
-        dashaStartAge = currentAge;
-        break;
-      }
-      currentAge += period;
-    }
-
-    return {
-      dasha: currentDasha,
-      startAge: dashaStartAge,
-      endAge: dashaStartAge + dashaPeriods[currentDasha],
-      remainingYears: (dashaStartAge + dashaPeriods[currentDasha]) - ageInYears
-    };
-  }
+  // Removed calculateCurrentDasha method - now using DetailedDashaAnalysisService for consistency
 
   /**
    * Generate comprehensive analysis
