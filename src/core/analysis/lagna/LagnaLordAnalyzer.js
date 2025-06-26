@@ -798,11 +798,35 @@ class LagnaLordAnalyzer {
    * @returns {string} - Navamsa sign
    */
   static getNavamsaSign(longitude, rasiSign) {
-    // Simplified Navamsa calculation
     const signs = ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo',
                    'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'];
 
-    return signs[Math.floor(Math.random() * 12)]; // Placeholder calculation
+    // Proper Navamsa calculation based on longitude
+    // Each sign (30°) is divided into 9 parts (3°20' each)
+    // Normalize longitude to 0-360 range
+    const normalizedLongitude = ((longitude % 360) + 360) % 360;
+
+    // Get the sign index (0-11) from longitude
+    const signIndex = Math.floor(normalizedLongitude / 30);
+
+    // Get degrees within the sign (0-30)
+    const degreeInSign = normalizedLongitude % 30;
+
+    // Calculate Navamsa position within the sign (0-8)
+    const navamsaPosition = Math.floor(degreeInSign / (30/9));
+
+    // Calculate Navamsa sign based on sign type and position
+    let navamsaSignIndex;
+
+    if (signIndex % 3 === 0) { // Fire signs (Aries, Leo, Sagittarius)
+      navamsaSignIndex = (signIndex + navamsaPosition) % 12;
+    } else if (signIndex % 3 === 1) { // Earth signs (Taurus, Virgo, Capricorn)
+      navamsaSignIndex = (signIndex + 8 + navamsaPosition) % 12;
+    } else { // Air/Water signs (Gemini, Cancer, Libra, Scorpio, Aquarius, Pisces)
+      navamsaSignIndex = (signIndex + 4 + navamsaPosition) % 12;
+    }
+
+    return signs[navamsaSignIndex];
   }
 
   /**
