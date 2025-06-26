@@ -694,9 +694,18 @@ class MasterAnalysisOrchestrator {
       throw new Error('Cannot generate expert recommendations: Comprehensive house analysis required');
     }
 
+    // Generate actual expert recommendations based on comprehensive analysis
+    const recommendations = {
+      immediate: this.generateImmediateRecommendations(analysis),
+      shortTerm: this.generateShortTermRecommendations(analysis),
+      longTerm: this.generateLongTermRecommendations(analysis),
+      spiritual: this.generateSpiritualRecommendations(analysis),
+      remedial: this.generateRemedialRecommendations(analysis)
+    };
+
     return {
       priority: "high",
-      recommendations: this.synthesizeExpertRecommendations(analysis)
+      recommendations: recommendations
     };
   }
 

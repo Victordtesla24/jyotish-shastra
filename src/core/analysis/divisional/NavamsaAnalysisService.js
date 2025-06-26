@@ -1925,9 +1925,9 @@ class NavamsaAnalysisService {
    * @returns {string} Sign name
    */
   getSignFromIndex(index) {
-    const signs = ['ARIES', 'TAURUS', 'GEMINI', 'CANCER', 'LEO', 'VIRGO',
-                   'LIBRA', 'SCORPIO', 'SAGITTARIUS', 'CAPRICORN', 'AQUARIUS', 'PISCES'];
-    return signs[index % 12] || 'ARIES';
+    const signs = ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo',
+                   'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'];
+    return signs[index % 12] || 'Aries';
   }
 
   /**
