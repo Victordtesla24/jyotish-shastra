@@ -90,33 +90,33 @@ Gender: Male
 
 ```bash
 +-----------------------------------------------------------------------------------------------------------------------------------------+
-|                                               ROOT CAUSE ANALYSIS                                                                      |
+|                                               ROOT CAUSE ANALYSIS                                                                       |
 +-----------------------------------------------------------------------------------------------------------------------------------------+
-| ROOT CAUSE                             | REASONING & IMPACT                           | MINIMAL CODE IMPLEMENTATION FIX                |
+| ROOT CAUSE                             | REASONING & IMPACT                           | MINIMAL CODE IMPLEMENTATION FIX                 |
 +----------------------------------------+----------------------------------------------+-------------------------------------------------+
-| 1. MULTIPLE DATA GENERATION SERVICES   | ChartGenerationService.js AND                | CONSOLIDATE: Remove duplicate services,  |
-|    Creating Conflicting Datasets       | EnhancedChartService.js both generate        | use single ChartGenerationService.js     |
-|                                        | planetary data with different algorithms     | with Swiss Ephemeris integration         |
+| 1. MULTIPLE DATA GENERATION SERVICES   | ChartGenerationService.js AND                | CONSOLIDATE: Remove duplicate services,         |
+|    Creating Conflicting Datasets       | EnhancedChartService.js both generate        | use single ChartGenerationService.js            |
+|                                        | planetary data with different algorithms     | with Swiss Ephemeris integration                |
 +----------------------------------------+----------------------------------------------+-------------------------------------------------+
-| 2. PLACEHOLDER DATA IN ANALYSIS        | Services return hardcoded/template data      | IMPLEMENT: Actual calculation logic in   |
-|    ENDPOINTS                           | instead of computed results. Files:          | NavamsaAnalysisService.js,               |
-|                                        | - DetailedDashaAnalysisService.js            | DetailedDashaAnalysisService.js,         |
-|                                        | - NavamsaAnalysisService.js                  | HouseAnalysisService.js                  |
-|                                        | - HouseAnalysisService.js                    |                                          |
+| 2. PLACEHOLDER DATA IN ANALYSIS        | Services return hardcoded/template data      | IMPLEMENT: Actual calculation logic in          |
+|    ENDPOINTS                           | instead of computed results. Files:          | NavamsaAnalysisService.js,                      |
+|                                        | - DetailedDashaAnalysisService.js            | DetailedDashaAnalysisService.js,                |
+|                                        | - NavamsaAnalysisService.js                  | HouseAnalysisService.js                         |
+|                                        | - HouseAnalysisService.js                    |                                                 |
 +----------------------------------------+----------------------------------------------+-------------------------------------------------+
-| 3. TIMEZONE CONVERSION ERRORS          | System not properly handling IST timezone    | FIX: dateTimeHelpers.js to correctly    |
-|                                        | May be converting to incorrect timezones     | handle Asia/Kolkata timezone without     |
-|                                        | affecting planetary calculations             | unintended conversions                   |
+| 3. TIMEZONE CONVERSION ERRORS          | System not properly handling IST timezone    | FIX: dateTimeHelpers.js to correctly            |
+|                                        | May be converting to incorrect timezones     | handle Asia/Kolkata timezone without            |
+|                                        | affecting planetary calculations             | unintended conversions                          |
 +----------------------------------------+----------------------------------------------+-------------------------------------------------+
-| 4. SWISS EPHEMERIS INTEGRATION         | Ephemeris files present but may not be       | VERIFY: Swiss Ephemeris integration in   |
-|    ISSUES                              | properly integrated with calculation         | AscendantCalculator.js and planetary     |
-|                                        | services. Affects accuracy.                  | calculation services                     |
+| 4. SWISS EPHEMERIS INTEGRATION         | Ephemeris files present but may not be       | VERIFY: Swiss Ephemeris integration in          |
+|    ISSUES                              | properly integrated with calculation         | AscendantCalculator.js and planetary            |
+|                                        | services. Affects accuracy.                  | calculation services                            |
 +----------------------------------------+----------------------------------------------+-------------------------------------------------+
-| 5. VALIDATION INCONSISTENCIES          | Some endpoints require 'name' field,       | STANDARDIZE: birthDataValidator.js to   |
-|                                        | others don't. Causes API confusion.       | make 'name' consistently optional       |
+| 5. VALIDATION INCONSISTENCIES          | Some endpoints require 'name' field,         | STANDARDIZE: birthDataValidator.js to           |
+|                                        | others don't. Causes API confusion.          | make 'name' consistently optional               |
 +----------------------------------------+----------------------------------------------+-------------------------------------------------+
-| 6. DEVELOPMENT MODE SERVICES           | GeocodingService returning demo responses   | ACTIVATE: Production geocoding service   |
-|                                        | instead of live coordinates               | in GeocodingService.js                  |
+| 6. DEVELOPMENT MODE SERVICES           | GeocodingService returning demo responses    | ACTIVATE: Production geocoding service          |
+|                                        | instead of live coordinates                  | in GeocodingService.js                          |
 +----------------------------------------+----------------------------------------------+-------------------------------------------------+
 ```
 

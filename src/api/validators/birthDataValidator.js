@@ -858,8 +858,38 @@ function validateArudhaAnalysis(data, isStandardization = false) {
  * @param {boolean} isStandardization - Whether this is a standardization test (name optional)
  * @returns {Object} Validation result
  */
-function validateNavamsaAnalysis(data, isStandardization = false) {
-  return validateHouseAnalysis(data, isStandardization); // Same logic for now
+function validateNavamsaAnalysis(data, isStandardization = true) {
+  // Use analysisRequiredSchema which has name as optional by default
+  const { error, value } = analysisRequiredSchema.validate(data, {
+    abortEarly: false,
+    allowUnknown: true,
+    stripUnknown: false
+  });
+
+  if (error) {
+    const errors = [];
+    error.details.forEach(detail => {
+      errors.push({
+        field: detail.path.join('.'),
+        message: detail.message,
+        providedValue: detail.context?.value
+      });
+    });
+
+    return {
+      isValid: false,
+      errors,
+      suggestions: generateValidationSuggestions(error.details),
+      helpText: 'Navamsa analysis requires birth date, time, and location information.',
+      data: null
+    };
+  }
+
+  return {
+    isValid: true,
+    errors: [],
+    data: value
+  };
 }
 
 /**
@@ -868,8 +898,38 @@ function validateNavamsaAnalysis(data, isStandardization = false) {
  * @param {boolean} isStandardization - Whether this is a standardization test (name optional)
  * @returns {Object} Validation result
  */
-function validateDashaAnalysis(data, isStandardization = false) {
-  return validateHouseAnalysis(data, isStandardization); // Same logic for now
+function validateDashaAnalysis(data, isStandardization = true) {
+  // Use analysisRequiredSchema which has name as optional by default
+  const { error, value } = analysisRequiredSchema.validate(data, {
+    abortEarly: false,
+    allowUnknown: true,
+    stripUnknown: false
+  });
+
+  if (error) {
+    const errors = [];
+    error.details.forEach(detail => {
+      errors.push({
+        field: detail.path.join('.'),
+        message: detail.message,
+        providedValue: detail.context?.value
+      });
+    });
+
+    return {
+      isValid: false,
+      errors,
+      suggestions: generateValidationSuggestions(error.details),
+      helpText: 'Dasha analysis requires birth date, time, and location information.',
+      data: null
+    };
+  }
+
+  return {
+    isValid: true,
+    errors: [],
+    data: value
+  };
 }
 
 /**
