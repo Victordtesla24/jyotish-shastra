@@ -1,0 +1,49 @@
+---
+description: Backend structure guidelines and API documentation
+globs: ["**/backend/**", "**/server/**", "**/api/**"]
+alwaysApply: false
+---
+
+# Backend Structure Document
+
+## API Architecture
+- RESTful API design principles
+- GraphQL implementation where appropriate
+- Microservices architecture patterns
+- Event-driven architecture considerations
+
+## Database Schema
+- Entity relationship definitions
+- Data model specifications
+- Migration strategies
+- Index optimization
+
+## Security Implementation
+- Authentication mechanisms (JWT, OAuth2)
+- Authorization patterns (RBAC, ABAC)
+- Data encryption standards
+- Input validation protocols
+
+## Error Handling
+- Standardized error response formats
+- Logging strategies
+- Monitoring and alerting
+- Graceful degradation patterns
+
+## Performance Optimization
+- Caching strategies (Redis, Memcached)
+- Database query optimization
+- Load balancing configurations
+- Rate limiting implementations
+
+## Testing Protocols
+- Unit testing standards
+- Integration testing frameworks
+- API testing methodologies
+- Performance testing criteria
+
+## Deployment Guidelines
+- Container configuration (Docker)
+- CI/CD pipeline requirements
+- Environment management
+- Health check implementations
