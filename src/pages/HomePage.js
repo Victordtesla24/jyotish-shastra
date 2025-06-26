@@ -1,247 +1,203 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import useCountUp from '../hooks/useCountUp';
-import './HomePage.css';
-
-// Zodiac sign data
-const zodiacSigns = [
-  { name: 'Aries', symbol: '♈', dates: 'Mar 21 - Apr 19', sanskrit: 'मेष' },
-  { name: 'Taurus', symbol: '♉', dates: 'Apr 20 - May 20', sanskrit: 'वृष' },
-  { name: 'Gemini', symbol: '♊', dates: 'May 21 - Jun 20', sanskrit: 'मिथुन' },
-  { name: 'Cancer', symbol: '♋', dates: 'Jun 21 - Jul 22', sanskrit: 'कर्क' },
-  { name: 'Leo', symbol: '♌', dates: 'Jul 23 - Aug 22', sanskrit: 'सिंह' },
-  { name: 'Virgo', symbol: '♍', dates: 'Aug 23 - Sep 22', sanskrit: 'कन्या' },
-  { name: 'Libra', symbol: '♎', dates: 'Sep 23 - Oct 22', sanskrit: 'तुला' },
-  { name: 'Scorpio', symbol: '♏', dates: 'Oct 23 - Nov 21', sanskrit: 'वृश्चिक' },
-  { name: 'Sagittarius', symbol: '♐', dates: 'Nov 22 - Dec 21', sanskrit: 'धनु' },
-  { name: 'Capricorn', symbol: '♑', dates: 'Dec 22 - Jan 19', sanskrit: 'मकर' },
-  { name: 'Aquarius', symbol: '♒', dates: 'Jan 20 - Feb 18', sanskrit: 'कुम्भ' },
-  { name: 'Pisces', symbol: '♓', dates: 'Feb 19 - Mar 20', sanskrit: 'मीन' }
-];
-
-// Stat Counter Component
-const StatCounter = ({ value, label }) => {
-  const [ref, count] = useCountUp(value);
-  return (
-    <div ref={ref} className="stat-card">
-      <div className="stat-number">{count.toLocaleString()}+</div>
-      <div className="stat-label">{label}</div>
-    </div>
-  );
-};
-
-// Services data
-const services = [
-  { icon: '🌟', title: 'Kundli Analysis', description: 'Comprehensive birth chart analysis with planetary positions and predictions.' },
-  { icon: '💎', title: 'Gemstone Recommendation', description: 'Personalized gemstone suggestions based on your planetary positions.' },
-  { icon: '🏠', title: 'Vastu Consultation', description: 'Home and office Vastu guidance for prosperity and peace.' },
-  { icon: '💑', title: 'Marriage Compatibility', description: 'Complete horoscope matching for marital harmony.' },
-  { icon: '💼', title: 'Career Astrology', description: 'Professional guidance based on your astrological profile.' },
-  { icon: '⚡', title: 'Manglik Dosha', description: 'Manglik dosha analysis and remedial solutions.' }
-];
-
-// Testimonials data
-const testimonials = [
-  { name: 'Priya Sharma', location: 'Mumbai', rating: 5, review: 'Incredibly accurate predictions! The kundli analysis helped me make important life decisions.', avatar: 'https://i.pravatar.cc/150?img=1' },
-  { name: 'Raj Patel', location: 'Delhi', rating: 5, review: 'The marriage compatibility report was spot on. Highly recommend their services.', avatar: 'https://i.pravatar.cc/150?img=2' },
-  { name: 'Anita Singh', location: 'Bangalore', rating: 5, review: 'Professional astrology service with deep knowledge of Vedic traditions.', avatar: 'https://i.pravatar.cc/150?img=3' }
-];
+import { Button, Card, OmIcon, LotusIcon, MandalaIcon, StarIcon } from '../components/ui';
 
 const HomePage = () => {
-  const [quickFormData, setQuickFormData] = useState({
-    date: '',
-    time: '',
-    place: ''
-  });
-
-  const handleQuickFormChange = (e) => {
-    setQuickFormData({
-      ...quickFormData,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const handleQuickFormSubmit = (e) => {
-    e.preventDefault();
-    // Redirect to chart generation with pre-filled data
-    // This would integrate with your existing chart generation logic
-    console.log('Quick form data:', quickFormData);
-  };
-
   return (
-    <div className="home-page">
-      <div className="container">
+    <div className="min-h-screen bg-gradient-to-br from-sacred-white to-gray-50">
+      <div className="container-vedic">
         {/* Enhanced Hero Section */}
-        <section className="hero">
-          <div className="hero-content">
-            <div className="sanskrit-subtitle">ज्योतिष शास्त्र</div>
-            <h1>Expert-Level Vedic Kundli Analysis</h1>
-            <p>
-              Discover your destiny through comprehensive Vedic astrology analysis.
-              Get detailed insights into your personality, career, relationships, and life path using ancient wisdom and modern AI technology.
+        <section className="hero-vedic mb-16 relative overflow-hidden">
+          {/* Animated background elements */}
+          <div className="absolute inset-0 overflow-hidden">
+            <MandalaIcon
+              size={200}
+              className="absolute top-10 right-10 opacity-10 animate-mandala-rotate"
+              color="white"
+            />
+            <LotusIcon
+              size={150}
+              className="absolute bottom-10 left-10 opacity-10 animate-pulse-soft"
+              color="white"
+            />
+          </div>
+
+          <div className="relative z-10 max-w-4xl mx-auto">
+            <div className="flex items-center justify-center mb-6">
+              <OmIcon size={48} className="mr-4 animate-pulse-soft" color="#FFD700" />
+              <div className="font-vedic text-3xl md:text-4xl font-semibold text-vedic-gold">
+                ज्योतिष शास्त्र
+              </div>
+              <OmIcon size={48} className="ml-4 animate-pulse-soft" color="#FFD700" />
+            </div>
+
+            <h1 className="text-responsive-3xl mb-6 font-bold leading-tight font-accent text-center animate-fade-in">
+              Discover Your Cosmic Blueprint
+            </h1>
+
+            <p className="text-xl mb-12 opacity-90 leading-relaxed text-center max-w-3xl mx-auto animate-slide-up">
+              Unveil your destiny through comprehensive Vedic astrology. Get detailed insights into your personality, career, relationships, and life path, all written in the stars with ancient wisdom and modern AI precision.
             </p>
-            <div className="hero-buttons">
-              <Link to="/chart" className="btn btn-primary">
-                Get Free Kundli
-              </Link>
-              <Link to="/analysis" className="btn btn-secondary">
-                Consult Astrologer
-              </Link>
+
+            <div className="flex gap-6 justify-center flex-wrap">
+              <Button
+                variant="golden"
+                size="lg"
+                className="transform hover:scale-110 shadow-golden"
+                onClick={() => window.location.href = '/chart'}
+              >
+                <StarIcon size={20} className="mr-2" />
+                Discover Your Cosmic Blueprint
+              </Button>
+
+              <Button
+                variant="secondary"
+                size="lg"
+                className="transform hover:scale-110"
+                onClick={() => window.location.href = '/analysis'}
+              >
+                <MandalaIcon size={20} className="mr-2" />
+                Unlock Ancient Wisdom
+              </Button>
             </div>
           </div>
         </section>
 
-        {/* Trust Building Stats */}
-        <section className="trust-stats">
-          <div className="stats-grid">
-            <StatCounter value={5000} label="Happy Clients" />
-            <StatCounter value={15} label="Years Experience" />
-            <StatCounter value={25} label="Expert Astrologers" />
-            <StatCounter value={98} label="Accuracy Rate" />
-          </div>
+        {/* Welcome Section with Enhanced Typography */}
+        <section className="section-spacing text-center animate-fade-in">
+          <h2 className="text-responsive-2xl mb-8 text-earth-brown font-accent">
+            Welcome to Jyotish Shastra
+          </h2>
+          <p className="text-vedic-lg text-wisdom-gray max-w-3xl mx-auto leading-relaxed">
+            Experience authentic Vedic astrology analysis with our advanced AI-powered system.
+            Get detailed birth chart analysis, predictions, and guidance based on thousands of years of ancient wisdom.
+          </p>
         </section>
 
-        {/* Zodiac Forecast Grid */}
-        <section className="zodiac-forecasts">
-          <h2>राशिफल - Today's Horoscope</h2>
-          <p className="section-subtitle">Discover what the stars have in store for you today</p>
-          <div className="zodiac-grid">
-            {zodiacSigns.map((sign, index) => (
-              <div key={index} className="zodiac-card">
-                <div className="zodiac-symbol">{sign.symbol}</div>
-                <div className="zodiac-sanskrit">{sign.sanskrit}</div>
-                <h3>{sign.name}</h3>
-                <p className="zodiac-dates">{sign.dates}</p>
-                <Link to={`/horoscope/${sign.name.toLowerCase()}`} className="zodiac-link">
-                  Read Today's Horoscope
+        {/* Enhanced Stats Section */}
+        <section className="section-spacing">
+          <Card variant="glassmorphic" className="mb-8 backdrop-blur-xl">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+              <div className="text-center group">
+                <div className="text-5xl font-bold text-solar-orange mb-2 transform group-hover:scale-110 transition-transform duration-300">
+                  5000+
+                </div>
+                <div className="text-wisdom-gray font-medium">Happy Clients</div>
+                <StarIcon size={24} className="mx-auto mt-2 text-gold animate-pulse-soft" />
+              </div>
+
+              <div className="text-center group">
+                <div className="text-5xl font-bold text-solar-orange mb-2 transform group-hover:scale-110 transition-transform duration-300">
+                  15+
+                </div>
+                <div className="text-wisdom-gray font-medium">Years Experience</div>
+                <MandalaIcon size={24} className="mx-auto mt-2 text-cosmic-purple animate-spin-slow" />
+              </div>
+
+              <div className="text-center group">
+                <div className="text-5xl font-bold text-solar-orange mb-2 transform group-hover:scale-110 transition-transform duration-300">
+                  25+
+                </div>
+                <div className="text-wisdom-gray font-medium">Expert Astrologers</div>
+                <LotusIcon size={24} className="mx-auto mt-2 text-lotus animate-pulse-soft" />
+              </div>
+
+              <div className="text-center group">
+                <div className="text-5xl font-bold text-solar-orange mb-2 transform group-hover:scale-110 transition-transform duration-300">
+                  98%
+                </div>
+                <div className="text-wisdom-gray font-medium">Accuracy Rate</div>
+                <OmIcon size={24} className="mx-auto mt-2 text-saffron animate-pulse-soft" />
+              </div>
+            </div>
+          </Card>
+        </section>
+
+        {/* Services Preview Section */}
+        <section className="section-spacing">
+          <h2 className="text-responsive-2xl mb-12 text-earth-brown font-accent text-center">
+            Our Sacred Services
+          </h2>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <Card variant="default" className="group">
+              <Card.Header>
+                <div className="flex items-center mb-4">
+                  <StarIcon size={32} className="text-gold mr-3" />
+                  <Card.Title size="md">Birth Chart Analysis</Card.Title>
+                </div>
+              </Card.Header>
+              <Card.Content>
+                Comprehensive analysis of your birth chart revealing personality traits,
+                strengths, challenges, and life purpose based on planetary positions.
+              </Card.Content>
+              <Card.Footer>
+                <Link to="/chart">
+                  <Button variant="outline" size="sm" className="w-full">
+                    Generate Chart
+                  </Button>
                 </Link>
-              </div>
-            ))}
+              </Card.Footer>
+            </Card>
+
+            <Card variant="default" className="group">
+              <Card.Header>
+                <div className="flex items-center mb-4">
+                  <MandalaIcon size={32} className="text-cosmic-purple mr-3" />
+                  <Card.Title size="md">Detailed Analysis</Card.Title>
+                </div>
+              </Card.Header>
+              <Card.Content>
+                In-depth interpretation of yogas, dashas, and planetary influences
+                affecting your career, relationships, health, and spiritual growth.
+              </Card.Content>
+              <Card.Footer>
+                <Link to="/analysis">
+                  <Button variant="outline" size="sm" className="w-full">
+                    Get Analysis
+                  </Button>
+                </Link>
+              </Card.Footer>
+            </Card>
+
+            <Card variant="default" className="group md:col-span-2 lg:col-span-1">
+              <Card.Header>
+                <div className="flex items-center mb-4">
+                  <LotusIcon size={32} className="text-lotus mr-3" />
+                  <Card.Title size="md">Comprehensive Reports</Card.Title>
+                </div>
+              </Card.Header>
+              <Card.Content>
+                Detailed written reports covering all aspects of your astrological profile
+                with remedies, predictions, and guidance for your life journey.
+              </Card.Content>
+              <Card.Footer>
+                <Link to="/report">
+                  <Button variant="outline" size="sm" className="w-full">
+                    View Reports
+                  </Button>
+                </Link>
+              </Card.Footer>
+            </Card>
           </div>
         </section>
 
-        {/* Traditional Services */}
-        <section className="services">
-          <h2>Our Vedic Astrology Services</h2>
-          <p className="section-subtitle">Comprehensive solutions for all aspects of life</p>
-          <div className="services-grid">
-            {services.map((service, index) => (
-              <div key={index} className="service-card">
-                <div className="service-icon">{service.icon}</div>
-                <h3>{service.title}</h3>
-                <p>{service.description}</p>
-                <Link to="/services" className="service-link">Learn More</Link>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Quick Horoscope Widget */}
-        <section className="quick-horoscope">
-          <div className="quick-horoscope-content">
-            <h2>Know Your Zodiac Sign</h2>
-            <p>Enter your birth details to discover your zodiac sign and get instant insights</p>
-            <form onSubmit={handleQuickFormSubmit} className="quick-form">
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Date of Birth</label>
-                  <input
-                    type="date"
-                    name="date"
-                    value={quickFormData.date}
-                    onChange={handleQuickFormChange}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Time of Birth</label>
-                  <input
-                    type="time"
-                    name="time"
-                    value={quickFormData.time}
-                    onChange={handleQuickFormChange}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Place of Birth</label>
-                  <input
-                    type="text"
-                    name="place"
-                    value={quickFormData.place}
-                    onChange={handleQuickFormChange}
-                    placeholder="Enter city name"
-                    required
-                  />
-                </div>
-              </div>
-              <button type="submit" className="btn btn-primary">Find My Sign</button>
-            </form>
-          </div>
-        </section>
-
-        {/* How VedicAI Works */}
-        <section className="how-it-works">
-          <h2>How Our VedicAI Works</h2>
-          <p className="section-subtitle">Ancient wisdom meets modern AI technology</p>
-          <div className="steps">
-            <div className="step">
-              <div className="step-number">1</div>
-              <h3>Enter Birth Details</h3>
-              <p>Provide your exact birth date, time, and location for precise astronomical calculations.</p>
+        {/* Call to Action Section */}
+        <section className="section-spacing text-center">
+          <Card variant="cosmic" className="transform hover:scale-105 transition-transform duration-300">
+            <div className="max-w-2xl mx-auto">
+              <h2 className="text-3xl font-bold mb-6 font-accent">
+                Begin Your Cosmic Journey Today
+              </h2>
+              <p className="text-lg mb-8 opacity-90">
+                Join thousands of seekers who have discovered their true path through the wisdom of Vedic astrology.
+              </p>
+              <Button variant="golden" size="lg" className="shadow-xl">
+                <OmIcon size={20} className="mr-2" />
+                Start Your Reading
+              </Button>
             </div>
-            <div className="step">
-              <div className="step-number">2</div>
-              <h3>AI Analysis</h3>
-              <p>Our AI analyzes your birth chart using classical Vedic texts and modern interpretations.</p>
-            </div>
-            <div className="step">
-              <div className="step-number">3</div>
-              <h3>Comprehensive Insights</h3>
-              <p>Receive detailed analysis covering personality, career, relationships, and life predictions.</p>
-            </div>
-            <div className="step">
-              <div className="step-number">4</div>
-              <h3>Personalized Report</h3>
-              <p>Get your complete Vedic astrology report with remedies and guidance for life.</p>
-            </div>
-          </div>
-        </section>
-
-        {/* Testimonials */}
-        <section className="testimonials">
-          <h2>What Our Clients Say</h2>
-          <div className="testimonials-grid">
-            {testimonials.map((testimonial, index) => (
-              <div key={index} className="testimonial-card">
-                <img src={testimonial.avatar} alt={testimonial.name} className="testimonial-avatar" />
-                <div className="stars">
-                  {'★'.repeat(testimonial.rating)}
-                </div>
-                <p>"{testimonial.review}"</p>
-                <div className="testimonial-author">
-                  <strong>{testimonial.name}</strong>
-                  <span>{testimonial.location}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Newsletter Section */}
-        <section className="newsletter">
-          <div className="newsletter-content">
-            <h2>Get Daily Horoscope</h2>
-            <p>Subscribe to receive your personalized daily horoscope and astrological insights</p>
-            <form className="newsletter-form">
-              <input
-                type="email"
-                placeholder="Enter your email address"
-                required
-              />
-              <button type="submit" className="btn btn-primary">Subscribe</button>
-            </form>
-          </div>
+          </Card>
         </section>
       </div>
     </div>

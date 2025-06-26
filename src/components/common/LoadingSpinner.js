@@ -1,10 +1,9 @@
 import React from 'react';
-import './LoadingSpinner.css';
 
 const LoadingSpinner = () => {
   return (
-    <div className="loading-spinner-overlay">
-      <div className="loading-spinner"></div>
+    <div className="flex justify-center items-center py-8">
+      <div className="spinner-cosmic"></div>
     </div>
   );
 };

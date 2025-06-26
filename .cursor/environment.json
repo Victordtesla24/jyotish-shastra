@@ -1,0 +1,37 @@
+{
+  "agentCanUpdateSnapshot": true,
+  "backgroundAgent": {
+    "enabled": true,
+    "schedule": {
+      "frequency": "twice_daily",
+      "times": [
+        "09:00",
+        "17:00"
+      ],
+      "timezone": "local"
+    },
+    "capabilities": {
+      "fileSystemAccess": true,
+      "terminalAccess": true,
+      "webSearch": true,
+      "codeAnalysis": true,
+      "reportGeneration": true
+    },
+    "restrictions": {
+      "noNewFiles": true,
+      "preserveStructure": true,
+      "productionGradeOnly": true,
+      "minimalChanges": true
+    },
+    "protocols": {
+      "directoryManagement": "001-directory-management-protocols.mdc",
+      "errorFixing": "002-error-fixing-protocols.md",
+      "fakeCodeDetection": "fake-code-detection-system.sh"
+    },
+    "reporting": {
+      "outputPath": "user-docs/background-agent-report.md",
+      "includeTimestamp": true,
+      "detailedAnalysis": true
+    }
+  }
+}

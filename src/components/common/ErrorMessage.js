@@ -1,5 +1,4 @@
 import React from 'react';
-import './ErrorMessage.css';
 
 const ErrorMessage = ({ message }) => {
   if (!message) {
@@ -7,7 +6,7 @@ const ErrorMessage = ({ message }) => {
   }
 
   return (
-    <div className="error-message-container">
+    <div className="alert-error mb-4">
       <p>{message}</p>
     </div>
   );

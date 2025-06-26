@@ -1,0 +1,49 @@
+---
+description: Technology stack specifications and dependencies
+globs: ["package.json", "requirements.txt", "Cargo.toml", "pom.xml"]
+alwaysApply: false
+---
+
+# Tech Stack Document
+
+## Frontend Technologies
+- Framework: React/Vue/Angular specifications
+- State Management: Redux/Vuex/NgRx patterns
+- Styling: CSS-in-JS/SASS/Tailwind configurations
+- Build Tools: Webpack/Vite/Parcel setups
+
+## Backend Technologies
+- Runtime: Node.js/Python/Java/Go specifications
+- Framework: Express/FastAPI/Spring/Gin configurations
+- Database: PostgreSQL/MongoDB/Redis implementations
+- ORM/ODM: Prisma/SQLAlchemy/Hibernate patterns
+
+## Development Tools
+- Version Control: Git workflows and branching strategies
+- Package Management: npm/yarn/pip/cargo configurations
+- Linting: ESLint/Pylint/Clippy configurations
+- Formatting: Prettier/Black/Rustfmt setups
+
+## Testing Stack
+- Unit Testing: Jest/pytest/JUnit frameworks
+- Integration Testing: Cypress/Selenium configurations
+- API Testing: Postman/Insomnia/REST Assured
+- Performance Testing: k6/JMeter/Artillery
+
+## Infrastructure
+- Cloud Platform: AWS/GCP/Azure services
+- Containerization: Docker/Kubernetes configurations
+- Monitoring: Prometheus/Grafana/DataDog setups
+- Logging: ELK Stack/Fluentd configurations
+
+## Security Tools
+- Static Analysis: SonarQube/CodeQL configurations
+- Dependency Scanning: Snyk/WhiteSource setups
+- Vulnerability Assessment: OWASP ZAP/Burp Suite
+- Secret Management: HashiCorp Vault/AWS Secrets Manager
+
+## Documentation Standards
+- API Documentation: OpenAPI/Swagger specifications
+- Code Documentation: JSDoc/Sphinx/Rustdoc
+- Architecture Documentation: ADR (Architecture Decision Records)
+- User Documentation: GitBook/Notion/Confluence

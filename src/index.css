@@ -1,253 +1,210 @@
-/* Global CSS Reset and Base Styles */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-html {
-  font-size: 16px;
-  scroll-behavior: smooth;
-}
+/* Google Fonts Import */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@300;400;500;600;700&display=swap');
 
-body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  line-height: 1.6;
-  color: #333;
-  background-color: #f8fafc;
-}
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
-}
-
-/* Typography */
-h1, h2, h3, h4, h5, h6 {
-  font-weight: 600;
-  line-height: 1.3;
-  margin-bottom: 0.5rem;
-}
-
-h1 { font-size: 2.5rem; }
-h2 { font-size: 2rem; }
-h3 { font-size: 1.75rem; }
-h4 { font-size: 1.5rem; }
-h5 { font-size: 1.25rem; }
-h6 { font-size: 1rem; }
-
-p {
-  margin-bottom: 1rem;
-}
-
-/* Links */
-a {
-  color: #667eea;
-  text-decoration: none;
-  transition: color 0.2s ease;
-}
-
-a:hover {
-  color: #5a67d8;
-}
-
-/* Buttons */
-button {
-  cursor: pointer;
-  border: none;
-  outline: none;
-  font-family: inherit;
-  transition: all 0.2s ease;
-}
-
-/* Form Elements */
-input, textarea, select {
-  font-family: inherit;
-  font-size: 1rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.375rem;
-  padding: 0.75rem;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-input:focus, textarea:focus, select:focus {
-  outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-/* Utility Classes */
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 1rem;
-}
-
-.text-center { text-align: center; }
-.text-left { text-align: left; }
-.text-right { text-align: right; }
-
-.mb-1 { margin-bottom: 0.25rem; }
-.mb-2 { margin-bottom: 0.5rem; }
-.mb-3 { margin-bottom: 0.75rem; }
-.mb-4 { margin-bottom: 1rem; }
-.mb-5 { margin-bottom: 1.25rem; }
-.mb-6 { margin-bottom: 1.5rem; }
-
-.mt-1 { margin-top: 0.25rem; }
-.mt-2 { margin-top: 0.5rem; }
-.mt-3 { margin-top: 0.75rem; }
-.mt-4 { margin-top: 1rem; }
-.mt-5 { margin-top: 1.25rem; }
-.mt-6 { margin-top: 1.5rem; }
-
-.p-1 { padding: 0.25rem; }
-.p-2 { padding: 0.5rem; }
-.p-3 { padding: 0.75rem; }
-.p-4 { padding: 1rem; }
-.p-5 { padding: 1.25rem; }
-.p-6 { padding: 1.5rem; }
-
-/* Responsive Design */
-@media (max-width: 768px) {
+/* Base Layer Customizations */
+@layer base {
   html {
-    font-size: 14px;
+    scroll-behavior: smooth;
   }
 
-  .container {
-    padding: 0 0.5rem;
+  body {
+    @apply font-sans antialiased;
+    background-color: #f8fafc;
   }
 
-  h1 { font-size: 2rem; }
-  h2 { font-size: 1.75rem; }
-  h3 { font-size: 1.5rem; }
-}
-
-/* Loading States */
-.loading {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 200px;
-}
-
-.spinner {
-  border: 3px solid #f3f3f3;
-  border-top: 3px solid #667eea;
-  border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* Error States */
-.error {
-  color: #e53e3e;
-  background-color: #fed7d7;
-  border: 1px solid #feb2b2;
-  border-radius: 0.375rem;
-  padding: 1rem;
-  margin: 1rem 0;
-}
-
-.success {
-  color: #38a169;
-  background-color: #c6f6d5;
-  border: 1px solid #9ae6b4;
-  border-radius: 0.375rem;
-  padding: 1rem;
-  margin: 1rem 0;
-}
-
-.warning {
-  color: #d69e2e;
-  background-color: #fef5e7;
-  border: 1px solid #fbd38d;
-  border-radius: 0.375rem;
-  padding: 1rem;
-  margin: 1rem 0;
-}
-
-/* Card Styles */
-.card {
-  background: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-  padding: 1.5rem;
-  margin-bottom: 1rem;
-}
-
-.card-header {
-  border-bottom: 1px solid #e2e8f0;
-  padding-bottom: 1rem;
-  margin-bottom: 1rem;
-}
-
-.card-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #2d3748;
-}
-
-/* Grid System */
-.grid {
-  display: grid;
-  gap: 1rem;
-}
-
-.grid-cols-1 { grid-template-columns: repeat(1, 1fr); }
-.grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
-.grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
-.grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
-
-@media (max-width: 768px) {
-  .grid-cols-2,
-  .grid-cols-3,
-  .grid-cols-4 {
-    grid-template-columns: 1fr;
+  /* Remove default margins from headings for better Tailwind control */
+  h1, h2, h3, h4, h5, h6 {
+    @apply m-0;
   }
 }
 
-/* Flexbox Utilities */
-.flex { display: flex; }
-.flex-col { flex-direction: column; }
-.flex-row { flex-direction: row; }
-.items-center { align-items: center; }
-.justify-center { justify-content: center; }
-.justify-between { justify-content: space-between; }
-.justify-around { justify-content: space-around; }
+/* Component Layer - Reusable patterns */
+@layer components {
+  /* Vedic Button Styles */
+  .btn-vedic-primary {
+    @apply bg-gradient-vedic text-white px-6 py-3 rounded-vedic font-medium;
+    @apply shadow-vedic-medium hover:shadow-vedic-strong;
+    @apply transform transition-all duration-300 hover:scale-105;
+    @apply focus:outline-none focus:ring-2 focus:ring-saffron focus:ring-opacity-50;
+  }
 
-/* Astrology-specific styles */
-.zodiac-sign {
-  font-weight: 600;
-  color: #667eea;
+  .btn-vedic-secondary {
+    @apply bg-transparent border-2 border-white text-white px-6 py-3 rounded-vedic font-medium;
+    @apply hover:bg-white hover:text-navy transition-colors duration-300;
+    @apply focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50;
+  }
+
+  .btn-cosmic {
+    @apply bg-gradient-cosmic text-white px-6 py-3 rounded-vedic font-medium;
+    @apply shadow-cosmic hover:shadow-celestial;
+    @apply transform transition-all duration-300 hover:scale-105;
+  }
+
+  /* Card Components */
+  .card-vedic {
+    @apply bg-white rounded-2xl shadow-vedic-soft p-6;
+    @apply border border-gray-100 hover:shadow-vedic-medium;
+    @apply transition-shadow duration-300;
+  }
+
+  .card-cosmic {
+    @apply bg-gradient-cosmic text-white rounded-2xl p-6;
+    @apply shadow-cosmic backdrop-blur-sm;
+  }
+
+  /* Navigation Styles */
+  .nav-link-vedic {
+    @apply font-medium py-2 border-b-2 transition-all duration-200;
+    @apply hover:opacity-80 hover:border-white;
+  }
+
+  .nav-link-active {
+    @apply border-vedic-gold text-vedic-gold;
+  }
+
+  .nav-link-inactive {
+    @apply border-transparent;
+  }
+
+  /* Hero Section */
+  .hero-vedic {
+    @apply bg-gradient-to-br from-stellar-blue to-cosmic-purple;
+    @apply text-white p-12 md:p-20 text-center rounded-2xl;
+  }
+
+  /* Loading Spinner */
+  .spinner-vedic {
+    @apply inline-block w-8 h-8 border-4 border-saffron border-r-transparent;
+    @apply rounded-full animate-spin;
+  }
+
+  .spinner-cosmic {
+    @apply inline-block w-12 h-12 border-4 border-cosmic-purple border-r-transparent;
+    @apply rounded-full animate-mandala-rotate;
+  }
+
+  /* Form Elements Enhancement */
+  .input-vedic {
+    @apply w-full px-4 py-3 border border-gray-300 rounded-vedic;
+    @apply focus:outline-none focus:ring-2 focus:ring-saffron focus:border-saffron;
+    @apply transition-all duration-200;
+  }
+
+  .input-vedic:focus {
+    @apply shadow-vedic-soft;
+  }
+
+  /* Alert/Message Components */
+  .alert-success {
+    @apply bg-green-50 border border-green-200 text-green-800 p-4 rounded-vedic;
+  }
+
+  .alert-error {
+    @apply bg-red-50 border border-red-200 text-red-800 p-4 rounded-vedic;
+  }
+
+  .alert-warning {
+    @apply bg-yellow-50 border border-yellow-200 text-yellow-800 p-4 rounded-vedic;
+  }
+
+  /* Astrology-specific patterns */
+  .planet-card {
+    @apply bg-white rounded-lg p-4 shadow-vedic-soft border border-gray-200;
+    @apply hover:shadow-vedic-medium transition-shadow duration-300;
+  }
+
+  .house-section {
+    @apply border-2 border-gray-300 rounded-lg p-3;
+    @apply hover:border-saffron transition-colors duration-200;
+  }
+
+  .yoga-highlight {
+    @apply bg-gradient-to-r from-gold to-saffron text-white px-3 py-1 rounded-full;
+    @apply text-sm font-medium shadow-golden;
+  }
+
+  .dasha-timeline {
+    @apply relative pl-6 pb-6 border-l-2 border-cosmic-purple;
+  }
+
+  .dasha-timeline::before {
+    @apply absolute -left-2 top-0 w-4 h-4 bg-cosmic-purple rounded-full;
+    content: '';
+  }
 }
 
-.planet {
-  font-weight: 600;
-  color: #5a67d8;
+/* Utility Layer - Project-specific utilities */
+@layer utilities {
+  /* Vedic-specific text effects */
+  .text-vedic-gradient {
+    background: linear-gradient(135deg, #FF9933 0%, #800000 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-cosmic-gradient {
+    background: linear-gradient(135deg, #6B46C1 0%, #1E40AF 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Scroll behavior utilities */
+  .scroll-smooth {
+    scroll-behavior: smooth;
+  }
+
+  /* Animation utilities */
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.6s ease-out;
+  }
+
+  /* Container utilities for consistent spacing */
+  .container-vedic {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .section-spacing {
+    @apply py-12 md:py-16 lg:py-20;
+  }
+
+  /* Responsive text sizes with proper line heights */
+  .text-responsive-xl {
+    @apply text-xl md:text-2xl lg:text-3xl;
+  }
+
+  .text-responsive-2xl {
+    @apply text-2xl md:text-3xl lg:text-4xl;
+  }
+
+  .text-responsive-3xl {
+    @apply text-3xl md:text-4xl lg:text-5xl;
+  }
 }
 
-.house {
-  font-weight: 600;
-  color: #4c51bf;
+/* Critical CSS for immediate load */
+.no-js-fallback {
+  display: none;
 }
 
-.yoga {
-  font-weight: 600;
-  color: #38a169;
-}
-
-.dasha {
-  font-weight: 600;
-  color: #d69e2e;
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

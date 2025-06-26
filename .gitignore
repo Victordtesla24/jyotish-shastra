@@ -84,9 +84,8 @@ $RECYCLE.BIN/
 # -----------------------------------------------------------------------------
 # EDITORS & IDEs
 # -----------------------------------------------------------------------------
-# Visual Studio Code / Cursor
+# Visual Studio Code
 .vscode/
-.cursor/
 *.code-workspace
 
 # JetBrains IDEs
