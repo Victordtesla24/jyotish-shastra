@@ -120,68 +120,68 @@ curl -X POST http://localhost:3001/api/v1/geocoding/location \
 
 ## 3. API Endpoints Data-Structure Table (Table A)
 ```bash
-┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                                        COMPLETE API TEST RESULTS                                                                        │
-├─────────────────────────────┬────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ ENDPOINT                    │ RESULT & DATA STRUCTURE                                                                                                    │
-├─────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ /health                     │ {"status":"OK","message":"Jyotish Shastra API is running","timestamp":"2025-01-27T00:42:32.307Z","environment":"development"}│
-├─────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ /v1/chart/generate          │ SUCCESS: {                                                                                                                 │
-│                             │   "success": true,                                                                                                         │
-│                             │   "data": {                                                                                                                │
-│                             │     "birthData": {"name":"Test Case Pune 1985","dateOfBirth":"1985-10-24","timeOfBirth":"14:30",                         │
-│                             │                   "latitude":18.5204,"longitude":73.8567,"timezone":"Asia/Kolkata"},                                     │
-│                             │     "rasiChart": {                                                                                                         │
-│                             │       "ascendant": {"longitude":39.99,"sign":"TAURUS","degree":9.99},                                                    │
-│                             │       "planets": [                                                                                                         │
-│                             │         {"name":"Sun","longitude":187.47,"sign":"LIBRA","degree":7.47,"nakshatra":"Swati"},                            │
-│                             │         {"name":"Moon","longitude":321.95,"sign":"AQUARIUS","degree":21.95,"nakshatra":"Purva Bhadrapada"},            │
-│                             │         {"name":"Jupiter","longitude":284.20,"sign":"CAPRICORN","degree":14.20,"nakshatra":"Shravana"}                 │
-│                             │       ],                                                                                                                   │
-│                             │       "jd": 2446363.1041666665                                                                                            │
-│                             │     },                                                                                                                     │
-│                             │     "navamsaChart": {"ascendant":{"longitude":336.67,"sign":"PISCES"},"planetaryPositions":{...}}                        │
-│                             │   }                                                                                                                        │
-│                             │ }                                                                                                                          │
-├─────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ /v1/analysis/comprehensive  │ PARTIAL SUCCESS: {                                                                                                         │
-│                             │   "success": true,                                                                                                         │
-│                             │   "analysis": {                                                                                                            │
-│                             │     "sections": [                                                                                                          │
-│                             │       {"name":"Birth Data Collection","status":"complete"},                                                               │
-│                             │       {"name":"Basic Chart Generation","status":"complete"},                                                              │
-│                             │       {"name":"House Analysis","status":"error","error":"this.houseService.analyzeHouseInDetail is not a function"},    │
-│                             │       {"name":"Navamsa Analysis","status":"error","error":"this.navamsaService.analyzeNavamsaComprehensive undefined"},  │
-│                             │       {"name":"Dasha Analysis","status":"complete"}                                                                       │
-│                             │     ]                                                                                                                      │
-│                             │   }                                                                                                                        │
-│                             │ }                                                                                                                          │
-├─────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ /v1/analysis/navamsa        │ ERROR: {"success":false,"error":"this.navamsaService.analyzeNavamsaComprehensive is not a function"}                    │
-├─────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ /v1/analysis/dasha          │ SUCCESS: {                                                                                                                 │
-│                             │   "success": true,                                                                                                         │
-│                             │   "data": {                                                                                                                │
-│                             │     "dasha_sequence": [                                                                                                    │
-│                             │       {"planet":"Mercury","startAge":22.7,"endAge":39.7,"period":17},                                                   │
-│                             │       {"planet":"Ketu","startAge":39.7,"endAge":46.7,"period":7}                                                        │
-│                             │     ],                                                                                                                     │
-│                             │     "current_dasha": {"planet":"Mercury","startAge":22.7,"endAge":39.7,"period":17}                                      │
-│                             │   }                                                                                                                        │
-│                             │ }                                                                                                                          │
-├─────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ /v1/geocoding/location      │ SUCCESS: {                                                                                                                 │
-│                             │   "success": true,                                                                                                         │
-│                             │   "data": {                                                                                                                │
-│                             │     "latitude": 18.5204,                                                                                                  │
-│                             │     "longitude": 73.8567,                                                                                                 │
-│                             │     "formatted_address": "Pune, Maharashtra, India",                                                                      │
-│                             │     "timezone": "Asia/Kolkata",                                                                                           │
-│                             │     "elevation": 560                                                                                                      │
-│                             │   }                                                                                                                        │
-│                             │ }                                                                                                                          │
-└─────────────────────────────┴────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                                        COMPLETE API TEST RESULTS                                                                             │
+├─────────────────────────────┬────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ ENDPOINT                    │ RESULT & DATA STRUCTURE                                                                                                        │
+├─────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ /health                     │ {"status":"OK","message":"Jyotish Shastra API is running","timestamp":"2025-01-27T00:42:32.307Z","environment":"development"}  │
+├─────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ /v1/chart/generate          │ SUCCESS: {                                                                                                                     │
+│                             │   "success": true,                                                                                                             │
+│                             │   "data": {                                                                                                                    │
+│                             │     "birthData": {"name":"Test Case Pune 1985","dateOfBirth":"1985-10-24","timeOfBirth":"14:30",                               │
+│                             │                   "latitude":18.5204,"longitude":73.8567,"timezone":"Asia/Kolkata"},                                           │
+│                             │     "rasiChart": {                                                                                                             │
+│                             │       "ascendant": {"longitude":39.99,"sign":"TAURUS","degree":9.99},                                                          │
+│                             │       "planets": [                                                                                                             │
+│                             │         {"name":"Sun","longitude":187.47,"sign":"LIBRA","degree":7.47,"nakshatra":"Swati"},                                    │
+│                             │         {"name":"Moon","longitude":321.95,"sign":"AQUARIUS","degree":21.95,"nakshatra":"Purva Bhadrapada"},                    │
+│                             │         {"name":"Jupiter","longitude":284.20,"sign":"CAPRICORN","degree":14.20,"nakshatra":"Shravana"}                         │
+│                             │       ],                                                                                                                       │
+│                             │       "jd": 2446363.1041666665                                                                                                 │
+│                             │     },                                                                                                                         │
+│                             │     "navamsaChart": {"ascendant":{"longitude":336.67,"sign":"PISCES"},"planetaryPositions":{...}}                              │
+│                             │   }                                                                                                                            │
+│                             │ }                                                                                                                              │
+├─────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ /v1/analysis/comprehensive  │ PARTIAL SUCCESS: {                                                                                                             │
+│                             │   "success": true,                                                                                                             │
+│                             │   "analysis": {                                                                                                                │
+│                             │     "sections": [                                                                                                              │
+│                             │       {"name":"Birth Data Collection","status":"complete"},                                                                    │
+│                             │       {"name":"Basic Chart Generation","status":"complete"},                                                                   │
+│                             │       {"name":"House Analysis","status":"error","error":"this.houseService.analyzeHouseInDetail is not a function"},           │
+│                             │       {"name":"Navamsa Analysis","status":"error","error":"this.navamsaService.analyzeNavamsaComprehensive undefined"},        │
+│                             │       {"name":"Dasha Analysis","status":"complete"}                                                                            │
+│                             │     ]                                                                                                                          │
+│                             │   }                                                                                                                            │
+│                             │ }                                                                                                                              │
+├─────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ /v1/analysis/navamsa        │ ERROR: {"success":false,"error":"this.navamsaService.analyzeNavamsaComprehensive is not a function"}                           │
+├─────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ /v1/analysis/dasha          │ SUCCESS: {                                                                                                                     │
+│                             │   "success": true,                                                                                                             │
+│                             │   "data": {                                                                                                                    │
+│                             │     "dasha_sequence": [                                                                                                        │
+│                             │       {"planet":"Mercury","startAge":22.7,"endAge":39.7,"period":17},                                                          │
+│                             │       {"planet":"Ketu","startAge":39.7,"endAge":46.7,"period":7}                                                               │
+│                             │     ],                                                                                                                         │
+│                             │     "current_dasha": {"planet":"Mercury","startAge":22.7,"endAge":39.7,"period":17}                                            │
+│                             │   }                                                                                                                            │
+│                             │ }                                                                                                                              │
+├─────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ /v1/geocoding/location      │ SUCCESS: {                                                                                                                     │
+│                             │   "success": true,                                                                                                             │
+│                             │   "data": {                                                                                                                    │
+│                             │     "latitude": 18.5204,                                                                                                       │
+│                             │     "longitude": 73.8567,                                                                                                      │
+│                             │     "formatted_address": "Pune, Maharashtra, India",                                                                           │
+│                             │     "timezone": "Asia/Kolkata",                                                                                                │
+│                             │     "elevation": 560                                                                                                           │
+│                             │   }                                                                                                                            │
+│                             │ }                                                                                                                              │
+└─────────────────────────────┴────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ## 4. Reference Data from kundli-for-testing.pdf (Table B)
@@ -189,69 +189,69 @@ curl -X POST http://localhost:3001/api/v1/geocoding/location \
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 │                                                  REFERENCE DATA FROM KUNDLI PDF                                                                      │
 ├─────────────────────────────┬────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ PARAMETER                   │ EXPECTED VALUE (from PDF Reference)                                                                                        │
+│ PARAMETER                   │ EXPECTED VALUE (from PDF Reference)                                                                                    │
 ├─────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ Birth Date                  │ 24-10-1985 (Thursday)                                                                                                     │
+│ Birth Date                  │ 24-10-1985 (Thursday)                                                                                                  │
 ├─────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ Birth Time                  │ 14:30 (2:30 PM IST) - Local Mean Time conversion required                                                                │
+│ Birth Time                  │ 14:30 (2:30 PM IST) - Local Mean Time conversion required                                                              │
 ├─────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ Birth Place                 │ Pune, Maharashtra, India                                                                                                  │
+│ Birth Place                 │ Pune, Maharashtra, India                                                                                               │
 ├─────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ Coordinates                 │ 18°31'N, 73°51'E (18.5167°N, 73.85°E)                                                                                     │
+│ Coordinates                 │ 18°31'N, 73°51'E (18.5167°N, 73.85°E)                                                                                  │
 ├─────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ Ayanamsha Applied           │ Lahiri Ayanamsha (23°15'00.658" + precession)                                                                             │
+│ Ayanamsha Applied           │ Lahiri Ayanamsha (23°15'00.658" + precession)                                                                          │
 ├─────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ Expected Ascendant          │ Taurus 10°0'0" (Longitude: 40°0'0")                                                                                       │
+│ Expected Ascendant          │ Taurus 10°0'0" (Longitude: 40°0'0")                                                                                    │
 ├─────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ Expected Sun Position       │ Libra 7°0'0" (Longitude: 187°0'0") - Debilitated state confirmed                                                         │
+│ Expected Sun Position       │ Libra 7°0'0" (Longitude: 187°0'0") - Debilitated state confirmed                                                       │
 ├─────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ Expected Moon Position      │ Aquarius 22°0'0" (Longitude: 322°0'0") - Purva Bhadrapada nakshatra (25th)                                               │
+│ Expected Moon Position      │ Aquarius 22°0'0" (Longitude: 322°0'0") - Purva Bhadrapada nakshatra (25th)                                             │
 ├─────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ Expected Jupiter Position   │ Capricorn 14°0'0" (Longitude: 284°0'0") - Debilitated state confirmed                                                    │
+│ Expected Jupiter Position   │ Capricorn 14°0'0" (Longitude: 284°0'0") - Debilitated state confirmed                                                  │
 ├─────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ Expected Venus Position     │ Virgo 16°0'0" (Longitude: 166°0'0") - Debilitated state confirmed                                                        │
+│ Expected Venus Position     │ Virgo 16°0'0" (Longitude: 166°0'0") - Debilitated state confirmed                                                      │
 ├─────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ Expected Rashi Chart        │ Traditional 12-house chart with specific planetary placements                                                             │
+│ Expected Rashi Chart        │ Traditional 12-house chart with specific planetary placements                                                          │
 ├─────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ Expected Navamsa Chart      │ D9 divisional chart with Pisces ascendant for marriage analysis                                                          │
+│ Expected Navamsa Chart      │ D9 divisional chart with Pisces ascendant for marriage analysis                                                        │
 ├─────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ Expected Vimshottari Dasha  │ Mercury Mahadasha period (Age 22 years 8 months to 39 years 8 months)                                                   │
+│ Expected Vimshottari Dasha  │ Mercury Mahadasha period (Age 22 years 8 months to 39 years 8 months)                                                  │
 ├─────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ Current Planetary Period    │ Mercury MD, Venus AD, Sun PD (for 2025 analysis)                                                                         │
+│ Current Planetary Period    │ Mercury MD, Venus AD, Sun PD (for 2025 analysis)                                                                       │
 ├─────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ Yoga Combinations          │ Neecha Bhanga Raja Yoga (debilitation cancellation), Viparita Raja Yoga                                                  │
+│ Yoga Combinations          │ Neecha Bhanga Raja Yoga (debilitation cancellation), Viparita Raja Yoga                                                 │
 └─────────────────────────────┴────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ## 5. System vs Reference Data Comparison (Table A vs Table B)
 ```bash
-┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                                 SYSTEM vs PDF DATA DISCREPANCY ANALYSIS                                                               │
-├──────────────────────┬──────────────────────────────────┬──────────────────────────────────┬──────────────────────────────────────────────────┤
-│ PARAMETER            │ SYSTEM OUTPUT                    │ REFERENCE (PDF)                  │ DISCREPANCY STATUS & ANALYSIS                    │
-├──────────────────────┼──────────────────────────────────┼──────────────────────────────────┼──────────────────────────────────────────────────┤
-│ Ascendant            │ Taurus 9.99° (39.99°)            │ Taurus 10.00° (40.00°)          │ ✅ EXCELLENT (0.01° = 36" arc seconds)            │
-├──────────────────────┼──────────────────────────────────┼──────────────────────────────────┼──────────────────────────────────────────────────┤
-│ Sun Position         │ Libra 7.47° (187.47°)            │ Libra 7.00° (187.00°)           │ ✅ GOOD (0.47° = 28' arc minutes)                │
-├──────────────────────┼──────────────────────────────────┼──────────────────────────────────┼──────────────────────────────────────────────────┤
-│ Moon Position        │ Aquarius 21.95° (321.95°)        │ Aquarius 22.00° (322.00°)       │ ✅ EXCELLENT (0.05° = 3' arc minutes)            │
-├──────────────────────┼──────────────────────────────────┼──────────────────────────────────┼──────────────────────────────────────────────────┤
-│ Jupiter Position     │ Capricorn 14.20° (284.20°)       │ Capricorn 14.00° (284.00°)      │ ✅ GOOD (0.20° = 12' arc minutes)                │
-├──────────────────────┼──────────────────────────────────┼──────────────────────────────────┼──────────────────────────────────────────────────┤
-│ Venus Position       │ Virgo 16.35° (166.35°)           │ Virgo 16.00° (166.00°)          │ ✅ GOOD (0.35° = 21' arc minutes)                │
-├──────────────────────┼──────────────────────────────────┼──────────────────────────────────┼──────────────────────────────────────────────────┤
-│ Timezone Handling    │ Asia/Kolkata (UTC+5:30)          │ IST (UTC+5:30)                   │ ✅ CORRECT - No unwanted conversions detected    │
-├──────────────────────┼──────────────────────────────────┼──────────────────────────────────┼──────────────────────────────────────────────────┤
-│ Nakshatra Calculation│ Purva Bhadrapada (25th)          │ Purva Bhadrapada (Expected)      │ ✅ ACCURATE - Nakshatra mapping correct          │
-├──────────────────────┼──────────────────────────────────┼──────────────────────────────────┼──────────────────────────────────────────────────┤
-│ Current Dasha        │ Mercury MD (Age 22-39)           │ Mercury MD (Expected)            │ ✅ CORRECT - Vimshottari period accurate         │
-├──────────────────────┼──────────────────────────────────┼──────────────────────────────────┼──────────────────────────────────────────────────┤
-│ Dignity Analysis     │ 3 Debilitated planets            │ Multiple debilitated (Expected)  │ ✅ CONSISTENT - Sun, Jupiter, Venus debilitated  │
-├──────────────────────┼──────────────────────────────────┼──────────────────────────────────┼──────────────────────────────────────────────────┤
-│ Swiss Ephemeris      │ JD: 2446363.1041666665           │ Julian Date accurate             │ ✅ PRECISE - Swiss Ephemeris integration correct │
-├──────────────────────┼──────────────────────────────────┼──────────────────────────────────┼──────────────────────────────────────────────────┤
-│ Ayanamsha Applied    │ Lahiri (Chitra Paksha)           │ Lahiri (Expected)                │ ✅ STANDARD - Government-approved ayanamsha      │
-└──────────────────────┴──────────────────────────────────┴──────────────────────────────────┴──────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                                 SYSTEM vs PDF DATA DISCREPANCY ANALYSIS                                                         │
+├──────────────────────┬──────────────────────────────────┬──────────────────────────────────┬────────────────────────────────────────────────────┤
+│ PARAMETER            │ SYSTEM OUTPUT                    │ REFERENCE (PDF)                  │ DISCREPANCY STATUS & ANALYSIS                      │
+├──────────────────────┼──────────────────────────────────┼──────────────────────────────────┼────────────────────────────────────────────────────┤
+│ Ascendant            │ Taurus 9.99° (39.99°)            │ Taurus 10.00° (40.00°)          │ ✅ EXCELLENT (0.01° = 36" arc seconds)              │
+├──────────────────────┼──────────────────────────────────┼──────────────────────────────────┼────────────────────────────────────────────────────┤
+│ Sun Position         │ Libra 7.47° (187.47°)            │ Libra 7.00° (187.00°)           │ ✅ GOOD (0.47° = 28' arc minutes)                   │
+├──────────────────────┼──────────────────────────────────┼──────────────────────────────────┼────────────────────────────────────────────────────┤
+│ Moon Position        │ Aquarius 21.95° (321.95°)        │ Aquarius 22.00° (322.00°)       │ ✅ EXCELLENT (0.05° = 3' arc minutes)               │
+├──────────────────────┼──────────────────────────────────┼──────────────────────────────────┼────────────────────────────────────────────────────┤
+│ Jupiter Position     │ Capricorn 14.20° (284.20°)       │ Capricorn 14.00° (284.00°)      │ ✅ GOOD (0.20° = 12' arc minutes)                   │
+├──────────────────────┼──────────────────────────────────┼──────────────────────────────────┼────────────────────────────────────────────────────┤
+│ Venus Position       │ Virgo 16.35° (166.35°)           │ Virgo 16.00° (166.00°)          │ ✅ GOOD (0.35° = 21' arc minutes)                   │
+├──────────────────────┼──────────────────────────────────┼──────────────────────────────────┼────────────────────────────────────────────────────┤
+│ Timezone Handling    │ Asia/Kolkata (UTC+5:30)          │ IST (UTC+5:30)                   │ ✅ CORRECT - No unwanted conversions detected      │
+├──────────────────────┼──────────────────────────────────┼──────────────────────────────────┼────────────────────────────────────────────────────┤
+│ Nakshatra Calculation│ Purva Bhadrapada (25th)          │ Purva Bhadrapada (Expected)      │ ✅ ACCURATE - Nakshatra mapping correct            │
+├──────────────────────┼──────────────────────────────────┼──────────────────────────────────┼────────────────────────────────────────────────────┤
+│ Current Dasha        │ Mercury MD (Age 22-39)           │ Mercury MD (Expected)            │ ✅ CORRECT - Vimshottari period accurate           │
+├──────────────────────┼──────────────────────────────────┼──────────────────────────────────┼────────────────────────────────────────────────────┤
+│ Dignity Analysis     │ 3 Debilitated planets            │ Multiple debilitated (Expected)  │ ✅ CONSISTENT - Sun, Jupiter, Venus debilitated    │
+├──────────────────────┼──────────────────────────────────┼──────────────────────────────────┼────────────────────────────────────────────────────┤
+│ Swiss Ephemeris      │ JD: 2446363.1041666665           │ Julian Date accurate             │ ✅ PRECISE - Swiss Ephemeris integration correct   │
+├──────────────────────┼──────────────────────────────────┼──────────────────────────────────┼────────────────────────────────────────────────────┤
+│ Ayanamsha Applied    │ Lahiri (Chitra Paksha)           │ Lahiri (Expected)                │ ✅ STANDARD - Government-approved ayanamsha        │
+└──────────────────────┴──────────────────────────────────┴──────────────────────────────────┴────────────────────────────────────────────────────┘
 ```
 
 ## 6. Root Cause Analysis with Swiss Ephemeris Validation
