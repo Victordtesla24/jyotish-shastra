@@ -960,3 +960,123 @@
 
 
 
+## **Role**
+
+  Act as a **10x Engineer/Senior Software Developer** with expertise in React.js, Node.js, API integration, and UI/UX debugging.
+
+## **Objective**
+
+  Systematically diagnose and resolve routing errors, UI/backend integration failures, and visual rendering issues in a Vedic Astrology application while maintaining codebase integrity and following established protocols.
+
+## **Prerequisites**
+
+  -  Strict adherence to `001-directory-management-protocols.mdc` and `002-error-fixing-protocols.mdc`
+  -  Comprehensive online research and solution validation before implementation
+  -  Version control checkpoints before any modifications
+
+## **Analysis & Research Instructions**
+
+### **Phase 1: Error Diagnosis & Root Cause Analysis**
+
+  1.  **Routing Error Investigation**: Analyze why "Generate Chart" button triggers console errors and 404 responses (`POST /api/chart 404`)
+  2.  **API Routing Investigation**: Research why `POST /api/chart 404` errors occur and validate against Express.js routing best practices
+  3.  **Logging System Audit**: Determine why `npm run dev:all` fails to capture errors in log files (`front-end-server-logs.log`, `back-end-server-logs.log`)
+  3.  **UI Rendering Audit**: Analyze white background, invisible text, and component visibility issues using React DevTools methodology
+
+### **Phase 2: Component Architecture Analysis**
+
+  -  Research current React.js and Express.js integration patterns for error handling
+  -  Validate CSS/Tailwind solutions for text visibility and background rendering issues
+  -  **Import Path Resolution**: Identify and map all broken import statements without modifying component functionality
+  -  **Functional Requirement Gap Identification**: Identify requirement gaps, missing modules, incomplete code, functions, classes, Front & Back End integration from current implementation cross referencing system architecture in `docs/architecture/system-architecture.md`, API architecture in `docs/api/validation-guide.md` & requirements analysis in`user-docs/requirements-analysis-questions.md` documents
+  -  **Component Location Audit**: Locate missing/misplaced components according to established directory conventions
+  -  **Duplicate Code Detection**: Identify redundant files, code blocks, and scripts for elimination
+
+## **Core Instructions**
+
+### **Task 1: API Integration Resolution**
+
+  1.  Locate and examine backend route configurations for `/api/chart` endpoint
+  2.  Verify frontend API service configurations and request formatting
+  3.  Implement minimal fixes to establish proper frontend-backend communication
+  4.  Test API connectivity using provided server logs as reference
+
+### **Task 2: Logging System Restoration**
+
+  1.  Investigate `dev:all`, `dev:logs`, and `dev:backend-logs` script configurations
+  2.  Verify log file permissions and directory structure
+  3.  Implement minimal adjustments to capture runtime errors effectively
+
+### **Task 3: UI Enhancement Validation**
+
+  1.  Systematically inspect component rendering: backgrounds, text visibility, form elements
+  2.  Verify CSS/Tailwind class applications and color schemes
+  3.  Validate component imports and eliminate unused dependencies (as shown in ESLint warnings)
+  4.  Ensure responsive design and mobile optimization functionality
+
+### **Task 4: Component Architecture Audit**
+
+  1.  Fix broken import statements without modifying component functionality
+  2.  Remove duplicate code blocks while preserving functional requirements
+  3.  Place missing components in appropriate directories per established conventions
+
+### **Error Resolution Sequence**
+
+  1.  **Backend API Endpoints**: Fix routing issues causing 404 errors for `/api/chart` endpoint using analysis & Research from Phase 1 & 2.
+  2.  **Frontend-Backend Integration**: Ensure proper API communication and data flow is implemented with **only production grade** code.
+  3.  **UI Component Rendering**: Resolve visual styling issues (backgrounds, text visibility, form elements)
+  4.  **Import Dependencies**: Fix broken import paths and missing component references
+  5.  **ESLint Warnings**: Address unused variable warnings in enhanced components
+
+### **Quality Assurance Loop**
+
+  -  Apply minimal, targeted fixes based on online research validation
+  -  Test each fix immediately to prevent cascading errors
+  -  Verify UI enhancements are visually confirmed and functional
+  -  Ensure zero regression in existing functionality
+
+## **Deliverables**
+
+  -  ✅ **Zero Runtime Errors**: All server and browser console errors resolved
+  -  ✅ **Complete UI Enhancement Visibility**: Every enhanced component, styling, and feature properly displayed
+  -  ✅ **Full Frontend-Backend Integration**: All API data correctly rendered in UI with proper error handling
+  -  ✅ **Protocol Compliance**: Adherence to both error-fixing and directory management protocols
+  -  ✅ **Clean Codebase**: No duplicate files, broken imports, or unnecessary code additions
+
+## **Critical Constraints**
+
+  -  **PROHIBITED**: Creating new files, components, or scripts unless addressing missing core functionality
+  -  **PROHIBITED**: Modifying existing code outside the scope of error resolution and UI validation
+  -  **PROHIBITED**: Altering established directory structure or architectural patterns
+  -  **REQUIRED**: Maintain current codebase integrity while implementing minimal, precise fixes
+  -  **REQUIRED**: Online research and validation of solutions before implementation
+
+## **Success Criteria**
+
+Task completion achieved **ONLY** when:
+
+  - All console errors eliminated (frontend and backend)
+  - Every UI enhancement visually confirmed and functional
+  - Frontend displays accurate backend data without integration issues
+  - Both protocol documents fully adhered to
+  - No regression in existing functionality
+  - Codebase maintains production-ready quality standards
+
+## **Implementation Guidelines**
+
+  -  **Research First**: Conduct systematic online research for each identified root cause
+  -  **Minimal Changes**: Apply smallest possible code modifications following best practices
+  -  **Systematic Approach**: Address issues in logical, dependency-aware order
+  -  **Continuous Validation**: Test after each fix using automated testing protocols
+  -  **Zero Tolerance**: Task incomplete until ALL success criteria demonstrably met through working application
+
+## **Current Error Context**
+
+  ```bash
+    # Known Issues:
+      POST /api/chart 404 errors (routing failure)
+      - Empty log files despite error occurrence
+      - UI rendering problems (white backgrounds, invisible text)
+      - ESLint warnings in enhanced components
+      - Frontend-backend integration breakdown
+  ```

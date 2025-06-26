@@ -15,10 +15,17 @@
     "format": "prettier --write .",
     "setup": "bash scripts/setup.sh",
     "dev:frontend": "cd client && npm start",
-    "dev:backend": "nodemon src/index.js",  
+    "dev:backend": "nodemon src/index.js",
     "dev:logs": "tail -F logs/servers/front-end-server-logs.log | grep --line-buffered -iE 'error|warn|critical'",
     "dev:backend-logs": "tail -F logs/servers/back-end-server-logs.log | grep --line-buffered -iE 'error|warn|404|stack'",
-    "dev:all": "npm run dev:backend & npm run dev:frontend & sleep 3 && npm run dev:logs & npm run dev:backend-logs"
+    "dev:all": "npm run dev:backend & npm run dev:frontend & sleep 3 && npm run dev:logs & npm run dev:backend-logs",
+    "detect-duplicates": "node scripts/duplicate-detector.js",
+    "detect-duplicates:scan": "node scripts/duplicate-detector.js scan",
+    "detect-duplicates:remove": "node scripts/duplicate-detector.js remove",
+    "detect-duplicates:analyze": "node scripts/duplicate-detector.js analyze",
+    "detect-duplicates:interactive": "node scripts/duplicate-detector.js interactive",
+    "check-duplicates": "npm run detect-duplicates",
+    "clean-duplicates": "npm run detect-duplicates:remove"
   },
   "keywords": [
     "vedic-astrology",

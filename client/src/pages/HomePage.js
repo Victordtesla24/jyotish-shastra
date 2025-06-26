@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, Button } from '../components/ui';
+import HeroSection from '../components/enhanced/HeroSection';
 
 const HomePage = () => {
   const features = [
@@ -44,45 +45,8 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-sacred-white to-gray-50">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-cosmic-purple/10 to-vedic-gold/10"></div>
-        <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="text-center max-w-4xl mx-auto">
-            <div className="flex justify-center mb-8">
-              <div className="w-24 h-24 bg-gradient-to-br from-cosmic-purple to-vedic-gold rounded-full flex items-center justify-center animate-pulse">
-                <span className="text-4xl text-white">🕉️</span>
-              </div>
-            </div>
-
-            <h1 className="font-accent text-5xl md:text-6xl font-bold text-earth-brown mb-6">
-              Jyotish Shastra
-            </h1>
-
-            <p className="text-xl md:text-2xl text-cosmic-purple mb-4 font-medium">
-              ज्योतिष शास्त्र - The Science of Light
-            </p>
-
-            <p className="text-lg text-wisdom-gray mb-8 leading-relaxed">
-              Discover the profound wisdom of Vedic astrology through authentic calculations,
-              detailed analysis, and personalized insights that illuminate your life's path.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/chart">
-                <Button size="lg" className="bg-gradient-to-r from-cosmic-purple to-vedic-primary hover:shadow-cosmic">
-                  Generate Your Chart
-                </Button>
-              </Link>
-              <Link to="/analysis">
-                <Button variant="outline" size="lg" className="border-cosmic-purple text-cosmic-purple hover:bg-cosmic-purple hover:text-white">
-                  Explore Analysis
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Enhanced Hero Section with animations and interactivity */}
+      <HeroSection />
 
       {/* Features Section */}
       <section className="py-20">
