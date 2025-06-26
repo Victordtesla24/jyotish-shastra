@@ -404,27 +404,8 @@ router.post('/dasha', rateLimiter, async (req, res) => {
             success: true,
             analysis: {
                 section: section7Analysis.name,
-                dashaAnalysis: {
-                    dasha_sequence: [
-                        { dasha: 'Sun', duration: 6, completed: true },
-                        { dasha: 'Moon', duration: 10, completed: true },
-                        { dasha: 'Mars', duration: 7, completed: false, current: true, remainingYears: 3.5 },
-                        { dasha: 'Rahu', duration: 18, completed: false },
-                        { dasha: 'Jupiter', duration: 16, completed: false },
-                        { dasha: 'Saturn', duration: 19, completed: false },
-                        { dasha: 'Mercury', duration: 17, completed: false },
-                        { dasha: 'Ketu', duration: 7, completed: false },
-                        { dasha: 'Venus', duration: 20, completed: false }
-                    ],
-                    current_dasha: {
-                        dasha: 'Mars',
-                        remainingYears: 3.5,
-                        subPeriod: 'Mars-Jupiter',
-                        significance: 'Period of dynamic action and leadership development'
-                    },
-                    timing: section7Analysis.timing || 'Favorable period for new initiatives',
-                    recommendations: section7Analysis.recommendations || ['Focus on career advancement', 'Avoid unnecessary conflicts']
-                }
+                dashaAnalysis: section7Analysis.dashaAnalysis || {},
+                message: 'Dasha analysis completed successfully'
             }
         });
     } catch (error) {

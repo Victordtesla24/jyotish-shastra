@@ -342,11 +342,29 @@ class MasterAnalysisOrchestrator {
 
       const { rasiChart, navamsaChart } = charts;
 
-      section.navamsaAnalysis = this.navamsaService.analyzeNavamsaComprehensive(
-        rasiChart,
-        navamsaChart,
-        analysis.birthData.gender || 'male'
-      );
+      if (!rasiChart || !navamsaChart) {
+        throw new Error('Both Rasi and Navamsa charts are required for analysis');
+      }
+
+      // Convert chart structure to match NavamsaAnalysisService expectations
+      const convertedNavamsaChart = {
+        ...navamsaChart,
+        planets: this.convertPlanetaryPositionsToArray(navamsaChart.planetaryPositions)
+      };
+
+      const convertedRasiChart = {
+        ...rasiChart,
+        planets: this.convertPlanetaryPositionsToArray(rasiChart.planetaryPositions)
+      };
+
+      // Create proper chart structure for NavamsaAnalysisService
+      const combinedChart = {
+        ...convertedRasiChart,
+        d9: convertedNavamsaChart,
+        gender: analysis.birthData?.gender || 'male'
+      };
+
+      section.navamsaAnalysis = this.navamsaService.analyzeNavamsa(combinedChart);
 
       return section;
     } catch (error) {
@@ -430,6 +448,20 @@ class MasterAnalysisOrchestrator {
     } catch (error) {
       throw new Error(`Chart generation failed: ${error.message}`);
     }
+  }
+
+  /**
+   * Convert planetaryPositions object to planets array format expected by analysis services
+   * @param {Object} planetaryPositions - Object with planet names as keys
+   * @returns {Array} Array of planet objects with name property
+   */
+  convertPlanetaryPositionsToArray(planetaryPositions) {
+    if (!planetaryPositions) return [];
+
+    return Object.entries(planetaryPositions).map(([planetName, planetData]) => ({
+      name: planetName.charAt(0).toUpperCase() + planetName.slice(1), // Capitalize planet name
+      ...planetData
+    }));
   }
 
   /**
