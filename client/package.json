@@ -17,7 +17,9 @@
     "react-hook-form": "^7.48.2",
     "react-query": "^3.39.3",
     "react-router-dom": "^6.20.1",
-    "recharts": "^2.8.0"
+    "react-select": "^5.10.1",
+    "recharts": "^2.8.0",
+    "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.1.5",
@@ -37,7 +39,12 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint src/",
-    "lint:fix": "eslint src/ --fix"
+    "lint:fix": "eslint src/ --fix",
+    "dev:frontend": "npm start",
+    "dev:backend": "nodemon src/index.js",
+    "dev:logs": "tail -F logs/servers/front-end-server-logs.log | grep --line-buffered -iE 'error|warn|critical'",
+    "dev:backend-logs": "tail -F logs/servers/back-end-server-logs.log | grep --line-buffered -iE 'error|warn|404|stack'",
+    "dev:all": "npm run dev:backend & npm run dev:frontend & sleep 3 && npm run dev:logs & npm run dev:backend-logs"
   },
   "eslintConfig": {
     "extends": [

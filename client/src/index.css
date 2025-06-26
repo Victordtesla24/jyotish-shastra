@@ -1,0 +1,442 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Enhanced Google Fonts Import with optimal loading */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@300;400;500;600;700&display=swap');
+
+/* Base Layer - Enhanced with CSS Custom Properties */
+@layer base {
+  :root {
+    /* Vedic Color System - CSS Custom Properties for theming */
+    --vedic-saffron: #FF9933;
+    --vedic-gold: #FFD700;
+    --vedic-maroon: #800000;
+    --vedic-navy: #000080;
+    --vedic-lotus: #FFC0CB;
+
+    /* Cosmic Color System */
+    --cosmic-purple: #6B46C1;
+    --stellar-blue: #1E40AF;
+    --lunar-silver: #C0C0C0;
+    --solar-orange: #F97316;
+
+    /* Sacred Neutral System */
+    --sacred-white: #FFFEF7;
+    --wisdom-gray: #6B7280;
+    --earth-brown: #92400E;
+
+    /* Animation Durations */
+    --animation-fast: 150ms;
+    --animation-normal: 300ms;
+    --animation-slow: 500ms;
+    --animation-vedic: 800ms;
+
+    /* Spacing Scale */
+    --space-vedic: 1.618rem; /* Golden ratio spacing */
+    --border-radius-vedic: 0.625rem;
+
+    /* Typography Scale */
+    --font-size-vedic-sm: 0.875rem;
+    --font-size-vedic-base: 1rem;
+    --font-size-vedic-lg: 1.125rem;
+    --line-height-vedic: 1.618; /* Golden ratio line height */
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply font-sans antialiased;
+    background-color: var(--sacred-white);
+    transition: background-color var(--animation-normal) ease;
+  }
+
+  /* Dark mode body */
+  .dark body {
+    background-color: #0F0F23;
+  }
+
+  /* Enhanced focus styles for accessibility */
+  *:focus-visible {
+    outline: 2px solid var(--vedic-saffron);
+    outline-offset: 2px;
+    border-radius: var(--border-radius-vedic);
+  }
+
+  /* Remove default margins for better control */
+  h1, h2, h3, h4, h5, h6 {
+    @apply m-0 leading-tight;
+  }
+
+  /* Enhanced scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-100 dark:bg-dark-surface;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-saffron/50 hover:bg-saffron/70 rounded-full;
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .text-wisdom-gray {
+      @apply text-black dark:text-white;
+    }
+
+    .border-gray-200 {
+      @apply border-black dark:border-white;
+    }
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* Component Layer - Enhanced Reusable Patterns */
+@layer components {
+  /* Enhanced Button Styles */
+  .btn-vedic-primary {
+    @apply bg-gradient-vedic text-white px-6 py-3 rounded-vedic font-medium;
+    @apply shadow-vedic-medium hover:shadow-vedic-strong;
+    @apply transform transition-all duration-300 hover:scale-105;
+    @apply focus:outline-none focus:ring-2 focus:ring-saffron focus:ring-opacity-50;
+    @apply active:scale-95;
+  }
+
+  .btn-vedic-secondary {
+    @apply bg-transparent border-2 border-white text-white px-6 py-3 rounded-vedic font-medium;
+    @apply hover:bg-white hover:text-navy backdrop-blur-sm;
+    @apply transition-all duration-300;
+    @apply focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50;
+  }
+
+  .btn-cosmic {
+    @apply bg-gradient-cosmic text-white px-6 py-3 rounded-vedic font-medium;
+    @apply shadow-cosmic hover:shadow-celestial;
+    @apply transform transition-all duration-300 hover:scale-105;
+    @apply relative overflow-hidden;
+  }
+
+  .btn-cosmic::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-r from-white/20 to-transparent;
+    @apply opacity-0 transition-opacity duration-300;
+  }
+
+  .btn-cosmic:hover::before {
+    @apply opacity-100;
+  }
+
+  /* Enhanced Card Components */
+  .card-vedic {
+    @apply bg-white rounded-2xl shadow-vedic-soft p-6;
+    @apply border border-gray-100 hover:shadow-vedic-medium;
+    @apply transition-all duration-300 transform hover:-translate-y-1;
+    @apply backdrop-blur-sm;
+  }
+
+  .dark .card-vedic {
+    @apply bg-dark-surface border-dark-border shadow-cosmic;
+    @apply hover:shadow-celestial;
+  }
+
+  .card-glassmorphic {
+    @apply bg-white/10 backdrop-blur-xl border border-white/20;
+    @apply rounded-2xl p-6 shadow-cosmic;
+    @apply hover:bg-white/20 transition-all duration-300;
+  }
+
+  .card-sacred {
+    @apply bg-sacred-white border-2 border-gold/20 shadow-golden;
+    @apply rounded-2xl p-6 hover:border-gold/40;
+    @apply transition-all duration-300 transform hover:scale-105;
+  }
+
+  /* Navigation Enhancements */
+  .nav-link-vedic {
+    @apply font-medium py-2 px-4 rounded-lg border-b-2 transition-all duration-200;
+    @apply hover:opacity-80 hover:bg-white/10;
+    @apply focus:outline-none focus:ring-2 focus:ring-gold/50;
+  }
+
+  .nav-link-active {
+    @apply border-vedic-gold text-vedic-gold bg-gold/10;
+  }
+
+  .nav-link-inactive {
+    @apply border-transparent;
+  }
+
+  /* Form Elements Enhancement */
+  .input-vedic {
+    @apply w-full px-4 py-3 border border-gray-300 rounded-vedic;
+    @apply focus:outline-none focus:ring-2 focus:ring-saffron focus:border-saffron;
+    @apply transition-all duration-200 bg-white;
+    @apply placeholder:text-gray-400;
+  }
+
+  .input-vedic:focus {
+    @apply shadow-vedic-soft transform scale-[1.02];
+  }
+
+  .dark .input-vedic {
+    @apply bg-dark-surface border-dark-border text-dark-text-primary;
+    @apply focus:border-dark-accent focus:ring-dark-accent;
+  }
+
+  /* Enhanced Loading Spinners */
+  .spinner-vedic {
+    @apply inline-block w-8 h-8 border-4 border-saffron border-r-transparent;
+    @apply rounded-full animate-spin;
+  }
+
+  .spinner-cosmic {
+    @apply inline-block w-12 h-12 border-4 border-cosmic-purple border-r-transparent;
+    @apply rounded-full animate-mandala-rotate;
+  }
+
+  /* Alert Components with Better Accessibility */
+  .alert-success {
+    @apply bg-green-50 border-l-4 border-green-400 text-green-800 p-4 rounded-vedic;
+    @apply dark:bg-green-900/20 dark:border-green-400 dark:text-green-300;
+  }
+
+  .alert-error {
+    @apply bg-red-50 border-l-4 border-red-400 text-red-800 p-4 rounded-vedic;
+    @apply dark:bg-red-900/20 dark:border-red-400 dark:text-red-300;
+  }
+
+  .alert-warning {
+    @apply bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 p-4 rounded-vedic;
+    @apply dark:bg-yellow-900/20 dark:border-yellow-400 dark:text-yellow-300;
+  }
+
+  .alert-info {
+    @apply bg-blue-50 border-l-4 border-blue-400 text-blue-800 p-4 rounded-vedic;
+    @apply dark:bg-blue-900/20 dark:border-blue-400 dark:text-blue-300;
+  }
+
+  /* Astrology-specific Enhanced Patterns */
+  .planet-card {
+    @apply bg-white rounded-lg p-4 shadow-vedic-soft border border-gray-200;
+    @apply hover:shadow-vedic-medium hover:border-saffron/30 transition-all duration-300;
+    @apply transform hover:scale-105 hover:-translate-y-1;
+  }
+
+  .dark .planet-card {
+    @apply bg-dark-surface border-dark-border shadow-cosmic;
+    @apply hover:shadow-celestial hover:border-dark-accent;
+  }
+
+  .house-section {
+    @apply border-2 border-gray-300 rounded-lg p-3 transition-all duration-200;
+    @apply hover:border-saffron hover:shadow-vedic-soft;
+    @apply focus-within:border-saffron focus-within:ring-2 focus-within:ring-saffron/20;
+  }
+
+  .yoga-highlight {
+    @apply bg-gradient-to-r from-gold to-saffron text-white px-3 py-1 rounded-full;
+    @apply text-sm font-medium shadow-golden;
+    @apply animate-pulse-soft;
+  }
+
+  .dasha-timeline {
+    @apply relative pl-6 pb-6 border-l-2 border-cosmic-purple;
+  }
+
+  .dasha-timeline::before {
+    content: '';
+    @apply absolute left-[-5px] top-0 w-3 h-3 bg-cosmic-purple rounded-full;
+    @apply shadow-cosmic animate-pulse;
+  }
+
+  /* Typography Enhancements */
+  .text-vedic-gradient {
+    @apply bg-gradient-to-r from-saffron via-gold to-maroon;
+    @apply bg-clip-text text-transparent;
+  }
+
+  .text-cosmic-gradient {
+    @apply bg-gradient-to-r from-cosmic-purple via-stellar-blue to-lunar-silver;
+    @apply bg-clip-text text-transparent;
+  }
+
+  /* Container and Layout Utilities */
+  .container-vedic {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .section-spacing {
+    @apply py-12 md:py-16 lg:py-20;
+  }
+
+  /* Responsive Text Utilities */
+  .text-responsive-xl {
+    @apply text-lg sm:text-xl lg:text-2xl;
+  }
+
+  .text-responsive-2xl {
+    @apply text-xl sm:text-2xl lg:text-3xl;
+  }
+
+  .text-responsive-3xl {
+    @apply text-2xl sm:text-3xl lg:text-4xl;
+  }
+
+  .text-responsive-4xl {
+    @apply text-3xl sm:text-4xl lg:text-5xl xl:text-6xl;
+  }
+
+  /* Accessibility Utilities */
+  .sr-only {
+    @apply absolute w-px h-px p-0 -m-px overflow-hidden;
+    @apply whitespace-nowrap border-0;
+    clip: rect(0, 0, 0, 0);
+  }
+
+  .focus-visible-only {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .focus-visible-only:focus-visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Skip to content link */
+  .skip-to-content {
+    @apply absolute -top-full left-4 z-50;
+    @apply bg-saffron text-white px-4 py-2 rounded-vedic;
+    @apply font-medium transition-all duration-200;
+    @apply focus:top-4;
+  }
+}
+
+/* Utility Layer - Enhanced Custom Utilities */
+@layer utilities {
+  /* Text Shadow Utilities */
+  .text-vedic-shadow {
+    text-shadow: 0 2px 4px rgba(139, 69, 19, 0.3);
+  }
+
+  .text-cosmic-glow {
+    text-shadow: 0 0 20px rgba(107, 70, 193, 0.5);
+  }
+
+  .text-golden-glow {
+    text-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+  }
+
+  /* Backdrop Utilities */
+  .backdrop-vedic {
+    backdrop-filter: blur(12px) saturate(1.5);
+  }
+
+  /* Animation Utilities */
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+
+  .animate-sacred-pulse {
+    animation: sacred-pulse 4s ease-in-out infinite;
+  }
+
+  /* Gradient Background Utilities */
+  .bg-vedic-radial {
+    background: radial-gradient(circle at center, var(--vedic-saffron) 0%, var(--vedic-maroon) 100%);
+  }
+
+  .bg-cosmic-radial {
+    background: radial-gradient(circle at center, var(--cosmic-purple) 0%, var(--stellar-blue) 100%);
+  }
+
+  /* Border Gradient Utilities */
+  .border-vedic-gradient {
+    border-image: linear-gradient(135deg, var(--vedic-saffron), var(--vedic-gold), var(--vedic-maroon)) 1;
+  }
+
+  /* Transform Utilities */
+  .transform-preserve-3d {
+    transform-style: preserve-3d;
+  }
+
+  .backface-hidden {
+    backface-visibility: hidden;
+  }
+}
+
+/* Custom Keyframe Animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes glow {
+  from { box-shadow: 0 0 20px rgba(255, 153, 51, 0.5); }
+  to { box-shadow: 0 0 30px rgba(255, 153, 51, 0.8); }
+}
+
+@keyframes sacred-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes vedic-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* High Performance CSS */
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform, opacity;
+}
+
+/* Print Styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+  }
+}

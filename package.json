@@ -13,7 +13,12 @@
     "test:e2e": "cypress run",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "setup": "bash scripts/setup.sh"
+    "setup": "bash scripts/setup.sh",
+    "dev:frontend": "cd client && npm start",
+    "dev:backend": "nodemon src/index.js",  
+    "dev:logs": "tail -F logs/servers/front-end-server-logs.log | grep --line-buffered -iE 'error|warn|critical'",
+    "dev:backend-logs": "tail -F logs/servers/back-end-server-logs.log | grep --line-buffered -iE 'error|warn|404|stack'",
+    "dev:all": "npm run dev:backend & npm run dev:frontend & sleep 3 && npm run dev:logs & npm run dev:backend-logs"
   },
   "keywords": [
     "vedic-astrology",
@@ -41,6 +46,7 @@
     "morgan": "^1.10.0",
     "react-hook-form": "^7.58.1",
     "react-query": "^3.39.3",
+    "react-scripts": "^0.0.0",
     "redis": "^4.6.10",
     "swisseph": "^0.5.17",
     "tailwind-merge": "^3.3.1",
@@ -66,6 +72,7 @@
     "http-proxy": ">=1.18.1",
     "strong-log-transformer": ">=2.1.0"
   },
+
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=8.0.0"
@@ -78,4 +85,5 @@
     "url": "https://github.com/your-org/jyotish-shastra/issues"
   },
   "homepage": "https://github.com/your-org/jyotish-shastra#readme"
+
 }

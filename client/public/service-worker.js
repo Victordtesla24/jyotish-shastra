@@ -6,13 +6,13 @@ const CACHE_NAME = 'jyotish-shastra-v1';
 const urlsToCache = [
   '/',
   '/index.html',
-  '/static/css/main.css',
-  '/static/js/main.js',
   '/manifest.json',
   '/favicon.svg',
   // Add fonts
   'https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap'
 ];
+
+// Note: main.css and main.js are handled dynamically since they have hashes in production
 
 // Install event - cache assets
 self.addEventListener('install', event => {
