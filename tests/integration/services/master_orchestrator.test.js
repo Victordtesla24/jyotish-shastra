@@ -11,7 +11,7 @@ jest.mock('../../../src/services/analysis/ArudhaAnalysisService');
 jest.mock('../../../src/core/analysis/divisional/NavamsaAnalysisService');
 jest.mock('../../../src/services/analysis/DetailedDashaAnalysisService');
 jest.mock('../../../src/services/analysis/YogaDetectionService');
-jest.mock('../../../src/services/chart/EnhancedChartService');
+jest.mock('../../../src/services/chart/ChartGenerationService');
 
 // Create mock classes that return mock instances
 const mockBirthDataService = {
@@ -114,7 +114,7 @@ require('../../../src/core/analysis/aspects/AspectAnalysisService').mockImplemen
 require('../../../src/services/analysis/ArudhaAnalysisService').mockImplementation(() => mockArudhaService);
 require('../../../src/core/analysis/divisional/NavamsaAnalysisService').mockImplementation(() => mockNavamsaService);
 require('../../../src/services/analysis/DetailedDashaAnalysisService').mockImplementation(() => mockDashaService);
-require('../../../src/services/chart/EnhancedChartService').mockImplementation(() => mockChartService);
+require('../../../src/services/chart/ChartGenerationService').mockImplementation(() => mockChartService);
 
 describe('MasterAnalysisOrchestrator Integration Test', () => {
   let orchestrator;

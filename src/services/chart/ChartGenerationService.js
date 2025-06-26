@@ -5,6 +5,7 @@
  */
 
 const swisseph = require('swisseph');
+const { v4: uuidv4 } = require('uuid');
 const moment = require('moment-timezone');
 const GeocodingService = require('../geocoding/GeocodingService');
 const astroConfig = require('../../config/astro-config');
@@ -14,9 +15,12 @@ const {
   calculateNavamsa,
   getNakshatra,
   calculatePlanetaryDignity,
-  calculateHouseNumber
+  calculateHouseNumber,
+
 } = require('../../utils/helpers/astrologyHelpers');
 const { SWISS_EPHEMERIS, PLANETARY_DATA, ZODIAC_SIGNS } = require('../../utils/constants/astronomicalConstants');
+
+
 
 class ChartGenerationService {
   constructor() {
@@ -1068,6 +1072,8 @@ class ChartGenerationService {
 
     return true;
   }
+
+
 }
 
 module.exports = ChartGenerationService;

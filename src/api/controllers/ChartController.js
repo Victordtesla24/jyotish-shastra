@@ -5,7 +5,6 @@
  */
 
 const ChartGenerationService = require('../../services/chart/ChartGenerationService');
-const EnhancedChartService = require('../../services/chart/EnhancedChartService');
 const LagnaAnalysisService = require('../../services/analysis/LagnaAnalysisService');
 const HouseAnalysisService = require('../../core/analysis/houses/HouseAnalysisService');
 const BirthDataAnalysisService = require('../../services/analysis/BirthDataAnalysisService');
@@ -15,7 +14,6 @@ const { validateChartRequest } = require('../validators/birthDataValidator');
 class ChartController {
   constructor() {
     this.chartService = new ChartGenerationService();
-    this.enhancedChartService = new EnhancedChartService();
     this.lagnaService = new LagnaAnalysisService();
     this.houseService = new HouseAnalysisService();
     this.birthDataAnalysisService = new BirthDataAnalysisService();
@@ -39,7 +37,7 @@ class ChartController {
       }
 
       // Generate comprehensive chart with geocoding
-      const chartData = await this.enhancedChartService.generateComprehensiveChart(birthData);
+      const chartData = await this.chartService.generateComprehensiveChart(birthData);
 
       res.status(200).json({
         success: true,
@@ -619,7 +617,7 @@ class ChartController {
       }
 
       // Generate charts first
-      const chartData = await this.enhancedChartService.generateComprehensiveChart(birthData);
+      const chartData = await this.chartService.generateComprehensiveChart(birthData);
 
       // Perform systematic analysis of Section 1 questions
       const birthDataAnalysis = this.birthDataAnalysisService.analyzeBirthDataCollection(
