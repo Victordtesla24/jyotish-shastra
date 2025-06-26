@@ -29,5 +29,27 @@ export {
   SkeletonChart
 } from './loading/Skeleton';
 
+export {
+  default as VedicLoadingSpinner,
+  VedicSpinnerPresets,
+  useVedicLoading
+} from './VedicLoadingSpinner';
+
+// Theme Components
+export { default as ThemeToggle } from './ThemeToggle';
+
+// Vedic Icon Components (importing from client directory)
+export {
+  OmIcon,
+  LotusIcon,
+  MandalaIcon,
+  SunIcon,
+  MoonIcon,
+  StarIcon,
+  TrishulIcon,
+  YantraIcon,
+  ChakraIcon
+} from '../../../client/src/components/ui/VedicIcons';
+
 // Re-export utilities
 export { cn } from '../../lib/utils';

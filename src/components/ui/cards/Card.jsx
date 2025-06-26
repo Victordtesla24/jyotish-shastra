@@ -8,12 +8,12 @@ const cardVariants = cva(
   {
     variants: {
       variant: {
-        default: 'bg-vedic-surface border border-vedic-border shadow-soft hover:shadow-medium',
-        elevated: 'bg-vedic-surface shadow-medium hover:shadow-strong',
+        default: 'bg-white dark:bg-dark-surface border border-gray-200 dark:border-dark-border shadow-vedic-soft hover:shadow-vedic-medium',
+        elevated: 'bg-white dark:bg-dark-surface shadow-vedic-medium hover:shadow-vedic-strong',
         cosmic: 'bg-gradient-to-br from-cosmic-purple/10 to-stellar-blue/10 border border-cosmic-purple/20 backdrop-blur-sm',
-        vedic: 'bg-gradient-to-br from-vedic-primary/5 to-vedic-secondary/5 border border-vedic-primary/20',
-        glass: 'bg-white/10 backdrop-blur-md border border-white/20',
-        outlined: 'bg-transparent border-2 border-vedic-border',
+        vedic: 'bg-gradient-to-br from-saffron/5 to-gold/5 border border-saffron/20',
+        glassmorphic: 'bg-white/10 backdrop-blur-md border border-white/20',
+        outlined: 'bg-transparent border-2 border-gray-200 dark:border-dark-border',
       },
       padding: {
         none: 'p-0',

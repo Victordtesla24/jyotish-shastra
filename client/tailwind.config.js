@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
+  darkMode: 'class', // Enable class-based dark mode
   theme: {
     extend: {
       colors: {
@@ -21,6 +22,23 @@ module.exports = {
         'sacred-white': '#FFFEF7',
         'wisdom-gray': '#6B7280',
         'earth-brown': '#92400E',
+
+        // Dark Mode Vedic Palette
+        'dark': {
+          'bg-primary': '#0F0F23',
+          'bg-secondary': '#1A1A2E',
+          'bg-tertiary': '#16213E',
+          'surface': '#2D2D44',
+          'surface-elevated': '#3B3B58',
+          'border': '#4A4A6A',
+          'text-primary': '#E5E5F4',
+          'text-secondary': '#B8B8CC',
+          'text-muted': '#8B8BA0',
+          'accent': '#7C3AED',
+          'cosmic': '#6366F1',
+          'vedic-gold': '#FBBF24',
+          'vedic-saffron': '#F59E0B',
+        },
 
         // Vedic Semantic Colors (backward compatibility)
         'vedic-saffron': '#FF9933',
@@ -87,6 +105,10 @@ module.exports = {
         slideUp: {
           '0%': { opacity: '0', transform: 'translateY(30px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        slideInFromRight: {
+          '0%': { opacity: '0', transform: 'translateX(20px)' },
+          '100%': { opacity: '1', transform: 'translateX(0)' },
         },
       },
       backgroundImage: {

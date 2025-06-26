@@ -8,11 +8,11 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        primary: 'bg-gradient-to-r from-vedic-primary to-vedic-secondary text-white hover:shadow-vedic focus:ring-vedic-primary',
-        secondary: 'bg-vedic-surface border-2 border-vedic-primary text-vedic-primary hover:bg-vedic-primary hover:text-white focus:ring-vedic-primary',
-        accent: 'bg-gradient-to-r from-vedic-accent to-gold-pure text-vedic-text hover:shadow-gold focus:ring-vedic-accent',
+        primary: 'bg-gradient-to-r from-saffron to-maroon text-white hover:shadow-vedic-medium focus:ring-saffron',
+        secondary: 'bg-white border-2 border-saffron text-saffron hover:bg-saffron hover:text-white focus:ring-saffron',
+        golden: 'bg-gradient-to-r from-gold to-saffron text-white hover:shadow-golden focus:ring-gold',
         cosmic: 'bg-gradient-to-r from-cosmic-purple to-stellar-blue text-white hover:shadow-cosmic focus:ring-cosmic-purple',
-        ghost: 'bg-transparent text-vedic-text hover:bg-vedic-background focus:ring-vedic-primary',
+        ghost: 'bg-transparent text-current hover:bg-gray-100 dark:hover:bg-dark-surface focus:ring-saffron',
         destructive: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-600',
       },
       size: {
