@@ -1,4 +1,5 @@
 import React from 'react';
+import './NavamsaChart.css';
 
 const NavamsaChart = ({ navamsaData, style = 'south-indian' }) => {
   if (!navamsaData || !navamsaData.houses) {

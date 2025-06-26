@@ -1,5 +1,5 @@
 import React from 'react';
-// Removed CSS import - using Tailwind classes
+import './ErrorMessage.css';
 
 const ErrorMessage = ({ message }) => {
   if (!message) {
@@ -7,8 +7,8 @@ const ErrorMessage = ({ message }) => {
   }
 
   return (
-    <div className="p-4 my-4 border border-red-300 bg-red-50 text-red-800 rounded text-center">
-      <p className="m-0">{message}</p>
+    <div className="error-message-container">
+      <p>{message}</p>
     </div>
   );
 };
