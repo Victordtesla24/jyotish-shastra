@@ -618,34 +618,218 @@ class NavamsaAnalysisService {
    * Placeholder methods for complex calculations
    * In a full implementation, these would contain detailed logic
    */
-  calculatePlanetaryStrengthInNavamsa(planet) { return 5; }
-  getPlanetarySignificanceInNavamsa(planetName) { return `Significance of ${planetName} in Navamsa`; }
-  getPlanetaryEffectsInNavamsa(planet) { return `Effects of ${planet.name} in Navamsa`; }
-  getVargottamaSignificance(planetName) { return `${planetName} Vargottama brings exceptional strength`; }
-  getNavamsaLagnaEffects(lagnaSign) { return `${lagnaSign} Navamsa Lagna effects`; }
-  calculateLagnaStrength(chart, sign) { return 5; }
-  analyzeVenusForMarriage(venus) { return 'Venus analysis for marriage'; }
-  analyzeJupiterForMarriage(jupiter) { return 'Jupiter analysis for marriage'; }
-  analyzeMoonForMarriage(moon) { return 'Moon analysis for marriage'; }
-  analyzeMarsForMarriage(mars) { return 'Mars analysis for marriage'; }
-  calculateMarriageProspects(chart) { return 'Marriage prospects analysis'; }
-  getSpouseIndications(chart) { return 'Spouse indications'; }
-  getMarriageTimingFactors(chart) { return 'Marriage timing factors'; }
-  analyzeDharmaIndicators(chart) { return 'Dharma indicators'; }
-  identifySpiritualPlanets(chart) { return []; }
-  analyzeMokshaPlanets(chart) { return 'Moksha planets analysis'; }
-  calculateDharmaTrikonaStrength(chart) { return 5; }
-  assessSpiritualEvolution(chart) { return 'Spiritual evolution assessment'; }
-  identifyRajaYogasInNavamsa(chart) { return []; }
-  identifyDhanaYogasInNavamsa(chart) { return []; }
-  identifySpiritualYogas(chart) { return []; }
-  calculateOverallNavamsaStrength(analysis) { return 'Strong'; }
-  identifyKeyFindings(analysis) { return []; }
-  summarizeMarriageProspects(marriageAnalysis) { return 'Good prospects'; }
-  summarizeSpiritualPath(spiritualAnalysis) { return 'Dharmic path'; }
-  generateRecommendations(analysis) { return []; }
-  identifyImportantPeriods(analysis) { return []; }
-  getStrengthEffects(planetName, strength) { return `${planetName} strength effects`; }
+  calculatePlanetaryStrengthInNavamsa(planet) {
+    const dignity = this.calculateNavamsaDignity(planet);
+    let strength = 5; // Base strength
+
+    if (dignity === 'Exalted') strength = 9;
+    else if (dignity === 'Own Sign') strength = 8;
+    else if (dignity === 'Friendly') strength = 6;
+    else if (dignity === 'Enemy') strength = 4;
+    else if (dignity === 'Debilitated') strength = 2;
+
+    return strength;
+  }
+
+  getPlanetarySignificanceInNavamsa(planetName) {
+    const significances = {
+      Sun: 'Authority, soul, dharma, and spiritual practices',
+      Moon: 'Mind, emotions, mother, and inner peace',
+      Mars: 'Energy, spouse conflicts, property, and courage',
+      Mercury: 'Communication in marriage, business partnerships',
+      Jupiter: 'Dharma, wisdom, spiritual teacher, children',
+      Venus: 'Spouse, marriage happiness, artistic talents',
+      Saturn: 'Karmic duties, delays in marriage, discipline',
+      Rahu: 'Unconventional relationships, foreign connections',
+      Ketu: 'Spiritual detachment, moksha, past life karma'
+    };
+    return significances[planetName] || `${planetName} effects in Navamsa`;
+  }
+
+  getPlanetaryEffectsInNavamsa(planet) {
+    const sign = this.getSignFromLongitude(planet.longitude);
+    const dignity = this.calculateNavamsaDignity(planet);
+    return `${planet.name} in ${sign} (${dignity}) brings ${this.getPlanetarySignificanceInNavamsa(planet.name)}`;
+  }
+
+  getVargottamaSignificance(planetName) {
+    return `${planetName} Vargottama brings exceptional strength and consistency - results will be very stable and powerful throughout life`;
+  }
+
+  getNavamsaLagnaEffects(lagnaSign) {
+    const effects = {
+      ARIES: 'Dynamic and leadership-oriented spiritual nature',
+      TAURUS: 'Stable and pleasure-loving inner nature',
+      GEMINI: 'Intellectual and communicative spiritual approach',
+      CANCER: 'Emotional and nurturing dharmic nature',
+      LEO: 'Authoritative and noble spiritual character',
+      VIRGO: 'Analytical and service-oriented dharma',
+      LIBRA: 'Harmonious and balanced approach to relationships',
+      SCORPIO: 'Intense and transformative spiritual nature',
+      SAGITTARIUS: 'Philosophical and dharmic spiritual approach',
+      CAPRICORN: 'Disciplined and structured spiritual practices',
+      AQUARIUS: 'Humanitarian and unconventional dharmic path',
+      PISCES: 'Compassionate and mystical spiritual nature'
+    };
+    return effects[lagnaSign] || `${lagnaSign} brings unique spiritual qualities`;
+  }
+
+  calculateLagnaStrength(chart, sign) {
+    // Calculate based on lord position, aspects, etc.
+    return 7; // Simplified for now
+  }
+
+  analyzeVenusForMarriage(venus) {
+    const sign = this.getSignFromLongitude(venus.longitude);
+    const dignity = this.calculateNavamsaDignity(venus);
+
+    if (dignity === 'Exalted') {
+      return 'Venus exalted in Navamsa promises exceptional marriage happiness with devoted and high-quality spouse';
+    } else if (dignity === 'Debilitated') {
+      return 'Venus debilitated in Navamsa may cause marriage challenges, delays, or spouse-related issues';
+    } else {
+      return `Venus in ${sign} indicates ${dignity} marriage prospects with moderate to good spouse characteristics`;
+    }
+  }
+
+  analyzeJupiterForMarriage(jupiter) {
+    const sign = this.getSignFromLongitude(jupiter.longitude);
+    const dignity = this.calculateNavamsaDignity(jupiter);
+
+    return `Jupiter in ${sign} (${dignity}) indicates ${dignity === 'Exalted' ? 'highly spiritual and wise' :
+           dignity === 'Debilitated' ? 'challenges with wisdom or spiritual growth in' : 'moderate'} marriage influence`;
+  }
+
+  analyzeMoonForMarriage(moon) {
+    const sign = this.getSignFromLongitude(moon.longitude);
+    return `Moon in ${sign} indicates emotional compatibility and mental harmony in marriage`;
+  }
+
+  analyzeMarsForMarriage(mars) {
+    const sign = this.getSignFromLongitude(mars.longitude);
+    return `Mars in ${sign} indicates energy dynamics and potential for conflicts in marriage`;
+  }
+
+  calculateMarriageProspects(chart) {
+    if (!chart.planets) return 'Marriage analysis requires planetary data';
+
+    const venus = chart.planets.find(p => p.name === 'Venus');
+    const jupiter = chart.planets.find(p => p.name === 'Jupiter');
+
+    let prospects = 'moderate';
+    if (venus && this.calculateNavamsaDignity(venus) === 'Exalted') prospects = 'excellent';
+    if (jupiter && this.calculateNavamsaDignity(jupiter) === 'Exalted') prospects = 'very good';
+
+    return `Marriage prospects are ${prospects} based on Navamsa planetary positions`;
+  }
+
+  getSpouseIndications(chart) {
+    return 'Spouse will have qualities indicated by 7th house lord and Venus/Jupiter position in Navamsa';
+  }
+
+  getMarriageTimingFactors(chart) {
+    return 'Marriage timing depends on Venus, Jupiter, and 7th lord dasha periods';
+  }
+
+  analyzeDharmaIndicators(chart) {
+    return 'Jupiter and 9th house factors indicate strong dharmic inclinations';
+  }
+
+  identifySpiritualPlanets(chart) {
+    const spiritualPlanets = [];
+    if (chart.planets) {
+      chart.planets.forEach(planet => {
+        if (['Jupiter', 'Ketu', 'Moon'].includes(planet.name)) {
+          spiritualPlanets.push({
+            planet: planet.name,
+            significance: this.getPlanetarySignificanceInNavamsa(planet.name)
+          });
+        }
+      });
+    }
+    return spiritualPlanets;
+  }
+
+  analyzeMokshaPlanets(chart) {
+    return 'Ketu and Jupiter in strong positions indicate potential for spiritual liberation';
+  }
+
+  calculateDharmaTrikonaStrength(chart) {
+    // 1st, 5th, 9th houses strength
+    return 6; // Simplified
+  }
+
+  assessSpiritualEvolution(chart) {
+    return 'Spiritual evolution path is indicated by Jupiter, Ketu, and 12th house factors';
+  }
+
+  identifyRajaYogasInNavamsa(chart) {
+    return [{ name: 'Navamsa Raja Yoga', description: 'Kendra-Trikona yoga in D9' }];
+  }
+
+  identifyDhanaYogasInNavamsa(chart) {
+    return [{ name: 'Navamsa Dhana Yoga', description: 'Wealth yoga in D9' }];
+  }
+
+  identifySpiritualYogas(chart) {
+    return [{ name: 'Dharma Yoga', description: 'Spiritual practice yoga' }];
+  }
+
+  calculateOverallNavamsaStrength(analysis) {
+    if (!analysis.planetaryAnalysis) return 'Moderate';
+
+    const planets = Object.values(analysis.planetaryAnalysis);
+    const strongPlanets = planets.filter(p => p.strength >= 7).length;
+
+    if (strongPlanets >= 5) return 'Very Strong';
+    if (strongPlanets >= 3) return 'Strong';
+    if (strongPlanets >= 1) return 'Moderate';
+    return 'Weak';
+  }
+
+  identifyKeyFindings(analysis) {
+    const findings = [];
+    if (analysis.vargottamaPlanets?.length > 0) {
+      findings.push(`${analysis.vargottamaPlanets.length} Vargottama planets detected`);
+    }
+    if (analysis.marriageIndications) {
+      findings.push('Marriage indications analyzed');
+    }
+    return findings;
+  }
+
+  summarizeMarriageProspects(marriageAnalysis) {
+    if (!marriageAnalysis) return 'Marriage analysis not available';
+    return marriageAnalysis.overallMarriageProspects || 'Good marriage prospects indicated';
+  }
+
+  summarizeSpiritualPath(spiritualAnalysis) {
+    if (!spiritualAnalysis) return 'Spiritual analysis not available';
+    return 'Dharmic path with potential for spiritual growth';
+  }
+
+  generateRecommendations(analysis) {
+    const recommendations = [
+      'Strengthen Venus through appropriate remedies for marriage happiness',
+      'Practice dharmic principles for spiritual growth',
+      'Focus on Jupiter-related activities for wisdom'
+    ];
+    return recommendations;
+  }
+
+  identifyImportantPeriods(analysis) {
+    return [
+      { period: 'Venus Dasha', significance: 'Marriage and relationship focus' },
+      { period: 'Jupiter Dasha', significance: 'Spiritual growth and wisdom' }
+    ];
+  }
+
+  getStrengthEffects(planetName, strength) {
+    if (strength >= 8) return `${planetName} is very strong and will give excellent results`;
+    if (strength >= 6) return `${planetName} is moderately strong with good results`;
+    if (strength >= 4) return `${planetName} is weak but functional`;
+    return `${planetName} is very weak and may cause difficulties`;
+  }
 
   /**
    * Calculate dignity of a planet in a sign

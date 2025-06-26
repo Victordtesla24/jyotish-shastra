@@ -11,7 +11,7 @@
 ## 1. Infrastructure Validation Results
 
 ### Health Check Endpoint
-```
+```cs
 ┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 │                                           HEALTH CHECK VALIDATION                                                           │
 ├─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
@@ -24,9 +24,9 @@
 ```
 
 ### API Endpoints Documentation
-```
+```cs
 ┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                           API ENDPOINTS STRUCTURE                                                           │
+│                                        API ENDPOINTS DIRECTORY STRUCTURE                                                    │
 ├─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
 │ Chart Generation:                                                                                                           │
 │ ├── POST /v1/chart/generate                       ✅ WORKING                                                                │
@@ -64,8 +64,8 @@ curl -X POST http://localhost:3001/api/v1/chart/generate \
   }'
 ```
 
-### ASCII Data Structure Table
-```bash
+### API Endpoints Data-Structure Table (Table A)
+```js
 ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 │                                              COMPLETE API TEST RESULTS                                                 │
 ├─────────────────────────────┬──────────────────────────────────────────────────────────────────────────────────────────┤
@@ -97,8 +97,8 @@ curl -X POST http://localhost:3001/api/v1/chart/generate \
 
 ## 3. Reference Data Extraction from kundli-for-testing.pdf
 
-### ASCII Reference Data Table from PDF
-```
+### Reference Data Table from PDF (Table B)
+```bash
 ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 │                                      REFERENCE DATA FROM KUNDLI PDF                                                    │
 ├─────────────────────────────┬──────────────────────────────────────────────────────────────────────────────────────────┤
@@ -132,7 +132,7 @@ curl -X POST http://localhost:3001/api/v1/chart/generate \
 
 ## 4. Discrepancy Analysis: System vs Reference Data
 
-### ASCII Discrepancy Comparison Table
+### Discrepancy Comparison Table (Table A `-` Table B)
 ```js
 ┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 │                                      SYSTEM vs REFERENCE COMPARISON                                                       │
@@ -214,7 +214,7 @@ curl -X POST http://localhost:3001/api/v1/chart/generate \
 ### Minimal Code Implementation Strategy
 Following @002-error-fixing-protocols.mdc requirements for **targeted** & **minimal** code implementations:
 
-```
+```js
 ┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 │                                    SYSTEMATIC FIX IMPLEMENTATION PLAN                                                 │
 ├─────────────────────────────┬─────────────────────────────────────────────────────────────────────────────────────────┤
@@ -252,7 +252,7 @@ Following @002-error-fixing-protocols.mdc requirements for **targeted** & **mini
 ## 7. Astrological Accuracy Status
 
 ### Current Calculation Accuracy Assessment
-```
+```js
 ┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 │                                      ASTROLOGICAL ACCURACY VERIFICATION                                               │
 ├─────────────────────────────┬─────────────────────────────────────────────────────────────────────────────────────────┤
@@ -275,7 +275,7 @@ Following @002-error-fixing-protocols.mdc requirements for **targeted** & **mini
 ## 8. Performance & Quality Metrics
 
 ### System Performance Analysis
-```
+```js
 ┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 │                                           PERFORMANCE METRICS                                                         │
 ├─────────────────────────────┬─────────────────────────────────────────────────────────────────────────────────────────┤
@@ -294,7 +294,7 @@ Following @002-error-fixing-protocols.mdc requirements for **targeted** & **mini
 ## 9. Next Steps: Critical Implementation Required
 
 ### Implementation Priority Matrix
-```
+```js
 ┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 │                                     IMPLEMENTATION PRIORITY MATRIX                                                      │
 ├──────────────┬──────────────────────────────────────────────────────────────────────────────────────────────────────────┤
