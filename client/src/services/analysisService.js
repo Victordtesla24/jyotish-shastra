@@ -1,6 +1,10 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL || (
+  process.env.NODE_ENV === 'production'
+    ? '/api'
+    : 'http://localhost:3001/api'
+);
 
 /**
  * Analysis Service - Handles all analysis-related API calls
@@ -162,7 +166,7 @@ class AnalysisService {
    */
   async generateBirthDataAnalysis(birthData) {
     try {
-      const response = await this.api.post('/comprehensive-analysis/birth-data', birthData);
+      const response = await this.api.post('/comprehensive-analysis/comprehensive', birthData);
       return response.data;
     } catch (error) {
       throw new Error(`Birth data analysis failed: ${error.response?.data?.message || error.message}`);

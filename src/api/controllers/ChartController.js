@@ -87,6 +87,13 @@ class ChartController {
       // Generate comprehensive chart
       const chartData = await this.chartService.generateComprehensiveChart(processedBirthData);
 
+      // Generate birth data analysis for the frontend
+      const birthDataAnalysis = this.birthDataAnalysisService.analyzeBirthDataCollection(
+        chartData.birthData,
+        chartData.rasiChart,
+        chartData.navamsaChart
+      );
+
       return res.status(200).json({
         success: true,
         data: {
@@ -95,6 +102,7 @@ class ChartController {
           navamsaChart: chartData.navamsaChart,
           analysis: chartData.analysis,
           dashaInfo: chartData.dashaInfo,
+          birthDataAnalysis: birthDataAnalysis,
           generatedAt: chartData.generatedAt
         }
       });

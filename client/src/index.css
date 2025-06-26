@@ -192,7 +192,7 @@
   .input-vedic {
     @apply w-full px-4 py-3 border border-gray-300 rounded-vedic;
     @apply focus:outline-none focus:ring-2 focus:ring-saffron focus:border-saffron;
-    @apply transition-all duration-200 bg-white;
+    @apply transition-all duration-200 bg-white text-gray-900;
     @apply placeholder:text-gray-400;
   }
 
@@ -201,7 +201,7 @@
   }
 
   .dark .input-vedic {
-    @apply bg-dark-surface border-dark-border text-dark-text-primary;
+    @apply bg-dark-surface border-dark-border text-white;
     @apply focus:border-dark-accent focus:ring-dark-accent;
   }
 

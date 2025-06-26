@@ -231,9 +231,7 @@ export const useEnhancedAccessibility = (options = {}) => {
   const {
     enableKeyboardNavigation = true,
     enableScreenReaderSupport = true,
-    enableFocusTrapping = false,
-    announcePageChanges = true,
-    respectReducedMotion = true
+    enableFocusTrapping = false
   } = options;
 
   const [isHighContrast, setIsHighContrast] = useState(false);

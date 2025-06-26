@@ -8,7 +8,8 @@ PATTERNS=("TODO" "FIXME" "XXX" "HACK" "BUG"
     "In practice, this would" "would need full implementation"
     "In a production environment" "simulate" "for now"
     "This would be replaced with actual" "placeholder for actual"
-    "In a real implementation" "return 0")
+    "In a real implementation" "return 0"
+    "typically" "sample" "Demo" "demo")
 
 ROOT_DIR="$(pwd)"
 echo "Project Root: $ROOT_DIR"
@@ -22,6 +23,7 @@ EXCLUDE_DIRS=(
   ".vscode"
   ".cursor"
   ".clinerules"
+  ".github"
   "coverage"
   "dist"
   "build"

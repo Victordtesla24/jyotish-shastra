@@ -410,7 +410,7 @@ export const getEphemerisDateRange = (birthDate) => {
   };
 };
 
-export default {
+const dateUtils = {
   dateToJulianDay,
   julianDayToDate,
   timeToDecimalHours,
@@ -431,3 +431,5 @@ export default {
   validateCompleteBirthData,
   getEphemerisDateRange
 };
+
+export default dateUtils;

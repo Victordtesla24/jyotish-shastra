@@ -43,7 +43,27 @@ const ChartDisplay = ({ chartData, analysisType, useComprehensive }) => {
           return null;
         }
 
-        const { data } = chartData;
+                const { data } = chartData;
+
+        // Add defensive check for data
+        if (!data) {
+          console.warn('Chart data is missing data property:', chartData);
+          return (
+            <div className="text-center p-4">
+              <p className="text-red-500">Chart data is incomplete. Please try generating the chart again.</p>
+            </div>
+          );
+        }
+
+        // Debug logging for data structure
+        console.log('ChartDisplay received data:', {
+          hasData: !!data,
+          dataKeys: Object.keys(data),
+          hasBirthDataAnalysis: !!data.birthDataAnalysis,
+          hasAnalysis: !!data.analysis,
+          analysisType,
+          viewMode
+        });
 
         // Show interactive chart view
         if (viewMode === 'interactive') {
@@ -58,8 +78,17 @@ const ChartDisplay = ({ chartData, analysisType, useComprehensive }) => {
         }
 
         // Show analysis views
-        if (analysisType === 'birth-data' && data.birthDataAnalysis) {
-          return <BirthDataAnalysis analysis={data.birthDataAnalysis} />;
+        // For birth-data analysis, check if birthDataAnalysis exists or fall back to general analysis
+        if (analysisType === 'birth-data') {
+          if (data.birthDataAnalysis) {
+            return <BirthDataAnalysis analysis={data.birthDataAnalysis} />;
+          } else if (data.analysis) {
+            // Fall back to comprehensive analysis if birthDataAnalysis not available
+            return <ComprehensiveAnalysisDisplay data={data} />;
+          } else {
+            // Fall back to basic analysis
+            return <BasicAnalysisDisplay data={data} />;
+          }
         }
 
         if (useComprehensive && data?.analysis) {

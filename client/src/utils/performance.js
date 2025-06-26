@@ -28,21 +28,16 @@ const ComponentSkeleton = () => (
 // Image optimization utilities
 export const optimizeImage = (src, options = {}) => {
   const {
-    width,
-    height,
-    quality,
-    format
-  } = {
-    width: 'auto',
-    height: 'auto',
-    quality: 80,
-    format: 'webp',
-    ...options
-  };
+    width = 'auto',
+    height = 'auto',
+    quality = 80,
+    format = 'webp'
+  } = options;
 
   // For production, you might want to use a service like Cloudinary
   // For now, return the original src with basic optimization hints
-  // Note: width, height, quality, and format would be used in actual optimization
+  // Note: In a real implementation, width, height, quality, and format would be used
+  console.log(`Image optimization params: ${width}x${height}, quality: ${quality}, format: ${format}`);
   return src;
 };
 

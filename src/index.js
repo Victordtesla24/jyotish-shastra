@@ -9,6 +9,7 @@ require('dotenv').config();
 // Import routes
 const chartRoutes = require('./api/routes/chart');
 const comprehensiveAnalysisRoutes = require('./api/routes/comprehensiveAnalysis');
+const geocodingRoutes = require('./api/routes/geocoding');
 const indexRoutes = require('./api/routes/index');
 
 // Import middleware
@@ -50,7 +51,12 @@ app.use(helmet({
 app.use(cors({
   origin: process.env.NODE_ENV === 'production'
     ? process.env.FRONTEND_URL || 'https://your-domain.com'
-    : ['http://localhost:3000', 'http://127.0.0.1:3000'],
+    : [
+        process.env.CORS_ORIGIN || 'http://localhost:3000',
+        'http://localhost:3002',
+        'http://127.0.0.1:3000',
+        'http://127.0.0.1:3002'
+      ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
@@ -86,13 +92,14 @@ app.get('/health', (req, res) => {
 app.use('/api', indexRoutes);
 app.use('/api/chart', chartRoutes);
 app.use('/api/comprehensive-analysis', comprehensiveAnalysisRoutes);
+app.use('/api/geocoding', geocodingRoutes);
 
 // Handle static file requests that should go to frontend
 app.use('/static', (req, res) => {
   res.status(404).json({
     error: 'Static files should be served by frontend server',
-    message: `Static file ${req.originalUrl} should be requested from http://localhost:3000`,
-    redirect: `http://localhost:3000${req.originalUrl}`
+    message: `Static file ${req.originalUrl} should be requested from http://localhost:3002`,
+    redirect: `http://localhost:3002${req.originalUrl}`
   });
 });
 
@@ -104,7 +111,8 @@ app.use('/api/*', (req, res) => {
     available_endpoints: {
       'health': 'GET /health',
       'chart': 'GET|POST /api/chart',
-      'analysis': 'GET|POST /api/comprehensive-analysis'
+      'analysis': 'GET|POST /api/comprehensive-analysis',
+      'geocoding': 'POST /api/geocoding/location, POST /api/geocoding/timezone'
     }
   });
 });

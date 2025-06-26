@@ -42,10 +42,19 @@ describe('GeocodingService', () => {
         await expect(service.geocodeLocation(locationData)).rejects.toThrow('Location not found');
     });
 
-    it('should throw an error if the API key is not configured', async () => {
+    it('should fall back to demo mode when API key is not configured', async () => {
         service.apiKey = null;
         const locationData = { city: 'New Delhi', country: 'India' };
-        await expect(service.geocodeLocation(locationData)).rejects.toThrow('Geocoding API key not configured');
+        const result = await service.geocodeLocation(locationData);
+
+        expect(result).toEqual({
+            latitude: 28.6139,
+            longitude: 77.2090,
+            timezone: 'Asia/Kolkata',
+            service_used: 'demo_mode',
+            accuracy: 'demo',
+            formatted_address: 'New Delhi, Delhi, India'
+        });
     });
 
     it('should handle API errors gracefully', async () => {

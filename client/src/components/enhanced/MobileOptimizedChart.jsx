@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { motion, PanInfo, useSpring, useTransform } from 'framer-motion';
+import { motion, useSpring } from 'framer-motion';
 import {
   OmIcon,
   MandalaIcon,
@@ -29,25 +29,90 @@ const MobileOptimizedChart = ({
   const y = useSpring(chartPosition.y);
   const scale = useSpring(chartScale);
 
-  // Mock chart data if not provided
-  const defaultChartData = {
-    houses: [
-      { id: 1, name: 'Lagna', planets: ['Su'], sign: 'Aries' },
-      { id: 2, name: '2nd House', planets: ['Mo'], sign: 'Taurus' },
-      { id: 3, name: '3rd House', planets: [], sign: 'Gemini' },
-      { id: 4, name: '4th House', planets: ['Ma'], sign: 'Cancer' },
-      { id: 5, name: '5th House', planets: ['Me'], sign: 'Leo' },
-      { id: 6, name: '6th House', planets: [], sign: 'Virgo' },
-      { id: 7, name: '7th House', planets: ['Ve'], sign: 'Libra' },
-      { id: 8, name: '8th House', planets: ['Ju'], sign: 'Scorpio' },
-      { id: 9, name: '9th House', planets: [], sign: 'Sagittarius' },
-      { id: 10, name: '10th House', planets: ['Sa'], sign: 'Capricorn' },
-      { id: 11, name: '11th House', planets: ['Ra'], sign: 'Aquarius' },
-      { id: 12, name: '12th House', planets: ['Ke'], sign: 'Pisces' }
-    ]
+  // Convert chart data to house-based format
+  const convertChartDataToHouses = () => {
+    if (!chartData?.rasiChart) {
+      return [];
+    }
+
+    const houses = [];
+
+    // Create 12 houses
+    for (let i = 1; i <= 12; i++) {
+      const house = {
+        id: i,
+        name: i === 1 ? 'Lagna' : `${i}${getOrdinalSuffix(i)} House`,
+        planets: [],
+        sign: ''
+      };
+
+      // Get house sign from housePositions if available
+      if (chartData.rasiChart.housePositions) {
+        const housePosition = chartData.rasiChart.housePositions.find(h => h.houseNumber === i);
+        house.sign = housePosition?.sign || '';
+      }
+
+      // Add ascendant to house 1
+      if (i === 1 && chartData.rasiChart.ascendant) {
+        house.planets.push('As');
+      }
+
+             // Find planets in this house
+       if (chartData.rasiChart.planets && chartData.rasiChart.ascendant) {
+         const ascendantLongitude = chartData.rasiChart.ascendant.longitude;
+
+         chartData.rasiChart.planets.forEach(planet => {
+           const planetLongitude = planet.longitude;
+
+           // Calculate house number based on longitude difference
+           let diff = planetLongitude - ascendantLongitude;
+
+           // Normalize the difference to be between 0 and 360
+           while (diff < 0) diff += 360;
+           while (diff >= 360) diff -= 360;
+
+           // Calculate which house (1-12) the planet is in
+           const calculatedHouse = Math.floor(diff / 30) + 1;
+
+           if (calculatedHouse === i) {
+             // Convert planet names to abbreviations
+             const planetAbbr = getPlanetAbbreviation(planet.name || planet.Name);
+             house.planets.push(planetAbbr);
+           }
+         });
+       }
+
+      houses.push(house);
+    }
+
+    return houses;
   };
 
-  const data = chartData || defaultChartData;
+  const getPlanetAbbreviation = (planetName) => {
+    const abbreviations = {
+      'Sun': 'Su',
+      'Moon': 'Mo',
+      'Mars': 'Ma',
+      'Mercury': 'Me',
+      'Jupiter': 'Ju',
+      'Venus': 'Ve',
+      'Saturn': 'Sa',
+      'Rahu': 'Ra',
+      'Ketu': 'Ke'
+    };
+    return abbreviations[planetName] || planetName?.slice(0, 2) || '??';
+  };
+
+  const getOrdinalSuffix = (num) => {
+    const j = num % 10;
+    const k = num % 100;
+    if (j === 1 && k !== 11) return 'st';
+    if (j === 2 && k !== 12) return 'nd';
+    if (j === 3 && k !== 13) return 'rd';
+    return 'th';
+  };
+
+  const data = { houses: convertChartDataToHouses() };
 
   const planetIcons = {
     'Su': SunIcon,
@@ -58,7 +123,8 @@ const MobileOptimizedChart = ({
     'Ju': StarIcon,
     'Sa': StarIcon,
     'Ra': StarIcon,
-    'Ke': StarIcon
+    'Ke': StarIcon,
+    'As': OmIcon
   };
 
   const planetColors = {
@@ -70,7 +136,8 @@ const MobileOptimizedChart = ({
     'Ju': 'text-yellow-500',
     'Sa': 'text-purple-500',
     'Ra': 'text-indigo-500',
-    'Ke': 'text-teal-500'
+    'Ke': 'text-teal-500',
+    'As': 'text-blue-600'
   };
 
   const handlePlanetClick = (planet, house) => {
@@ -189,6 +256,34 @@ const MobileOptimizedChart = ({
   };
 
   if (isLoading) {
+    return (
+      <Card className="p-8 text-center">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+          className="inline-block mb-4"
+        >
+          <MandalaIcon size={48} className="text-saffron" />
+        </motion.div>
+        <h3 className="text-lg font-semibold text-earth-brown mb-2">Generating Chart...</h3>
+        <p className="text-wisdom-gray">Calculating planetary positions</p>
+      </Card>
+    );
+  }
+
+  if (!chartData?.rasiChart) {
+    console.warn('MobileOptimizedChart: Missing rasiChart data:', chartData);
+    return (
+      <Card className="p-8 text-center">
+        <div className="text-6xl mb-4">📊</div>
+        <h3 className="text-lg font-semibold text-earth-brown mb-2">Chart Layout Template</h3>
+        <p className="text-wisdom-gray">Generate a birth chart to see your planetary positions</p>
+
+      </Card>
+    );
+  }
+
+  if (data.houses.length === 0) {
     return (
       <Card className="p-8 text-center">
         <motion.div

@@ -95,6 +95,7 @@ const CardTitle = forwardRef(({
   className,
   size = 'lg',
   gradient = false,
+  children,
   ...props
 }, ref) => {
   const sizeClasses = {
@@ -115,7 +116,9 @@ const CardTitle = forwardRef(({
         className
       )}
       {...props}
-    />
+    >
+      {children || 'Card Title'}
+    </h3>
   );
 });
 

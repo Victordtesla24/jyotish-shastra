@@ -19,8 +19,8 @@ const EnhancedPersonalityProfile = ({ analysisData, isLoading = false }) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.3 });
 
-  // Sacred mantras for different sections
-  const sectionMantras = {
+  // Sacred mantras for different sections - memoized to prevent recreation
+  const sectionMantras = React.useMemo(() => ({
     overview: "ॐ गणेशाय नमः",
     lagna: "ॐ लग्नाधिपतये नमः",
     moon: "ॐ चन्द्राय नमः",
@@ -28,7 +28,7 @@ const EnhancedPersonalityProfile = ({ analysisData, isLoading = false }) => {
     arudha: "ॐ आरूढाय नमः",
     integration: "ॐ सर्वग्रहेभ्यो नमः",
     recommendations: "ॐ शान्तिकराय नमः"
-  };
+  }), []);
 
   // Rotate mantras periodically
   useEffect(() => {

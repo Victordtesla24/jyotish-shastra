@@ -1,0 +1,292 @@
+import React, { useState, useEffect } from 'react';
+import { Card } from '../ui/cards/Card';
+
+/**
+ * VedicChartDisplay Component
+ * Displays generated Vedic birth chart in traditional Kundli format
+ */
+const VedicChartDisplay = ({ chartData, isLoading = false, className = '' }) => {
+  const [selectedHouse, setSelectedHouse] = useState(null);
+  const [chartDetails, setChartDetails] = useState(null);
+
+  useEffect(() => {
+    if (chartData) {
+      console.log('🎯 VedicChartDisplay received chart data:', chartData);
+      console.log('🔍 Rasi Chart planets:', chartData.rasiChart?.planets);
+      console.log('🔍 Ascendant info:', chartData.rasiChart?.ascendant);
+      setChartDetails(chartData);
+    }
+  }, [chartData]);
+
+  // House positions in traditional Vedic chart layout
+  const housePositions = {
+    1: { top: '50%', left: '75%', transform: 'translate(-50%, -50%)' },
+    2: { top: '25%', left: '75%', transform: 'translate(-50%, -50%)' },
+    3: { top: '0%', left: '75%', transform: 'translate(-50%, 0%)' },
+    4: { top: '0%', left: '50%', transform: 'translate(-50%, 0%)' },
+    5: { top: '0%', left: '25%', transform: 'translate(-50%, 0%)' },
+    6: { top: '0%', left: '0%', transform: 'translate(0%, 0%)' },
+    7: { top: '25%', left: '0%', transform: 'translate(0%, -50%)' },
+    8: { top: '50%', left: '0%', transform: 'translate(0%, -50%)' },
+    9: { top: '75%', left: '0%', transform: 'translate(0%, -100%)' },
+    10: { top: '100%', left: '25%', transform: 'translate(-50%, -100%)' },
+    11: { top: '100%', left: '50%', transform: 'translate(-50%, -100%)' },
+    12: { top: '100%', left: '75%', transform: 'translate(-50%, -100%)' }
+  };
+
+  const planetSymbols = {
+    'Sun': '☉',
+    'Moon': '☽',
+    'Mars': '♂',
+    'Mercury': '☿',
+    'Jupiter': '♃',
+    'Venus': '♀',
+    'Saturn': '♄',
+    'Rahu': '☊',
+    'Ketu': '☋',
+    'Ascendant': 'As'
+  };
+
+        // Get planets in house using proper house calculation
+  const getPlanetsInHouse = (houseNumber) => {
+    if (!chartDetails?.rasiChart?.planets || !chartDetails?.rasiChart?.ascendant) return [];
+
+    const planetsInHouse = [];
+    const ascendantLongitude = chartDetails.rasiChart.ascendant.longitude;
+
+    // Add ascendant to house 1
+    if (houseNumber === 1) {
+      planetsInHouse.push({
+        name: 'Ascendant',
+        sign: chartDetails.rasiChart.ascendant.sign,
+        degree: chartDetails.rasiChart.ascendant.degree
+      });
+    }
+
+    // Check each planet and determine its house
+    chartDetails.rasiChart.planets.forEach(planet => {
+      const planetLongitude = planet.longitude;
+
+      // Calculate house number based on longitude difference
+      // Each house is 30 degrees
+      let diff = planetLongitude - ascendantLongitude;
+
+      // Normalize the difference to be between 0 and 360
+      while (diff < 0) diff += 360;
+      while (diff >= 360) diff -= 360;
+
+      // Calculate which house (1-12) the planet is in
+      const calculatedHouse = Math.floor(diff / 30) + 1;
+
+      // console.log(`🔍 Planet ${planet.name}: longitude=${planetLongitude.toFixed(2)}°, diff=${diff.toFixed(2)}°, house=${calculatedHouse}`);
+
+      if (calculatedHouse === houseNumber) {
+        planetsInHouse.push(planet);
+      }
+    });
+
+    return planetsInHouse;
+  };
+
+  const renderChart = () => {
+    if (!chartDetails) return null;
+
+    return (
+      <div className="relative w-full max-w-md mx-auto aspect-square">
+        {/* Chart Border */}
+        <div className="absolute inset-0 border-2 border-amber-800 bg-gradient-to-br from-amber-50 to-yellow-200">
+          {/* Inner Diamond Shape */}
+          <div className="absolute inset-4 border border-amber-700 transform rotate-45 bg-amber-50/50"></div>
+
+          {/* House Numbers and Planets */}
+          {Object.entries(housePositions).map(([houseNum, position]) => {
+            const housePlanets = getPlanetsInHouse(parseInt(houseNum));
+            return (
+              <div
+                key={houseNum}
+                className={`absolute w-16 h-16 border border-amber-600/30 bg-amber-50/80 cursor-pointer transition-all hover:bg-yellow-200/60 ${
+                  selectedHouse === parseInt(houseNum) ? 'ring-2 ring-orange-500 shadow-lg' : ''
+                }`}
+                style={position}
+                onClick={() => setSelectedHouse(parseInt(houseNum))}
+              >
+                {/* House Number */}
+                <div className="absolute top-1 left-1 text-xs font-bold text-amber-800">
+                  {houseNum}
+                </div>
+
+                {/* Planets in House */}
+                <div className="flex flex-wrap justify-center items-center h-full p-1">
+                  {housePlanets.map((planet, index) => (
+                    <span
+                      key={index}
+                      className="text-lg text-orange-600 font-bold"
+                      title={`${planet.name || planet.Name} - ${planet.sign} ${planet.degree?.toFixed(1)}°`}
+                    >
+                      {planetSymbols[planet.name || planet.Name] || (planet.name || planet.Name).slice(0, 2)}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+
+          {/* Center Information */}
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center bg-amber-50/90 p-2 rounded-lg border border-amber-700">
+            <div className="text-sm font-semibold text-amber-800">
+              {chartDetails.birthData?.name || chartDetails.name || 'Birth Chart'}
+            </div>
+            <div className="text-xs text-amber-700">
+              {chartDetails.birthData?.dateOfBirth ? new Date(chartDetails.birthData.dateOfBirth).toLocaleDateString() : chartDetails.dateOfBirth}
+            </div>
+            <div className="text-xs text-amber-700">
+              {chartDetails.birthData?.placeOfBirth || chartDetails.placeOfBirth}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderHouseDetails = () => {
+    if (!selectedHouse || !chartDetails) return null;
+
+    const housePlanets = getPlanetsInHouse(selectedHouse);
+    const housePosition = chartDetails.rasiChart?.housePositions?.find(house => house.houseNumber === selectedHouse);
+
+    return (
+      <Card className="mt-4 p-4">
+        <h3 className="text-lg font-semibold text-amber-800 mb-2">
+          House {selectedHouse} Details
+        </h3>
+
+        <div className="space-y-2">
+          <div className="flex justify-between">
+            <span className="text-sm text-amber-700">Sign:</span>
+            <span className="text-sm font-medium text-gray-800">{housePosition?.sign || 'Unknown'}</span>
+          </div>
+
+          <div className="flex justify-between">
+            <span className="text-sm text-amber-700">Degree:</span>
+            <span className="text-sm font-medium text-gray-800">
+              {housePosition?.degree ? `${housePosition.degree.toFixed(2)}°` : 'Unknown'}
+            </span>
+          </div>
+
+          {housePlanets && housePlanets.length > 0 ? (
+            <div>
+              <div className="text-sm text-amber-700 mb-2">Planets:</div>
+              <div className="space-y-1">
+                {housePlanets.map((planet, index) => (
+                  <div key={index} className="text-sm bg-yellow-100 p-2 rounded">
+                    <div className="font-medium text-gray-800">
+                      {planetSymbols[planet.name || planet.Name]} {planet.name || planet.Name}
+                    </div>
+                    <div className="text-xs text-amber-700">
+                      {planet.sign} {planet.degree?.toFixed(2)}° - {planet.dignity || 'neutral'}
+                      {planet.isRetrograde && ' (R)'}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="text-sm text-amber-600">
+              No planets in this house
+            </div>
+          )}
+        </div>
+      </Card>
+    );
+  };
+
+  if (isLoading) {
+    return (
+      <Card className={`p-6 ${className}`}>
+        <div className="text-center">
+          <div className="animate-spin h-8 w-8 border-4 border-vedic-orange border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p className="text-earth-brown">Generating your Vedic birth chart...</p>
+          <p className="text-sm text-earth-brown/70 mt-2">
+            Calculating planetary positions and house placements
+          </p>
+        </div>
+      </Card>
+    );
+  }
+
+  if (!chartData) {
+    return (
+      <Card className={`p-6 ${className}`}>
+        <div className="text-center text-gray-600">
+          <div className="text-6xl mb-4">📊</div>
+          <h3 className="text-lg font-semibold mb-2 text-amber-800">No Chart Data</h3>
+          <p className="text-sm text-gray-700">
+            Please generate a birth chart by filling out the form and clicking "Generate Chart"
+          </p>
+        </div>
+      </Card>
+    );
+  }
+
+  return (
+    <div className={`space-y-4 ${className}`}>
+      <Card className="p-6">
+        <div className="text-center mb-4">
+          <h2 className="text-2xl font-bold text-amber-800 mb-2">
+            Vedic Birth Chart (Kundli)
+          </h2>
+          <p className="text-sm text-amber-700">
+            Click on any house to view detailed planetary information
+          </p>
+        </div>
+
+        {renderChart()}
+
+        <div className="mt-4 text-center">
+          <div className="inline-flex space-x-4 text-xs text-amber-600">
+            <span>☉ Sun</span>
+            <span>☽ Moon</span>
+            <span>♂ Mars</span>
+            <span>☿ Mercury</span>
+            <span>♃ Jupiter</span>
+            <span>♀ Venus</span>
+            <span>♄ Saturn</span>
+            <span>☊ Rahu</span>
+            <span>☋ Ketu</span>
+          </div>
+        </div>
+      </Card>
+
+      {renderHouseDetails()}
+
+      {chartData.analysis && (
+        <Card className="p-4">
+          <h3 className="text-lg font-semibold text-amber-800 mb-2">
+            Chart Summary
+          </h3>
+          <div className="text-sm text-gray-700 space-y-2">
+            <div>
+              <strong className="text-amber-700">Ascendant:</strong> {chartData.rasiChart?.ascendant?.sign || chartData.analysis?.personality?.lagnaSign || 'Calculating...'}
+            </div>
+            <div>
+              <strong className="text-amber-700">Moon Sign:</strong> {chartData.analysis?.personality?.moonSign || 'Calculating...'}
+            </div>
+            <div>
+              <strong className="text-amber-700">Sun Sign:</strong> {chartData.analysis?.personality?.sunSign || 'Calculating...'}
+            </div>
+            <div>
+              <strong className="text-amber-700">Nakshatra:</strong> {chartData.rasiChart?.nakshatra?.name || 'Calculating...'}
+            </div>
+            {chartData.analysis?.personality?.keyTraits && (
+              <div>
+                <strong className="text-amber-700">Key Traits:</strong> {chartData.analysis.personality.keyTraits.join(', ')}
+              </div>
+            )}
+          </div>
+        </Card>
+      )}
+    </div>
+  );
+};
+
+export default VedicChartDisplay;

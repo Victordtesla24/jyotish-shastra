@@ -6,6 +6,7 @@
 const express = require('express');
 const chartRoutes = require('./chart');
 const comprehensiveAnalysisRoutes = require('./comprehensiveAnalysis');
+const geocodingRoutes = require('./geocoding');
 
 const router = express.Router();
 
@@ -17,6 +18,9 @@ router.use(`${API_VERSION}/chart`, chartRoutes);
 
 // Comprehensive Analysis routes
 router.use(`${API_VERSION}/analysis`, comprehensiveAnalysisRoutes);
+
+// Geocoding routes
+router.use(`${API_VERSION}/geocoding`, geocodingRoutes);
 
 // Health check endpoint
 router.get('/health', (req, res) => {
@@ -59,6 +63,11 @@ router.get('/', (req, res) => {
         userHistory: 'GET /v1/analysis/user/:userId',
         delete: 'DELETE /v1/analysis/:analysisId',
         progress: 'GET /v1/analysis/progress/:analysisId'
+      },
+      geocoding: {
+        location: 'POST /geocoding/location',
+        timezone: 'POST /geocoding/timezone',
+        validate: 'GET /geocoding/validate'
       }
     }
   });

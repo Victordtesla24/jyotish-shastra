@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Card, CardHeader, CardTitle, CardContent, Button } from '../components/ui';
 import ComprehensiveAnalysisDisplay from '../components/reports/ComprehensiveAnalysisDisplay';
+import analysisService from '../services/analysisService';
+import ChartDataManager from '../utils/chartDataManager';
 
 const ReportPage = () => {
   const { id } = useParams();
@@ -69,39 +71,46 @@ const ReportPage = () => {
   const fetchExistingReport = async (reportId) => {
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/reports/${reportId}`);
-      if (response.ok) {
-        const data = await response.json();
-        setReportData(data);
-      }
+      const result = await analysisService.getComprehensiveAnalysis(reportId);
+      setReportData(result);
     } catch (error) {
       console.error('Error fetching report:', error);
+      alert('Error fetching report: ' + error.message);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const generateReport = async (type) => {
+    const generateReport = async (type) => {
     setIsLoading(true);
     setReportType(type);
 
     try {
-      const response = await fetch('/api/comprehensive-analysis', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ reportType: type }),
-      });
+      // Try to get birth data from stored chart generation
+      let birthData = ChartDataManager.getFormattedBirthData();
 
-      if (response.ok) {
-        const data = await response.json();
-        setReportData(data);
+      if (!birthData) {
+        alert('Please generate a birth chart first by visiting the Chart page to provide your birth details.');
+        setIsLoading(false);
+        return;
+      }
+
+      console.log(`Generating ${type} report with birth data:`, birthData);
+
+      // Call the comprehensive analysis endpoint
+      const result = await analysisService.generateBirthDataAnalysis(birthData);
+      console.log('Report generation result:', result);
+
+      if (result.success) {
+        setReportData(result.analysis);
+        console.log('Report data set successfully');
       } else {
-        console.error('Failed to generate report');
+        console.error('Report generation failed:', result.error);
+        alert('Failed to generate report: ' + (result.error || 'Unknown error'));
       }
     } catch (error) {
       console.error('Error generating report:', error);
+      alert('Error generating report: ' + error.message);
     } finally {
       setIsLoading(false);
     }

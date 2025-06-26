@@ -2,32 +2,45 @@ import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, Button } from '../components/ui';
 import BirthDataForm from '../components/forms/BirthDataForm';
 import ChartDisplay from '../components/charts/ChartDisplay';
+import VedicChartDisplay from '../components/charts/VedicChartDisplay';
+import chartService from '../services/chartService';
+import ChartDataManager from '../utils/chartDataManager';
 
 const ChartPage = () => {
   const [chartData, setChartData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [analysisType, setAnalysisType] = useState('birth-data');
 
   const handleChartGeneration = async (birthData) => {
     setIsLoading(true);
+    setError(null);
     try {
-      // This would typically call your API
-      const response = await fetch('/api/chart', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(birthData),
-      });
+      console.log('🔮 Generating chart with data:', birthData);
 
-      if (response.ok) {
-        const data = await response.json();
-        setChartData(data);
+      // Store birth data for later use in reports
+      ChartDataManager.storeBirthData(birthData);
+
+      const data = await chartService.generateChart(birthData);
+      console.log('📊 Chart generation result:', data);
+
+      if (data.success) {
+        console.log('✅ Chart generation successful, setting chart data:', data.data);
+        setChartData(data.data);
+
+        // Store chart data for later use in reports
+        ChartDataManager.storeChartData(data.data);
+
+        console.log('💾 Chart data set and stored successfully');
       } else {
-        console.error('Failed to generate chart');
+        console.error('❌ Chart generation failed:', data.error);
+        setError(data.error || 'An unexpected error occurred.');
+        setChartData(null);
       }
-    } catch (error) {
-      console.error('Error generating chart:', error);
+    } catch (err) {
+      console.error('💥 Error generating chart:', err);
+      setError(err.message || 'An unexpected error occurred.');
+      setChartData(null);
     } finally {
       setIsLoading(false);
     }
@@ -108,6 +121,7 @@ const ChartPage = () => {
                   onSubmit={handleChartGeneration}
                   isLoading={isLoading}
                 />
+                {error && <div className="text-red-500 mt-4">{error}</div>}
               </CardContent>
             </Card>
           </div>
@@ -142,11 +156,18 @@ const ChartPage = () => {
               </Card>
             ) : (
               <div className="space-y-6">
-                <Card variant="elevated">
+                {/* Enhanced Vedic Chart Display */}
+                <VedicChartDisplay
+                  chartData={chartData}
+                  isLoading={false}
+                />
+
+                {/* Traditional Chart Display (Fallback) */}
+                <Card variant="elevated" className="mt-4">
                   <CardHeader>
                     <CardTitle className="flex items-center">
-                      <span className="text-2xl mr-3">🌟</span>
-                      Your Birth Chart
+                      <span className="text-2xl mr-3">📊</span>
+                      Alternative Chart View
                     </CardTitle>
                   </CardHeader>
                   <CardContent>

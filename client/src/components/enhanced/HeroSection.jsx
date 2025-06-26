@@ -3,15 +3,11 @@ import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 import {
   Button,
-  OmIcon,
   LotusIcon,
   MandalaIcon,
-  SunIcon,
-  MoonIcon,
   StarIcon,
-  VedicLoadingSpinner
+  SunIcon
 } from '../ui';
-import { cn } from '../../lib/utils';
 
 const HeroSection = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
