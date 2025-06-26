@@ -1,17 +1,17 @@
 
-## **Role:**
+## ****Role:**
 
   You are an expert 10x Full-Stack UI/UX Engineer specializing in modern React applications with deep expertise in Vedic astrology platforms, cultural authenticity, and cutting-edge web technologies. You excel at creating visually stunning, highly functional, and culturally respectful interfaces that blend ancient wisdom with modern digital experiences.
 
-## **Objective:**
+## ****Objective:**
 
   Transform the existing Jyotish Shastra React application into a world-class, modern, and visually captivating Vedic astrology platform that delivers an exceptional user experience while maintaining authentic cultural representation. Create a "wow factor" interface that rivals the best astrology platforms globally while respecting traditional Vedic principles.
 
-## **Context:**
+## ****Context:**
 
   You are working on the Jyotish Shastra project - a comprehensive Vedic astrology analysis system that combines ancient wisdom with modern AI technology. The project provides expert-level Vedic Kundli (birth chart) analysis, detailed interpretations, planetary analysis, and life predictions.
 
-## **Current Technology Stack:**
+## ****Current Technology Stack:**
 
   - **Frontend:** React 18.2.0, React Router DOM 6.20.1, React Hook Form 7.48.2
   - **Styling:** Pure CSS with custom utilities (no framework currently)
@@ -20,7 +20,7 @@
   - **HTTP Client:** Axios 1.6.2
   - **Date/Time:** Moment.js 2.29.4 with timezone support
 
-## **Current Project Structure:**
+## ****Current Project Structure:**
 
   ```bash
     client/src/
@@ -42,7 +42,7 @@
     └── utils/                 # Utilities
   ```
 
-## **Prerequisites:**
+## ****Prerequisites:**
 
   1. Deep understanding of React 18+ best practices and modern hooks
   2. Expertise in responsive design and mobile-first development
@@ -50,7 +50,7 @@
   4. Proficiency in modern CSS techniques, animations, and micro-interactions
   5. Understanding of accessibility (WCAG) and performance optimization
 
-## **Rsearch/Analysis Tasks:**
+## ****Rsearch/Analysis Tasks:**
 
   Before implementing changes, analyze the current codebase to understand:
 
@@ -60,7 +60,7 @@
     4. Mobile Experience: Assess responsive design implementation and mobile-specific enhancements
     5. Cultural Authenticity: Ensure all design decisions respect Vedic traditions and Sanskrit terminology
 
-##  **Instructions/Tasks:**
+## ** **Instructions/Tasks:**
 
 **Phase 1: Foundation Enhancement (Priority: HIGH)**
 
@@ -205,7 +205,7 @@
    - Create mobile-specific layouts for complex data
    - Ensure fast loading on mobile networks
 
-##  **Deliverables/Outcomes**
+## ** **Deliverables/Outcomes**
 
   ***Immediate Deliverables:***
 
@@ -223,7 +223,7 @@
     * **Accessibility Compliance:** WCAG 2.1 AA compliant interface
     * **Interactive Tools:** Enhanced calculators and user engagement features
 
-##  **Constraints**
+## ** **Constraints**
 
   **Technical Constraints:**
 
@@ -233,7 +233,7 @@
     * Maintain current project structure and file organization
     * Keep bundle size optimized (target: <500KB gzipped)
 
-##  **Cultural Constraints:**
+## ** **Cultural Constraints:**
 
     - Respect traditional Vedic principles and terminology
     - Use authentic Sanskrit terms with proper transliteration
@@ -249,7 +249,7 @@
     * Fast loading times (LCP < 2.5s, FID < 100ms)
     * SEO-friendly implementation
 
-##  **Success Criteria**
+## ** **Success Criteria**
 
   * **User Experience Metrics:**
 
@@ -274,7 +274,7 @@
     - **Professional Credibility:** Scholarly presentation of ancient wisdom
     - **User Trust:** Authentic, non-commercialized spiritual experience
 
-##  **Additional Notes**
+## ** **Additional Notes**
 
   * **Development Approach:**
 
@@ -298,7 +298,7 @@
     * Use modern JavaScript features (ES6+) while maintaining browser compatibility
     * Implement proper error handling and user feedback mechanisms
 
-##  **Testing Strategy:**
+## ** **Testing Strategy:**
   - Test on real devices for mobile experience validation
   - Validate accessibility with screen readers and keyboard navigation
   - Performance testing on various network conditions
@@ -311,15 +311,15 @@
 
 ***UI CHANGING PROMPT***
 
-## **Role**
+## ****Role**
 
   You are a Senior Frontend Architect specializing in design systems, CSS architecture, and modern frontend development with expertise in creating production-ready utility systems and implementing complex UI frameworks from scratch.
 
-## **Objective**
+## ****Objective**
 
   Implement a comprehensive CSS utility system for a Vedic astrology application to replace missing Tailwind classes, ensuring zero visual regressions while maintaining design system consistency, optimal performance, and scalability. Create a complete utility-first CSS architecture that supports all existing component requirements and future extensibility.
 
-## **Prerequisites**
+## ****Prerequisites**
 
   - Deep understanding of CSS utility frameworks (Tailwind CSS methodology)
   - Experience with design system architecture and theming
@@ -327,7 +327,7 @@
   - Proficiency in CSS Grid, Flexbox, and modern CSS features
   - Understanding of PostCSS, CRACO, and build tool configurations
 
-## **Analysis & Research Instructions**
+## ****Analysis & Research Instructions**
 
   1.  **Comprehensive CSS Audit**
 
@@ -353,7 +353,7 @@
     * Analyze browser compatibility requirements and fallback strategies
     * Plan modular CSS architecture for maintainability
 
-## **Core Instructions & Tasks**
+## ****Core Instructions & Tasks**
 
   1. **Complete CSS Utility System Implementation**
 
@@ -427,7 +427,7 @@
       * Ensure no conflicts with existing CSS rules
       * Test performance impact and load times
 
-## **Deliverables & Outcomes**
+## ****Deliverables & Outcomes**
 
   1. **Complete Utility System Files**
 
@@ -450,7 +450,7 @@
     - Accessibility audit: WCAG compliance verification for all utilities
     - Cross-browser test results: Compatibility verification across major browsers
 
-## **Constraints**
+## ****Constraints**
 
   * **Strict Limitations**
 
@@ -460,7 +460,7 @@
     - *Performance budget:* CSS additions must not exceed 50KB gzipped
     - *Browser support:* Must support all browsers currently supported by the application
 
-##  **Implementation Rules**
+## ** **Implementation Rules**
 
   1. Follow existing naming conventions and patterns in current index.css
   2. Use CSS custom properties for themeable values
@@ -468,7 +468,7 @@
   4. Maintain logical CSS organization and commenting
   5. Ensure cascade order prevents specificity conflicts
 
-##  **Success Criteria**
+## ** **Success Criteria**
 
   * **[ ] Functional Requirements ✅**
 
@@ -494,7 +494,7 @@
       - [ ] Utility classes follow predictable naming patterns
       - [ ] CSS structure supports future utility additions
 
-##  **Additional Notes**
+## ** **Additional Notes**
 
   1.  **Technical Considerations**
 
@@ -652,19 +652,19 @@
 
 ----------
 
-## **Role:**
+## ****Role:**
 
   You are an expert 10x Full-Stack UI/UX Engineer specializing in modern React applications with deep expertise in Vedic astrology platforms, cultural authenticity, and cutting-edge web technologies. You excel at creating visually stunning, highly functional, and culturally respectful interfaces that blend ancient wisdom with modern digital experiences.
 
-## **Objective:**
+## ****Objective:**
 
   Transform the existing Jyotish Shastra React application into a world-class, modern, and visually captivating Vedic astrology platform that delivers an exceptional user experience while maintaining authentic cultural representation. Create a "wow factor" interface that rivals the best astrology platforms globally while respecting traditional Vedic principles.
 
-## **Context:**
+## ****Context:**
 
   You are working on the Jyotish Shastra project - a comprehensive Vedic astrology analysis system that combines ancient wisdom with modern AI technology. The project provides expert-level Vedic Kundli (birth chart) analysis, detailed interpretations, planetary analysis, and life predictions.
 
-## **Current Technology Stack:**
+## ****Current Technology Stack:**
   - **Frontend:** React 18.2.0, React Router DOM 6.20.1, React Hook Form 7.48.2
   - **Styling:** Pure CSS with custom utilities (no framework currently)
   - **harts:** Recharts 2.8.0 for visualization
@@ -672,7 +672,7 @@
   - **HTTP Client:** Axios 1.6.2
   - **Date/Time:** Moment.js 2.29.4 with timezone support
 
-## **Current Project Structure:**
+## ****Current Project Structure:**
   ```bash
     client/src/
     ├── App.js/css              # Main application
@@ -693,14 +693,14 @@
     └── utils/                 # Utilities
   ```
 
-## **Prerequisites:**
+## ****Prerequisites:**
   1. Deep understanding of React 18+ best practices and modern hooks
   2. Expertise in responsive design and mobile-first development
   3. Knowledge of Vedic astrology terminology and cultural sensitivity
   4. Proficiency in modern CSS techniques, animations, and micro-interactions
   5. Understanding of accessibility (WCAG) and performance optimization
 
-## **Rsearch/Analysis Tasks:**
+## ****Rsearch/Analysis Tasks:**
 
   - Before implementing changes, analyze the current codebase to understand:
 
@@ -710,7 +710,7 @@
     4. Mobile Experience: Assess responsive design implementation and mobile-specific enhancements
     5. Cultural Authenticity: Ensure all design decisions respect Vedic traditions and Sanskrit terminology
 
-##  **Instructions/Tasks:**
+## ** **Instructions/Tasks:**
 
 **Phase 1: Foundation Enhancement (Priority: HIGH)**
 
@@ -855,7 +855,7 @@
    - Create mobile-specific layouts for complex data
    - Ensure fast loading on mobile networks
 
-##  **Deliverables/Outcomes**
+## ** **Deliverables/Outcomes**
 
   * ***Immediate Deliverables:***
 
@@ -873,7 +873,7 @@
     * **Accessibility Compliance:** WCAG 2.1 AA compliant interface
     * **Interactive Tools:** Enhanced calculators and user engagement features
 
-##  **Constraints**
+## ** **Constraints**
 
   **Technical Constraints:**
 
@@ -883,7 +883,7 @@
     * Maintain current project structure and file organization
     * Keep bundle size optimized (target: <500KB gzipped)
 
-##  **Cultural Constraints:**
+## ** **Cultural Constraints:**
 
     - Respect traditional Vedic principles and terminology
     - Use authentic Sanskrit terms with proper transliteration
@@ -899,7 +899,7 @@
     * Fast loading times (LCP < 2.5s, FID < 100ms)
     * SEO-friendly implementation
 
-##  **Success Criteria**
+## ** **Success Criteria**
 
   * **User Experience Metrics:**
 
@@ -924,7 +924,7 @@
     - **Professional Credibility:** Scholarly presentation of ancient wisdom
     - **User Trust:** Authentic, non-commercialized spiritual experience
 
-##  **Additional Notes**
+## ** **Additional Notes**
 
   * **Development Approach:**
 
@@ -948,7 +948,7 @@
     * Use modern JavaScript features (ES6+) while maintaining browser compatibility
     * Implement proper error handling and user feedback mechanisms
 
-##  **Testing Strategy:**
+## ** **Testing Strategy:**
   - Test on real devices for mobile experience validation
   - Validate accessibility with screen readers and keyboard navigation
   - Performance testing on various network conditions
@@ -960,30 +960,30 @@
 
 
 
-## **Role**
+## ****Role**
 
   Act as a **10x Engineer/Senior Software Developer** with expertise in React.js, Node.js, API integration, and UI/UX debugging.
 
-## **Objective**
+## ****Objective**
 
   Systematically diagnose and resolve routing errors, UI/backend integration failures, and visual rendering issues in a Vedic Astrology application while maintaining codebase integrity and following established protocols.
 
-## **Prerequisites**
+## ****Prerequisites**
 
   -  Strict adherence to `001-directory-management-protocols.mdc` and `002-error-fixing-protocols.mdc`
   -  Comprehensive online research and solution validation before implementation
   -  Version control checkpoints before any modifications
 
-## **Analysis & Research Instructions**
+## ****Analysis & Research Instructions**
 
-### **Phase 1: Error Diagnosis & Root Cause Analysis**
+### ****Phase 1: Error Diagnosis & Root Cause Analysis**
 
   1.  **Routing Error Investigation**: Analyze why "Generate Chart" button triggers console errors and 404 responses (`POST /api/chart 404`)
   2.  **API Routing Investigation**: Research why `POST /api/chart 404` errors occur and validate against Express.js routing best practices
   3.  **Logging System Audit**: Determine why `npm run dev:all` fails to capture errors in log files (`front-end-server-logs.log`, `back-end-server-logs.log`)
   3.  **UI Rendering Audit**: Analyze white background, invisible text, and component visibility issues using React DevTools methodology
 
-### **Phase 2: Component Architecture Analysis**
+### ****Phase 2: Component Architecture Analysis**
 
   -  Research current React.js and Express.js integration patterns for error handling
   -  Validate CSS/Tailwind solutions for text visibility and background rendering issues
@@ -992,35 +992,35 @@
   -  **Component Location Audit**: Locate missing/misplaced components according to established directory conventions
   -  **Duplicate Code Detection**: Identify redundant files, code blocks, and scripts for elimination
 
-## **Core Instructions**
+## ****Core Instructions**
 
-### **Task 1: API Integration Resolution**
+### ****Task 1: API Integration Resolution**
 
   1.  Locate and examine backend route configurations for `/api/chart` endpoint
   2.  Verify frontend API service configurations and request formatting
   3.  Implement minimal fixes to establish proper frontend-backend communication
   4.  Test API connectivity using provided server logs as reference
 
-### **Task 2: Logging System Restoration**
+### ****Task 2: Logging System Restoration**
 
   1.  Investigate `dev:all`, `dev:logs`, and `dev:backend-logs` script configurations
   2.  Verify log file permissions and directory structure
   3.  Implement minimal adjustments to capture runtime errors effectively
 
-### **Task 3: UI Enhancement Validation**
+### ****Task 3: UI Enhancement Validation**
 
   1.  Systematically inspect component rendering: backgrounds, text visibility, form elements
   2.  Verify CSS/Tailwind class applications and color schemes
   3.  Validate component imports and eliminate unused dependencies (as shown in ESLint warnings)
   4.  Ensure responsive design and mobile optimization functionality
 
-### **Task 4: Component Architecture Audit**
+### ****Task 4: Component Architecture Audit**
 
   1.  Fix broken import statements without modifying component functionality
   2.  Remove duplicate code blocks while preserving functional requirements
   3.  Place missing components in appropriate directories per established conventions
 
-### **Error Resolution Sequence**
+### ****Error Resolution Sequence**
 
   1.  **Backend API Endpoints**: Fix routing issues causing 404 errors for `/api/chart` endpoint using analysis & Research from Phase 1 & 2.
   2.  **Frontend-Backend Integration**: Ensure proper API communication and data flow is implemented with **only production grade** code.
@@ -1028,14 +1028,14 @@
   4.  **Import Dependencies**: Fix broken import paths and missing component references
   5.  **ESLint Warnings**: Address unused variable warnings in enhanced components
 
-### **Quality Assurance Loop**
+### ****Quality Assurance Loop**
 
   -  Apply minimal, targeted fixes based on online research validation
   -  Test each fix immediately to prevent cascading errors
   -  Verify UI enhancements are visually confirmed and functional
   -  Ensure zero regression in existing functionality
 
-## **Deliverables**
+## ****Deliverables**
 
   -  ✅ **Zero Runtime Errors**: All server and browser console errors resolved
   -  ✅ **Complete UI Enhancement Visibility**: Every enhanced component, styling, and feature properly displayed
@@ -1043,7 +1043,7 @@
   -  ✅ **Protocol Compliance**: Adherence to both error-fixing and directory management protocols
   -  ✅ **Clean Codebase**: No duplicate files, broken imports, or unnecessary code additions
 
-## **Critical Constraints**
+## ****Critical Constraints**
 
   -  **PROHIBITED**: Creating new files, components, or scripts unless addressing missing core functionality
   -  **PROHIBITED**: Modifying existing code outside the scope of error resolution and UI validation
@@ -1051,7 +1051,7 @@
   -  **REQUIRED**: Maintain current codebase integrity while implementing minimal, precise fixes
   -  **REQUIRED**: Online research and validation of solutions before implementation
 
-## **Success Criteria**
+## ****Success Criteria**
 
 Task completion achieved **ONLY** when:
 
@@ -1062,7 +1062,7 @@ Task completion achieved **ONLY** when:
   - No regression in existing functionality
   - Codebase maintains production-ready quality standards
 
-## **Implementation Guidelines**
+## ****Implementation Guidelines**
 
   -  **Research First**: Conduct systematic online research for each identified root cause
   -  **Minimal Changes**: Apply smallest possible code modifications following best practices
@@ -1070,7 +1070,7 @@ Task completion achieved **ONLY** when:
   -  **Continuous Validation**: Test after each fix using automated testing protocols
   -  **Zero Tolerance**: Task incomplete until ALL success criteria demonstrably met through working application
 
-## **Current Error Context**
+## ****Current Error Context**
 
   ```bash
     # Known Issues:
@@ -1084,3 +1084,136 @@ Task completion achieved **ONLY** when:
 
 
 
+
+## **Role**
+Act as a **10x Engineer/Senior Software Developer** with expertise in astronomical calculations, API development, and system analysis. Think systematically before acting and proceed with precision.
+
+## **Objective**
+Identify and resolve critical discrepancies between the Vedic astrology system's output and expected astronomical calculations, ensuring accurate birth chart generation and planetary position calculations without impacting existing codebase integrity.
+
+## **Prerequisites**
+- **System Architecture Mastery**: Comprehensive understanding of `@system-architecture.md`, `@validation-guide.md`, and `@requirements-analysis-questions.md`
+- **Codebase Proficiency**: Deep knowledge of Frontend (`/client`) and Backend (`/src`) implementations
+- **Astronomical Knowledge**: Understanding of Vedic astrology calculations, timezone handling, and ephemeris data
+
+**Note**: Both Frontend and Backend servers are operational - focus exclusively on functional requirement resolution, not server management.
+
+## **Input Test Dataset**
+```bash
+Birth Date: 24-10-1985
+Birth Place: Pune, Maharashtra, India
+Birth Time: 14:30
+Gender: Male
+```
+
+## **Analysis & Research Instructions**
+
+### **Phase 1: Comprehensive API Testing**
+1. **API Endpoint Validation**: Construct and execute `cURL` statements for ALL Backend API endpoints using the provided test data
+2. **Output Documentation**: Capture complete JSON responses from every API endpoint
+3. **Structure Analysis**: Document input/output API structures comprehensively
+
+### **Phase 2: Reference Data Extraction**
+1. **PDF Analysis**: Extract **Planetary Position** and **Kundli/Birth Chart** sections from `@kundli-for-testing.pdf`
+2. **Data Tabulation**: Create structured ASCII tables from PDF-extracted data
+3. **Baseline Establishment**: Use PDF data as ground truth for comparison
+
+### **Phase 3: Root Cause Investigation**
+1. **Online Research**: Conduct thorough internet research on astronomical calculation standards
+2. **Codebase Analysis**: Identify system components causing calculation discrepancies
+3. **Error Trail Mapping**: Trace complete error propagation paths through the system
+
+## **Core Implementation Tasks**
+
+### **Task 1: API Testing & Documentation**
+Create ASCII-based Input/Output Data Table (120-character fixed-width columns) containing:
+- Input Data (`cURL` commands)
+- Output Data (JSON responses)
+- API structure details for every endpoint
+
+### **Task 2: Reference Data Extraction**
+Generate ASCII table from PDF sections:
+- Planetary positions
+- Birth chart configurations
+- Astronomical calculation details
+
+### **Task 3: Comparative Analysis**
+Build ASCII comparison table highlighting:
+- System-generated data vs PDF reference data
+- Key discrepancies and variations
+- Magnitude of calculation errors
+
+### **Task 4: Root Cause Analysis**
+Create detailed analysis table documenting:
+- **Root Causes**: Specific issues (e.g., timezone conversion errors, placeholder data usage)
+- **Location**: Exact files, functions, and code segments affected
+- **Error Trail**: Complete propagation path from source to output
+- **Impact Assessment**: Scope of affected functionality
+- **Resolution Strategy**: Minimal, effective code fixes required
+
+### **Task 5: Solution Implementation**
+- Apply **minimal code changes** to resolve identified issues
+- Ensure timezone integrity (no unwanted conversions to Australian time)
+- Eliminate placeholder/mock data producing incorrect results
+- Validate astronomical calculation accuracy
+
+### **Task 6: Validation Testing**
+- Create comprehensive `cURL`-based test suite
+- Execute tests to verify system output matches PDF reference data
+- Document test results showing resolution of all discrepancies
+
+### **Task 7: Documentation Updates**
+- Update `@cURL-data-testing.md` with all analysis, maintaining existing structure
+- Enhance `@system-architecture.md` and `@validation-guide.md` with accurate current state
+- Preserve existing document content and formatting
+
+## **Deliverables**
+
+1. **Complete API Test Results**: Structured ASCII tables (120-char width) for all endpoints
+2. **Reference Data Tables**: ASCII-formatted PDF extraction results
+3. **Discrepancy Analysis**: Comprehensive comparison tables
+4. **Root Cause Documentation**: Detailed error analysis with resolution strategies
+5. **Updated Test Suite**: Validated `cURL` test scripts with results
+6. **Enhanced Documentation**: Updated system and API architecture documents
+7. **Verified System**: Functioning system producing accurate astronomical calculations
+
+## **Critical Constraints**
+
+### **Operational Restrictions**
+- **Zero Tolerance for Mocking**: No fake, mock, or simulated code generating false positives
+- **Directory Management Compliance**: Strict adherence to `001-directory-management-protocols.mdc`
+- **Error Protocol Adherence**: Mandatory compliance with `002-error-fixing-protocols.mdc`
+- **No Duplication**: Prevent creation of duplicate files, code, or scripts
+
+### **Implementation Guidelines**
+- **Minimal Code Changes**: Apply only necessary modifications
+- **Timezone Integrity**: Preserve local timezone without unwanted conversions
+- **Astronomical Accuracy**: Ensure calculations match established ephemeris standards
+- **System Stability**: Maintain existing functionality while resolving issues
+
+## **Success Criteria**
+
+### **Completion Validation**
+- [ ] All API endpoints tested and documented with `cURL` commands
+- [ ] PDF reference data extracted and tabulated accurately
+- [ ] System vs reference data discrepancies identified and quantified
+- [ ] Root causes analyzed with complete error trail documentation
+- [ ] Minimal code fixes implemented and tested
+- [ ] Validation test suite created and executed successfully
+- [ ] All discrepancies resolved and verified
+- [ ] Documentation updated with current accurate information
+- [ ] System produces astronomically correct results matching PDF reference
+
+### **Quality Assurance**
+- **No False Positives**: All test results reflect genuine system accuracy
+- **Calculation Integrity**: Planetary positions match established astronomical standards
+- **Documentation Completeness**: All analysis and resolutions thoroughly documented
+- **Protocol Compliance**: Full adherence to directory management and error fixing protocols
+
+## **Additional Notes**
+- **Systematic Approach**: Execute tasks iteratively, validating each phase before proceeding
+- **Research Validation**: Verify all solutions through online research before implementation
+- **Focus Maintenance**: Continuously reference original requirements to prevent scope drift
+- **Precision Requirement**: Deliver exact outcomes specified without assuming task completion until ALL criteria are met
+
+**Task Status**: Incomplete until every single requirement above is fully satisfied and validated.
