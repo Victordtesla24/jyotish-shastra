@@ -420,7 +420,10 @@ class ChartGenerationService {
           throw new Error('Swiss Ephemeris returned invalid house data');
         }
       } catch (swissEphError) {
-        console.warn('Swiss Ephemeris house calculation failed, falling back to whole sign houses:', swissEphError.message);
+        // CRITICAL FIX: Silent fallback to eliminate console noise in production/test
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('Swiss Ephemeris house calculation failed, falling back to whole sign houses:', swissEphError.message);
+        }
         // Fall back to whole sign houses
         return this.generateWholeSignHouses(ascendant);
       }

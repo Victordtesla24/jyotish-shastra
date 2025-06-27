@@ -339,7 +339,10 @@ class MasterAnalysisOrchestrator {
    */
   async executeSection6Analysis(charts, analysis) {
     try {
+      // CRITICAL FIX: Only log in development environment
+    if (process.env.NODE_ENV === 'development') {
       console.log('🔸 Generating Section 6: Navamsa Analysis (D9)');
+    }
 
       const { rasiChart, navamsaChart } = charts;
 

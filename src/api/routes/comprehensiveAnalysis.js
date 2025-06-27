@@ -71,7 +71,10 @@ const formatAnalysisSections = (sections) => {
  */
 router.post('/comprehensive', rateLimiter, async (req, res) => {
     try {
-        console.log('Starting comprehensive analysis...');
+        // CRITICAL FIX: Only log in development environment
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Starting comprehensive analysis...');
+    }
 
         const requestData = req.body;
         const isStandardizationTest = req.headers['x-test-type'] === 'standardization';
@@ -146,7 +149,10 @@ router.post('/comprehensive', rateLimiter, async (req, res) => {
             includeDashas: true
         });
 
-        console.log('Analysis completed successfully');
+        // CRITICAL FIX: Only log in development environment
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Analysis completed successfully');
+        }
 
         // CRITICAL FIX: Ensure sections property is preserved for API compatibility
         const response = {
