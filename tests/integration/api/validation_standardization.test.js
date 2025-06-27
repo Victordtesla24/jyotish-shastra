@@ -79,14 +79,37 @@ describe('Validation Standardization Integration Tests', () => {
 
       const response = await request(app)
         .post('/api/v1/analysis/comprehensive')
-        .set('x-test-type', 'standardization')
         .send({ birthData: dataWithoutName })
         .expect(200);
 
       expect(response.body.success).toBe(true);
     });
 
-    it('should require name for regular comprehensive analysis', async () => {
+    it('should reject incomplete birth data (missing required fields)', async () => {
+      const incompleteData = {
+        name: 'Test Person'
+        // Missing dateOfBirth, timeOfBirth, location - these are the actual required fields
+      };
+
+      const response = await request(app)
+        .post('/api/v1/analysis/comprehensive')
+        .send({ birthData: incompleteData })
+        .expect(400);
+
+      expect(response.body.success).toBe(false);
+      expect(response.body.details).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            field: expect.stringMatching(/dateOfBirth|timeOfBirth|latitude|longitude|timezone/),
+            message: expect.any(String)
+          })
+        ])
+      );
+      expect(response.body.suggestions).toEqual(expect.any(Array));
+      expect(response.body.helpText).toBeDefined();
+    });
+
+    it('should still require essential birth data fields', async () => {
       const response = await request(app)
         .post('/api/v1/analysis/comprehensive')
         .send({ birthData: { dateOfBirth: '1985-03-15', timeOfBirth: '08:30' } })
@@ -96,7 +119,7 @@ describe('Validation Standardization Integration Tests', () => {
       expect(response.body.details).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
-            field: 'name',
+            field: expect.stringMatching(/latitude|longitude|timezone/),
             message: expect.any(String)
           })
         ])
@@ -137,10 +160,9 @@ describe('Validation Standardization Integration Tests', () => {
 
     analysisEndpoints.forEach(endpoint => {
       describe(`${endpoint}`, () => {
-        it('should accept valid birth data without name (flexible validation)', async () => {
+        it('should accept valid birth data without name (standardized validation)', async () => {
           const response = await request(app)
             .post(endpoint)
-            .set('x-test-type', 'standardization')
             .send(validBirthDataFlat);
 
           expect([200, 500]).toContain(response.status); // 500 is acceptable for unimplemented services
@@ -150,13 +172,12 @@ describe('Validation Standardization Integration Tests', () => {
           }
         });
 
-        it('should accept nested placeOfBirth format', async () => {
+        it('should accept nested placeOfBirth format without name', async () => {
           const dataWithNestedPlace = { ...validBirthData };
-          delete dataWithNestedPlace.name; // Name not required for individual endpoints
+          delete dataWithNestedPlace.name; // Name is optional for all endpoints
 
           const response = await request(app)
             .post(endpoint)
-            .set('x-test-type', 'standardization')
             .send(dataWithNestedPlace);
 
           expect([200, 500]).toContain(response.status);
@@ -168,7 +189,6 @@ describe('Validation Standardization Integration Tests', () => {
         it('should provide user-friendly validation errors', async () => {
           const response = await request(app)
             .post(endpoint)
-            .set('x-test-type', 'standardization')
             .send(invalidBirthData);
 
           if (response.status === 400) {
@@ -183,20 +203,18 @@ describe('Validation Standardization Integration Tests', () => {
     });
   });
 
-  describe('Dasha Analysis Endpoint (Special Case)', () => {
-    it('should accept both wrapped and direct birth data formats', async () => {
-      // Test wrapped format
+  describe('Dasha Analysis Endpoint (Standardized)', () => {
+    it('should accept both wrapped and direct birth data formats without name', async () => {
+      // Test wrapped format without name
       const wrappedResponse = await request(app)
         .post('/api/v1/analysis/dasha')
-        .set('x-test-type', 'standardization')
         .send({ birthData: validBirthDataFlat });
 
       expect([200, 500]).toContain(wrappedResponse.status);
 
-      // Test direct format
+      // Test direct format without name
       const directResponse = await request(app)
         .post('/api/v1/analysis/dasha')
-        .set('x-test-type', 'standardization')
         .send(validBirthDataFlat);
 
       expect([200, 500]).toContain(directResponse.status);

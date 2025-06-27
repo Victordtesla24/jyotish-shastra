@@ -155,9 +155,9 @@ describe('API Validation Integration Tests', () => {
     });
   });
 
-  describe('Analysis Endpoints (Name Required)', () => {
-    describe('POST /api/v1/analysis/comprehensive', () => {
-      it('should accept valid comprehensive analysis data', async () => {
+  describe('Analysis Endpoints (Standardized Validation - Name Optional)', () => {
+    describe('POST /v1/analysis/comprehensive', () => {
+      it('should accept valid comprehensive analysis data with name', async () => {
         const requestData = { birthData: validBirthData };
         const response = await request(testApp)
           .post('/api/v1/analysis/comprehensive')
@@ -168,20 +168,18 @@ describe('API Validation Integration Tests', () => {
         expect(response.body.analysis).toBeDefined();
       });
 
-      it('should reject missing name field', async () => {
+      it('should accept comprehensive analysis data without name (standardized)', async () => {
         const dataWithoutName = { ...validBirthData };
         delete dataWithoutName.name;
         const requestData = { birthData: dataWithoutName };
 
         const response = await request(testApp)
           .post('/api/v1/analysis/comprehensive')
-          .set('x-test-type', 'technical-validation')
           .send(requestData)
-          .expect(400);
+          .expect(200);
 
-        expect(response.body.success).toBe(false);
-        expect(response.body.details[0].field).toBe('birthData.name');
-        expect(response.body.details[0].message).toContain('required');
+        expect(response.body.success).toBe(true);
+        expect(response.body.analysis).toBeDefined();
       });
 
       it('should handle chartId alternative format', async () => {
@@ -205,8 +203,8 @@ describe('API Validation Integration Tests', () => {
       });
     });
 
-    describe('POST /api/v1/analysis/houses', () => {
-      it('should accept valid house analysis data', async () => {
+    describe('POST /v1/analysis/houses', () => {
+      it('should accept valid house analysis data with name', async () => {
         const response = await request(testApp)
           .post('/api/v1/analysis/houses')
           .send(validBirthData)
@@ -216,20 +214,20 @@ describe('API Validation Integration Tests', () => {
         expect(response.body.analysis.section).toBeDefined();
       });
 
-      it('should require name field', async () => {
+      it('should accept house analysis data without name (standardized)', async () => {
         const dataWithoutName = { ...validBirthData };
         delete dataWithoutName.name;
 
         const response = await request(testApp)
           .post('/api/v1/analysis/houses')
           .send(dataWithoutName)
-          .expect(400);
+          .expect(200);
 
-        expect(response.body.success).toBe(false);
-        expect(response.body.details[0].field).toBe('name');
+        expect(response.body.success).toBe(true);
+        expect(response.body.analysis.section).toBeDefined();
       });
 
-      it('should provide user-friendly error messages', async () => {
+      it('should provide user-friendly error messages for invalid data', async () => {
         const response = await request(testApp)
           .post('/api/v1/analysis/houses')
           .send(invalidBirthData)
@@ -242,8 +240,8 @@ describe('API Validation Integration Tests', () => {
       });
     });
 
-    describe('POST /api/v1/analysis/aspects', () => {
-      it('should accept valid aspect analysis data', async () => {
+    describe('POST /v1/analysis/aspects', () => {
+      it('should accept valid aspect analysis data with name', async () => {
         const response = await request(testApp)
           .post('/api/v1/analysis/aspects')
           .send(validBirthData)
@@ -253,22 +251,22 @@ describe('API Validation Integration Tests', () => {
         expect(response.body.analysis.section).toBeDefined();
       });
 
-      it('should require name field', async () => {
+      it('should accept aspect analysis data without name (standardized)', async () => {
         const dataWithoutName = { ...validBirthData };
         delete dataWithoutName.name;
 
         const response = await request(testApp)
           .post('/api/v1/analysis/aspects')
           .send(dataWithoutName)
-          .expect(400);
+          .expect(200);
 
-        expect(response.body.success).toBe(false);
-        expect(response.body.details[0].field).toBe('name');
+        expect(response.body.success).toBe(true);
+        expect(response.body.analysis.section).toBeDefined();
       });
     });
 
-    describe('POST /api/v1/analysis/arudha', () => {
-      it('should accept valid arudha analysis data', async () => {
+    describe('POST /v1/analysis/arudha', () => {
+      it('should accept valid arudha analysis data with name', async () => {
         const response = await request(testApp)
           .post('/api/v1/analysis/arudha')
           .send(validBirthData)
@@ -278,22 +276,22 @@ describe('API Validation Integration Tests', () => {
         expect(response.body.analysis.section).toBeDefined();
       });
 
-      it('should require name field', async () => {
+      it('should accept arudha analysis data without name (standardized)', async () => {
         const dataWithoutName = { ...validBirthData };
         delete dataWithoutName.name;
 
         const response = await request(testApp)
           .post('/api/v1/analysis/arudha')
           .send(dataWithoutName)
-          .expect(400);
+          .expect(200);
 
-        expect(response.body.success).toBe(false);
-        expect(response.body.details[0].field).toBe('name');
+        expect(response.body.success).toBe(true);
+        expect(response.body.analysis.section).toBeDefined();
       });
     });
 
-    describe('POST /api/v1/analysis/navamsa', () => {
-      it('should accept valid navamsa analysis data', async () => {
+    describe('POST /v1/analysis/navamsa', () => {
+      it('should accept valid navamsa analysis data with name', async () => {
         const response = await request(testApp)
           .post('/api/v1/analysis/navamsa')
           .send(validBirthData)
@@ -303,22 +301,22 @@ describe('API Validation Integration Tests', () => {
         expect(response.body.analysis.section).toBeDefined();
       });
 
-      it('should require name field', async () => {
+      it('should accept navamsa analysis data without name (standardized)', async () => {
         const dataWithoutName = { ...validBirthData };
         delete dataWithoutName.name;
 
         const response = await request(testApp)
           .post('/api/v1/analysis/navamsa')
           .send(dataWithoutName)
-          .expect(400);
+          .expect(200);
 
-        expect(response.body.success).toBe(false);
-        expect(response.body.details[0].field).toBe('name');
+        expect(response.body.success).toBe(true);
+        expect(response.body.analysis.section).toBeDefined();
       });
     });
 
-    describe('POST /api/v1/analysis/dasha', () => {
-      it('should accept valid dasha analysis data', async () => {
+    describe('POST /v1/analysis/dasha', () => {
+      it('should accept valid dasha analysis data with name', async () => {
         const response = await request(testApp)
           .post('/api/v1/analysis/dasha')
           .send(validBirthData)
@@ -338,17 +336,17 @@ describe('API Validation Integration Tests', () => {
         expect(response.body.success).toBe(true);
       });
 
-      it('should require name field', async () => {
+      it('should accept dasha analysis data without name (standardized)', async () => {
         const dataWithoutName = { ...validBirthData };
         delete dataWithoutName.name;
 
         const response = await request(testApp)
           .post('/api/v1/analysis/dasha')
           .send(dataWithoutName)
-          .expect(400);
+          .expect(200);
 
-        expect(response.body.success).toBe(false);
-        expect(response.body.details[0].field).toBe('name');
+        expect(response.body.success).toBe(true);
+        expect(response.body.analysis.section).toBeDefined();
       });
     });
   });
@@ -546,7 +544,7 @@ describe('API Validation Integration Tests', () => {
           .expect(400);
 
         expect(response.body.helpText).toBeDefined();
-        expect(response.body.helpText).toContain('birth data');
+        expect(response.body.helpText).toMatch(/birth (date|data|information)/i);
       }
     });
 
@@ -595,18 +593,28 @@ describe('API Validation Integration Tests', () => {
 
       validators.forEach(({ name, fn }) => {
         describe(name, () => {
-          it('should require name field', () => {
+          it('should accept data without name field (standardized)', () => {
             const dataWithoutName = { ...validBirthData };
             delete dataWithoutName.name;
 
             const result = fn(dataWithoutName);
-            expect(result.isValid).toBe(false);
-            expect(result.errors.some(e => e.field === 'name')).toBe(true);
+            expect(result.isValid).toBe(true);
           });
 
           it('should accept valid data with name', () => {
             const result = fn(validBirthData);
             expect(result.isValid).toBe(true);
+          });
+
+          it('should reject invalid birth data regardless of name presence', () => {
+            const invalidData = { ...invalidBirthData };
+            delete invalidData.name; // Remove name to test other validation
+
+            const result = fn(invalidData);
+            expect(result.isValid).toBe(false);
+            expect(result.errors.length).toBeGreaterThan(0);
+            // Should have errors for invalid date, time, coordinates, etc.
+            expect(result.errors.some(e => ['dateOfBirth', 'timeOfBirth', 'latitude', 'longitude'].includes(e.field))).toBe(true);
           });
         });
       });
