@@ -74,11 +74,14 @@ class TestChartFactory {
    * @param {number} degree - The degree of the planet within the sign.
    * @returns {object} The modified chart object.
    */
-  static addPlanet(chart, planetName, sign, houseOrDegree) {
+  static addPlanet(chart, planetName, sign, degree) {
     const signLongitudes = {
       'Aries': 0, 'Taurus': 30, 'Gemini': 60, 'Cancer': 90, 'Leo': 120, 'Virgo': 150,
       'Libra': 180, 'Scorpio': 210, 'Sagittarius': 240, 'Capricorn': 270, 'Aquarius': 300, 'Pisces': 330
     };
+
+    // Calculate absolute longitude from sign and degree
+    const absoluteLongitude = signLongitudes[sign] + degree;
 
     // If chart has planetaryPositions as an array, update existing or add new
     if (Array.isArray(chart.planetaryPositions)) {
@@ -88,9 +91,8 @@ class TestChartFactory {
         planet: planetName,
         name: planetName,
         sign: sign,
-        house: houseOrDegree, // Assuming the 3rd parameter is house for array format
-        longitude: signLongitudes[sign] + 15,
-        degree: 15
+        longitude: absoluteLongitude,
+        degree: degree
       };
 
       if (existingIndex !== -1) {
@@ -103,8 +105,8 @@ class TestChartFactory {
       chart.planetaryPositions[planetName.toLowerCase()] = {
         name: planetName,
         sign: sign,
-        longitude: signLongitudes[sign] + houseOrDegree,
-        degree: houseOrDegree,
+        longitude: absoluteLongitude,
+        degree: degree,
       };
     }
     return chart;

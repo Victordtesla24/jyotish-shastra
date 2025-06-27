@@ -1800,29 +1800,28 @@ class NavamsaAnalysisService {
     const sign = planet.sign || this.getSignFromLongitude(planet.longitude);
     const longitude = planet.longitude || 0;
 
-    // Calculate the sign index (0-11)
-    const signIndex = this.getSignIndex(sign);
-
     // Calculate the longitude within the sign (0-30 degrees)
     const longitudeInSign = longitude % 30;
 
-    // Each navamsa is 3°20' (or 10/3 degrees)
+    // Each navamsa is 3°20' (3.333... degrees)
     const navamsaIndex = Math.floor(longitudeInSign / (10/3));
 
-    // Calculate the starting navamsa index based on element
-    let startingIndex;
-    if (this.isFireSign(sign)) {
-      startingIndex = 0; // Aries
-    } else if (this.isEarthSign(sign)) {
-      startingIndex = 4; // Leo
-    } else if (this.isAirSign(sign)) {
-      startingIndex = 8; // Sagittarius
-    } else { // Water sign
-      startingIndex = 0; // Aries
+    // Calculate the starting navamsa sign index based on sign type (mobility)
+    let startingSignIndex;
+
+    if (this.isMovableSign(sign)) {
+      // Movable signs start from the same sign
+      startingSignIndex = this.getSignIndex(sign);
+    } else if (this.isFixedSign(sign)) {
+      // Fixed signs start from the 9th sign from themselves
+      startingSignIndex = (this.getSignIndex(sign) + 8) % 12; // +8 because 9th from index
+    } else {
+      // Dual signs start from the 5th sign from themselves
+      startingSignIndex = (this.getSignIndex(sign) + 4) % 12; // +4 because 5th from index
     }
 
     // Calculate the final navamsa sign index
-    const navamsaSignIndex = (startingIndex + navamsaIndex) % 12;
+    const navamsaSignIndex = (startingSignIndex + navamsaIndex) % 12;
 
     // Convert index back to sign name
     return this.getSignFromIndex(navamsaSignIndex);
@@ -1968,6 +1967,36 @@ class NavamsaAnalysisService {
   isWaterSign(sign) {
     const waterSigns = ['CANCER', 'SCORPIO', 'PISCES'];
     return waterSigns.includes(sign.toUpperCase());
+  }
+
+  /**
+   * PRODUCTION-GRADE: Check if sign is movable/cardinal
+   * @param {string} sign - Sign name
+   * @returns {boolean} True if movable sign
+   */
+  isMovableSign(sign) {
+    const movableSigns = ['ARIES', 'CANCER', 'LIBRA', 'CAPRICORN'];
+    return movableSigns.includes(sign.toUpperCase());
+  }
+
+  /**
+   * PRODUCTION-GRADE: Check if sign is fixed
+   * @param {string} sign - Sign name
+   * @returns {boolean} True if fixed sign
+   */
+  isFixedSign(sign) {
+    const fixedSigns = ['TAURUS', 'LEO', 'SCORPIO', 'AQUARIUS'];
+    return fixedSigns.includes(sign.toUpperCase());
+  }
+
+  /**
+   * PRODUCTION-GRADE: Check if sign is dual/mutable
+   * @param {string} sign - Sign name
+   * @returns {boolean} True if dual sign
+   */
+  isDualSign(sign) {
+    const dualSigns = ['GEMINI', 'VIRGO', 'SAGITTARIUS', 'PISCES'];
+    return dualSigns.includes(sign.toUpperCase());
   }
 
   /**
