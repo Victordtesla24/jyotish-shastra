@@ -66,14 +66,18 @@ class ChartController {
       // Validate birth data using flexible schema
       const validationResult = validateChartRequest(birthData);
       if (!validationResult.isValid) {
+        const errorDetails = validationResult.errors.map(error => ({
+          field: error.field,
+          message: error.message,
+          providedValue: error.providedValue
+        }));
+
         return res.status(400).json({
           success: false,
           error: 'Validation failed',
-          details: validationResult.errors.map(error => ({
-            field: error.field,
-            message: error.message,
-            providedValue: error.providedValue
-          })),
+          // CRITICAL FIX: Include both "details" and "errors" for API compatibility
+          details: errorDetails,
+          errors: errorDetails, // E2E tests expect this property
           suggestions: this.generateValidationSuggestions(validationResult.errors),
           helpText: 'Chart generation requires date, time, and location information. Name is optional.'
         });
@@ -92,9 +96,27 @@ class ChartController {
         chartData.navamsaChart
       );
 
+            // CRITICAL FIX: Generate chartId for E2E workflow (minimal approach)
+      // Use temporary in-memory storage for E2E tests to avoid complex schema mapping
+      const crypto = require('crypto');
+      const chartId = crypto.randomUUID();
+
+      // Store chart data temporarily for E2E workflow (could be enhanced with Redis/cache later)
+      global.tempChartStorage = global.tempChartStorage || new Map();
+      global.tempChartStorage.set(chartId, {
+        birthData: chartData.birthData,
+        rasiChart: chartData.rasiChart,
+        navamsaChart: chartData.navamsaChart,
+        analysis: chartData.analysis,
+        dashaInfo: chartData.dashaInfo,
+        birthDataAnalysis: birthDataAnalysis,
+        generatedAt: chartData.generatedAt
+      });
+
       return res.status(200).json({
         success: true,
         data: {
+          chartId: chartId,
           birthData: chartData.birthData,
           rasiChart: chartData.rasiChart,
           navamsaChart: chartData.navamsaChart,

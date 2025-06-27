@@ -11,20 +11,29 @@ class AscendantCalculator {
     constructor(ayanamsa = 'LAHIRI') {
         this.ayanamsaType = ayanamsa;
         this.initialized = false;
+        this.ephePath = null;
 
         try {
             // PRODUCTION-GRADE: Enhanced ephemeris path validation and setup
-            const ephePath = __dirname + '/../../../../ephemeris';
-            swisseph.swe_set_ephe_path(ephePath);
+            // Use absolute path resolution for better reliability
+            this.ephePath = path.resolve(__dirname, '../../../../ephemeris');
 
-            // Validate ephemeris files exist
-            this.validateEphemerisFiles(ephePath);
+            // Validate ephemeris files exist before initialization
+            this.validateEphemerisFiles(this.ephePath);
+
+            // Set ephemeris path with validated directory
+            swisseph.swe_set_ephe_path(this.ephePath);
+
+            // Set sidereal mode to Lahiri explicitly during initialization
+            swisseph.swe_set_sid_mode(swisseph.SE_SIDM_LAHIRI || 1);
+
             this.initialized = true;
 
         } catch (error) {
             // Suppress console warnings in test environment or when ephemeris is missing
             if (process.env.NODE_ENV !== 'test') {
                 console.warn('Swiss Ephemeris initialization warning:', error.message);
+                console.warn('Ephemeris path attempted:', this.ephePath);
             }
             // Continue with Moshier as fallback
             this.initialized = false;
@@ -36,9 +45,6 @@ class AscendantCalculator {
      * Based on research: Swiss Ephemeris requires proper data files for house calculations
      */
     validateEphemerisFiles(ephePath) {
-        const fs = require('fs');
-        const path = require('path');
-
         try {
             // Check if ephemeris directory exists
             if (!fs.existsSync(ephePath)) {
@@ -46,18 +52,31 @@ class AscendantCalculator {
             }
 
             // Check for essential ephemeris files for current date range
-            const essentialFiles = ['sepl_18.se1', 'semo_18.se1']; // 1800-2399 CE range
+            const essentialFiles = ['sepl_18.se1', 'semo_18.se1', 'seas_18.se1']; // 1800-2399 CE range
+            const missingFiles = [];
+
             for (const file of essentialFiles) {
                 const filePath = path.join(ephePath, file);
                 if (!fs.existsSync(filePath)) {
-                    console.warn(`Missing ephemeris file: ${file}, falling back to Moshier`);
-                    this.initialized = false;
-                    return;
+                    missingFiles.push(file);
                 }
             }
+
+            if (missingFiles.length > 0) {
+                throw new Error(`Missing ephemeris files: ${missingFiles.join(', ')}`);
+            }
+
+            // Verify file sizes are reasonable (not corrupted)
+            for (const file of essentialFiles) {
+                const filePath = path.join(ephePath, file);
+                const stats = fs.statSync(filePath);
+                if (stats.size < 1000) { // Files should be much larger than 1KB
+                    throw new Error(`Ephemeris file ${file} appears to be corrupted (size: ${stats.size} bytes)`);
+                }
+            }
+
         } catch (error) {
-            console.warn('Ephemeris validation failed:', error.message);
-            this.initialized = false;
+            throw new Error(`Ephemeris validation failed: ${error.message}`);
         }
     }
 

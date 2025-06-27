@@ -924,8 +924,11 @@ class DetailedDashaAnalysisService {
       nextAntardasha = antardashas.find(ad => ad.startAge > currentAge);
     }
 
+    // CRITICAL FIX: Enhanced null safety for currentDasha access
+    const currentPlanet = (currentDasha && currentDasha.planet) ? currentDasha.planet : 'Unknown';
+
     return {
-      currentPeriod: `${currentDasha.planet} Mahadasha`,
+      currentPeriod: `${currentPlanet} Mahadasha`,
       nextAntardasha: nextAntardasha,
       upcomingPeriods: upcomingDashas.slice(0, 2),
       overallAssessment: 'Period analysis complete'

@@ -42,11 +42,19 @@ const mockLagnaService = {
 };
 
 const mockHouseService = {
-  analyzeHouseInDetail: jest.fn().mockReturnValue({
-    analysis: 'House analysis complete',
-    lord: 'Mars',
-    occupants: [],
-    specificAnalysis: 'Detailed house analysis'
+  analyzeHouses: jest.fn().mockReturnValue({
+    house1: { analysis: 'House 1 analysis complete', occupants: [], strength: 'strong' },
+    house2: { analysis: 'House 2 analysis complete', occupants: [], strength: 'medium' },
+    house3: { analysis: 'House 3 analysis complete', occupants: [], strength: 'weak' },
+    house4: { analysis: 'House 4 analysis complete', occupants: [], strength: 'medium' },
+    house5: { analysis: 'House 5 analysis complete', occupants: [], strength: 'strong' },
+    house6: { analysis: 'House 6 analysis complete', occupants: [], strength: 'weak' },
+    house7: { analysis: 'House 7 analysis complete', occupants: [], strength: 'medium' },
+    house8: { analysis: 'House 8 analysis complete', occupants: [], strength: 'weak' },
+    house9: { analysis: 'House 9 analysis complete', occupants: [], strength: 'strong' },
+    house10: { analysis: 'House 10 analysis complete', occupants: [], strength: 'medium' },
+    house11: { analysis: 'House 11 analysis complete', occupants: [], strength: 'strong' },
+    house12: { analysis: 'House 12 analysis complete', occupants: [], strength: 'weak' }
   }),
   crossVerifyHouseIndications: jest.fn().mockReturnValue({
     consistency: 'Good'
@@ -86,21 +94,67 @@ const mockNavamsaService = {
 
 const mockDashaService = {
   analyzeAllDashas: jest.fn().mockReturnValue({
-    timeline: 'Dasha timeline complete'
+    timeline: 'Dasha timeline complete',
+    currentDasha: {
+      mahadasha: 'Jupiter',
+      antardasha: 'Venus',
+      remainingYears: 2.5,
+      effects: 'Positive period for growth and relationships'
+    },
+    dashaSequence: [
+      { planet: 'Jupiter', startAge: 25, endAge: 41, isCurrent: true },
+      { planet: 'Saturn', startAge: 41, endAge: 60, isCurrent: false }
+    ],
+    majorTransitions: [
+      { age: 35, event: 'Career advancement', planet: 'Jupiter' },
+      { age: 42, event: 'Major life change', planet: 'Saturn' }
+    ]
   })
 };
 
 const mockChartService = {
   generateRasiChart: jest.fn().mockResolvedValue({
-    ascendant: { sign: 'Aries', degree: 15 },
+    ascendant: { sign: 'Aries', degree: 15, minutes: 30, seconds: 45 },
     planetaryPositions: {
-      sun: { sign: 'Leo', house: 5 },
-      moon: { sign: 'Cancer', house: 4 }
-    }
+      sun: { sign: 'Leo', house: 5, degree: 10.5 },
+      moon: { sign: 'Cancer', house: 4, degree: 25.2 },
+      mars: { sign: 'Gemini', house: 3, degree: 5.8 },
+      mercury: { sign: 'Virgo', house: 6, degree: 18.3 },
+      jupiter: { sign: 'Scorpio', house: 8, degree: 22.7 },
+      venus: { sign: 'Libra', house: 7, degree: 15.1 },
+      saturn: { sign: 'Capricorn', house: 10, degree: 28.9 },
+      rahu: { sign: 'Aquarius', house: 11, degree: 12.4 },
+      ketu: { sign: 'Leo', house: 5, degree: 12.4 }
+    },
+    planets: [
+      { name: 'Sun', sign: 'Leo', house: 5, degree: 10.5 },
+      { name: 'Moon', sign: 'Cancer', house: 4, degree: 25.2 },
+      { name: 'Mars', sign: 'Gemini', house: 3, degree: 5.8 },
+      { name: 'Mercury', sign: 'Virgo', house: 6, degree: 18.3 },
+      { name: 'Jupiter', sign: 'Scorpio', house: 8, degree: 22.7 },
+      { name: 'Venus', sign: 'Libra', house: 7, degree: 15.1 },
+      { name: 'Saturn', sign: 'Capricorn', house: 10, degree: 28.9 },
+      { name: 'Rahu', sign: 'Aquarius', house: 11, degree: 12.4 },
+      { name: 'Ketu', sign: 'Leo', house: 5, degree: 12.4 }
+    ]
   }),
   generateNavamsaChart: jest.fn().mockResolvedValue({
-    ascendant: { sign: 'Sagittarius' },
-    planets: []
+    ascendant: { sign: 'Sagittarius', degree: 20, minutes: 15, seconds: 30 },
+    planetaryPositions: {
+      sun: { sign: 'Scorpio', house: 12, degree: 5.2 },
+      moon: { sign: 'Pisces', house: 4, degree: 18.8 }
+    },
+    planets: [
+      { name: 'Sun', sign: 'Scorpio', house: 12, degree: 5.2 },
+      { name: 'Moon', sign: 'Pisces', house: 4, degree: 18.8 },
+      { name: 'Mars', sign: 'Capricorn', house: 2, degree: 12.1 },
+      { name: 'Mercury', sign: 'Sagittarius', house: 1, degree: 8.7 },
+      { name: 'Jupiter', sign: 'Cancer', house: 8, degree: 25.3 },
+      { name: 'Venus', sign: 'Aquarius', house: 3, degree: 14.9 },
+      { name: 'Saturn', sign: 'Virgo', house: 10, degree: 22.6 },
+      { name: 'Rahu', sign: 'Gemini', house: 7, degree: 9.8 },
+      { name: 'Ketu', sign: 'Sagittarius', house: 1, degree: 9.8 }
+    ]
   })
 };
 
@@ -134,7 +188,7 @@ describe('MasterAnalysisOrchestrator Integration Test', () => {
 
     // Verify that the orchestrator called each service
     expect(mockLagnaService.analyzeLagna).toHaveBeenCalled();
-    expect(mockHouseService.analyzeHouseInDetail).toHaveBeenCalled();
+    expect(mockHouseService.analyzeHouses).toHaveBeenCalled();
     expect(mockYogaService.detectAllYogas).toHaveBeenCalled();
     expect(mockLuminariesService.analyzeLuminaries).toHaveBeenCalled();
 
@@ -166,10 +220,11 @@ describe('MasterAnalysisOrchestrator Integration Test', () => {
     }, { legacyFormat: false });
 
     expect(results).toBeDefined();
-    expect(results).toHaveProperty('errors');
-    expect(results.errors[0]).toContain('Insufficient birth data for complete analysis');
-    // It should still have tried to process other services
-    expect(results).toHaveProperty('sections');
+    expect(results).toHaveProperty('status', 'failed');
+    expect(results).toHaveProperty('error');
+    expect(results.error).toContain('Insufficient birth data for comprehensive analysis');
+    // The orchestrator should fail fast with insufficient data
+    expect(results).not.toHaveProperty('sections');
   });
 
 });

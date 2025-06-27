@@ -249,8 +249,8 @@ class ChartGenerationService {
             rasiChart.ascendant &&
             rasiChart.ascendant.longitude !== undefined &&
             rasiChart.ascendant.longitude !== null) {
-          try {
-            houseNumber = calculateHouseNumber(navamsaPosition.longitude, rasiChart.ascendant.longitude);
+                      try {
+              houseNumber = calculateHouseNumber(navamsaPosition.longitude, rasiChart.ascendant.longitude);
             // Validate house number
             if (!houseNumber || houseNumber < 1 || houseNumber > 12) {
               houseNumber = 1;
@@ -557,8 +557,15 @@ class ChartGenerationService {
     // Calculate comprehensive Dasha analysis
     const dashaAnalysis = dashaService.analyzeAllDashas(rasiChart);
 
-    // Extract birth Dasha from the sequence
-    const birthDasha = dashaAnalysis.dasha_sequence[0]?.planet || 'moon';
+    // Extract birth Dasha from the sequence with enhanced null safety
+    const birthDasha = (dashaAnalysis &&
+                       dashaAnalysis.dasha_sequence &&
+                       Array.isArray(dashaAnalysis.dasha_sequence) &&
+                       dashaAnalysis.dasha_sequence.length > 0 &&
+                       dashaAnalysis.dasha_sequence[0] &&
+                       dashaAnalysis.dasha_sequence[0].planet)
+                       ? dashaAnalysis.dasha_sequence[0].planet
+                       : 'moon';
 
     // Legacy format for backward compatibility
     const dashaPeriods = {

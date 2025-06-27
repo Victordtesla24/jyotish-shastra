@@ -298,7 +298,13 @@ class BirthDataAnalysisService {
       const currentDashaInfo = dashaSequence.find(d => d.isCurrent);
       const nextDasha = dashaSequence.find(d => d.startAge > ageInYears);
 
-      analysis.answer = `Based on Moon's nakshatra (${nakshatra.name}), the person started with ${startingDasha} Mahadasha. Currently running ${currentDashaInfo.planet} Mahadasha (${currentDashaInfo.remainingYears.toFixed(1)} years remaining). Next: ${nextDasha.planet} Mahadasha starting at age ${nextDasha.startAge.toFixed(1)}. The complete 120-year Vimshottari cycle includes all 9 planets.`;
+      // CRITICAL FIX: Enhanced null safety for dasha info access
+      const currentPlanet = (currentDashaInfo && currentDashaInfo.planet) ? currentDashaInfo.planet : startingDasha;
+      const currentRemaining = (currentDashaInfo && currentDashaInfo.remainingYears) ? currentDashaInfo.remainingYears.toFixed(1) : '0';
+      const nextPlanet = (nextDasha && nextDasha.planet) ? nextDasha.planet : 'Unknown';
+      const nextStartAge = (nextDasha && nextDasha.startAge) ? nextDasha.startAge.toFixed(1) : 'Unknown';
+
+      analysis.answer = `Based on Moon's nakshatra (${nakshatra.name}), the person started with ${startingDasha} Mahadasha. Currently running ${currentPlanet} Mahadasha (${currentRemaining} years remaining). Next: ${nextPlanet} Mahadasha starting at age ${nextStartAge}. The complete 120-year Vimshottari cycle includes all 9 planets.`;
     } else {
       analysis.answer = "Mahadasha calculation requires Moon's nakshatra position, which could not be determined.";
     }

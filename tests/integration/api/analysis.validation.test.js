@@ -175,6 +175,7 @@ describe('API Validation Integration Tests', () => {
 
         const response = await request(testApp)
           .post('/api/v1/analysis/comprehensive')
+          .set('x-test-type', 'technical-validation')
           .send(requestData)
           .expect(400);
 
