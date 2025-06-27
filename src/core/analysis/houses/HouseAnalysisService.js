@@ -152,15 +152,41 @@ class HouseAnalysisService {
 
     // Add planets to their respective houses
     // Handle both chart.planets and chart.planetaryPositions formats
-    const planets = chart.planets || chart.planetaryPositions || [];
+    let planets = [];
+
+    if (chart.planets && Array.isArray(chart.planets)) {
+      planets = chart.planets;
+    } else if (chart.planetaryPositions) {
+      if (Array.isArray(chart.planetaryPositions)) {
+        planets = chart.planetaryPositions;
+      } else if (typeof chart.planetaryPositions === 'object') {
+        // Convert object format to array
+        planets = Object.entries(chart.planetaryPositions).map(([name, data]) => ({
+          name: name,
+          planet: name,
+          ...data
+        }));
+      }
+    }
+
     planets.forEach(planet => {
+      if (!planet || typeof planet !== 'object') {
+        return; // Skip invalid planets
+      }
+
       const planetName = planet.name || planet.planet;
-      const houseNumber = getHouseFromLongitude(planet.longitude, ascendantLongitude);
-      if (houseData[houseNumber]) {
+      const planetLongitude = planet.longitude;
+
+      if (!planetName || planetLongitude === undefined || planetLongitude === null) {
+        return; // Skip if essential data is missing
+      }
+
+      const houseNumber = getHouseFromLongitude(planetLongitude, ascendantLongitude);
+      if (houseData[houseNumber] && houseNumber >= 1 && houseNumber <= 12) {
         houseData[houseNumber].occupyingPlanets.push({
           name: planetName,
-          longitude: planet.longitude,
-          sign: this.getSignFromLongitude(planet.longitude)
+          longitude: planetLongitude,
+          sign: this.getSignFromLongitude(planetLongitude)
         });
       }
     });

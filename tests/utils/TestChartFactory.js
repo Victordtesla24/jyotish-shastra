@@ -83,6 +83,9 @@ class TestChartFactory {
     // Calculate absolute longitude from sign and degree
     const absoluteLongitude = signLongitudes[sign] + degree;
 
+    // Calculate house number based on ascendant
+    const houseNumber = this.calculateHouseNumber(absoluteLongitude, chart.ascendant);
+
     // If chart has planetaryPositions as an array, update existing or add new
     if (Array.isArray(chart.planetaryPositions)) {
       // Find and update existing planet, or add new one
@@ -92,7 +95,8 @@ class TestChartFactory {
         name: planetName,
         sign: sign,
         longitude: absoluteLongitude,
-        degree: degree
+        degree: degree,
+        house: houseNumber
       };
 
       if (existingIndex !== -1) {
@@ -107,6 +111,7 @@ class TestChartFactory {
         sign: sign,
         longitude: absoluteLongitude,
         degree: degree,
+        house: houseNumber
       };
     }
     return chart;
@@ -146,8 +151,44 @@ class TestChartFactory {
       planetaryPositions: []
     };
 
-    // Add the lagna lord with the specified placement
-    this.addPlanet(chart, lagnaLord, lordSign, lordHouse);
+        // Calculate the longitude for the specified house
+    // Place the planet at the beginning of the specified house
+    const ascendantLongitude = chart.ascendant.longitude;
+    const targetLongitude = ascendantLongitude + ((lordHouse - 1) * 30);
+
+    // Normalize to 0-360 range
+    let normalizedLongitude = targetLongitude;
+    while (normalizedLongitude < 0) normalizedLongitude += 360;
+    while (normalizedLongitude >= 360) normalizedLongitude -= 360;
+
+    // Determine the sign and degree from the calculated longitude
+    const signs = ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo',
+                   'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'];
+    const signIndex = Math.floor(normalizedLongitude / 30);
+    const calculatedSign = signs[signIndex];
+    const calculatedDegree = normalizedLongitude % 30;
+
+    // Use the provided sign if specified, otherwise use calculated sign
+    const finalSign = lordSign || calculatedSign;
+
+    // If we're forcing a specific sign, adjust the degree to maintain the house placement
+    let finalDegree = calculatedDegree;
+    if (lordSign && lordSign !== calculatedSign) {
+      // If forcing a different sign, place the planet at the beginning of that sign
+      // and adjust ascendant to make it fall in the correct house
+      const signLongitudes = {
+        'Aries': 0, 'Taurus': 30, 'Gemini': 60, 'Cancer': 90, 'Leo': 120, 'Virgo': 150,
+        'Libra': 180, 'Scorpio': 210, 'Sagittarius': 240, 'Capricorn': 270, 'Aquarius': 300, 'Pisces': 330
+      };
+
+      const signLongitude = signLongitudes[lordSign];
+      const requiredAscendantLongitude = signLongitude - ((lordHouse - 1) * 30);
+      chart.ascendant.longitude = requiredAscendantLongitude >= 0 ? requiredAscendantLongitude : requiredAscendantLongitude + 360;
+      finalDegree = 0; // Place at beginning of sign
+    }
+
+    // Add the lagna lord with the calculated values
+    this.addPlanet(chart, lagnaLord, finalSign, finalDegree);
     return chart;
   }
 
@@ -173,6 +214,26 @@ class TestChartFactory {
       Pisces: 'Jupiter',
     };
     return rulers[sign];
+  }
+
+  /**
+   * Calculate house number for a planet based on its longitude and ascendant.
+   * @param {number} planetLongitude - The longitude of the planet
+   * @param {Object} ascendant - The ascendant object with longitude property
+   * @returns {number} The house number (1-12)
+   */
+  static calculateHouseNumber(planetLongitude, ascendant) {
+    const ascendantLongitude = ascendant.longitude || 0;
+
+    // Calculate the difference and normalize to 0-360 range
+    let diff = planetLongitude - ascendantLongitude;
+    if (diff < 0) diff += 360;
+    if (diff >= 360) diff -= 360;
+
+    // Each house is 30 degrees, starting from house 1
+    const houseNumber = Math.floor(diff / 30) + 1;
+
+    return houseNumber;
   }
 
   static createChartWithPlanets(planetOverrides = [], chartProps = {}) {

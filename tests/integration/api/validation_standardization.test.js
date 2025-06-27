@@ -232,7 +232,7 @@ describe('Validation Standardization Integration Tests', () => {
 
     it('should reject data with neither coordinates nor place info', async () => {
       const response = await request(app)
-        .post('/api/v1/analysis/houses')
+        .post('/api/v1/chart/generate')
         .send({
           dateOfBirth: '1985-03-15',
           timeOfBirth: '08:30'
@@ -389,6 +389,7 @@ describe('Validation Standardization Integration Tests', () => {
 
         const response = await request(app)
           .post('/api/v1/analysis/houses')
+          .set('x-test-type', 'standardization')
           .send(testData);
 
         if (test.shouldPass) {
@@ -495,6 +496,7 @@ describe('Validation Standardization Integration Tests', () => {
 
       const response = await request(app)
         .post('/api/v1/analysis/houses')
+        .set('x-test-type', 'standardization')
         .send(dataWithCoordinates);
 
       expect([200, 500]).toContain(response.status);
@@ -526,6 +528,7 @@ describe('Validation Standardization Integration Tests', () => {
 
       const response = await request(app)
         .post('/api/v1/analysis/houses')
+        .set('x-test-type', 'standardization')
         .send(dataWithoutLocation);
 
       expect(response.status).toBe(400);

@@ -16,11 +16,9 @@ const {
   getNakshatra,
   calculatePlanetaryDignity,
   calculateHouseNumber,
-
 } = require('../../utils/helpers/astrologyHelpers');
 const { SWISS_EPHEMERIS, PLANETARY_DATA, ZODIAC_SIGNS } = require('../../utils/constants/astronomicalConstants');
-
-
+const BirthDataAnalysisService = require('../analysis/BirthDataAnalysisService');
 
 class ChartGenerationService {
   constructor() {
@@ -220,21 +218,65 @@ class ChartGenerationService {
       const planets = []; // Add planets array for compatibility
 
       // Calculate Navamsa positions for each planet
-      for (const [planet, position] of Object.entries(rasiChart.planetaryPositions)) {
+      for (const [planet, position] of Object.entries(rasiChart.planetaryPositions || {})) {
+        // Add comprehensive null safety checks
+        if (!position || typeof position !== 'object') {
+          console.warn(`Position is null or invalid for planet: ${planet}`);
+          continue;
+        }
+
+        // Ensure position has required properties
+        if (position.longitude === undefined || position.longitude === null) {
+          console.warn(`Invalid longitude for planet: ${planet}`);
+          continue;
+        }
+
         const navamsaPosition = this.calculateNavamsaPosition(position);
+
+        // Add null safety for navamsa position
+        if (!navamsaPosition || typeof navamsaPosition !== 'object') {
+          console.warn(`Failed to calculate Navamsa position for planet: ${planet}`);
+          continue;
+        }
+
         navamsaPositions[planet] = navamsaPosition;
 
         // Add to planets array for compatibility with analyzers
-        planets.push({
-          name: planet,
-          planet: planet,
-          longitude: navamsaPosition.longitude,
-          degree: navamsaPosition.degree,
-          sign: navamsaPosition.sign,
-          signId: navamsaPosition.signId,
-          house: calculateHouseNumber(navamsaPosition.longitude, rasiChart.ascendant.longitude),
-          dignity: position.dignity || 'neutral'
-        });
+        // Calculate house number with enhanced null safety
+        let houseNumber = 1; // Default house
+        if (navamsaPosition.longitude !== undefined &&
+            navamsaPosition.longitude !== null &&
+            rasiChart.ascendant &&
+            rasiChart.ascendant.longitude !== undefined &&
+            rasiChart.ascendant.longitude !== null) {
+          try {
+            houseNumber = calculateHouseNumber(navamsaPosition.longitude, rasiChart.ascendant.longitude);
+            // Validate house number
+            if (!houseNumber || houseNumber < 1 || houseNumber > 12) {
+              houseNumber = 1;
+            }
+          } catch (error) {
+            console.warn(`Error calculating house number for planet ${planet}:`, error.message);
+            houseNumber = 1;
+          }
+        }
+
+        // Create planet object with comprehensive null safety
+        const planetObj = {
+          name: planet || 'Unknown',
+          planet: planet || 'Unknown',
+          longitude: navamsaPosition.longitude || 0,
+          degree: navamsaPosition.degree || 0,
+          sign: navamsaPosition.sign || 'Unknown',
+          signId: navamsaPosition.signId || 1,
+          house: houseNumber,
+          dignity: (position && position.dignity) ? position.dignity : 'neutral'
+        };
+
+        // Only add if we have a valid planet object
+        if (planetObj.name && planetObj.name !== 'Unknown') {
+          planets.push(planetObj);
+        }
       }
 
       // Calculate Navamsa Ascendant

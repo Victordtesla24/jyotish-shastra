@@ -791,7 +791,8 @@ function validateWithNameRequired(data, helpText = 'Analysis requires name, birt
           });
         });
       } else {
-        const fieldName = isWrapped ? `birthData.${detail.path.join('.')}` : detail.path.join('.');
+        // Use consistent field names regardless of wrapper for better UX
+        const fieldName = detail.path.join('.');
         errors.push({
           field: fieldName,
           message: detail.message,
@@ -962,15 +963,16 @@ function validateNavamsaAnalysis(data, isStandardization = false) {
  * @returns {Object} Validation result
  */
 function validateDashaAnalysis(data, isStandardization = false) {
+  const birthData = data.birthData || data;
+  const isWrapped = !!data.birthData; // Track if data came in wrapped format
+
   if (!isStandardization) {
     // For backwards compatibility - require name when not in standardization mode
-    const birthData = data.birthData || data;
-    const isWrapped = !!data.birthData; // Track if data came in wrapped format
     return validateWithNameRequired(birthData, 'Dasha analysis requires complete birth data including name, birth date, time, and location information.', isWrapped);
   }
 
   // Use analysisRequiredSchema which has name as optional by default
-  const { error, value } = analysisRequiredSchema.validate(data, {
+  const { error, value } = analysisRequiredSchema.validate(birthData, {
     abortEarly: false,
     allowUnknown: true,
     stripUnknown: false
@@ -998,7 +1000,7 @@ function validateDashaAnalysis(data, isStandardization = false) {
   return {
     isValid: true,
     errors: [],
-    data: value
+    data: data.birthData ? { birthData: value } : value
   };
 }
 
