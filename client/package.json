@@ -35,7 +35,7 @@
     "tailwindcss": "^3.4.17"
   },
   "scripts": {
-    "start": "node --no-deprecation ./node_modules/react-scripts/scripts/start.js",
+    "start": "PORT=3002 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",

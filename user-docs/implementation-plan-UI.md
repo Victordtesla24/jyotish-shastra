@@ -36,8 +36,10 @@ client/src/
 │   └── forms/             # Form components
 ├── pages/                 # Page components
 │   ├── HomePage.js/css    # Landing page
+│   ├── NakshatraPage.js/css   # Rashi & Nakshatra display and information
 │   ├── ChartPage.js/css   # Chart generation
 │   ├── AnalysisPage.js/css # Analysis display
+│   ├── ComprehensiveAnalysisPage.js/css   # Comprehensive analysis generation
 │   └── ReportPage.js/css  # Report generation
 ├── hooks/                 # Custom hooks
 ├── services/              # API services
@@ -111,24 +113,24 @@ Before implementing changes, analyze the current codebase to understand:
 ## **Phase 2: Visual Enhancement (Priority: HIGH)**
 
 ### **2.1 Hero Section Transformation**
-- Design captivating hero with celestial background (stars, constellations)
-- Implement parallax scrolling effects for depth
-- Add animated Sanskrit mantras or cosmic elements
-- Create compelling CTAs: *"Discover Your Cosmic Blueprint"* or *"Unlock Ancient Wisdom"*
+- Design **captivating, AI Generated Ultra HD High Quality hero with celestial background (stars, constellations, planets etc., in Vedic Astrology)**
+- Implement **parallax scrolling effects for depth** on every page of the website
+- Add **animated Sanskrit mantras or cosmic elements**
+- Create compelling CTAs in Sanskrit & English: *"Discover Your Cosmic Blueprint"* or *"Unlock Ancient Wisdom"*
 - Include trust indicators (testimonials count, years of tradition)
 
 ### **2.2 Interactive Chart Visualization**
-- Enhance Recharts implementation with custom Vedic chart styles
+- Enhance Recharts implementation with *AI Generated Ultra HD High Quality* **custom Vedic chart styles**
 - Add hover effects, tooltips, and click interactions for chart elements
-- Implement smooth animations for chart transitions
+- Implement **smooth animations** for chart transitions
 - Create mobile-optimized chart interactions (touch-friendly)
 - Add chart comparison features with side-by-side layouts
 
 ### **2.3 Cultural Symbol Integration**
-- Implement SVG icons for Om, Lotus, Mandala, and planetary symbols
-- Create subtle background patterns using traditional motifs
-- Add animated loading states with rotating mandalas or celestial movements
-- Ensure all symbols are culturally accurate and respectfully implemented
+- Implement *AI Generated Ultra HD High Quality*  **SVG icons for Om, Lotus, Mandala, Rashi's and planetary symbols**
+- Create **subtle background patterns, page watermarks** using *AI Generated Ultra HD High Quality* **traditional motifs**
+- Add **animated loading states** with **rotating mandalas, planets, stars, constellations and celestial movements**
+- Ensure all *AI Generated Ultra HD High Quality*  symbols are culturally accurate and respectfully implemented
 
 ## **Phase 3: User Experience Enhancement (Priority: MEDIUM)**
 
@@ -139,17 +141,18 @@ Before implementing changes, analyze the current codebase to understand:
 - Implement search functionality with auto-suggestions
 
 ### **3.2 Interactive Features**
-- **Birth Chart Calculator:** Enhanced UI with step-by-step wizard
-- **Zodiac Sign Finder:** Interactive zodiac wheel with hover effects
-- **Daily Horoscope Widget:** Personalized dashboard component
-- **Compatibility Checker:** Interactive tool for relationship analysis
-- **Dasha Calculator:** Visual timeline representation
+- **Birth Chart Calculator:** *Enhanced UI with step-by-step wizard*
+- **Zodiac Sign Finder:** *Interactive zodiac wheel with hover effects*
+- **Daily Horoscope Widget:** *Personalized dashboard component*
+- **Compatibility Checker:** *Interactive tool for relationship analysis*
+- **Dasha Calculator:** *Visual timeline representation*
+- **Rashi Analyser:** *Visual Rashi representation with detailed Rashi information in Vedic Astrology*
 
 ### **3.3 Content Presentation**
 - Implement card-based layouts for services, articles, and testimonials
-- Create expandable/collapsible sections for detailed analysis
+- Create *expandable/collapsible sections for detailed analysis*
 - Add reading progress indicators for long-form content
-- Implement content filtering and sorting capabilities
+- Implement *content filtering and sorting capabilities*
 
 ## **Phase 4: Advanced Features (Priority: MEDIUM)**
 
@@ -163,25 +166,24 @@ Before implementing changes, analyze the current codebase to understand:
 - Implement system-preference-aware dark mode
 - Create smooth theme transitions
 - Maintain cultural authenticity in dark theme
-- Ensure accessibility compliance in both themes
 
 ### **4.3 Animation and Micro-interactions**
 - Add subtle hover effects and button interactions
 - Implement page transition animations
-- Create loading animations with celestial themes
+- Create **loading animations** with *above mentioned celestial themes*
 - Add scroll-triggered animations for content revelation
 
 ## **Phase 5: Performance and Accessibility (Priority: HIGH)**
 
 ### **5.1 Performance Optimization**
 - Implement code splitting and lazy loading
-- Optimize images with WebP format and responsive sizing
+- Optimize images with WebP format and responsive sizing ensuring all images are *AI Generated Ultra HD High Quality* and align with Vedic Astrology
 - Add skeleton loading states for better perceived performance
 - Implement efficient caching strategies
 
 ### **5.2 Accessibility Enhancement**
 - Ensure **WCAG 2.1 AA compliance**
-- Add proper ARIA labels and semantic HTML
+- Add advanced *ARIA labels and semantic HTML*
 - Implement keyboard navigation support
 - Create screen reader-friendly chart descriptions
 - Add focus management for interactive elements
@@ -199,11 +201,10 @@ Before implementing changes, analyze the current codebase to understand:
 - Responsive Design System: Complete design tokens and component documentation
 - Interactive Chart Components: Enhanced visualization with smooth animations
 - Mobile-Optimized Interface: Touch-friendly, fast-loading mobile experience
-- Cultural Integration: Authentic Vedic symbols and typography implementation
+- Cultural Integration: Authentic *AI Generated Ultra HD High Quality* **Vedic symbols, animations, images and typography implementation**
 
 ### **Advanced Deliverables:**
 - PWA Implementation: Offline-capable, installable web application
-- Dark Mode Support: Complete theme switching with cultural authenticity
 - Performance Optimization: Fast-loading, efficiently bundled application
 - Accessibility Compliance: WCAG 2.1 AA compliant interface
 - Interactive Tools: Enhanced calculators and user engagement features
@@ -234,7 +235,7 @@ Before implementing changes, analyze the current codebase to understand:
 ## **Success Criteria**
 
 ### **User Experience Metrics:**
-- **Visual Appeal:** Modern, professional interface that creates immediate "wow factor"
+- **Visual Appeal:** Extremly appealing, Modern, professional *Ultra HD High Quality* interface that creates immediate ***"wow factor"***
 - **Usability:** Intuitive navigation with <3 clicks to any major feature
 - **Performance:** Page load times <2 seconds on 3G networks
 - **Engagement:** Increased time on site and interaction with tools
@@ -245,7 +246,7 @@ Before implementing changes, analyze the current codebase to understand:
 - **Bundle Size:** Optimized JavaScript bundle <500KB gzipped
 - **Mobile Performance:** Mobile-first design with touch-optimized interactions
 - **Cross-browser Compatibility:** Consistent experience across modern browsers
-- **Code Quality:** Clean, maintainable code following React best practices
+- **Code Quality:** Minimal, clean, maintainable code following React best practices
 
 ### **Cultural Authenticity:**
 - **Respectful Representation:** Accurate use of Vedic symbols and terminology
@@ -256,7 +257,7 @@ Before implementing changes, analyze the current codebase to understand:
 ## **Additional Notes**
 
 ### **Development Approach:**
-- **Iterative Enhancement:** Implement changes incrementally to maintain stability
+- **Iterative Enhancement:** ***Implement minimal changes incrementally to maintain stability***
 - **Component-First:** Build reusable components before page-level implementations
 - **Mobile-First:** Design and develop for mobile devices first, then scale up
 - **Performance-Conscious:** Monitor bundle size and performance metrics throughout development
@@ -264,23 +265,22 @@ Before implementing changes, analyze the current codebase to understand:
 
 ### **Cultural Sensitivity Guidelines:**
 - Research proper Sanskrit transliteration and pronunciation guides
+- Research well reviewed websites, github repositories for *AI Generated Ultra HD High Quality* **Vedic Astrology images, animations, SVG's etc.**
 - Consult authentic Vedic sources for symbol meanings and usage
 - Avoid stereotypical or commercialized representations of Indian culture
 - Maintain reverent and educational tone in all content
-- Provide context and explanations for traditional concepts
+- **Provide content with context and explanations for traditional concepts, Rashi's, nakshatra's, planets's and other key Vedic Astrology Concepts**
 
 ### **Modern Web Standards:**
-- Use semantic HTML5 elements for better SEO and accessibility
+- Use semantic **HTML5 elements** for better SEO and accessibility
 - Implement proper meta tags and structured data for search engines
 - Follow React best practices including proper key props and error boundaries
 - Use modern JavaScript features (ES6+) while maintaining browser compatibility
 - Implement proper error handling and user feedback mechanisms
 
 ### **Testing Strategy:**
-- Test on real devices for mobile experience validation
-- Validate accessibility with screen readers and keyboard navigation
-- Performance testing on various network conditions
-- Cross-browser testing on major browsers and versions
-- User testing with target audience for cultural authenticity feedback
+- Test every single UI Feature and verify its implementation, working status, integration with the Back End, API Endpoints etc.
+- Validate UI feature functionality, visibility and integration using **browser console** and other techniques
+- User testing with target audience, functionality and requirements validation, UI Features working status & Back End integration as well as for cultural authenticity feedback
 
 *Remember: You are creating a digital bridge between ancient Vedic wisdom and modern technology. Every design decision should honor the sacred nature of Jyotish Shastra while providing an exceptional, accessible, and engaging user experience. Focus on creating something that feels both timeless and cutting-edge, respectful yet innovative.*

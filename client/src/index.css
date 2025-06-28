@@ -28,6 +28,34 @@
     --wisdom-gray: #6B7280;
     --earth-brown: #92400E;
 
+    /* Light Mode Colors */
+    --vedic-bg-primary: #FFFEF7;
+    --vedic-bg-secondary: #FFFFFF;
+    --vedic-bg-tertiary: #F9FAFB;
+    --vedic-surface: #FFFFFF;
+    --vedic-surface-elevated: #F9FAFB;
+    --vedic-border: #E2E8F0;
+    --vedic-text-primary: #1F2937;
+    --vedic-text-secondary: #4B5563;
+    --vedic-text-muted: #6B7280;
+    --vedic-accent: #FF9933;
+    --vedic-cosmic: #6B46C1;
+
+    /* Dark Mode Colors */
+    --dark-bg-primary: #0F0F23;
+    --dark-bg-secondary: #1A1A2E;
+    --dark-bg-tertiary: #16213E;
+    --dark-surface: #2D2D44;
+    --dark-surface-elevated: #3B3B58;
+    --dark-border: #4A4A6A;
+    --dark-text-primary: #E5E5F4;
+    --dark-text-secondary: #B8B8CC;
+    --dark-text-muted: #8B8BA0;
+    --dark-accent: #FBBF24;
+    --dark-cosmic: #6366F1;
+    --dark-vedic-gold: #FBBF24;
+    --dark-vedic-saffron: #F59E0B;
+
     /* Animation Durations */
     --animation-fast: 150ms;
     --animation-normal: 300ms;
@@ -43,6 +71,33 @@
     --font-size-vedic-base: 1rem;
     --font-size-vedic-lg: 1.125rem;
     --line-height-vedic: 1.618; /* Golden ratio line height */
+
+    /* Shadow System */
+    --shadow-vedic-soft: 0 2px 8px rgba(139, 69, 19, 0.1);
+    --shadow-vedic-medium: 0 4px 12px rgba(139, 69, 19, 0.15);
+    --shadow-vedic-strong: 0 8px 24px rgba(139, 69, 19, 0.2);
+    --shadow-cosmic: 0 8px 32px rgba(76, 29, 149, 0.15);
+    --shadow-celestial: 0 0 40px rgba(107, 70, 193, 0.3);
+    --shadow-golden: 0 8px 32px rgba(255, 215, 0, 0.2);
+
+    /* Dark Mode Shadows */
+    --dark-shadow-vedic-soft: 0 2px 8px rgba(0, 0, 0, 0.3);
+    --dark-shadow-vedic-medium: 0 4px 12px rgba(0, 0, 0, 0.4);
+    --dark-shadow-vedic-strong: 0 8px 24px rgba(0, 0, 0, 0.5);
+    --dark-shadow-cosmic: 0 8px 32px rgba(0, 0, 0, 0.6);
+    --dark-shadow-celestial: 0 0 40px rgba(124, 58, 237, 0.4);
+    --dark-shadow-golden: 0 8px 32px rgba(251, 191, 36, 0.3);
+
+    /* Performance Optimizations */
+    --transform-gpu: translateZ(0);
+    --will-change-transform: transform;
+    --will-change-auto: auto;
+
+    /* Enhanced Color Contrasts for Accessibility */
+    --contrast-aa-normal: 4.5;
+    --contrast-aa-large: 3;
+    --contrast-aaa-normal: 7;
+    --contrast-aaa-large: 4.5;
   }
 
   html {
@@ -50,24 +105,44 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    /* Enhanced performance */
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transform: var(--transform-gpu);
+    transform: var(--transform-gpu);
   }
 
   body {
     @apply font-sans antialiased;
-    background-color: var(--sacred-white);
-    transition: background-color var(--animation-normal) ease;
+    background-color: var(--vedic-bg-primary);
+    color: var(--vedic-text-primary);
+    transition: background-color var(--animation-normal) ease, color var(--animation-normal) ease;
+    /* Enhanced text rendering */
+    text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+    /* Better font rendering on high-DPI displays */
+    -webkit-font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
   }
 
   /* Dark mode body */
   .dark body {
-    background-color: #0F0F23;
+    background-color: var(--dark-bg-primary);
+    color: var(--dark-text-primary);
   }
 
   /* Enhanced focus styles for accessibility */
   *:focus-visible {
-    outline: 2px solid var(--vedic-saffron);
+    outline: 2px solid var(--vedic-accent);
     outline-offset: 2px;
     border-radius: var(--border-radius-vedic);
+    /* Ensure focus is visible in high contrast mode */
+    box-shadow: 0 0 0 4px rgba(255, 153, 51, 0.2);
+  }
+
+  .dark *:focus-visible {
+    outline-color: var(--dark-vedic-saffron);
+    box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.3);
   }
 
   /* Remove default margins for better control */
@@ -82,11 +157,27 @@
   }
 
   ::-webkit-scrollbar-track {
-    @apply bg-gray-100 dark:bg-dark-surface;
+    background-color: var(--vedic-bg-tertiary);
+    border-radius: 4px;
+  }
+
+  .dark ::-webkit-scrollbar-track {
+    background-color: var(--dark-bg-tertiary);
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-saffron/50 hover:bg-saffron/70 rounded-full;
+    background-color: var(--vedic-border);
+    border-radius: 4px;
+    opacity: 0.5;
+    transition: opacity var(--animation-normal) ease;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    opacity: 0.8;
+  }
+
+  .dark ::-webkit-scrollbar-thumb {
+    background-color: var(--dark-border);
   }
 
   /* High contrast mode support */
@@ -98,6 +189,26 @@
     .border-gray-200 {
       @apply border-black dark:border-white;
     }
+
+    /* Enhanced contrast for buttons */
+    .btn-vedic-primary {
+      border: 2px solid transparent;
+    }
+
+    .dark .btn-vedic-primary {
+      border-color: var(--dark-text-primary);
+    }
+  }
+
+  /* Enhanced selection styling */
+  ::selection {
+    background-color: var(--vedic-accent);
+    color: var(--sacred-white);
+  }
+
+  .dark ::selection {
+    background-color: var(--dark-vedic-saffron);
+    color: var(--dark-bg-primary);
   }
 
   /* Reduced motion support */
@@ -110,327 +221,436 @@
       transition-duration: 0.01ms !important;
       scroll-behavior: auto !important;
     }
+
+    .parallax-element {
+      transform: none !important;
+    }
+  }
+
+  /* Print styles */
+  @media print {
+    body {
+      background: white !important;
+      color: black !important;
+    }
+
+    .no-print {
+      display: none !important;
+    }
+
+    .print-break-before {
+      page-break-before: always;
+    }
+
+    .print-break-after {
+      page-break-after: always;
+    }
   }
 }
 
-/* Component Layer - Enhanced Reusable Patterns */
+/* Components Layer - Enhanced Button and UI Components */
 @layer components {
   /* Enhanced Button Styles */
   .btn-vedic-primary {
-    @apply bg-gradient-vedic text-white px-4 py-2 sm:px-6 sm:py-3 rounded-vedic font-medium;
-    @apply shadow-vedic-medium hover:shadow-vedic-strong;
-    @apply transform transition-all duration-300 hover:scale-105;
-    @apply focus:outline-none focus:ring-2 focus:ring-saffron focus:ring-opacity-50;
-    @apply active:scale-95;
-    @apply text-sm sm:text-base;
-    @apply min-h-[44px] touch-manipulation;
+    @apply inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white;
+    background: linear-gradient(135deg, var(--vedic-saffron), var(--vedic-gold));
+    box-shadow: var(--shadow-vedic-medium);
+    transition: all var(--animation-normal) ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-vedic-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-vedic-strong);
+  }
+
+  .dark .btn-vedic-primary {
+    background: linear-gradient(135deg, var(--dark-vedic-saffron), var(--dark-vedic-gold));
+    box-shadow: var(--dark-shadow-vedic-medium);
+  }
+
+  .dark .btn-vedic-primary:hover {
+    box-shadow: var(--dark-shadow-vedic-strong);
   }
 
   .btn-vedic-secondary {
-    @apply bg-transparent border-2 border-white text-white px-4 py-2 sm:px-6 sm:py-3 rounded-vedic font-medium;
-    @apply hover:bg-white hover:text-navy backdrop-blur-sm;
-    @apply transition-all duration-300;
-    @apply focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50;
-    @apply text-sm sm:text-base;
-    @apply min-h-[44px] touch-manipulation;
+    @apply inline-flex items-center justify-center px-6 py-3 border-2 border-vedic-saffron text-base font-medium rounded-lg text-vedic-saffron bg-transparent;
+    transition: all var(--animation-normal) ease;
   }
 
   .btn-cosmic {
-    @apply bg-gradient-cosmic text-white px-4 py-2 sm:px-6 sm:py-3 rounded-vedic font-medium;
-    @apply shadow-cosmic hover:shadow-celestial;
-    @apply transform transition-all duration-300 hover:scale-105;
-    @apply relative overflow-hidden;
-    @apply text-sm sm:text-base;
-    @apply min-h-[44px] touch-manipulation;
+    @apply inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white;
+    background: linear-gradient(135deg, var(--cosmic-purple), var(--stellar-blue));
+    box-shadow: var(--shadow-cosmic);
+    transition: all var(--animation-normal) ease;
+    position: relative;
+    overflow: hidden;
   }
 
+  .btn-cosmic:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-celestial);
+  }
+
+  .dark .btn-cosmic {
+    background: linear-gradient(135deg, var(--dark-cosmic), var(--stellar-blue));
+    box-shadow: var(--dark-shadow-cosmic);
+  }
+
+  .dark .btn-cosmic:hover {
+    box-shadow: var(--dark-shadow-celestial);
+  }
+
+  /* Cosmic button shimmer effect */
   .btn-cosmic::before {
     content: '';
-    @apply absolute inset-0 bg-gradient-to-r from-white/20 to-transparent;
-    @apply opacity-0 transition-opacity duration-300;
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.2),
+      transparent
+    );
+    transition: left var(--animation-slow) ease;
   }
 
   .btn-cosmic:hover::before {
-    @apply opacity-100;
+    left: 100%;
   }
 
-  /* Responsive Button Utilities */
-  .btn-responsive {
-    @apply w-full sm:w-auto;
-    @apply text-sm sm:text-base;
-    @apply px-4 py-3 sm:px-6 sm:py-3;
-    @apply min-h-[48px] sm:min-h-[44px];
-  }
-
-  .btn-mobile-optimized {
-    @apply w-full sm:w-auto;
-    @apply px-6 py-4 sm:px-6 sm:py-3;
-    @apply text-base sm:text-base;
-    @apply min-h-[52px] sm:min-h-[44px];
-    @apply touch-manipulation;
-  }
-
-  /* Enhanced Card Components */
+  /* Enhanced Card Styles */
   .card-vedic {
-    @apply bg-white rounded-2xl shadow-vedic-soft p-4 sm:p-6;
-    @apply border border-gray-100 hover:shadow-vedic-medium;
-    @apply transition-all duration-300 transform hover:-translate-y-1;
-    @apply backdrop-blur-sm;
+    @apply bg-white rounded-xl border border-gray-200 p-6;
+    box-shadow: var(--shadow-vedic-soft);
+    transition: all var(--animation-normal) ease;
+  }
+
+  .card-vedic:hover {
+    box-shadow: var(--shadow-vedic-medium);
+    transform: translateY(-2px);
   }
 
   .dark .card-vedic {
-    @apply bg-dark-surface border-dark-border shadow-cosmic;
-    @apply hover:shadow-celestial;
+    @apply bg-dark-surface border-dark-border;
+    box-shadow: var(--dark-shadow-vedic-soft);
   }
 
+  .dark .card-vedic:hover {
+    box-shadow: var(--dark-shadow-vedic-medium);
+  }
+
+  /* Glassmorphism card */
   .card-glassmorphic {
-    @apply bg-white/10 backdrop-blur-xl border border-white/20;
-    @apply rounded-2xl p-4 sm:p-6 shadow-cosmic;
-    @apply hover:bg-white/20 transition-all duration-300;
+    @apply backdrop-blur-md bg-white/10 border border-white/20 rounded-xl p-6;
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
   }
 
+  .dark .card-glassmorphic {
+    @apply bg-black/20 border-white/10;
+  }
+
+  /* Sacred card with gradient border */
   .card-sacred {
-    @apply bg-sacred-white border-2 border-gold/20 shadow-golden;
-    @apply rounded-2xl p-4 sm:p-6 hover:border-gold/40;
-    @apply transition-all duration-300 transform hover:scale-105;
+    @apply bg-white rounded-xl p-6 relative;
+    background: linear-gradient(white, white) padding-box,
+                linear-gradient(135deg, var(--vedic-saffron), var(--vedic-gold)) border-box;
+    border: 2px solid transparent;
   }
 
-  /* Navigation Enhancements */
+  .dark .card-sacred {
+    background: linear-gradient(var(--dark-surface), var(--dark-surface)) padding-box,
+                linear-gradient(135deg, var(--dark-vedic-saffron), var(--dark-vedic-gold)) border-box;
+  }
+
+  /* Enhanced Navigation Styles */
   .nav-link-vedic {
-    @apply font-medium py-2 px-4 rounded-lg border-b-2 transition-all duration-200;
-    @apply hover:opacity-80 hover:bg-white/10;
-    @apply focus:outline-none focus:ring-2 focus:ring-gold/50;
-    @apply text-sm sm:text-base;
-    @apply min-h-[44px] touch-manipulation;
+    @apply px-4 py-2 rounded-md text-sm font-medium transition-all duration-200;
   }
 
   .nav-link-active {
-    @apply border-vedic-gold text-vedic-gold bg-gold/10;
+    @apply bg-vedic-saffron text-white shadow-md;
   }
 
   .nav-link-inactive {
-    @apply border-transparent;
+    @apply text-gray-600 hover:text-vedic-saffron hover:bg-gray-50;
   }
 
-  /* Form Elements Enhancement */
+  .dark .nav-link-inactive {
+    @apply text-gray-300 hover:text-dark-vedic-saffron hover:bg-dark-surface;
+  }
+
+  /* Enhanced Input Styles */
   .input-vedic {
-    @apply w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-vedic;
-    @apply focus:outline-none focus:ring-2 focus:ring-saffron focus:border-saffron;
-    @apply transition-all duration-200 bg-white text-gray-900;
-    @apply placeholder:text-gray-400;
-    @apply text-sm sm:text-base;
-    @apply min-h-[44px] touch-manipulation;
+    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vedic-saffron focus:border-vedic-saffron;
+    transition: all var(--animation-normal) ease;
   }
 
   .input-vedic:focus {
-    @apply shadow-vedic-soft transform scale-[1.02];
+    box-shadow: 0 0 0 3px rgba(255, 153, 51, 0.1);
   }
 
   .dark .input-vedic {
-    @apply bg-dark-surface border-dark-border text-white;
-    @apply placeholder:text-gray-400 focus:border-cosmic-purple;
+    @apply bg-dark-surface border-dark-border text-dark-text-primary;
+    @apply focus:ring-dark-vedic-saffron focus:border-dark-vedic-saffron;
   }
 
-  /* Loading Spinners */
+  /* Enhanced Loading Spinners */
   .spinner-vedic {
-    @apply animate-spin h-6 w-6 sm:h-8 sm:w-8 border-4 border-vedic-saffron border-t-transparent rounded-full;
+    @apply animate-spin rounded-full border-4 border-vedic-saffron border-t-transparent;
   }
 
   .spinner-cosmic {
-    @apply animate-spin h-6 w-6 sm:h-8 sm:w-8 border-4 border-cosmic-purple border-t-transparent rounded-full;
+    @apply animate-spin rounded-full;
+    background: conic-gradient(from 0deg, var(--cosmic-purple), var(--stellar-blue), var(--cosmic-purple));
+    mask: radial-gradient(farthest-side, transparent calc(100% - 4px), white 0);
   }
 
-  /* Alert Components */
+  /* Enhanced Alert Styles */
   .alert-success {
-    @apply bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-vedic;
+    @apply bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg;
+  }
+
+  .dark .alert-success {
+    @apply bg-green-900/20 border-green-700 text-green-300;
   }
 
   .alert-error {
-    @apply bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-vedic;
+    @apply bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg;
+  }
+
+  .dark .alert-error {
+    @apply bg-red-900/20 border-red-700 text-red-300;
   }
 
   .alert-warning {
-    @apply bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded-vedic;
+    @apply bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg;
+  }
+
+  .dark .alert-warning {
+    @apply bg-yellow-900/20 border-yellow-700 text-yellow-300;
   }
 
   .alert-info {
-    @apply bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded-vedic;
+    @apply bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-lg;
   }
 
-  /* Chart Components */
+  .dark .alert-info {
+    @apply bg-blue-900/20 border-blue-700 text-blue-300;
+  }
+
+  /* Vedic-specific component styles */
   .planet-card {
-    @apply bg-white rounded-lg border border-gray-200 p-3 sm:p-4 shadow-vedic-soft;
-    @apply hover:shadow-vedic-medium hover:border-saffron/50;
-    @apply transform hover:scale-105 hover:-translate-y-1;
+    @apply bg-gradient-to-br from-cosmic-purple to-stellar-blue text-white rounded-xl p-4 shadow-cosmic;
   }
 
   .dark .planet-card {
-    @apply bg-dark-surface border-dark-border shadow-cosmic;
-    @apply hover:shadow-celestial hover:border-dark-accent;
+    @apply from-dark-cosmic to-stellar-blue;
   }
 
   .house-section {
-    @apply border-2 border-gray-300 rounded-lg p-2 sm:p-3 transition-all duration-200;
-    @apply hover:border-saffron hover:shadow-vedic-soft;
-    @apply focus-within:border-saffron focus-within:ring-2 focus-within:ring-saffron/20;
+    @apply border-l-4 border-vedic-gold pl-4 py-2 bg-gray-50 rounded-r-lg;
+  }
+
+  .dark .house-section {
+    @apply bg-dark-surface-elevated border-dark-vedic-saffron;
   }
 
   .yoga-highlight {
-    @apply bg-gradient-to-r from-gold to-saffron text-white px-2 py-1 sm:px-3 sm:py-1 rounded-full;
-    @apply text-xs sm:text-sm font-medium shadow-golden;
-    @apply animate-pulse-soft;
+    @apply bg-gradient-to-r from-vedic-saffron to-vedic-gold text-white px-3 py-1 rounded-full text-sm font-medium;
+  }
+
+  .dark .yoga-highlight {
+    @apply from-dark-vedic-saffron to-vedic-gold;
   }
 
   .dasha-timeline {
-    @apply relative pl-4 sm:pl-6 pb-4 sm:pb-6 border-l-2 border-cosmic-purple;
+    @apply relative pl-8;
   }
 
   .dasha-timeline::before {
     content: '';
-    @apply absolute left-[-5px] top-0 w-3 h-3 bg-cosmic-purple rounded-full;
-    @apply shadow-cosmic animate-pulse;
+    @apply absolute left-0 top-0 w-0.5 h-full bg-gradient-to-b from-vedic-saffron to-vedic-gold;
   }
 
-  /* Typography Enhancements */
+  .dark .dasha-timeline::before {
+    @apply from-dark-vedic-saffron to-vedic-gold;
+  }
+}
+
+/* Utilities Layer - Enhanced Typography and Layout */
+@layer utilities {
+  /* Enhanced Typography Gradients */
   .text-vedic-gradient {
-    @apply bg-gradient-to-r from-saffron via-gold to-maroon;
-    @apply bg-clip-text text-transparent;
+    background: linear-gradient(135deg, var(--vedic-saffron), var(--vedic-gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
   }
 
   .text-cosmic-gradient {
-    @apply bg-gradient-to-r from-cosmic-purple via-stellar-blue to-lunar-silver;
-    @apply bg-clip-text text-transparent;
+    background: linear-gradient(135deg, var(--cosmic-purple), var(--stellar-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
   }
 
-  /* Container and Layout Utilities */
+  /* Enhanced Container Utilities */
   .container-vedic {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
 
   .section-spacing {
-    @apply py-8 sm:py-12 md:py-16 lg:py-20;
+    @apply py-16 md:py-24 lg:py-32;
   }
 
-  /* Responsive Text Utilities */
+  /* Enhanced Responsive Typography */
   .text-responsive-xl {
-    @apply text-lg sm:text-xl lg:text-2xl;
+    @apply text-xl md:text-2xl lg:text-3xl;
   }
 
   .text-responsive-2xl {
-    @apply text-xl sm:text-2xl lg:text-3xl;
+    @apply text-2xl md:text-3xl lg:text-4xl;
   }
 
   .text-responsive-3xl {
-    @apply text-2xl sm:text-3xl lg:text-4xl;
+    @apply text-3xl md:text-4xl lg:text-5xl;
   }
 
   .text-responsive-4xl {
-    @apply text-3xl sm:text-4xl lg:text-5xl xl:text-6xl;
+    @apply text-4xl md:text-5xl lg:text-6xl;
   }
 
-  /* Responsive Grid Utilities */
+  /* Enhanced Grid Utilities */
   .grid-responsive {
-    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6;
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
   }
 
   .grid-responsive-2 {
-    @apply grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8;
+    @apply grid grid-cols-1 md:grid-cols-2 gap-6;
   }
 
   .flex-responsive {
-    @apply flex flex-col sm:flex-row gap-3 sm:gap-4;
+    @apply flex flex-col md:flex-row items-center gap-6;
   }
 
-  /* Mobile-First Spacing */
+  /* Enhanced Spacing Utilities */
   .space-responsive {
-    @apply space-y-4 sm:space-y-6 lg:space-y-8;
+    @apply space-y-4 md:space-y-6 lg:space-y-8;
   }
 
   .padding-responsive {
-    @apply p-4 sm:p-6 lg:p-8;
+    @apply p-4 md:p-6 lg:p-8;
   }
 
   .margin-responsive {
-    @apply m-4 sm:m-6 lg:m-8;
+    @apply m-4 md:m-6 lg:m-8;
   }
 
-  /* Accessibility Utilities */
+  /* Enhanced Accessibility Utilities */
   .sr-only {
-    @apply absolute w-px h-px p-0 -m-px overflow-hidden;
-    @apply whitespace-nowrap border-0;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
     clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 
   .focus-visible-only {
-    opacity: 0;
-    pointer-events: none;
+    @apply sr-only;
   }
 
   .focus-visible-only:focus-visible {
-    opacity: 1;
-    pointer-events: auto;
+    @apply not-sr-only;
   }
 
-  /* Skip to content link */
   .skip-to-content {
-    @apply absolute -top-full left-4 z-50;
-    @apply bg-saffron text-white px-4 py-2 rounded-vedic;
-    @apply font-medium transition-all duration-200;
-    @apply focus:top-4;
+    @apply sr-only focus-visible:not-sr-only focus-visible:absolute focus-visible:top-4 focus-visible:left-4 focus-visible:z-50 focus-visible:px-4 focus-visible:py-2 focus-visible:bg-vedic-saffron focus-visible:text-white focus-visible:rounded-md;
   }
 
-  /* Chart Display Enhancements */
+  /* Chart-specific utilities */
   .chart-container {
-    @apply relative w-full max-w-sm sm:max-w-md lg:max-w-lg mx-auto;
-    @apply aspect-square min-h-[300px] sm:min-h-[400px];
+    @apply relative w-full h-96 bg-white rounded-xl shadow-vedic-soft overflow-hidden;
   }
 
   .house-number {
-    @apply text-xs sm:text-sm font-bold text-amber-800 mb-1;
+    @apply absolute w-8 h-8 bg-vedic-saffron text-white rounded-full flex items-center justify-center text-sm font-bold;
   }
 
   .planet-symbol {
-    @apply text-sm sm:text-base text-orange-600 font-bold mx-0.5;
+    @apply text-cosmic-purple font-vedic text-lg;
   }
 
   .chart-legend {
-    @apply flex flex-wrap justify-center gap-2 sm:gap-4 text-xs text-amber-600;
+    @apply flex flex-wrap gap-2 mt-4;
   }
 
-  /* Mobile Touch Optimization */
+  /* Enhanced Touch Targets */
   .touch-optimized {
-    @apply min-h-[44px] min-w-[44px] touch-manipulation;
+    @apply min-h-[44px] min-w-[44px];
   }
 
   .touch-area {
-    @apply p-2 sm:p-3 cursor-pointer;
-    @apply transition-all duration-200;
-    @apply hover:bg-gray-100 active:bg-gray-200;
-    @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500;
+    @apply relative;
   }
-}
 
-/* Utility Layer - Enhanced Custom Utilities */
-@layer utilities {
-  /* Text Shadow Utilities */
+  .touch-area::before {
+    content: '';
+    @apply absolute inset-0;
+    min-height: 44px;
+    min-width: 44px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  /* Enhanced Text Effects */
   .text-vedic-shadow {
-    text-shadow: 0 2px 4px rgba(139, 69, 19, 0.3);
+    text-shadow: 2px 2px 4px rgba(139, 69, 19, 0.3);
+  }
+
+  .dark .text-vedic-shadow {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
   }
 
   .text-cosmic-glow {
-    text-shadow: 0 0 20px rgba(107, 70, 193, 0.5);
+    text-shadow: 0 0 10px rgba(107, 70, 193, 0.5);
+  }
+
+  .dark .text-cosmic-glow {
+    text-shadow: 0 0 10px rgba(124, 58, 237, 0.7);
   }
 
   .text-golden-glow {
-    text-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
   }
 
-  /* Backdrop Utilities */
+  .dark .text-golden-glow {
+    text-shadow: 0 0 10px rgba(251, 191, 36, 0.7);
+  }
+
+  /* Enhanced Backdrop Utilities */
   .backdrop-vedic {
-    backdrop-filter: blur(12px) saturate(1.5);
+    backdrop-filter: blur(10px) saturate(180%);
+    -webkit-backdrop-filter: blur(10px) saturate(180%);
+    background-color: rgba(255, 254, 247, 0.8);
   }
 
-  /* Animation Utilities */
+  .dark .backdrop-vedic {
+    background-color: rgba(15, 15, 35, 0.8);
+  }
+
+  /* Enhanced Animation Utilities */
   .animate-float {
     animation: float 6s ease-in-out infinite;
   }
@@ -440,24 +660,25 @@
   }
 
   .animate-sacred-pulse {
-    animation: sacred-pulse 4s ease-in-out infinite;
+    animation: sacred-pulse 3s ease-in-out infinite;
   }
 
-  /* Gradient Background Utilities */
+  /* Enhanced Background Utilities */
   .bg-vedic-radial {
-    background: radial-gradient(circle at center, var(--vedic-saffron) 0%, var(--vedic-maroon) 100%);
+    background: radial-gradient(circle at center, var(--vedic-saffron), var(--vedic-gold));
   }
 
   .bg-cosmic-radial {
-    background: radial-gradient(circle at center, var(--cosmic-purple) 0%, var(--stellar-blue) 100%);
+    background: radial-gradient(circle at center, var(--cosmic-purple), var(--stellar-blue));
   }
 
-  /* Border Gradient Utilities */
+  /* Enhanced Border Utilities */
   .border-vedic-gradient {
-    border-image: linear-gradient(135deg, var(--vedic-saffron), var(--vedic-gold), var(--vedic-maroon)) 1;
+    border: 2px solid;
+    border-image: linear-gradient(135deg, var(--vedic-saffron), var(--vedic-gold)) 1;
   }
 
-  /* Transform Utilities */
+  /* Enhanced Transform Utilities */
   .transform-preserve-3d {
     transform-style: preserve-3d;
   }
@@ -466,143 +687,47 @@
     backface-visibility: hidden;
   }
 
-  /* Missing Tailwind-like Utilities */
+  /* Enhanced Aspect Ratio Utilities */
   .aspect-square {
     aspect-ratio: 1 / 1;
   }
 
-  .min-h-screen {
-    min-height: 100vh;
+  /* Enhanced Theme Transition */
+  .theme-transition {
+    transition: background-color var(--animation-normal) ease,
+                color var(--animation-normal) ease,
+                border-color var(--animation-normal) ease,
+                box-shadow var(--animation-normal) ease;
   }
 
-  .bg-gradient-to-br {
-    background-image: linear-gradient(to bottom right, var(--tw-gradient-stops));
+  /* Enhanced Search Utilities */
+  .search-dropdown {
+    @apply absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg mt-1 max-h-64 overflow-y-auto z-50;
   }
 
-  .from-sacred-white {
-    --tw-gradient-from: var(--sacred-white);
-    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(255, 254, 247, 0));
+  .dark .search-dropdown {
+    @apply bg-dark-surface border-dark-border;
   }
 
-  .to-gray-50 {
-    --tw-gradient-to: #f9fafb;
+  .search-item {
+    @apply px-4 py-2 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0;
   }
 
-  .bg-gradient-vedic {
-    background: linear-gradient(135deg, var(--vedic-saffron), var(--vedic-gold));
+  .search-item:hover {
+    @apply bg-gray-50;
   }
 
-  .bg-gradient-cosmic {
-    background: linear-gradient(135deg, var(--cosmic-purple), var(--stellar-blue));
+  .dark .search-item:hover {
+    @apply bg-dark-surface-elevated;
   }
 
-  .shadow-vedic-soft {
-    box-shadow: 0 2px 8px rgba(255, 153, 51, 0.1);
+  /* GPU Acceleration for Performance */
+  .gpu-accelerated {
+    transform: translateZ(0);
+    will-change: transform;
+    backface-visibility: hidden;
+    perspective: 1000px;
   }
-
-  .shadow-vedic-medium {
-    box-shadow: 0 4px 16px rgba(255, 153, 51, 0.2);
-  }
-
-  .shadow-vedic-strong {
-    box-shadow: 0 8px 24px rgba(255, 153, 51, 0.3);
-  }
-
-  .shadow-cosmic {
-    box-shadow: 0 4px 16px rgba(107, 70, 193, 0.2);
-  }
-
-  .shadow-celestial {
-    box-shadow: 0 8px 24px rgba(107, 70, 193, 0.3);
-  }
-
-  .shadow-golden {
-    box-shadow: 0 4px 16px rgba(255, 215, 0, 0.3);
-  }
-
-  .rounded-vedic {
-    border-radius: var(--border-radius-vedic);
-  }
-
-  /* Color Utilities */
-  .text-earth-brown {
-    color: var(--earth-brown);
-  }
-
-  .text-wisdom-gray {
-    color: var(--wisdom-gray);
-  }
-
-  .text-vedic-gold {
-    color: var(--vedic-gold);
-  }
-
-  .text-cosmic-purple {
-    color: var(--cosmic-purple);
-  }
-
-  .bg-cosmic-purple {
-    background-color: var(--cosmic-purple);
-  }
-
-  .bg-vedic-primary {
-    background-color: var(--vedic-saffron);
-  }
-
-  .border-cosmic-purple {
-    border-color: var(--cosmic-purple);
-  }
-
-  /* Font Utilities */
-  .font-accent {
-    font-family: 'Cinzel', serif;
-  }
-
-  .font-vedic {
-    font-family: 'Noto Sans Devanagari', sans-serif;
-  }
-
-  .font-sans {
-    font-family: 'Inter', sans-serif;
-  }
-}
-
-/* Custom Keyframe Animations */
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-}
-
-@keyframes glow {
-  from { box-shadow: 0 0 20px rgba(255, 153, 51, 0.5); }
-  to { box-shadow: 0 0 30px rgba(255, 153, 51, 0.8); }
-}
-
-@keyframes sacred-pulse {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.8;
-    transform: scale(1.05);
-  }
-}
-
-@keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-
-@keyframes vedic-spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* High Performance CSS */
-.gpu-accelerated {
-  transform: translateZ(0);
-  will-change: transform, opacity;
 }
 
 /* Print Styles */
@@ -617,25 +742,85 @@
   }
 }
 
-/* Mobile-Specific Optimizations */
+/* Mobile-specific optimizations */
 @media (max-width: 640px) {
   .mobile-stack {
-    flex-direction: column !important;
+    @apply flex flex-col space-y-4;
   }
 
   .mobile-full-width {
-    width: 100% !important;
+    @apply w-full;
   }
 
   .mobile-center {
-    text-align: center !important;
+    @apply text-center;
   }
 
   .mobile-hide {
-    display: none !important;
+    @apply hidden;
   }
 
   .mobile-show {
-    display: block !important;
+    @apply block;
+  }
+}
+
+/* Enhanced Keyframes */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes glow {
+  0% {
+    box-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+  }
+  100% {
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+  }
+}
+
+@keyframes sacred-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes vedic-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes cosmic-spin {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.1);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
   }
 }
