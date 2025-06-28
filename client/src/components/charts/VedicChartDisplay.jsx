@@ -3,7 +3,7 @@ import { Card } from '../ui/cards/Card';
 
 /**
  * VedicChartDisplay Component
- * Displays generated Vedic birth chart in traditional Kundli format
+ * Displays generated Vedic birth chart in traditional North Indian Kundli diamond format
  */
 const VedicChartDisplay = ({ chartData, isLoading = false, className = '' }) => {
   const [selectedHouse, setSelectedHouse] = useState(null);
@@ -18,20 +18,29 @@ const VedicChartDisplay = ({ chartData, isLoading = false, className = '' }) => 
     }
   }, [chartData]);
 
-  // House positions in traditional Vedic chart layout
+  // Traditional North Indian Kundli diamond layout
   const housePositions = {
-    1: { top: '50%', left: '75%', transform: 'translate(-50%, -50%)' },
-    2: { top: '25%', left: '75%', transform: 'translate(-50%, -50%)' },
-    3: { top: '0%', left: '75%', transform: 'translate(-50%, 0%)' },
-    4: { top: '0%', left: '50%', transform: 'translate(-50%, 0%)' },
-    5: { top: '0%', left: '25%', transform: 'translate(-50%, 0%)' },
-    6: { top: '0%', left: '0%', transform: 'translate(0%, 0%)' },
-    7: { top: '25%', left: '0%', transform: 'translate(0%, -50%)' },
-    8: { top: '50%', left: '0%', transform: 'translate(0%, -50%)' },
-    9: { top: '75%', left: '0%', transform: 'translate(0%, -100%)' },
-    10: { top: '100%', left: '25%', transform: 'translate(-50%, -100%)' },
-    11: { top: '100%', left: '50%', transform: 'translate(-50%, -100%)' },
-    12: { top: '100%', left: '75%', transform: 'translate(-50%, -100%)' }
+    // Top triangle
+    1: { top: '0%', left: '50%', transform: 'translate(-50%, 0%)', width: '25%', height: '25%' },
+
+    // Right side houses
+    2: { top: '12.5%', left: '75%', transform: 'translate(-50%, -50%)', width: '25%', height: '25%' },
+    3: { top: '37.5%', left: '87.5%', transform: 'translate(-50%, -50%)', width: '25%', height: '25%' },
+    4: { top: '62.5%', left: '75%', transform: 'translate(-50%, -50%)', width: '25%', height: '25%' },
+
+    // Bottom triangle
+    5: { top: '75%', left: '62.5%', transform: 'translate(-50%, -50%)', width: '25%', height: '25%' },
+    6: { top: '87.5%', left: '50%', transform: 'translate(-50%, -50%)', width: '25%', height: '25%' },
+    7: { top: '75%', left: '37.5%', transform: 'translate(-50%, -50%)', width: '25%', height: '25%' },
+
+    // Left side houses
+    8: { top: '62.5%', left: '25%', transform: 'translate(-50%, -50%)', width: '25%', height: '25%' },
+    9: { top: '37.5%', left: '12.5%', transform: 'translate(-50%, -50%)', width: '25%', height: '25%' },
+    10: { top: '12.5%', left: '25%', transform: 'translate(-50%, -50%)', width: '25%', height: '25%' },
+
+    // Inner houses
+    11: { top: '25%', left: '50%', transform: 'translate(-50%, -50%)', width: '25%', height: '25%' },
+    12: { top: '50%', left: '37.5%', transform: 'translate(-50%, -50%)', width: '25%', height: '25%' }
   };
 
   const planetSymbols = {
@@ -47,7 +56,7 @@ const VedicChartDisplay = ({ chartData, isLoading = false, className = '' }) => 
     'Ascendant': 'As'
   };
 
-        // Get planets in house using proper house calculation
+  // Get planets in house using proper house calculation
   const getPlanetsInHouse = (houseNumber) => {
     if (!chartDetails?.rasiChart?.planets || !chartDetails?.rasiChart?.ascendant) return [];
 
@@ -78,8 +87,6 @@ const VedicChartDisplay = ({ chartData, isLoading = false, className = '' }) => 
       // Calculate which house (1-12) the planet is in
       const calculatedHouse = Math.floor(diff / 30) + 1;
 
-      // console.log(`🔍 Planet ${planet.name}: longitude=${planetLongitude.toFixed(2)}°, diff=${diff.toFixed(2)}°, house=${calculatedHouse}`);
-
       if (calculatedHouse === houseNumber) {
         planetsInHouse.push(planet);
       }
@@ -92,11 +99,22 @@ const VedicChartDisplay = ({ chartData, isLoading = false, className = '' }) => 
     if (!chartDetails) return null;
 
     return (
-      <div className="relative w-full max-w-md mx-auto aspect-square">
-        {/* Chart Border */}
-        <div className="absolute inset-0 border-2 border-amber-800 bg-gradient-to-br from-amber-50 to-yellow-200">
-          {/* Inner Diamond Shape */}
-          <div className="absolute inset-4 border border-amber-700 transform rotate-45 bg-amber-50/50"></div>
+      <div className="relative w-full max-w-lg mx-auto" style={{ aspectRatio: '1', minHeight: '400px' }}>
+        {/* Main Diamond Container */}
+        <div className="absolute inset-0">
+          {/* Outer Diamond Border */}
+          <div className="absolute inset-0 border-2 border-amber-800 bg-gradient-to-br from-amber-50 to-yellow-100 transform rotate-45 origin-center"></div>
+
+          {/* Inner Diamond Structure */}
+          <div className="absolute inset-8 border border-amber-700 transform rotate-45 bg-amber-50/50"></div>
+
+          {/* Diamond Cross Lines */}
+          <div className="absolute top-0 left-1/2 w-0.5 h-full bg-amber-700 transform -translate-x-0.5"></div>
+          <div className="absolute top-1/2 left-0 w-full h-0.5 bg-amber-700 transform -translate-y-0.5"></div>
+
+          {/* Diagonal Lines */}
+          <div className="absolute inset-0 border border-amber-600/30 transform rotate-45"></div>
+          <div className="absolute inset-4 border border-amber-600/20 transform rotate-45"></div>
 
           {/* House Numbers and Planets */}
           {Object.entries(housePositions).map(([houseNum, position]) => {
@@ -104,23 +122,32 @@ const VedicChartDisplay = ({ chartData, isLoading = false, className = '' }) => 
             return (
               <div
                 key={houseNum}
-                className={`absolute w-16 h-16 border border-amber-600/30 bg-amber-50/80 cursor-pointer transition-all hover:bg-yellow-200/60 ${
-                  selectedHouse === parseInt(houseNum) ? 'ring-2 ring-orange-500 shadow-lg' : ''
+                className={`absolute cursor-pointer transition-all hover:bg-yellow-200/80 border border-amber-600/50 ${
+                  selectedHouse === parseInt(houseNum) ? 'ring-2 ring-orange-500 shadow-lg bg-yellow-300/60' : 'bg-amber-50/90'
                 }`}
-                style={position}
+                style={{
+                  ...position,
+                  minWidth: '60px',
+                  minHeight: '60px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  padding: '4px'
+                }}
                 onClick={() => setSelectedHouse(parseInt(houseNum))}
               >
                 {/* House Number */}
-                <div className="absolute top-1 left-1 text-xs font-bold text-amber-800">
+                <div className="text-xs font-bold text-amber-800 mb-1">
                   {houseNum}
                 </div>
 
                 {/* Planets in House */}
-                <div className="flex flex-wrap justify-center items-center h-full p-1">
+                <div className="flex flex-wrap justify-center items-center text-center">
                   {housePlanets.map((planet, index) => (
                     <span
                       key={index}
-                      className="text-lg text-orange-600 font-bold"
+                      className="text-sm text-orange-600 font-bold mx-0.5"
                       title={`${planet.name || planet.Name} - ${planet.sign} ${planet.degree?.toFixed(1)}°`}
                     >
                       {planetSymbols[planet.name || planet.Name] || (planet.name || planet.Name).slice(0, 2)}
@@ -132,7 +159,7 @@ const VedicChartDisplay = ({ chartData, isLoading = false, className = '' }) => 
           })}
 
           {/* Center Information */}
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center bg-amber-50/90 p-2 rounded-lg border border-amber-700">
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center bg-white/95 p-3 rounded-lg border border-amber-700 shadow-md z-10">
             <div className="text-sm font-semibold text-amber-800">
               {chartDetails.birthData?.name || chartDetails.name || 'Birth Chart'}
             </div>
@@ -230,12 +257,12 @@ const VedicChartDisplay = ({ chartData, isLoading = false, className = '' }) => 
 
   return (
     <div className={`space-y-4 ${className}`}>
-      <Card className="p-6">
+      <Card className="p-4 sm:p-6">
         <div className="text-center mb-4">
-          <h2 className="text-2xl font-bold text-amber-800 mb-2">
+          <h2 className="text-xl sm:text-2xl font-bold text-amber-800 mb-2">
             Vedic Birth Chart (Kundli)
           </h2>
-          <p className="text-sm text-amber-700">
+          <p className="text-xs sm:text-sm text-amber-700">
             Click on any house to view detailed planetary information
           </p>
         </div>
@@ -243,7 +270,7 @@ const VedicChartDisplay = ({ chartData, isLoading = false, className = '' }) => 
         {renderChart()}
 
         <div className="mt-4 text-center">
-          <div className="inline-flex space-x-4 text-xs text-amber-600">
+          <div className="flex flex-wrap justify-center gap-2 sm:gap-4 text-xs text-amber-600">
             <span>☉ Sun</span>
             <span>☽ Moon</span>
             <span>♂ Mars</span>

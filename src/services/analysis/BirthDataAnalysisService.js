@@ -5,7 +5,8 @@
  */
 
 const swisseph = require('swisseph');
-const moment = require('moment-timezone');
+const moment = require('moment');
+const { getSign, getSignName } = require('../../utils/helpers/astrologyHelpers');
 
 class BirthDataAnalysisService {
   constructor() {
@@ -27,16 +28,22 @@ class BirthDataAnalysisService {
     };
 
     this.nakshatras = [
-      'Ashwini', 'Bharani', 'Krittika', 'Rohini', 'Mrigashira', 'Ardra',
-      'Punarvasu', 'Pushya', 'Ashlesha', 'Magha', 'Purva Phalguni', 'Uttara Phalguni',
-      'Hasta', 'Chitra', 'Swati', 'Vishakha', 'Anuradha', 'Jyeshtha',
-      'Mula', 'Purva Ashadha', 'Uttara Ashadha', 'Shravana', 'Dhanishta', 'Shatabhisha',
-      'Purva Bhadrapada', 'Uttara Bhadrapada', 'Revati'
+      'Ashwini', 'Bharani', 'Krittika', 'Rohini', 'Mrigashira', 'Ardra', 'Punarvasu', 'Pushya', 'Ashlesha',
+      'Magha', 'Purva Phalguni', 'Uttara Phalguni', 'Hasta', 'Chitra', 'Swati', 'Vishakha', 'Anuradha', 'Jyeshtha',
+      'Mula', 'Purva Ashadha', 'Uttara Ashadha', 'Shravana', 'Dhanishta', 'Shatabhisha', 'Purva Bhadrapada',
+      'Uttara Bhadrapada', 'Revati'
     ];
 
     this.dashaPeriods = {
-      'Sun': 6, 'Moon': 10, 'Mars': 7, 'Mercury': 17, 'Jupiter': 16,
-      'Venus': 20, 'Saturn': 19, 'Rahu': 18, 'Ketu': 7
+      Ketu: 7,
+      Venus: 20,
+      Sun: 6,
+      Moon: 10,
+      Mars: 7,
+      Rahu: 18,
+      Jupiter: 16,
+      Saturn: 19,
+      Mercury: 17
     };
   }
 

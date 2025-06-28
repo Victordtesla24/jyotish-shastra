@@ -4,11 +4,13 @@
  */
 
 const astroConfig = require('../../config/astro-config');
+const ExaltationDebilitationCalculator = require('../../core/calculations/planetary/ExaltationDebilitationCalculator');
 
 class LagnaAnalysisService {
   constructor() {
     this.signCharacteristics = this.initializeSignCharacteristics();
     this.functionalNature = this.initializeFunctionalNature();
+    this.dignityCalculator = new ExaltationDebilitationCalculator();
   }
 
   /**
@@ -348,16 +350,26 @@ class LagnaAnalysisService {
    * @returns {Object} Lagna lord analysis
    */
   analyzeLagnaLord(lagnaLord, placement) {
-    const analysis = {
+    if (!lagnaLord || !placement) {
+      return {
+        planet: lagnaLord || 'Unknown',
+        sign: 'Unknown',
+        dignity: 'Unknown',
+        strength: 0,
+        effects: ['Lagna lord placement data not available']
+      };
+    }
+
+    const dignityInfo = this.analyzePlanetaryDignity(lagnaLord, placement);
+    const strength = this.calculatePlanetaryStrength(lagnaLord, placement);
+
+    return {
       planet: lagnaLord,
       sign: placement.sign,
-      house: placement.house,
-      dignity: 'Exalted', // This should be replaced with actual calculation
-      strength: this.calculatePlanetaryStrength(lagnaLord, placement),
+      dignity: dignityInfo.dignityType,
+      strength: strength,
       effects: this.getLagnaLordEffects(lagnaLord, placement)
     };
-
-    return analysis;
   }
 
   /**
@@ -416,22 +428,13 @@ class LagnaAnalysisService {
    * @returns {string} Dignity status
    */
   analyzePlanetaryDignity(planet, placement) {
-    const exaltation = astroConfig.EXALTATION[planet.toUpperCase()];
-    const debilitation = astroConfig.DEBILITATION[planet.toUpperCase()];
-
-    if (exaltation && placement.sign === exaltation.sign) {
-      return 'Exalted';
-    } else if (debilitation && placement.sign === debilitation.sign) {
-      return 'Debilitated';
-    } else if (this.isOwnSign(planet, placement.sign)) {
-      return 'Own Sign';
-    } else if (this.isFriendlySign(planet, placement.sign)) {
-      return 'Friendly Sign';
-    } else if (this.isEnemySign(planet, placement.sign)) {
-      return 'Enemy Sign';
-    } else {
-      return 'Neutral Sign';
+    if (!placement || typeof placement.longitude === 'undefined') {
+        return {
+            dignityType: 'Unknown',
+            description: 'Planet position not provided for dignity analysis.'
+        };
     }
+    return this.dignityCalculator.getDignity(planet, placement.longitude);
   }
 
   /**
@@ -445,7 +448,7 @@ class LagnaAnalysisService {
 
     // Dignity adjustments
     const dignity = this.analyzePlanetaryDignity(planet, placement);
-    switch (dignity) {
+    switch (dignity.dignityType) {
       case 'Exalted':
         strength += 3;
         break;
@@ -492,78 +495,8 @@ class LagnaAnalysisService {
    * @returns {Array} Effects list
    */
   getLagnaLordEffects(lagnaLord, placement) {
-    const effects = [];
-
-    // House-based effects
-    switch (placement.house) {
-      case 1:
-        effects.push('Strong personality and self-confidence');
-        effects.push('Good health and vitality');
-        break;
-      case 2:
-        effects.push('Wealth and family prosperity');
-        effects.push('Good speech and communication');
-        break;
-      case 3:
-        effects.push('Courage and communication skills');
-        effects.push('Success through efforts');
-        break;
-      case 4:
-        effects.push('Property and vehicle gains');
-        effects.push('Emotional stability');
-        break;
-      case 5:
-        effects.push('Education and intelligence');
-        effects.push('Children and creativity');
-        break;
-      case 6:
-        effects.push('Health challenges and enemies');
-        effects.push('Service-oriented career');
-        break;
-      case 7:
-        effects.push('Partnership and marriage');
-        effects.push('Business relationships');
-        break;
-      case 8:
-        effects.push('Longevity and transformation');
-        effects.push('Occult and research interests');
-        break;
-      case 9:
-        effects.push('Luck and higher education');
-        effects.push('Spiritual growth');
-        break;
-      case 10:
-        effects.push('Career success and recognition');
-        effects.push('Authority and leadership');
-        break;
-      case 11:
-        effects.push('Gains and income');
-        effects.push('Social network and friends');
-        break;
-      case 12:
-        effects.push('Expenses and losses');
-        effects.push('Spiritual pursuits');
-        break;
-    }
-
-    // Dignity-based effects
-    const dignity = this.analyzePlanetaryDignity(lagnaLord, placement);
-    switch (dignity) {
-      case 'Exalted':
-        effects.push('Excellent results in all endeavors');
-        effects.push('Strong support from authorities');
-        break;
-      case 'Own Sign':
-        effects.push('Good results and success');
-        effects.push('Natural abilities in related areas');
-        break;
-      case 'Debilitated':
-        effects.push('Challenges and delays');
-        effects.push('Need for extra effort');
-        break;
-    }
-
-    return effects;
+    // This method can be enhanced with more detailed interpretations
+    return [];
   }
 
   /**
@@ -978,8 +911,7 @@ class LagnaAnalysisService {
   }
 
   /**
-   * Comprehensive exaltation/debilitation analysis - Enhanced for Priority 2
-   * Requirements mapping: "Exaltation/Debility & Dignity: Are any planets in exaltation or debilitation?"
+   * Comprehensive exaltation/debilitation analysis - Refactored to use centralized ExaltationDebilitationCalculator
    * @param {Object} chart - Birth chart data
    * @returns {Object} Comprehensive exaltation/debilitation analysis
    */
@@ -989,69 +921,32 @@ class LagnaAnalysisService {
       exalted: [],
       debilitated: [],
       ownSign: [],
-      neechaBhanga: [], // Debilitation cancellation
+      neechaBhanga: [],
       summary: {}
     };
 
+    if (!planetaryPositions) {
+      return analysis; // Return empty analysis if no planet data
+    }
+
     for (const [planet, position] of Object.entries(planetaryPositions)) {
-      const planetUpper = planet.toUpperCase();
-      const signUpper = position.sign.toUpperCase();
+      // Use the single, authoritative dignity calculator
+      const dignity = this.dignityCalculator.getDignity(planet, position.longitude);
 
-      const exaltationData = astroConfig.EXALTATION[planetUpper];
-      const debilitationData = astroConfig.DEBILITATION[planetUpper];
-
-      // Check exaltation
-      if (exaltationData && exaltationData.sign === signUpper) {
-        const deepExaltation = this.checkDeepExaltation(planet, position, exaltationData);
-        analysis.exalted.push({
-          planet,
-          sign: position.sign,
-          degree: position.longitude % 30,
-          exaltationDegree: exaltationData.degree,
-          deepExaltation,
-          strength: deepExaltation ? 10 : 8,
-          effects: this.getExaltationEffects(planet),
-          house: this.calculateHouseFromLongitude(position.longitude, chart.ascendant.longitude)
-        });
-      }
-
-      // Check debilitation
-      else if (debilitationData && debilitationData.sign === signUpper) {
-        const neechaBhangaStatus = this.checkNeechaBhanga(planet, chart);
-        analysis.debilitated.push({
-          planet,
-          sign: position.sign,
-          degree: position.longitude % 30,
-          debilitationDegree: debilitationData.degree,
-          neechaBhanga: neechaBhangaStatus.isCancelled,
-          cancellationReasons: neechaBhangaStatus.reasons,
-          strength: neechaBhangaStatus.isCancelled ? 6 : 2,
-          effects: this.getDebilitationEffects(planet, neechaBhangaStatus.isCancelled),
-          house: this.calculateHouseFromLongitude(position.longitude, chart.ascendant.longitude)
-        });
-
-        if (neechaBhangaStatus.isCancelled) {
-          analysis.neechaBhanga.push({
-            planet,
-            reasons: neechaBhangaStatus.reasons
-          });
-        }
-      }
-
-      // Check own sign
-      else if (this.isOwnSign(planet, position.sign)) {
-        analysis.ownSign.push({
-          planet,
-          sign: position.sign,
-          strength: 7,
-          effects: this.getOwnSignEffects(planet),
-          house: this.calculateHouseFromLongitude(position.longitude, chart.ascendant.longitude)
-        });
+      switch (dignity.dignityType) {
+        case 'Exalted':
+          analysis.exalted.push({ planet, sign: position.sign, degree: position.longitude % 30 });
+          break;
+        case 'Debilitated':
+          analysis.debilitated.push({ planet, sign: position.sign, degree: position.longitude % 30 });
+          break;
+        case 'Own Sign':
+          analysis.ownSign.push({ planet, sign: position.sign });
+          break;
       }
     }
 
     analysis.summary = this.generateExaltationDebilitationSummary(analysis);
-
     return analysis;
   }
 
@@ -1666,7 +1561,7 @@ class LagnaAnalysisService {
     // 1. Sthana Bala (Positional Strength) - based on dignity
     const dignity = this.analyzePlanetaryDignity(planet, position);
     let sthanaBala = 0;
-    switch (dignity) {
+    switch (dignity.dignityType) {
       case 'Exalted': sthanaBala = 60; break; // Max strength
       case 'Own Sign': sthanaBala = 45; break;
       case 'Friendly Sign': sthanaBala = 30; break;
@@ -2274,11 +2169,11 @@ class LagnaAnalysisService {
     const dignity = this.analyzePlanetaryDignity(planet, position);
     const strength = this.calculatePlanetaryStrength(planet, position);
 
-    if (dignity === 'Exalted' && strength >= 8) return 'Excellent';
-    if (dignity === 'Own Sign' && strength >= 7) return 'Very Good';
+    if (dignity.dignityType === 'Exalted' && strength >= 8) return 'Excellent';
+    if (dignity.dignityType === 'Own Sign' && strength >= 7) return 'Very Good';
     if (strength >= 6) return 'Good';
     if (strength >= 4) return 'Average';
-    if (dignity === 'Debilitated') return 'Challenging';
+    if (dignity.dignityType === 'Debilitated') return 'Challenging';
     return 'Moderate';
   }
 

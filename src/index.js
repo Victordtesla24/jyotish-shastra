@@ -4,6 +4,8 @@ const helmet = require('helmet');
 const compression = require('compression');
 const rateLimit = require('express-rate-limit');
 const morgan = require('morgan');
+const fs = require('fs');
+const path = require('path');
 require('dotenv').config();
 
 // Import routes
@@ -14,7 +16,6 @@ const indexRoutes = require('./api/routes/index');
 
 // Import middleware
 const errorHandling = require('./api/middleware/errorHandling');
-const logging = require('./api/middleware/logging');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -73,10 +74,15 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Logging middleware
+// Create a write stream (in append mode)
+const accessLogStream = fs.createWriteStream(path.join(__dirname, '..', 'logs', 'servers', 'back-end-server-logs.log'), { flags: 'a' });
+
 if (process.env.NODE_ENV !== 'test') {
-  app.use(morgan('combined'));
+  // Log to the console
+  app.use(morgan('dev'));
+  // Log to the file
+  app.use(morgan('combined', { stream: accessLogStream }));
 }
-app.use(logging);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

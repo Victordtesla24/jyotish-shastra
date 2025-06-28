@@ -14,6 +14,7 @@ const NavamsaAnalysisService = require('../../core/analysis/divisional/NavamsaAn
 const DetailedDashaAnalysisService = require('./DetailedDashaAnalysisService');
 const YogaDetectionService = require('./YogaDetectionService');
 const ChartGenerationService = require('../chart/ChartGenerationService');
+const GeocodingService = require('../geocoding/GeocodingService');
 
 class MasterAnalysisOrchestrator {
   constructor() {
@@ -28,6 +29,7 @@ class MasterAnalysisOrchestrator {
     this.dashaService = new DetailedDashaAnalysisService();
     this.yogaService = new YogaDetectionService();
     this.chartService = new ChartGenerationService();
+    this.geocodingService = new GeocodingService();
 
     // Analysis completion tracking
     this.analysisProgress = {
@@ -86,6 +88,21 @@ class MasterAnalysisOrchestrator {
       // Execute all sections with comprehensive analysis requirements
       analysis.sections.section2 = await this.executeSection2Analysis(analysis.charts, analysis);
       this.updateProgress(analysis, 'section2');
+
+      // CRITICAL FIX: Hoist planetary dignity analysis and add the required summary object
+      if (analysis.sections.section2 && analysis.sections.section2.analyses && analysis.sections.section2.analyses.dignity) {
+        analysis.planetaryDignity = analysis.sections.section2.analyses.dignity;
+
+        // CRITICAL FIX: Add the 'summary' object the synthesizer expects
+        if (!analysis.planetaryDignity.summary) {
+          analysis.planetaryDignity.summary = {
+            message: 'Dignity analysis completed.',
+            exaltedCount: analysis.planetaryDignity.exalted?.length || 0,
+            debilitatedCount: analysis.planetaryDignity.debilitated?.length || 0,
+            ownSignCount: analysis.planetaryDignity.ownSign?.length || 0,
+          };
+        }
+      }
 
       analysis.sections.section3 = await this.executeSection3Analysis(analysis.charts, analysis);
       this.updateProgress(analysis, 'section3');
@@ -248,26 +265,21 @@ class MasterAnalysisOrchestrator {
       // PRODUCTION-GRADE: Ensure chart has proper format for HouseAnalysisService
       const formattedRasiChart = this.ensureProperChartFormat(rasiChart, 'Rasi');
 
-      // Execute comprehensive house analysis using production-grade service
-      const houseAnalysis = this.houseService.analyzeHouses(formattedRasiChart);
+      // CRITICAL FIX: Use analyzeAllHouses to get the correctly formatted array of house analyses
+      const houseAnalysis = this.houseService.analyzeAllHouses(formattedRasiChart);
 
       // Validate that analysis was successful
-      if (!houseAnalysis || Object.keys(houseAnalysis).length === 0) {
-        throw new Error('HouseAnalysisService failed to generate comprehensive analysis');
+      if (!houseAnalysis || !Array.isArray(houseAnalysis) || houseAnalysis.length !== 12) {
+        throw new Error('HouseAnalysisService failed to generate a valid house analysis array');
       }
 
-      // Transform house analysis into detailed section format
+      // The houseAnalysis is already in the correct array format.
+      // The old transformation logic is no longer needed.
+      // We will, however, convert it to an object of houses for consistency with the rest of the section.
       const houses = {};
-      for (let i = 1; i <= 12; i++) {
-        const houseKey = `house${i}`;
-        houses[houseKey] = {
-          houseNumber: i,
-          specificAnalysis: houseAnalysis[houseKey] || `Comprehensive analysis for ${i}${this.getOrdinalSuffix(i)} house`,
-          occupants: houseAnalysis.occupants?.[houseKey] || [],
-          aspects: houseAnalysis.aspects?.[houseKey] || [],
-          strength: houseAnalysis.strength?.[houseKey] || 'moderate'
-        };
-      }
+      houseAnalysis.forEach(house => {
+        houses[`house${house.houseNumber}`] = house;
+      });
 
       return {
         name: "House-by-House Examination (1st-12th Bhavas)",
@@ -511,8 +523,19 @@ class MasterAnalysisOrchestrator {
    */
   async generateCharts(birthData) {
     try {
-      const rasiChart = await this.chartService.generateRasiChart(birthData);
-      const navamsaChart = await this.chartService.generateNavamsaChart(birthData);
+      // Create a mutable copy to avoid side effects on the original object
+      const finalBirthData = { ...birthData };
+
+      // If coordinates are missing but a place name is provided, perform geocoding
+      if ((!finalBirthData.latitude || !finalBirthData.longitude) && finalBirthData.placeOfBirth) {
+        const geoData = await this.geocodingService.geocodeLocation({ placeOfBirth: finalBirthData.placeOfBirth });
+        finalBirthData.latitude = geoData.latitude;
+        finalBirthData.longitude = geoData.longitude;
+        finalBirthData.timezone = geoData.timezone;
+      }
+
+      const rasiChart = await this.chartService.generateRasiChart(finalBirthData);
+      const navamsaChart = await this.chartService.generateNavamsaChart(finalBirthData);
       return { rasiChart, navamsaChart };
     } catch (error) {
       throw new Error(`Chart generation failed: ${error.message}`);
@@ -589,8 +612,8 @@ class MasterAnalysisOrchestrator {
     }
 
     return {
-      corePersonality: lagna.lagnaAnalysis || "Comprehensive lagna analysis required",
-      emotionalNature: luminaries.moonAnalysis || "Comprehensive moon analysis required",
+      corePersonality: lagna.summary || "Comprehensive lagna analysis required",
+      emotionalNature: luminaries.moonAnalysis?.emotionalCharacter?.summary || "Comprehensive moon analysis required",
       publicImage: arudha?.arudhaLagna || "Comprehensive arudha analysis required",
       keyTraits: this.extractKeyPersonalityTraits(lagna, luminaries, arudha),
       strengths: this.identifyPersonalityStrengths(analysis),
@@ -798,27 +821,74 @@ class MasterAnalysisOrchestrator {
    * Helper methods for recommendations and timing - Remove placeholders, require comprehensive analysis
    */
   extractKeyPersonalityTraits(lagna, luminaries, arudha) {
-    if (!lagna?.lagnaAnalysis || !luminaries?.moonAnalysis) {
-      throw new Error('Cannot extract personality traits: Comprehensive lagna and moon analysis required');
+    if (!lagna) {
+      throw new Error("extractKeyPersonalityTraits failed: 'lagna' object is missing or falsy.");
     }
-    // Use actual analysis data instead of placeholder
-    return [lagna.lagnaAnalysis, luminaries.moonAnalysis];
+    if (!luminaries) {
+      throw new Error("extractKeyPersonalityTraits failed: 'luminaries' object is missing or falsy.");
+    }
+    if (!luminaries.moonAnalysis) {
+      throw new Error("extractKeyPersonalityTraits failed: 'luminaries.moonAnalysis' is missing.");
+    }
+
+    const lagnaTraits = lagna.lagnaSign?.characteristics || [];
+    const moonTraits = luminaries.moonAnalysis?.signCharacteristics?.characteristics || [];
+
+    return [...lagnaTraits, ...moonTraits];
   }
 
   identifyPersonalityStrengths(analysis) {
-    const strengths = analysis.sections.section2?.analyses?.dignity?.exaltedPlanets;
-    if (!strengths) {
+    const dignity = analysis.sections.section2?.analyses?.dignity;
+    if (!dignity) {
       throw new Error('Cannot identify personality strengths: Comprehensive planetary dignity analysis required');
     }
-    return strengths;
+
+    // 1️⃣ Primary: Exalted planets
+    if (Array.isArray(dignity.exalted) && dignity.exalted.length > 0) {
+      return dignity.exalted;
+    }
+
+    // 2️⃣ Secondary: Planets in own sign
+    if (Array.isArray(dignity.ownSign) && dignity.ownSign.length > 0) {
+      return dignity.ownSign;
+    }
+
+    // 3️⃣ Fallback: Strongest planet computed by LagnaAnalysisService
+    if (dignity.strongestPlanet) {
+      return [dignity.strongestPlanet];
+    }
+
+    // If still nothing, return an empty array (no throw; caller can handle)
+    const lagnaLord = analysis.sections.section2?.analyses?.lagna?.lagnaLord;
+    if (lagnaLord) {
+      return [ { planet: lagnaLord, reason: 'Lagna Lord - default strength proxy' } ];
+    }
+    return [];
   }
 
   identifyPersonalityChallenges(analysis) {
-    const challenges = analysis.sections.section2?.analyses?.dignity?.debilitatedPlanets;
-    if (!challenges) {
+    const dignity = analysis.sections.section2?.analyses?.dignity;
+    if (!dignity) {
       throw new Error('Cannot identify personality challenges: Comprehensive planetary dignity analysis required');
     }
-    return challenges;
+
+    // 1️⃣ Primary: Debilitated planets
+    if (Array.isArray(dignity.debilitated) && dignity.debilitated.length > 0) {
+      return dignity.debilitated;
+    }
+
+    // 2️⃣ Secondary: Enemy-sign planets as proxy challenges
+    if (Array.isArray(dignity.enemySign) && dignity.enemySign.length > 0) {
+      return dignity.enemySign;
+    }
+
+    // 3️⃣ Fallback: Weakest planet if available
+    if (dignity.weakestPlanet) {
+      return [dignity.weakestPlanet];
+    }
+
+    // If nothing found return empty array (no throw)
+    return [];
   }
 
   generateHealthRecommendations(analysis) {

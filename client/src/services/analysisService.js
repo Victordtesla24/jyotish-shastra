@@ -166,7 +166,7 @@ class AnalysisService {
    */
   async generateBirthDataAnalysis(birthData) {
     try {
-      const response = await this.api.post('/comprehensive-analysis/comprehensive', birthData);
+      const response = await this.api.post('/v1/analysis/comprehensive', birthData);
       return response.data;
     } catch (error) {
       throw new Error(`Birth data analysis failed: ${error.response?.data?.message || error.message}`);

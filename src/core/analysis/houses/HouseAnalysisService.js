@@ -106,6 +106,11 @@ class HouseAnalysisService {
       throw new Error('Invalid chart data provided for house analysis');
     }
 
+    const detailedAnalysis = {};
+    for (let i = 1; i <= 12; i++) {
+        detailedAnalysis[`house${i}`] = this.getHouseInterpretation(i, chart);
+    }
+
     const houseData = this.calculateHouseData(chart);
     const houseLords = this.calculateHouseLords(chart);
     const planetHousePositions = this.calculatePlanetHousePositions(chart);
@@ -114,6 +119,7 @@ class HouseAnalysisService {
     const houseRelationships = this.analyzeHouseRelationships(houseLords, planetHousePositions);
 
     return {
+      ...detailedAnalysis,
       houseData: houseData,
       houseLords: houseLords,
       planetHousePositions: planetHousePositions,
@@ -624,14 +630,14 @@ class HouseAnalysisService {
             analysis: this.getPlanetInHouseAnalysis(planet.name, houseNumber)
         })),
         aspects: this.getHouseAspects(houseNumber),
-        interpretation: this.getHouseInterpretation(houseNumber),
+        interpretation: this.getHouseInterpretation(houseNumber, chartToUse),
         // Add services compatibility fields
         houseData: this.houseSignifications[houseNumber],
         houseSign: { sign: houseInfo.sign },
         houseLord: lordAnalysis.planet,
         houseOccupants: occupantsArray.map(p => p.name),
         analysis: {
-          summary: this.getHouseInterpretation(houseNumber),
+          summary: this.getHouseInterpretation(houseNumber, chartToUse),
           strengths: this.identifyHouseStrengths(houseNumber, lordAnalysis.planet, occupantsArray.map(p => p.name)),
           challenges: this.identifyHouseChallenges(houseNumber, lordAnalysis.planet, occupantsArray.map(p => p.name)),
           recommendations: this.generateHouseRecommendations(houseNumber, this.houseSignifications[houseNumber])
@@ -855,23 +861,25 @@ class HouseAnalysisService {
     ];
   }
 
-  getHouseInterpretation(houseNumber) {
-    const interpretations = {
-      1: 'The 1st house, or Lagna, represents the self, personality, health, and overall vitality',
-      2: 'The 2nd house represents wealth, family, speech, and values',
-      3: 'The 3rd house represents siblings, courage, communication, and short journeys',
-      4: 'The 4th house represents mother, home, happiness, and property',
-      5: 'The 5th house relates to creativity, children, education, and intelligence',
-      6: 'The 6th house represents enemies, diseases, debts, and service',
-      7: 'The 7th house represents spouse, partnerships, and business relationships',
-      8: 'The 8th house represents longevity, transformation, and occult sciences',
-      9: 'The 9th house represents fortune, father, dharma, and higher learning',
-      10: 'The 10th house represents career, reputation, authority, and status',
-      11: 'The 11th house represents gains, income, elder siblings, and social circle',
-      12: 'The 12th house represents expenses, losses, spirituality, and foreign lands'
-    };
+  getHouseInterpretation(houseNumber, chart) {
+    const houseSignifications = this.houseSignifications[houseNumber];
+    const houseData = this.calculateHouseData(chart)[houseNumber];
+    const houseLordInfo = this.calculateHouseLords(chart)[houseNumber];
 
-    return interpretations[houseNumber] || `The ${houseNumber}th house has specific significations`;
+    let interpretation = `House ${houseNumber} (${houseSignifications.name}) governs areas of life such as ${houseSignifications.significations.join(', ')}.`;
+
+    if (houseLordInfo) {
+        interpretation += ` The lord of this house, ${houseLordInfo.planet}, is placed in house ${houseLordInfo.house}, which influences how these matters manifest.`;
+    }
+
+    if (houseData.occupyingPlanets.length > 0) {
+        const occupants = houseData.occupyingPlanets.map(p => p.name).join(', ');
+        interpretation += ` It is occupied by ${occupants}, which directly impacts the affairs of this house.`;
+    } else {
+        interpretation += ` There are no planets occupying this house, so its results will primarily be delivered by its lord.`;
+    }
+
+    return interpretation;
   }
 
   // =============================================================================

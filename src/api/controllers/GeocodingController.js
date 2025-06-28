@@ -20,6 +20,34 @@ class GeocodingController {
       const locationData = await this.geocodingService.geocodeLocation({ placeOfBirth });
       res.json({ success: true, ...locationData });
     } catch (error) {
+      // Provide clearer HTTP status codes for known geocoding errors
+      const lower = error.message.toLowerCase();
+
+      if (lower.includes('location not found')) {
+        return res.status(404).json({
+          success: false,
+          message: 'Location not found',
+          details: error.message
+        });
+      }
+
+      if (lower.includes('api key')) {
+        return res.status(503).json({
+          success: false,
+          message: 'Geocoding service unavailable – API key issue',
+          details: error.message
+        });
+      }
+
+      if (lower.includes('rate limit')) {
+        return res.status(429).json({
+          success: false,
+          message: 'Geocoding rate-limit exceeded',
+          details: error.message
+        });
+      }
+
+      // Fall back to generic 500 for unexpected errors
       next(error);
     }
   }

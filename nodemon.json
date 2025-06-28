@@ -37,5 +37,6 @@
   },
   "delay": 1000,
   "legacyWatch": false,
-  "verbose": false
+  "verbose": false,
+  "exec": "node src/index.js"
 }

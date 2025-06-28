@@ -67,11 +67,11 @@ This document outlines the comprehensive system architecture for the Vedic astro
 └─────────────┘    └────────────────┘    └─────────────┘    └─────────────┘    └─────────────┘
        │                   │                   │                   │                   │
        ▼                   ▼                   ▼                   ▼                   ▼
-┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
-│ Validation  │    │ External API│    │ Swiss       │    │ Rule        │    │ Template    │
+┌─────────────┐    ┌──────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+│ Validation  │    │ External API │    │ Swiss       │    │ Rule        │    │ Template    │
 │ & Storage   │    │   (e.g.      │    │ Ephemeris   │    │ Engine      │    │ Engine      │
 │             │    │  Google Maps)│    │             │    │             │    │             │
-└─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘
+└─────────────┘    └──────────────┘    └─────────────┘    └─────────────┘    └─────────────┘
        │                   │                   │                   │                   │
        ▼                   ▼                   ▼                   ▼                   ▼
 ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
@@ -235,7 +235,7 @@ This document outlines the comprehensive system architecture for the Vedic astro
 │  │   ├── Based on Moon's longitude                                          │
 │  │   └── Vimshottari Dasha system                                           │
 │  └── Configuration                                                          │
-│      ├── Ephemeris file path set via `swe_set_ephe_path`                     │
+│      ├── Ephemeris file path set via `swe_set_ephe_path`                    │
 │      └── Sidereal mode set via `swe_set_sid_mode`                           │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │  Ephemeris Data Management                                                  │
@@ -393,10 +393,10 @@ This architecture provides a scalable, maintainable, and secure foundation for t
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                     ASTRONOMICAL CALCULATION ACCURACY                       │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│  Test Data: Oct 24, 1985, 14:30 IST, Pune (18.52°N, 73.86°E)               │
-│  ├── Sun Position: 187.24° (7°14' Libra) ✅ Verified accurate              │
-│  ├── Moon Position: 319.12° (19°07' Aquarius) ✅ Verified accurate         │
-│  ├── Ayanamsa: Lahiri (SE_SIDM_LAHIRI) ✅ Properly configured              │
+│  Test Data: Oct 24, 1985, 14:30 IST, Pune (18.52°N, 73.86°E)                │
+│  ├── Sun Position: 187.24° (7°14' Libra) ✅ Verified accurate               │
+│  ├── Moon Position: 319.12° (19°07' Aquarius) ✅ Verified accurate          │
+│  ├── Ayanamsa: Lahiri (SE_SIDM_LAHIRI) ✅ Properly configured               │
 │  └── Timezone: Asia/Kolkata preserved ✅ No unwanted conversions            │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │  Swiss Ephemeris Integration Status:                                        │
@@ -474,10 +474,10 @@ This architecture provides a scalable, maintainable, and secure foundation for t
 │  └── Chart casting: Ascendant calculation depends on precise timing         │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │  Validation Results:                                                        │
-│  ├── Input: 14:30 IST → Preserved in calculations                          │
+│  ├── Input: 14:30 IST → Preserved in calculations                           │
 │  ├── No automatic conversion to other timezones                             │
-│  ├── Proper UTC offset handling (+05:30 for IST)                           │
-│  └── Astronomical calculations maintain temporal accuracy                    │
+│  ├── Proper UTC offset handling (+05:30 for IST)                            │
+│  └── Astronomical calculations maintain temporal accuracy                   │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -587,17 +587,17 @@ Following comprehensive testing and validation protocol implementation, the syst
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                     SWISS EPHEMERIS VALIDATION RESULTS                      │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│  Test Data: Oct 24, 1985, 14:30 IST, Pune (18.52°N, 73.86°E)               │
+│  Test Data: Oct 24, 1985, 14:30 IST, Pune (18.52°N, 73.86°E)                │
 │  ├── Sun: 187.24° (7°14' Libra) ✅ Matches reference data                   │
 │  ├── Moon: 319.12° (19°07' Aquarius) ✅ Matches reference data              │
 │  ├── All Planets: Within 0.01-0.02° tolerance ✅ Astronomical accuracy      │
 │  └── Ayanamsa: Lahiri properly configured ✅ Sidereal calculations correct  │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │  Integration Status:                                                        │
-│  ├── Ephemeris Files: Loaded and validated ✅                              │
-│  ├── House Calculations: Placidus system working ✅                        │
-│  ├── Timezone Handling: IST preserved correctly ✅                         │
-│  └── Error Handling: Silent fallback to Moshier ✅                         │
+│  ├── Ephemeris Files: Loaded and validated ✅                               │
+│  ├── House Calculations: Placidus system working ✅                         │
+│  ├── Timezone Handling: IST preserved correctly ✅                          │
+│  └── Error Handling: Silent fallback to Moshier ✅                          │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -626,13 +626,13 @@ Following comprehensive testing and validation protocol implementation, the syst
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                         PRODUCTION OPTIMIZATIONS                            │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│  Console Noise Elimination:                                                │
+│  Console Noise Elimination:                                                 │
 │  ├── Development: Full logging enabled for debugging                        │
 │  ├── Production: Silent operation, no console warnings                      │
 │  ├── Test: Silent operation to avoid test noise                             │
 │  └── Error Handling: Graceful fallbacks without console output              │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│  Error Handling Improvements:                                              │
+│  Error Handling Improvements:                                               │
 │  ├── Swiss Ephemeris: Enhanced initialization with test calculations        │
 │  ├── Moshier Fallback: Improved error detection and handling                │
 │  ├── Validation Errors: Descriptive messages with helpful suggestions       │

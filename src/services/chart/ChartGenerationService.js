@@ -21,9 +21,9 @@ const { SWISS_EPHEMERIS, PLANETARY_DATA, ZODIAC_SIGNS } = require('../../utils/c
 const BirthDataAnalysisService = require('../analysis/BirthDataAnalysisService');
 
 class ChartGenerationService {
-  constructor() {
+  constructor(geocodingService) {
     this.initializeSwissEphemeris();
-    this.geocodingService = new GeocodingService();
+    this.geocodingService = geocodingService || new GeocodingService();
   }
 
   /**

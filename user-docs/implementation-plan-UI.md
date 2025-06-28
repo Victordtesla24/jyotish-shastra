@@ -44,31 +44,36 @@ client/src/
 └── utils/                 # Utilities
 ```
 
-Prerequisites
-Deep understanding of React 18+ best practices and modern hooks
-Expertise in responsive design and mobile-first development
-Knowledge of Vedic astrology terminology and cultural sensitivity
-Proficiency in modern CSS techniques, animations, and micro-interactions
-Understanding of accessibility (WCAG) and performance optimization
-Research/Analysis Tasks
+## **Prerequisites**
+- Deep understanding of React 18+ best practices and modern hooks
+- Expertise in responsive design and mobile-first development
+- Knowledge of Vedic astrology terminology and cultural sensitivity
+- Proficiency in modern CSS techniques, animations, and micro-interactions
+- Understanding of accessibility (WCAG) and performance optimization
+
+## **Research/Analysis Tasks**
 
 Before implementing changes, analyze the current codebase to understand:
 
-Current UI State: Review existing components, styling patterns, and user flows
-Performance Bottlenecks: Identify areas for optimization and modern best practices
-Accessibility Gaps: Evaluate current accessibility compliance and improvement opportunities
-Mobile Experience: Assess responsive design implementation and mobile-specific enhancements
-Cultural Authenticity: Ensure all design decisions respect Vedic traditions and Sanskrit terminology
-Instructions/Tasks
-Phase 1: Foundation Enhancement (Priority: HIGH)
-1.1 Modern CSS Framework Integration
-Migrate from pure CSS to Tailwind CSS for better maintainability and consistency
-Implement custom Tailwind configuration with Vedic-inspired design tokens
-Create utility classes for common Vedic UI patterns (mandala borders, celestial gradients)
-Maintain existing component structure while upgrading styling approach
-1.2 Design System Implementation
+- **Current UI State**: Review existing components, styling patterns, and user flows
+- **Performance Bottlenecks**: Identify areas for optimization and modern best practices
+- **Accessibility Gaps**: Evaluate current accessibility compliance and improvement opportunities
+- **Mobile Experience**: Assess responsive design implementation and mobile-specific enhancements
+- **Cultural Authenticity**: Ensure all design decisions respect Vedic traditions and Sanskrit terminology
 
-Color Palette (implement as CSS custom properties and Tailwind config):
+## **Instructions/Tasks**
+
+### **Phase 1: Foundation Enhancement (Priority: HIGH)**
+
+#### **1.1 Modern CSS Framework Integration**
+- Migrate from pure CSS to Tailwind CSS for better maintainability and consistency
+- Implement custom Tailwind configuration with Vedic-inspired design tokens
+- Create utility classes for common Vedic UI patterns (mandala borders, celestial gradients)
+- Maintain existing component structure while upgrading styling approach
+
+#### **1.2 Design System Implementation**
+
+**Color Palette** (implement as CSS custom properties and Tailwind config):
 
 ```css
 /* Primary Vedic Colors */

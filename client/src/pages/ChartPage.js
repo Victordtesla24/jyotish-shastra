@@ -69,33 +69,33 @@ const ChartPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-sacred-white to-gray-50">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Header */}
-        <div className="text-center mb-12">
-          <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 bg-gradient-to-br from-cosmic-purple to-vedic-gold rounded-full flex items-center justify-center">
-              <span className="text-2xl text-white">📊</span>
+        <div className="text-center mb-8 sm:mb-12">
+          <div className="flex justify-center mb-4 sm:mb-6">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-cosmic-purple to-vedic-gold rounded-full flex items-center justify-center">
+              <span className="text-xl sm:text-2xl text-white">📊</span>
             </div>
           </div>
-          <h1 className="font-accent text-4xl md:text-5xl font-bold text-earth-brown mb-4">
+          <h1 className="font-accent text-3xl sm:text-4xl md:text-5xl font-bold text-earth-brown mb-3 sm:mb-4">
             Birth Chart Generation
           </h1>
-          <p className="text-lg text-wisdom-gray max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg text-wisdom-gray max-w-2xl mx-auto px-4">
             Create your authentic Vedic birth chart with precise astronomical calculations
             based on traditional Indian astrology principles.
           </p>
         </div>
 
         {/* Steps Guide */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12">
           {steps.map((step) => (
             <Card key={step.number} variant="elevated" className="text-center">
-              <CardContent className="p-6">
-                <div className="text-3xl mb-4">{step.icon}</div>
-                <div className="w-8 h-8 bg-cosmic-purple text-white rounded-full flex items-center justify-center mx-auto mb-3 font-bold">
+              <CardContent className="p-4 sm:p-6">
+                <div className="text-2xl sm:text-3xl mb-3 sm:mb-4">{step.icon}</div>
+                <div className="w-6 h-6 sm:w-8 sm:h-8 bg-cosmic-purple text-white rounded-full flex items-center justify-center mx-auto mb-2 sm:mb-3 font-bold text-sm sm:text-base">
                   {step.number}
                 </div>
-                <h3 className="font-accent text-lg font-bold text-earth-brown mb-2">
+                <h3 className="font-accent text-base sm:text-lg font-bold text-earth-brown mb-2">
                   {step.title}
                 </h3>
                 <p className="text-wisdom-gray text-sm">
@@ -106,13 +106,13 @@ const ChartPage = () => {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 sm:gap-8">
           {/* Birth Data Form */}
-          <div>
-            <Card variant="vedic" className="sticky top-8">
+          <div className="order-2 xl:order-1">
+            <Card variant="vedic" className="sticky top-4 sm:top-8">
               <CardHeader>
-                <CardTitle className="text-white flex items-center">
-                  <span className="text-2xl mr-3">🕉️</span>
+                <CardTitle className="text-white flex items-center text-lg sm:text-xl">
+                  <span className="text-xl sm:text-2xl mr-2 sm:mr-3">🕉️</span>
                   Birth Details
                 </CardTitle>
               </CardHeader>
@@ -121,41 +121,45 @@ const ChartPage = () => {
                   onSubmit={handleChartGeneration}
                   isLoading={isLoading}
                 />
-                {error && <div className="text-red-500 mt-4">{error}</div>}
+                {error && (
+                  <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 sm:px-4 sm:py-3 rounded-vedic mt-3 sm:mt-4 text-sm">
+                    <span className="font-medium">Error:</span> {error}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
 
           {/* Chart Display */}
-          <div>
+          <div className="order-1 xl:order-2">
             {!chartData && !isLoading ? (
-              <Card variant="elevated" className="h-96 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="text-6xl mb-4 opacity-50">📊</div>
-                  <h3 className="font-accent text-xl font-bold text-earth-brown mb-2">
+              <Card variant="elevated" className="h-80 sm:h-96 flex items-center justify-center">
+                <div className="text-center px-4">
+                  <div className="text-4xl sm:text-6xl mb-3 sm:mb-4 opacity-50">📊</div>
+                  <h3 className="font-accent text-lg sm:text-xl font-bold text-earth-brown mb-2">
                     Ready to Generate Your Chart
                   </h3>
-                  <p className="text-wisdom-gray">
-                    Fill in your birth details on the left to begin your cosmic journey.
+                  <p className="text-wisdom-gray text-sm sm:text-base">
+                    Fill in your birth details to begin your cosmic journey.
                   </p>
                 </div>
               </Card>
             ) : isLoading ? (
-              <Card variant="elevated" className="h-96 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-br from-cosmic-purple to-vedic-gold rounded-full flex items-center justify-center mx-auto mb-4 animate-spin">
-                    <span className="text-xl text-white">🕉️</span>
+              <Card variant="elevated" className="h-80 sm:h-96 flex items-center justify-center">
+                <div className="text-center px-4">
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-cosmic-purple to-vedic-gold rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 animate-spin">
+                    <span className="text-lg sm:text-xl text-white">🕉️</span>
                   </div>
-                  <h3 className="font-accent text-xl font-bold text-earth-brown mb-2">
+                  <h3 className="font-accent text-lg sm:text-xl font-bold text-earth-brown mb-2">
                     Generating Your Chart
                   </h3>
-                  <p className="text-wisdom-gray">
+                  <p className="text-wisdom-gray text-sm sm:text-base">
                     Calculating planetary positions and cosmic influences...
                   </p>
                 </div>
               </Card>
             ) : (
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 {/* Enhanced Vedic Chart Display */}
                 <VedicChartDisplay
                   chartData={chartData}
@@ -165,8 +169,8 @@ const ChartPage = () => {
                 {/* Traditional Chart Display (Fallback) */}
                 <Card variant="elevated" className="mt-4">
                   <CardHeader>
-                    <CardTitle className="flex items-center">
-                      <span className="text-2xl mr-3">📊</span>
+                    <CardTitle className="flex items-center text-lg sm:text-xl">
+                      <span className="text-xl sm:text-2xl mr-2 sm:mr-3">📊</span>
                       Alternative Chart View
                     </CardTitle>
                   </CardHeader>
@@ -180,18 +184,18 @@ const ChartPage = () => {
                 </Card>
 
                 {/* Chart Actions */}
-                <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                   <Button
                     variant="outline"
-                    className="flex-1 border-cosmic-purple text-cosmic-purple hover:bg-cosmic-purple hover:text-white"
+                    className="flex-1 border-cosmic-purple text-cosmic-purple hover:bg-cosmic-purple hover:text-white btn-responsive"
                     onClick={() => setAnalysisType('birth-data')}
                   >
-                    View Analysis
+                    📋 View Analysis
                   </Button>
                   <Button
-                    className="flex-1 bg-gradient-to-r from-cosmic-purple to-vedic-primary"
+                    className="flex-1 bg-gradient-to-r from-cosmic-purple to-vedic-primary btn-responsive"
                   >
-                    Generate Full Report
+                    📄 Generate Full Report
                   </Button>
                 </div>
               </div>
@@ -200,29 +204,29 @@ const ChartPage = () => {
         </div>
 
         {/* Information Section */}
-        <div className="mt-16">
+        <div className="mt-12 sm:mt-16">
           <Card variant="cosmic">
-            <CardContent className="p-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            <CardContent className="p-6 sm:p-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 items-center">
                 <div>
-                  <h3 className="font-accent text-2xl font-bold text-white mb-4">
+                  <h3 className="font-accent text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4">
                     Why Accurate Birth Time Matters
                   </h3>
-                  <p className="text-white/90 leading-relaxed mb-4">
+                  <p className="text-white/90 leading-relaxed mb-3 sm:mb-4 text-sm sm:text-base">
                     In Vedic astrology, precise birth time is crucial for accurate chart casting.
                     Even a 4-minute difference can change your Lagna (ascendant), affecting the
                     entire interpretation of your chart.
                   </p>
-                  <ul className="text-white/80 space-y-2 text-sm">
+                  <ul className="text-white/80 space-y-1 sm:space-y-2 text-xs sm:text-sm">
                     <li>• Determines your exact Lagna and house positions</li>
                     <li>• Affects planetary strength calculations</li>
                     <li>• Essential for accurate Dasha periods</li>
                     <li>• Influences yoga formations and their timing</li>
                   </ul>
                 </div>
-                <div className="text-center">
-                  <div className="text-6xl text-white/80 mb-4">⏰</div>
-                  <p className="text-white/60 italic">
+                <div className="text-center mt-4 lg:mt-0">
+                  <div className="text-4xl sm:text-6xl text-white/80 mb-3 sm:mb-4">⏰</div>
+                  <p className="text-white/60 italic text-sm sm:text-base">
                     "Time is the most precious element in astrological calculations"
                   </p>
                 </div>

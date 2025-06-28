@@ -307,9 +307,11 @@
 
 **Remember: You are creating a digital bridge between ancient Vedic wisdom and modern technology. Every design decision should honor the sacred nature of Jyotish Shastra while providing an exceptional, accessible, and engaging user experience. Focus on creating something that feels both timeless and cutting-edge, respectful yet innovative.**
 
------
+------------------------------------------------
 
 ***UI CHANGING PROMPT***
+
+------------------------------------------------
 
 ## ****Role**
 
@@ -518,11 +520,11 @@
 ***Remember:*** **You are creating a digital bridge between ancient Vedic wisdom and modern technology. Every design decision should honor the sacred nature of Jyotish Shastra while providing an exceptional, accessible, and engaging user experience. Focus on creating something that feels both timeless and cutting-edge, respectful yet innovative.**
 
 
-------
+------------------------------------------------
 
 ***GENERIC PROMPT OPTIMIZATION PROMPT***
 
-------
+------------------------------------------------
 
 **[Role]**
 
@@ -647,10 +649,11 @@
   -   Contains every single detail above
 
 
-----------
+------------------------------------------------
 
+***UI CHANGING PROMPT***
 
-----------
+------------------------------------------------
 
 ## ****Role:**
 
@@ -957,6 +960,8 @@
 
 **Remember: You are creating a digital bridge between ancient Vedic wisdom and modern technology. Every design decision should honor the sacred nature of Jyotish Shastra while providing an exceptional, accessible, and engaging user experience. Focus on creating something that feels both timeless and cutting-edge, respectful yet innovative.**
 
+------------------------------------------------
+
 
 
 
@@ -1082,8 +1087,11 @@ Task completion achieved **ONLY** when:
   ```
 
 
+------------------------------------------------
 
+***`cURL` TESTING PROMPT***
 
+------------------------------------------------
 
 ## **Role**
 Act as a **10x Engineer/Senior Software Developer** with expertise in astronomical calculations, API development, and system analysis. Think systematically before acting and proceed with precision.
@@ -1219,7 +1227,11 @@ Create detailed analysis table documenting:
 **Task Status**: Incomplete until every single requirement above is fully satisfied and validated.
 
 
+------------------------------------------------
 
+***CREATING AN ERROR TRAIL FOR ERROR FIXING PROMPT***
+
+------------------------------------------------
 
 # **Role**
 You are a **10x Engineer/Senior Software Developer** specializing in comprehensive error analysis, debugging, and minimal-impact code fixes across all programming languages and platforms.
@@ -1461,103 +1473,217 @@ Create an **ASCII-based flowchart** in markdown format showing:
 - **Ensure scalability** - fixes should work across different environments and use cases
 
 
+------------------------------------------------
 
+***ERROR TRAIL AND ERROR FIXING PROTOCOL PROMPT***
+
+------------------------------------------------
 
 # **Role**
 
-You are a 10x Senior Software Engineer and Error Resolution Specialist with expertise in systematic testing, debugging, and minimal-impact code fixes. Act with precision, think methodically, and proceed with careful analysis before implementation.
+## Role
+Act as a **10x Engineer/Senior Software Developer** with expertise in astronomical calculations, API development, system testing, and comprehensive error analysis. Think systematically before acting and proceed with precision following established protocols.
 
-# **Objective**
+## Objectives
 
-Execute comprehensive test suites, systematically resolve all errors following established protocols, and implement targeted fixes for persistent issues through complete error trail analysis while maintaining absolute codebase integrity.
+### Objective 1: Complete System Functionality Testing
+Comprehensively test full system functionality from Frontend Implementation (`client/`) - starting from the first UI component (e.g., text box on `birthChart` form) to Backend Implementation (`src/`) using `cURL` - without human intervention. Identify requirement gaps and fix them to ensure a fully operational **production-ready** product.
 
-# **Prerequisites**
+### Objective 2: Error Trail Analysis & Resolution
+Execute comprehensive test suites, systematically resolve all errors following **002-error-fixing-protocols.mdc**, and implement targeted fixes for persistent issues through complete error trail analysis while maintaining absolute codebase and architectural integrity.
 
-- Strict adherence to **@002-error-fixing-protocols.mdc** and **@001-directory-management-protocols.mdc**
-- Access to complete test suites and error logs
-- Ability to conduct comprehensive online research for solution validation
-- Understanding of project architecture and dependency relationships
+## Prerequisites
+- **System Architecture Mastery**: Comprehensive understanding of `@system-architecture.md`, `@validation-guide.md`, `@requirements-analysis-questions.md`, and `@project-structure.md`
+- **Codebase Proficiency**: Deep knowledge of Frontend (`/client`) and Backend (`/src`) implementations
+- **Protocol Adherence**: Strict compliance with **002-error-fixing-protocols.mdc** and **001-directory-management-protocols.mdc**
+- **Astronomical Knowledge**: Understanding of Vedic astrology calculations, timezone handling, and ephemeris data
+- **Error Analysis Capability**: Ability to trace complete error propagation chains and conduct comprehensive online research
 
-# **Analysis/Research Instructions**
+**Note**: Both Frontend and Backend servers are operational - focus exclusively on functionality validation and error resolution.
 
-- Conduct comprehensive online research to validate solutions before implementation
-- Cross-reference similar error patterns across different technologies and platforms
-- Verify proposed fixes against established best practices and documentation
-- Validate that solutions don't introduce new vulnerabilities or breaking changes
+## Input Test Dataset
+```bash
+Birth Date: 24-10-1985
+Birth Place: Pune, Maharashtra, India
+Birth Time: 14:30
+Gender: Male
+```
 
-# **Core Instructions**
+## Analysis & Research Instructions
 
-## **Phase 1: Test Execution and Initial Error Resolution**
+### Research Phase (Mandatory for All Solutions)
+- **Online Validation**: Conduct comprehensive internet research for each identified issue using proven methodologies
+- **Cross-Reference**: Validate solutions against current best practices and framework documentation
+- **Pattern Analysis**: Cross-reference similar error patterns across different technologies and platforms
+- **Security Validation**: Verify proposed fixes don't introduce vulnerabilities or breaking changes
+- **Documentation Verification**: Validate solutions against established astronomical calculation standards
 
-- Run all test suites and document failures systematically
-- Apply protocol-based fixes following **@002-error-fixing-protocols.mdc** and **@001-directory-management-protocols.mdc**
-- Address standard errors using established resolution patterns
-- Identify persistent errors that require deeper analysis
+## Core Implementation Tasks
 
-## **Phase 2: Complete Error Trail Analysis (For Persistent Errors)**
+### Phase 1: Complete System Functionality Testing
 
-- Trace the complete error path from initial trigger to final failure point
-- Identify all affected components including files, functions, services, and dependencies
-- Map circular dependencies and recursive call patterns
-- Document the exact error propagation chain through all architectural layers
+#### Frontend to Backend Integration Testing
+1. **Frontend Component Testing**: Start from first UI element (birth chart form text box) through complete user workflow
+2. **API Integration Testing**: Test all Frontend-to-Backend communication paths
+3. **End-to-End Workflow**: Validate complete user journey from data input to report generation
+4. **Cross-Component Validation**: Verify seamless integration between all system components
 
-## **Phase 3: Visual Error Trail Documentation**
+#### Comprehensive API Testing & Documentation
+Create ASCII-based Input/Output Data Table (120-character fixed-width columns) containing:
+- **cURL Commands**: Complete test commands for ALL Backend API endpoints
+- **Response Analysis**: Full JSON responses with validation against expected outputs
+- **API Structure Documentation**: Input/output structures for every endpoint
+- **Integration Validation**: Verify Frontend component integration with each API endpoint
 
-Create an ASCII-based flowchart in markdown format showing:
+#### Reference Data Validation
+1. **PDF Data Extraction**: Extract **Planetary Position** and **Kundli/Birth Chart** sections from `@kundli-for-testing.pdf`
+2. **Baseline Establishment**: Create structured ASCII tables from PDF-extracted data
+3. **System Comparison**: Build comprehensive comparison between system output and reference data
+4. **Accuracy Assessment**: Quantify calculation discrepancies and identify root causes
 
-- Entry points and initial error triggers
-- Complete call stack with file names and line numbers
-- Error propagation paths with success/failure indicators
-- Circular dependency loops with clear visual markers
-- Final error states and their impact on system functionality
-- Component impact mapping categorized by severity (**Critical/Warning/Info**)
+### Phase 2: Test Execution and Initial Error Resolution
 
-## **Phase 4: Targeted Solution Implementation**
+#### Protocol-Based Error Resolution
+- **Test Suite Execution**: Run all test suites and document failures systematically
+- **Standard Fixes**: Apply fixes following **002-error-fixing-protocols.mdc** and **001-directory-management-protocols.mdc**
+- **Error Classification**: Categorize errors by impact (**Critical/Warning/Info**)
+- **Persistent Error Identification**: Identify errors requiring deeper analysis
 
-- Research and validate the most effective fix for each identified issue
-- Implement minimal changes targeting only the impacted code segments
-- Preserve all existing functionality outside the error scope
-- Test fixes to ensure no new errors are introduced
+### Phase 3: Complete Error Trail Analysis (For Persistent Errors)
 
-# **Deliverables/Outcomes**
+#### Error Propagation Mapping
+- **Complete Call Stack Tracing**: Trace error path from initial trigger to final failure point
+- **Component Impact Analysis**: Identify all affected files, functions, services, and dependencies
+- **Circular Dependency Detection**: Map recursive call patterns and dependency loops
+- **Architecture Layer Analysis**: Document error propagation through all system layers
 
-## **1. Complete Error Trail Analysis Report**
-- Full end-to-end error trace with technical details
-- ASCII flowchart showing comprehensive error flow
-- Component impact map with severity classifications
-- Architecture layer analysis showing failure propagation
+#### Visual Error Trail Documentation
+Create ASCII-based flowchart in markdown format showing:
+- **Entry Points**: Initial error triggers with file names and line numbers
+- **Propagation Paths**: Complete call stack with success/failure indicators
+- **Circular Dependencies**: Loops with clear visual markers
+- **Impact Assessment**: Component impact mapping by severity
+- **Failure States**: Final error states and system functionality impact
 
-## **2. Targeted Fix Implementation**
-- Precise code changes addressing only identified issues
-- Research-backed solution rationale for each fix
-- Verification that fixes resolve root causes without side effects
+### Phase 4: Targeted Solution Implementation & Root Cause Resolution
 
-## **3. Quality Assurance Documentation**
-- Confirmation that all existing functionality remains intact
-- Validation that circular dependencies are resolved
-- Proof that error propagation chains are broken
+#### Research-Informed Fix Implementation
+- **Root Cause Analysis**: Create detailed analysis table documenting:
+  - **Specific Issues**: Timezone conversion errors, placeholder data usage, calculation inaccuracies
+  - **Location Mapping**: Exact files, functions, and code segments affected
+  - **Error Trail**: Complete propagation path from source to output
+  - **Impact Assessment**: Scope of affected functionality
+  - **Resolution Strategy**: Minimal, effective code fixes with research backing
 
-# **Constraints**
-- **NEVER** implement mock functions, stubs, or incomplete solutions
-- **NEVER** modify code outside the identified error scope
-- **NEVER** suppress errors or warnings without proper resolution
-- **NEVER** create false positive test results or bypass actual issues
-- **ALWAYS** maintain backward compatibility and existing functionality
-- **ALWAYS** use minimal, precise code changes
-- **ALWAYS** validate solutions through comprehensive research
+#### Solution Validation & Implementation
+- **Minimal Code Changes**: Apply only necessary modifications targeting identified issues
+- **Swiss Ephemeris Integrity**: Ensure timezone preservation (no unwanted conversions)
+- **Calculation Accuracy**: Eliminate placeholder/mock data producing incorrect results
+- **Astronomical Validation**: Verify calculations match established ephemeris standards
 
-# **Success Criteria**
-- ✅ Complete error trail identified and documented with visual flowchart
-- ✅ All circular dependencies and recursive issues resolved
-- ✅ Root cause fixes implemented with minimal code impact
-- ✅ Zero regression in existing functionality
-- ✅ Error propagation chains completely eliminated
-- ✅ All fixes validated through online research and testing
-- ✅ Documentation clear enough for future maintenance and debugging
+### Phase 5: Comprehensive Validation Testing
 
-# **Additional Notes**
-- **Protocol Compliance**: Mandatory adherence to both **@002-error-fixing-protocols.mdc** and **@001-directory-management-protocols.mdc** at all times
+#### Production Readiness Validation
+- **Complete Test Suite**: Create comprehensive `cURL`-based test scripts
+- **Accuracy Verification**: Execute tests to verify system output matches PDF reference data
+- **Integration Testing**: Validate all Frontend-Backend integration points
+- **Performance Assessment**: Ensure production-level performance standards
+
+#### Documentation & Architecture Updates
+- **cURL Testing Guide**: Update `@cURL-data-testing.md` with all analysis and comparative data
+- **Architecture Documentation**: Enhance `@system-architecture.md` with current accurate state
+- **API Documentation**: Update `@validation-guide.md` with validated endpoints
+- **Structure Preservation**: Maintain existing document content and formatting
+
+## Deliverables/Outcomes
+
+### 1. Complete System Functionality Report
+- **Frontend-Backend Integration Map**: Complete component interaction documentation
+- **API Test Results**: Structured ASCII tables (120-char width) for all endpoints
+- **Reference Data Validation**: PDF extraction and comparison tables
+- **Requirement Gap Analysis**: Identified gaps with resolution strategies
+
+### 2. Complete Error Trail Analysis Report
+- **End-to-End Error Traces**: Full technical details with visual flowcharts
+- **ASCII Error Flow Diagrams**: Comprehensive error propagation visualization
+- **Component Impact Maps**: Severity-classified impact assessments
+- **Circular Dependency Resolution**: Complete dependency loop elimination
+
+### 3. Targeted Fix Implementation
+- **Root Cause Documentation**: Detailed analysis with research-backed solutions
+- **Minimal Code Changes**: Precise modifications addressing only identified issues
+- **Architecture Compliance**: Strict adherence to existing system structure
+- **Solution Validation**: Research-verified fixes with zero side effects
+
+### 4. Production-Ready System Validation
+- **Complete Test Suite**: Validated `cURL` test scripts with comprehensive results
+- **Updated Documentation**: Enhanced system, API, and testing documentation
+- **Performance Verification**: Production-level performance and accuracy confirmation
+- **Quality Assurance**: Zero regression confirmation with comprehensive validation
+
+## Critical Constraints
+
+### Operational Restrictions
+- **Zero Tolerance for Mocking**: No fake, mock, or simulated code generating false positives
+- **Protocol Compliance**: Mandatory adherence to **002-error-fixing-protocols.mdc** and **001-directory-management-protocols.mdc**
+- **No Duplication**: Prevent creation of duplicate files, code, or scripts
+- **No Assumptions**: Never assume or jump to conclusions; always validate through research
+
+### Implementation Guidelines
+- **Think Before Acting**: Act like a 10x Engineer, analyze before implementing
+- **Minimal Code Changes**: Apply only necessary modifications
+- **Timezone Integrity**: Preserve local timezone without unwanted conversions
+- **Astronomical Accuracy**: Ensure calculations match established ephemeris standards
+- **System Stability**: Maintain existing functionality while resolving issues
+- **Research Validation**: Every solution must be verified through online research before implementation
+
+### Error Resolution Standards
+- **Complete Error Trails**: Never suppress errors without proper resolution
+- **No False Positives**: All test results must reflect genuine system accuracy
+- **Surgical Fixes**: Focus on precise changes preserving all existing functionality
+- **Documentation Integrity**: Maintain backward compatibility and clear documentation
+
+## Success Criteria
+
+### Objective 1 Completion Validation
+- [ ] Complete Frontend-Backend integration testing performed and documented
+- [ ] All API endpoints tested with `cURL` and results documented in ASCII tables
+- [ ] PDF reference data extracted and compared with system output
+- [ ] All discrepancies identified and resolved with minimal code changes
+- [ ] Production-ready system validated through comprehensive testing
+- [ ] Documentation updated with accurate current state information
+
+### Objective 2 Completion Validation
+- [ ] Complete error trail identified and documented with visual flowchart
+- [ ] All circular dependencies and recursive issues resolved
+- [ ] Root cause fixes implemented with minimal code impact and research validation
+- [ ] Zero regression in existing functionality confirmed
+- [ ] Error propagation chains completely eliminated
+- [ ] Every single error isolated & fixed inline with existing architecture
+- [ ] All error fixes validated through online research before implementation
+- [ ] Documentation clear enough for future maintenance and debugging
+
+### Overall System Validation
+- [ ] **Production Readiness**: System functions correctly in real-world scenarios
+- [ ] **Calculation Accuracy**: Astronomical calculations match reference standards
+- [ ] **Integration Integrity**: Seamless Frontend-Backend communication verified
+- [ ] **Protocol Compliance**: Full adherence to error fixing and directory management protocols
+- [ ] **Documentation Completeness**: All analysis, fixes, and validations thoroughly documented
+- [ ] **Quality Assurance**: Zero false positives, all functionality preserved
+
+## Additional Notes
+- **Protocol Compliance**: Mandatory adherence to both **002-error-fixing-protocols.mdc** and **001-directory-management-protocols.mdc** at all times
 - **Systematic Approach**: Complete each phase methodically before proceeding to the next
+- **No Human Intervention**: Execute all tasks autonomously until every success criteria is met
 - **Research Validation**: Every proposed solution must be verified through online research
 - **Minimal Impact**: Focus on surgical fixes that preserve all existing functionality
-- **Documentation**: Maintain clear, actionable documentation for future reference
+- **Task Completion**: Never consider task "finished" until ALL success criteria are met fully and completely
+
+**Task Status**: Incomplete until every single requirement above is fully satisfied, validated, and documented
+
+
+------------------------------------------------
+
+
+
+------------------------------------------------

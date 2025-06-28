@@ -43,14 +43,17 @@ const ChartDisplay = ({ chartData, analysisType, useComprehensive }) => {
           return null;
         }
 
-                const { data } = chartData;
+        // Handle different data structures flexibly
+        // chartData could be: { data: {...} } or direct chart data object
+        const data = chartData.data || chartData;
 
-        // Add defensive check for data
-        if (!data) {
-          console.warn('Chart data is missing data property:', chartData);
+        // Add defensive check for data with more flexible validation
+        if (!data || (typeof data !== 'object')) {
+          console.warn('Chart data is not in expected format:', chartData);
           return (
             <div className="text-center p-4">
-              <p className="text-red-500">Chart data is incomplete. Please try generating the chart again.</p>
+              <div className="text-amber-600 mb-2">⚠️</div>
+              <p className="text-amber-700">Chart data is being processed. Please wait a moment or try regenerating the chart.</p>
             </div>
           );
         }
@@ -61,6 +64,7 @@ const ChartDisplay = ({ chartData, analysisType, useComprehensive }) => {
           dataKeys: Object.keys(data),
           hasBirthDataAnalysis: !!data.birthDataAnalysis,
           hasAnalysis: !!data.analysis,
+          hasRasiChart: !!data.rasiChart,
           analysisType,
           viewMode
         });
@@ -97,7 +101,12 @@ const ChartDisplay = ({ chartData, analysisType, useComprehensive }) => {
           return <BasicAnalysisDisplay data={data} />;
         }
 
-        return null;
+        return (
+          <div className="text-center p-4">
+            <div className="text-blue-600 mb-2">ℹ️</div>
+            <p className="text-blue-700">Chart data loaded successfully. Analysis will appear here.</p>
+          </div>
+        );
       })()}
     </div>
   );

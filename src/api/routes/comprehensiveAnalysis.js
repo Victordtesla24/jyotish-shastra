@@ -146,7 +146,8 @@ router.post('/comprehensive', rateLimiter, async (req, res) => {
         const analysis = await orchestrator.performComprehensiveAnalysis(finalBirthData, {
             includeNavamsa: true,
             includeYogas: true,
-            includeDashas: true
+            includeDashas: true,
+            legacyFormat: false
         });
 
         // CRITICAL FIX: Only log in development environment

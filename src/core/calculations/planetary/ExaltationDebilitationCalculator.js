@@ -59,6 +59,34 @@ class ExaltationDebilitationCalculator {
       }
     };
 
+    // Moolatrikona data
+    this.moolatrikonaData = {
+        'sun': { sign: 4, start: 0, end: 20, signName: 'Leo' },
+        'moon': { sign: 1, start: 3, end: 30, signName: 'Taurus' },
+        'mars': { sign: 0, start: 0, end: 12, signName: 'Aries' },
+        'mercury': { sign: 5, start: 15, end: 20, signName: 'Virgo' },
+        'jupiter': { sign: 8, start: 0, end: 10, signName: 'Sagittarius' },
+        'venus': { sign: 6, start: 0, end: 15, signName: 'Libra' },
+        'saturn': { sign: 10, start: 0, end: 20, signName: 'Aquarius' }
+    };
+
+    // Own house data
+    this.ownHouseData = {
+        'sun': [4], 'moon': [3], 'mars': [0, 7], 'mercury': [2, 5],
+        'jupiter': [8, 11], 'venus': [1, 6], 'saturn': [9, 10]
+    };
+
+    // Planetary friendships (permanent)
+    this.friendshipData = {
+        'sun': { friends: ['moon', 'mars', 'jupiter'], enemies: ['venus', 'saturn'], neutral: ['mercury'] },
+        'moon': { friends: ['sun', 'mercury'], enemies: [], neutral: ['mars', 'jupiter', 'venus', 'saturn'] },
+        'mars': { friends: ['sun', 'moon', 'jupiter'], enemies: ['mercury'], neutral: ['venus', 'saturn'] },
+        'mercury': { friends: ['sun', 'venus'], enemies: ['moon'], neutral: ['mars', 'jupiter', 'saturn'] },
+        'jupiter': { friends: ['sun', 'moon', 'mars'], enemies: ['mercury', 'venus'], neutral: ['saturn'] },
+        'venus': { friends: ['mercury', 'saturn'], enemies: ['sun', 'moon'], neutral: ['mars', 'jupiter'] },
+        'saturn': { friends: ['mercury', 'venus'], enemies: ['sun', 'moon', 'mars'], neutral: ['jupiter'] }
+    };
+
     // Debilitation data (exactly opposite to exaltation)
     this.debilitationData = {
       'sun': {
@@ -193,6 +221,48 @@ class ExaltationDebilitationCalculator {
 
         dignity.description = debilData.description;
         dignity.effects = this.getDebilitationEffects(planetKey, dignity.dignityStrength);
+        return dignity;
+      }
+    }
+
+    // Check for Moolatrikona
+    if (this.moolatrikonaData[planetKey]) {
+        const moolaData = this.moolatrikonaData[planetKey];
+        if (sign === moolaData.sign && degree >= moolaData.start && degree <= moolaData.end) {
+            dignity.dignityType = 'Moolatrikona';
+            dignity.dignityStrength = 1.7;
+            dignity.description = `${planet} in Moolatrikona in ${moolaData.signName}, a position of great strength.`;
+            return dignity;
+        }
+    }
+
+    // Check for Own House (Swa-kshetra)
+    if (this.ownHouseData[planetKey] && this.ownHouseData[planetKey].includes(sign)) {
+        dignity.dignityType = 'Own House';
+        dignity.dignityStrength = 1.5;
+        dignity.description = `${planet} in its own house, ${dignity.signName}, providing comfort and strength.`;
+        return dignity;
+    }
+
+    // Check for Friendship status
+    const signLord = this.getSignLord(sign);
+    if (this.friendshipData[planetKey] && signLord) {
+        if (this.friendshipData[planetKey].friends.includes(signLord)) {
+            dignity.dignityType = 'Friends House';
+            dignity.dignityStrength = 1.3;
+            dignity.description = `${planet} is in the house of a friend (${signLord}), which is a supportive placement.`;
+            return dignity;
+        }
+        if (this.friendshipData[planetKey].enemies.includes(signLord)) {
+            dignity.dignityType = 'Enemies House';
+            dignity.dignityStrength = 0.6;
+            dignity.description = `${planet} is in the house of an enemy (${signLord}), causing potential weakness.`;
+            return dignity;
+        }
+        if (this.friendshipData[planetKey].neutral.includes(signLord)) {
+            dignity.dignityType = 'Neutral House';
+            dignity.dignityStrength = 1.0;
+            dignity.description = `${planet} is in the house of a neutral planet (${signLord}), resulting in standard strength.`;
         return dignity;
       }
     }
@@ -648,6 +718,11 @@ class ExaltationDebilitationCalculator {
     }
 
     return 'Neutral'; // Default case
+  }
+
+  getSignLord(signIndex) {
+      const lords = ['mars', 'venus', 'mercury', 'moon', 'sun', 'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'saturn', 'jupiter'];
+      return lords[signIndex];
   }
 }
 

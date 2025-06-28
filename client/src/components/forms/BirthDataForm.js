@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { Button } from '../ui';
 import geocodingService from '../../services/geocodingService';
@@ -15,8 +15,11 @@ const BirthDataForm = ({ onSubmit, isLoading }) => {
   const [coordinates, setCoordinates] = useState(null);
   const [formattedAddress, setFormattedAddress] = useState(null);
 
-  const debouncedGeocode = useCallback(
-    debounce(async (place) => {
+  // Memoise the debounced function so its identity only changes when its
+  // internal dependencies change, satisfying the `react-hooks/exhaustive-deps`
+  // rule.
+  const debouncedGeocode = useMemo(
+    () => debounce(async (place) => {
       if (place && place.length >= 3) {
         setGeocodingStatus('pending');
         setGeocodingError(null);
@@ -55,6 +58,8 @@ const BirthDataForm = ({ onSubmit, isLoading }) => {
 
   useEffect(() => {
     debouncedGeocode(placeOfBirthValue);
+    // Cancel the debounced invocation on unmount to avoid memory leaks.
+    return () => debouncedGeocode.cancel();
   }, [placeOfBirthValue, debouncedGeocode]);
 
   const handleFormSubmit = (data) => {

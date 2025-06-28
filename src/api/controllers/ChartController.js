@@ -5,6 +5,7 @@
  */
 
 const ChartGenerationService = require('../../services/chart/ChartGenerationService');
+const GeocodingService = require('../../services/geocoding/GeocodingService');
 const LagnaAnalysisService = require('../../services/analysis/LagnaAnalysisService');
 const HouseAnalysisService = require('../../core/analysis/houses/HouseAnalysisService');
 const BirthDataAnalysisService = require('../../services/analysis/BirthDataAnalysisService');
@@ -13,7 +14,8 @@ const { validateChartRequest } = require('../validators/birthDataValidator');
 
 class ChartController {
   constructor() {
-    this.chartService = new ChartGenerationService();
+    this.geocodingService = new GeocodingService();
+    this.chartService = new ChartGenerationService(this.geocodingService);
     this.lagnaService = new LagnaAnalysisService();
     this.houseService = new HouseAnalysisService();
     this.birthDataAnalysisService = new BirthDataAnalysisService();
@@ -85,6 +87,12 @@ class ChartController {
 
       // Process timezone format conversion
       const processedBirthData = this.processTimezoneFormat(validationResult.data);
+
+      // Geocode location if coordinates are not provided
+      if (!processedBirthData.latitude || !processedBirthData.longitude) {
+        const geocodedData = await this.geocodingService.geocodeLocation(processedBirthData);
+        Object.assign(processedBirthData, geocodedData);
+      }
 
       // Generate comprehensive chart
       const chartData = await this.chartService.generateComprehensiveChart(processedBirthData);
@@ -163,6 +171,16 @@ class ChartController {
           'Ensure the date and time are valid.'
         ];
         response.helpText = 'The calculation engine failed. This is often due to coordinates being too close to the poles or an invalid date/time.';
+      } else if (lowerCaseErrorMessage.includes('location not found')) {
+        statusCode = 404;
+        response.error = 'Location Not Found';
+        response.message = 'The specified birth place could not be resolved to coordinates.';
+        response.details = [{ field: 'placeOfBirth', message: error.message, providedValue: req.body.placeOfBirth }];
+        response.suggestions = [
+          'Try a more specific format like "City, State, Country".',
+          'Ensure spelling is correct.'
+        ];
+        response.helpText = 'We could not geocode the provided location.';
       } else if (lowerCaseErrorMessage.includes('latitude and longitude are required')) {
         statusCode = 400;
         response.error = 'Missing Location Data';
@@ -185,6 +203,13 @@ class ChartController {
         }];
         response.suggestions = ['Use IANA format (e.g., "Asia/Kolkata") or UTC offset (e.g., "+05:30").'];
         response.helpText = 'The timezone needs to be in a standard format recognized by the system.';
+      } else if (lowerCaseErrorMessage.includes('geocoding api error')) {
+        statusCode = lowerCaseErrorMessage.includes('location not found') ? 404 : 400;
+        response.error = 'Geocoding Failed';
+        response.message = error.message;
+        response.details = [{ field: 'placeOfBirth', message: error.message, providedValue: req.body.placeOfBirth }];
+        response.suggestions = ['Provide a more specific place name (e.g., "City, State, Country")', 'Verify spelling or try nearby city.'];
+        response.helpText = 'We were unable to determine coordinates for the provided place of birth.';
       }
 
       return res.status(statusCode).json(response);

@@ -67,7 +67,7 @@ class ChartService {
 
       console.log('Generating chart with validated data:', birthData);
 
-      const response = await this.api.post('/v1/chart/generate', birthData);
+      const response = await this.api.post('/chart/generate', birthData);
 
       if (!response.data.success) {
         throw new Error(response.data.message || 'Chart generation failed');
