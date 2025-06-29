@@ -185,12 +185,6 @@ const ComprehensiveAnalysisDisplay = ({ data }) => {
           </div>
         </div>
 
-        {/* Hidden Spiritual Analysis for internal use */}
-        <div className="analysis-section hidden">
-          <h4>Spiritual Analysis</h4>
-          <p><strong>Spiritual Indicators:</strong> {analysis.spirituality.spiritualIndicators}</p>
-          <p><strong>Spiritual Path:</strong> {analysis.spirituality.spiritualPath}</p>
-        </div>
       </div>
     </div>
   );

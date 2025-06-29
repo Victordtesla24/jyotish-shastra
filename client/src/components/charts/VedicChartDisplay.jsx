@@ -18,29 +18,46 @@ const VedicChartDisplay = ({ chartData, isLoading = false, className = '' }) => 
     }
   }, [chartData]);
 
-  // Traditional North Indian Kundli diamond layout
-  const housePositions = {
-    // Top triangle
-    1: { top: '0%', left: '50%', transform: 'translate(-50%, 0%)', width: '25%', height: '25%' },
+  // Traditional North Indian Kundli diamond layout - CORRECTED to match template
+  const getHousePosition = (houseNumber) => {
+    const positions = {
+      // House 1 - Top center (Ascendant)
+      1: { top: '8%', left: '50%', transform: 'translate(-50%, -50%)', width: '20%', height: '16%', clipPath: 'polygon(50% 0%, 100% 100%, 0% 100%)' },
 
-    // Right side houses
-    2: { top: '12.5%', left: '75%', transform: 'translate(-50%, -50%)', width: '25%', height: '25%' },
-    3: { top: '37.5%', left: '87.5%', transform: 'translate(-50%, -50%)', width: '25%', height: '25%' },
-    4: { top: '62.5%', left: '75%', transform: 'translate(-50%, -50%)', width: '25%', height: '25%' },
+      // House 2 - Top left
+      2: { top: '8%', left: '25%', transform: 'translate(-50%, -50%)', width: '20%', height: '16%', clipPath: 'polygon(0% 0%, 100% 0%, 50% 100%)' },
 
-    // Bottom triangle
-    5: { top: '75%', left: '62.5%', transform: 'translate(-50%, -50%)', width: '25%', height: '25%' },
-    6: { top: '87.5%', left: '50%', transform: 'translate(-50%, -50%)', width: '25%', height: '25%' },
-    7: { top: '75%', left: '37.5%', transform: 'translate(-50%, -50%)', width: '25%', height: '25%' },
+      // House 3 - Left top
+      3: { top: '25%', left: '8%', transform: 'translate(-50%, -50%)', width: '16%', height: '20%', clipPath: 'polygon(0% 0%, 100% 50%, 0% 100%)' },
 
-    // Left side houses
-    8: { top: '62.5%', left: '25%', transform: 'translate(-50%, -50%)', width: '25%', height: '25%' },
-    9: { top: '37.5%', left: '12.5%', transform: 'translate(-50%, -50%)', width: '25%', height: '25%' },
-    10: { top: '12.5%', left: '25%', transform: 'translate(-50%, -50%)', width: '25%', height: '25%' },
+      // House 4 - Left center
+      4: { top: '50%', left: '8%', transform: 'translate(-50%, -50%)', width: '16%', height: '20%', clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%)' },
 
-    // Inner houses
-    11: { top: '25%', left: '50%', transform: 'translate(-50%, -50%)', width: '25%', height: '25%' },
-    12: { top: '50%', left: '37.5%', transform: 'translate(-50%, -50%)', width: '25%', height: '25%' }
+      // House 5 - Left bottom
+      5: { top: '75%', left: '8%', transform: 'translate(-50%, -50%)', width: '16%', height: '20%', clipPath: 'polygon(100% 0%, 100% 100%, 0% 50%)' },
+
+      // House 6 - Bottom left
+      6: { top: '92%', left: '25%', transform: 'translate(-50%, -50%)', width: '20%', height: '16%', clipPath: 'polygon(50% 0%, 100% 100%, 0% 100%)' },
+
+      // House 7 - Bottom center
+      7: { top: '92%', left: '50%', transform: 'translate(-50%, -50%)', width: '20%', height: '16%', clipPath: 'polygon(0% 0%, 100% 0%, 50% 100%)' },
+
+      // House 8 - Bottom right
+      8: { top: '92%', left: '75%', transform: 'translate(-50%, -50%)', width: '20%', height: '16%', clipPath: 'polygon(0% 0%, 100% 0%, 50% 100%)' },
+
+      // House 9 - Right bottom
+      9: { top: '75%', left: '92%', transform: 'translate(-50%, -50%)', width: '16%', height: '20%', clipPath: 'polygon(0% 0%, 0% 100%, 100% 50%)' },
+
+      // House 10 - Right center
+      10: { top: '50%', left: '92%', transform: 'translate(-50%, -50%)', width: '16%', height: '20%', clipPath: 'polygon(0% 0%, 0% 100%, 100% 100%)' },
+
+      // House 11 - Right top
+      11: { top: '25%', left: '92%', transform: 'translate(-50%, -50%)', width: '16%', height: '20%', clipPath: 'polygon(0% 50%, 100% 0%, 100% 100%)' },
+
+      // House 12 - Top right
+      12: { top: '8%', left: '75%', transform: 'translate(-50%, -50%)', width: '20%', height: '16%', clipPath: 'polygon(0% 0%, 100% 0%, 50% 100%)' }
+    };
+    return positions[houseNumber] || {};
   };
 
   const planetSymbols = {
@@ -117,13 +134,14 @@ const VedicChartDisplay = ({ chartData, isLoading = false, className = '' }) => 
           <div className="absolute inset-4 border border-amber-600/20 transform rotate-45"></div>
 
           {/* House Numbers and Planets */}
-          {Object.entries(housePositions).map(([houseNum, position]) => {
-            const housePlanets = getPlanetsInHouse(parseInt(houseNum));
+          {Array.from({ length: 12 }, (_, i) => i + 1).map((houseNum) => {
+            const position = getHousePosition(houseNum);
+            const housePlanets = getPlanetsInHouse(houseNum);
             return (
               <div
                 key={houseNum}
                 className={`absolute cursor-pointer transition-all hover:bg-yellow-200/80 border border-amber-600/50 ${
-                  selectedHouse === parseInt(houseNum) ? 'ring-2 ring-orange-500 shadow-lg bg-yellow-300/60' : 'bg-amber-50/90'
+                  selectedHouse === houseNum ? 'ring-2 ring-orange-500 shadow-lg bg-yellow-300/60' : 'bg-amber-50/90'
                 }`}
                 style={{
                   ...position,
@@ -135,7 +153,7 @@ const VedicChartDisplay = ({ chartData, isLoading = false, className = '' }) => 
                   alignItems: 'center',
                   padding: '4px'
                 }}
-                onClick={() => setSelectedHouse(parseInt(houseNum))}
+                onClick={() => setSelectedHouse(houseNum)}
               >
                 {/* House Number */}
                 <div className="text-xs font-bold text-amber-800 mb-1">

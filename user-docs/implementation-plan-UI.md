@@ -51,7 +51,6 @@ client/src/
 - Expertise in responsive design and mobile-first development
 - Knowledge of Vedic astrology terminology and cultural sensitivity
 - Proficiency in modern CSS techniques, animations, and micro-interactions
-- Understanding of accessibility (WCAG) and performance optimization
 
 ## **Research/Analysis Tasks**
 
@@ -59,7 +58,6 @@ Before implementing changes, analyze the current codebase to understand:
 
 - **Current UI State**: Review existing components, styling patterns, and user flows
 - **Performance Bottlenecks**: Identify areas for optimization and modern best practices
-- **Accessibility Gaps**: Evaluate current accessibility compliance and improvement opportunities
 - **Mobile Experience**: Assess responsive design implementation and mobile-specific enhancements
 - **Cultural Authenticity**: Ensure all design decisions respect Vedic traditions and Sanskrit terminology
 
@@ -173,7 +171,7 @@ Before implementing changes, analyze the current codebase to understand:
 - Create **loading animations** with *above mentioned celestial themes*
 - Add scroll-triggered animations for content revelation
 
-## **Phase 5: Performance and Accessibility (Priority: HIGH)**
+## **Phase 5: Performance (Priority: LOW)**
 
 ### **5.1 Performance Optimization**
 - Implement code splitting and lazy loading
@@ -181,12 +179,6 @@ Before implementing changes, analyze the current codebase to understand:
 - Add skeleton loading states for better perceived performance
 - Implement efficient caching strategies
 
-### **5.2 Accessibility Enhancement**
-- Ensure **WCAG 2.1 AA compliance**
-- Add advanced *ARIA labels and semantic HTML*
-- Implement keyboard navigation support
-- Create screen reader-friendly chart descriptions
-- Add focus management for interactive elements
 
 ### **5.3 Mobile-First Responsive Design**
 - Optimize touch interactions for mobile devices
@@ -206,7 +198,6 @@ Before implementing changes, analyze the current codebase to understand:
 ### **Advanced Deliverables:**
 - PWA Implementation: Offline-capable, installable web application
 - Performance Optimization: Fast-loading, efficiently bundled application
-- Accessibility Compliance: WCAG 2.1 AA compliant interface
 - Interactive Tools: Enhanced calculators and user engagement features
 
 ## **Constraints**
@@ -228,7 +219,6 @@ Before implementing changes, analyze the current codebase to understand:
 ### **Design Constraints:**
 - Mobile-first responsive design mandatory
 - Support for modern browsers (Chrome 90+, Firefox 88+, Safari 14+)
-- Accessibility compliance (WCAG 2.1 AA minimum)
 - Fast loading times (LCP < 2.5s, FID < 100ms)
 - SEO-friendly implementation
 
@@ -239,10 +229,8 @@ Before implementing changes, analyze the current codebase to understand:
 - **Usability:** Intuitive navigation with <3 clicks to any major feature
 - **Performance:** Page load times <2 seconds on 3G networks
 - **Engagement:** Increased time on site and interaction with tools
-- **Accessibility:** 100% keyboard navigable, screen reader compatible
 
 ### **Technical Metrics:**
-- **Lighthouse Score:** 90+ in all categories (Performance, Accessibility, Best Practices, SEO)
 - **Bundle Size:** Optimized JavaScript bundle <500KB gzipped
 - **Mobile Performance:** Mobile-first design with touch-optimized interactions
 - **Cross-browser Compatibility:** Consistent experience across modern browsers
@@ -261,7 +249,6 @@ Before implementing changes, analyze the current codebase to understand:
 - **Component-First:** Build reusable components before page-level implementations
 - **Mobile-First:** Design and develop for mobile devices first, then scale up
 - **Performance-Conscious:** Monitor bundle size and performance metrics throughout development
-- **Accessibility-Driven:** Consider accessibility in every design and development decision
 
 ### **Cultural Sensitivity Guidelines:**
 - Research proper Sanskrit transliteration and pronunciation guides
@@ -272,7 +259,7 @@ Before implementing changes, analyze the current codebase to understand:
 - **Provide content with context and explanations for traditional concepts, Rashi's, nakshatra's, planets's and other key Vedic Astrology Concepts**
 
 ### **Modern Web Standards:**
-- Use semantic **HTML5 elements** for better SEO and accessibility
+- Use semantic **HTML5 elements** for better animation and high quality web design appeal
 - Implement proper meta tags and structured data for search engines
 - Follow React best practices including proper key props and error boundaries
 - Use modern JavaScript features (ES6+) while maintaining browser compatibility
@@ -283,4 +270,4 @@ Before implementing changes, analyze the current codebase to understand:
 - Validate UI feature functionality, visibility and integration using **browser console** and other techniques
 - User testing with target audience, functionality and requirements validation, UI Features working status & Back End integration as well as for cultural authenticity feedback
 
-*Remember: You are creating a digital bridge between ancient Vedic wisdom and modern technology. Every design decision should honor the sacred nature of Jyotish Shastra while providing an exceptional, accessible, and engaging user experience. Focus on creating something that feels both timeless and cutting-edge, respectful yet innovative.*
+*Remember: You are creating a digital bridge between ancient Vedic wisdom and modern technology. Every design decision should honor the sacred nature of Jyotish Shastra while providing an exceptional, and engaging user experience. Focus on creating something that feels both timeless and cutting-edge, respectful yet innovative.*

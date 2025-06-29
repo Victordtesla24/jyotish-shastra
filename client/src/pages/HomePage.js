@@ -1,16 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, Button, LotusIcon, SunIcon, MoonIcon, StarIcon } from '../components/ui';
-import { motion } from 'framer-motion';
 
 const HomePage = () => {
   const [currentMantra, setCurrentMantra] = useState(0);
 
   const vedicMantras = [
-    "ॐ गं गणपतये नमः",
-    "ॐ सूर्याय नमः",
-    "ॐ चन्द्राय नमः",
-    "ॐ मंगलाय नमः"
+    "ॐ ह्रीं ह्रौं सूर्याय नमः",
+    "ॐ श्रां श्रीं श्रौं सः चंद्राय नमः",
+    "ॐ क्रां क्रीं क्रौं सः भौमाय नमः",
+    "ॐ ब्रीं ब्रौं सः बुधाय नमः",
+    "ॐ ग्रां ग्रीं ग्रौं सः गुरवे नमः",
+    "ॐ द्रां द्रीं द्रौं सः शुक्राय नमः",
+    "ॐ शं शनिं श्रौं सः शनैश्चराय नमः",
+    "ॐ भ्रां भ्रीं भ्रौं सः राहवे नमः",
+    "ॐ स्रां स्रीं सः केतवे नमः"
   ];
 
   useEffect(() => {
@@ -68,117 +72,54 @@ const HomePage = () => {
   return (
     <div className="bg-sacred-white dark:bg-dark-bg-primary text-earth-brown dark:text-sacred-white min-h-screen">
       {/* Enhanced Hero Section with Parallax */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1.2 }}
-        className="relative h-screen flex items-center justify-center text-center overflow-hidden"
-      >
+      <div className="relative h-screen flex items-center justify-center text-center overflow-hidden">
         {/* Animated Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-dark-bg-primary via-cosmic-purple to-stellar-blue"></div>
 
         {/* Animated Stars */}
         <div className="absolute inset-0">
           {[...Array(50)].map((_, i) => (
-            <motion.div
+            <div
               key={i}
-              className="absolute w-1 h-1 bg-white rounded-full"
+              className="absolute w-1 h-1 bg-white rounded-full animate-pulse"
               style={{
                 left: `${Math.random() * 100}%`,
                 top: `${Math.random() * 100}%`,
-              }}
-              animate={{
-                opacity: [0.3, 1, 0.3],
-                scale: [1, 1.5, 1],
-              }}
-              transition={{
-                duration: 2 + Math.random() * 3,
-                repeat: Infinity,
-                delay: Math.random() * 2,
               }}
             />
           ))}
         </div>
 
         {/* Floating Om Symbol */}
-        <motion.div
-          className="absolute top-20 left-1/4 text-6xl text-vedic-gold opacity-20"
-          animate={{
-            y: [-10, 10, -10],
-            rotate: [0, 5, 0],
-          }}
-          transition={{
-            duration: 6,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        >
+        <div className="absolute top-20 left-1/4 text-6xl text-vedic-gold opacity-20 animate-bounce">
           ॐ
-        </motion.div>
+        </div>
 
         {/* Floating Lotus */}
-        <motion.div
-          className="absolute bottom-32 right-1/4 text-4xl text-vedic-lotus-pink opacity-30"
-          animate={{
-            y: [10, -10, 10],
-            rotate: [0, -5, 0],
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 1,
-          }}
-        >
+        <div className="absolute bottom-32 right-1/4 text-4xl text-vedic-lotus-pink opacity-30 animate-bounce">
           🪷
-        </motion.div>
+        </div>
 
         {/* Main Hero Content */}
-        <motion.div
-          initial={{ y: 50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 1, delay: 0.3 }}
-          className="relative z-10 max-w-5xl mx-auto px-4"
-        >
+        <div className="relative z-10 max-w-5xl mx-auto px-4">
           {/* Sanskrit Mantra */}
-          <motion.div
-            key={currentMantra}
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            className="text-lg md:text-xl text-vedic-gold font-serif mb-4"
-          >
+          <div className="text-lg md:text-xl text-vedic-gold font-serif mb-4">
             {vedicMantras[currentMantra]}
-          </motion.div>
+          </div>
 
-          <motion.h1
-            className="text-5xl md:text-7xl lg:text-8xl font-accent font-bold text-vedic-gradient mb-6 leading-tight"
-            initial={{ scale: 0.9 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 1, delay: 0.5 }}
-          >
+          <h1 className="text-5xl md:text-7xl lg:text-8xl font-accent font-bold text-vedic-gradient mb-6 leading-tight">
             Discover Your
             <span className="block text-cosmic-gradient">Cosmic Blueprint</span>
-          </motion.h1>
+          </h1>
 
-          <motion.p
-            className="text-xl md:text-2xl text-sacred-white mb-8 max-w-3xl mx-auto leading-relaxed"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.7 }}
-          >
+          <p className="text-xl md:text-2xl text-sacred-white mb-8 max-w-3xl mx-auto leading-relaxed">
             "ज्योतिषे प्रकाशते यत्र" - Where Jyotish illuminates your path
             <span className="block mt-2 text-lg opacity-80">
               Ancient Vedic wisdom meets modern precision
             </span>
-          </motion.p>
+          </p>
 
-          <motion.div
-            initial={{ y: 30, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.9 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center items-center"
-          >
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link to="/chart">
               <Button size="lg" className="btn-vedic-primary animate-sacred-pulse">
                 🌟 Begin Your Journey
@@ -189,15 +130,10 @@ const HomePage = () => {
                 📜 Explore Features
               </Button>
             </Link>
-          </motion.div>
+          </div>
 
           {/* Trust Indicators */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.1 }}
-            className="mt-12 flex flex-wrap justify-center items-center gap-8 text-sm text-sacred-white/80"
-          >
+          <div className="mt-12 flex flex-wrap justify-center items-center gap-8 text-sm text-sacred-white/80">
             <div className="flex items-center gap-2">
               <StarIcon className="w-4 h-4 text-vedic-gold" />
               <span>5000+ Years of Tradition</span>
@@ -210,31 +146,21 @@ const HomePage = () => {
               <MoonIcon className="w-4 h-4 text-lunar-silver" />
               <span>Authentic Parashari Methods</span>
             </div>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
 
         {/* Scroll Indicator */}
-        <motion.div
-          className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 2, repeat: Infinity }}
-        >
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
           <div className="w-6 h-10 border-2 border-vedic-gold rounded-full flex justify-center">
             <div className="w-1 h-3 bg-vedic-gold rounded-full mt-2"></div>
           </div>
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
 
       {/* Enhanced Features Section */}
       <section className="py-20 bg-gradient-to-br from-sacred-white to-vedic-background dark:from-dark-bg-primary dark:to-dark-surface">
         <div className="container-vedic">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-16"
-          >
+          <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-accent font-bold text-vedic-gradient mb-4">
               Sacred Features
               <span className="block text-2xl text-wisdom-gray font-normal mt-2">
@@ -245,29 +171,17 @@ const HomePage = () => {
               Authentic Vedic astrology tools designed with deep respect for ancient traditions,
               powered by modern astronomical precision and time-tested Parashari principles.
             </p>
-          </motion.div>
+          </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             {features.map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.2 }}
-                whileHover={{ y: -5 }}
-                className="group"
-              >
+              <div key={index} className="group">
                 <div className="card-sacred h-full transition-all duration-300 group-hover:shadow-cosmic group-hover:scale-105">
                   <div className="text-center p-8">
                     {/* Icon with animation */}
-                    <motion.div
-                      className="flex justify-center mb-6"
-                      whileHover={{ scale: 1.1, rotate: 5 }}
-                      transition={{ duration: 0.3 }}
-                    >
+                    <div className="flex justify-center mb-6 transform group-hover:scale-110 transition-transform duration-300">
                       {feature.icon}
-                    </motion.div>
+                    </div>
 
                     {/* Sanskrit Title */}
                     <h3 className="text-xl font-serif font-bold text-vedic-saffron mb-2">
@@ -309,7 +223,7 @@ const HomePage = () => {
                     </Link>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -347,19 +261,14 @@ const HomePage = () => {
           </div>
           <div className="grid md:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-              >
+              <div key={index} className="transform hover:scale-105 transition-transform duration-300">
                 <Card>
                   <CardContent className="p-6">
                     <p className="italic">"{testimonial.text}"</p>
                     <p className="mt-4 font-bold text-right">- {testimonial.author}</p>
                   </CardContent>
                 </Card>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>

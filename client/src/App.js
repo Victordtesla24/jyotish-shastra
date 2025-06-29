@@ -2,7 +2,6 @@ import React, { Suspense } from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
-import AccessibilityProvider from './components/ui/accessibility/AccessibilityProvider';
 import usePWA from './hooks/usePWA';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -171,8 +170,7 @@ function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider defaultTheme="system">
-        <AccessibilityProvider>
-          <QueryClientProvider client={queryClient}>
+        <QueryClientProvider client={queryClient}>
             <div className="app-container min-h-screen bg-gradient-to-br from-sacred-white to-gray-50 dark:from-dark-bg-primary dark:to-dark-bg-secondary transition-colors duration-300">
               {/* PWA Status Banners */}
               <PWAUpdateBanner />
@@ -234,7 +232,6 @@ function App() {
               <PWAInstallBanner />
             </div>
           </QueryClientProvider>
-        </AccessibilityProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );

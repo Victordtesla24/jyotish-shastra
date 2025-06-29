@@ -64,7 +64,13 @@ const BirthDataForm = ({ onSubmit, isLoading }) => {
 
   const handleFormSubmit = (data) => {
     if (geocodingStatus === 'success' && coordinates) {
-      onSubmit(data);
+      // Include coordinates in the form data
+      const formDataWithCoordinates = {
+        ...data,
+        latitude: coordinates.latitude,
+        longitude: coordinates.longitude
+      };
+      onSubmit(formDataWithCoordinates);
     } else {
       setGeocodingError('Please enter a valid location and wait for coordinates to be found.');
     }
@@ -231,9 +237,6 @@ const BirthDataForm = ({ onSubmit, isLoading }) => {
         )}
       </div>
 
-      {/* Hidden fields for latitude and longitude */}
-      <input type="hidden" {...register('latitude', { required: 'Could not determine latitude.' })} />
-      <input type="hidden" {...register('longitude', { required: 'Could not determine longitude.' })} />
 
       {/* Time Zone (Auto-suggested) */}
       <div className="space-y-1">

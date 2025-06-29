@@ -1,7 +1,6 @@
 // Enhanced Button Components
 export {
-  Button,
-  buttonVariants
+  Button
 } from './buttons/Button';
 
 // Enhanced Card Components

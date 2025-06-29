@@ -131,7 +131,7 @@ const CardDescription = forwardRef(({ className, ...props }, ref) => (
 ));
 
 const CardContent = forwardRef(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn('p-6 pt-0', className)} {...props} />
+  <div ref={ref} className={cn('p-6 pt-0 text-gray-800 dark:text-gray-200', className)} {...props} />
 ));
 
 const CardFooter = forwardRef(({ className, ...props }, ref) => (

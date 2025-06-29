@@ -68,7 +68,7 @@ const ChartPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sacred-white to-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-sacred-white to-vedic-lotus">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Header */}
         <div className="text-center mb-8 sm:mb-12">
@@ -80,7 +80,7 @@ const ChartPage = () => {
           <h1 className="font-accent text-3xl sm:text-4xl md:text-5xl font-bold text-earth-brown mb-3 sm:mb-4">
             Birth Chart Generation
           </h1>
-          <p className="text-base sm:text-lg text-wisdom-gray max-w-2xl mx-auto px-4">
+          <p className="text-base sm:text-lg text-earth-brown max-w-2xl mx-auto px-4">
             Create your authentic Vedic birth chart with precise astronomical calculations
             based on traditional Indian astrology principles.
           </p>
@@ -98,7 +98,7 @@ const ChartPage = () => {
                 <h3 className="font-accent text-base sm:text-lg font-bold text-earth-brown mb-2">
                   {step.title}
                 </h3>
-                <p className="text-wisdom-gray text-sm">
+                <p className="text-wisdom-gold text-sm">
                   {step.description}
                 </p>
               </CardContent>
@@ -109,7 +109,7 @@ const ChartPage = () => {
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 sm:gap-8">
           {/* Birth Data Form */}
           <div className="order-2 xl:order-1">
-            <Card variant="vedic" className="sticky top-4 sm:top-8">
+            <Card variant="vedic">
               <CardHeader>
                 <CardTitle className="text-white flex items-center text-lg sm:text-xl">
                   <span className="text-xl sm:text-2xl mr-2 sm:mr-3">🕉️</span>
@@ -139,7 +139,7 @@ const ChartPage = () => {
                   <h3 className="font-accent text-lg sm:text-xl font-bold text-earth-brown mb-2">
                     Ready to Generate Your Chart
                   </h3>
-                  <p className="text-wisdom-gray text-sm sm:text-base">
+                  <p className="text-vedic-saffron text-sm sm:text-base">
                     Fill in your birth details to begin your cosmic journey.
                   </p>
                 </div>
@@ -153,7 +153,7 @@ const ChartPage = () => {
                   <h3 className="font-accent text-lg sm:text-xl font-bold text-earth-brown mb-2">
                     Generating Your Chart
                   </h3>
-                  <p className="text-wisdom-gray text-sm sm:text-base">
+                  <p className="text-vedic-saffron text-sm sm:text-base">
                     Calculating planetary positions and cosmic influences...
                   </p>
                 </div>
@@ -166,34 +166,16 @@ const ChartPage = () => {
                   isLoading={false}
                 />
 
-                {/* Traditional Chart Display (Fallback) */}
-                <Card variant="elevated" className="mt-4">
-                  <CardHeader>
-                    <CardTitle className="flex items-center text-lg sm:text-xl">
-                      <span className="text-xl sm:text-2xl mr-2 sm:mr-3">📊</span>
-                      Alternative Chart View
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ChartDisplay
-                      chartData={chartData}
-                      analysisType={analysisType}
-                      useComprehensive={false}
-                    />
-                  </CardContent>
-                </Card>
-
                 {/* Chart Actions */}
                 <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                   <Button
-                    variant="outline"
-                    className="flex-1 border-cosmic-purple text-cosmic-purple hover:bg-cosmic-purple hover:text-white btn-responsive"
+                    className="flex-1 bg-saffron text-white hover:bg-saffron/90 btn-responsive"
                     onClick={() => setAnalysisType('birth-data')}
                   >
                     📋 View Analysis
                   </Button>
                   <Button
-                    className="flex-1 bg-gradient-to-r from-cosmic-purple to-vedic-primary btn-responsive"
+                    className="flex-1 bg-saffron text-white hover:bg-saffron/90 btn-responsive"
                   >
                     📄 Generate Full Report
                   </Button>

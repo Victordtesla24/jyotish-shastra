@@ -6,6 +6,8 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        'vedic-primary': '#FF6B35',
+        'vedic-secondary': '#8B4513',
         'vedic-saffron': '#FF9933',
         'vedic-gold': '#FFD700',
         'vedic-maroon': '#800000',
@@ -39,6 +41,7 @@ module.exports = {
       boxShadow: {
         'vedic-soft': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
         'vedic-medium': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+        'vedic-strong': '0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.1)',
         'cosmic': '0 0 15px rgba(107, 70, 193, 0.5)',
       },
       backgroundImage: {

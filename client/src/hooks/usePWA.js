@@ -64,6 +64,46 @@ export const usePWA = () => {
     };
   }, []);
 
+  // Handle messages from service worker
+  const handleServiceWorkerMessage = useCallback((event) => {
+    const { type, data } = event.data;
+
+    switch (type) {
+      case 'SYNC_SUCCESS':
+        console.log('[PWA] Background sync completed:', data);
+        // Dispatch custom event for components to listen to
+        window.dispatchEvent(new CustomEvent('syncSuccess', { detail: data }));
+        break;
+
+      case 'CACHE_UPDATED':
+        console.log('[PWA] Cache updated');
+        break;
+
+      case 'OFFLINE_FALLBACK':
+        console.log('[PWA] Serving offline fallback');
+        break;
+
+      default:
+        console.log('[PWA] Unknown message from SW:', type, data);
+    }
+  }, []);
+
+  // Check if app is installed
+  const checkInstallStatus = useCallback(() => {
+    // Check if running as PWA
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
+                        window.navigator.standalone ||
+                        document.referrer.includes('android-app://');
+
+    setIsInstalled(isStandalone);
+
+    // Also check for install prompt availability
+    if (!isStandalone && !deferredPromptRef.current) {
+      // Prompt might be available later
+      setIsInstallable(false);
+    }
+  }, []);
+
   const registerServiceWorker = useCallback(async () => {
     try {
       console.log('[PWA] Registering service worker...');
@@ -122,30 +162,6 @@ export const usePWA = () => {
     }
   }, [registerServiceWorker]);
 
-  // Handle messages from service worker
-  const handleServiceWorkerMessage = useCallback((event) => {
-    const { type, data } = event.data;
-
-    switch (type) {
-      case 'SYNC_SUCCESS':
-        console.log('[PWA] Background sync completed:', data);
-        // Dispatch custom event for components to listen to
-        window.dispatchEvent(new CustomEvent('syncSuccess', { detail: data }));
-        break;
-
-      case 'CACHE_UPDATED':
-        console.log('[PWA] Cache updated');
-        break;
-
-      case 'OFFLINE_FALLBACK':
-        console.log('[PWA] Serving offline fallback');
-        break;
-
-      default:
-        console.log('[PWA] Unknown message from SW:', type, data);
-    }
-  }, []);
-
   // Install prompt handling
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
@@ -172,22 +188,6 @@ export const usePWA = () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       window.removeEventListener('appinstalled', handleAppInstalled);
     };
-  }, []);
-
-  // Check if app is installed
-  const checkInstallStatus = useCallback(() => {
-    // Check if running as PWA
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
-                        window.navigator.standalone ||
-                        document.referrer.includes('android-app://');
-
-    setIsInstalled(isStandalone);
-
-    // Also check for install prompt availability
-    if (!isStandalone && !deferredPromptRef.current) {
-      // Prompt might be available later
-      setIsInstallable(false);
-    }
   }, []);
 
   // Install app function
