@@ -1,5 +1,5 @@
 const ChartGenerationService = require('../../../src/services/chart/ChartGenerationService');
-const { sampleBirthData } = require('../../fixtures/sample-chart-data');
+const { sampleBirthData } = require('../../test-data/sample-chart-data');
 
 describe('ChartGenerationService', () => {
   let chartGenerationService;

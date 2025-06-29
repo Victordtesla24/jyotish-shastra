@@ -1,5 +1,5 @@
 const LagnaAnalysisService = require('../../../../../src/services/analysis/LagnaAnalysisService');
-const sampleBirthData = require('../../../../fixtures/sample-birth-data.json');
+const sampleBirthData = require('../../../../test-data/sample-birth-data.json');
 
 describe('LagnaAnalysisService', () => {
   let service;

@@ -1,6 +1,6 @@
 const GajaKesariYogaCalculator = require('../../../../../src/core/analysis/yogas/GajaKesariYogaCalculator');
 const TestChartFactory = require('../../../../utils/TestChartFactory');
-const sampleBirthData = require('../../../../fixtures/sample-birth-data.json');
+const sampleBirthData = require('../../../../test-data/sample-birth-data.json');
 
 describe('GajaKesariYogaCalculator', () => {
   let calculator;

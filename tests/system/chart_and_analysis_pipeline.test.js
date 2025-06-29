@@ -1,6 +1,6 @@
 const ChartGenerationService = require('../../src/services/chart/ChartGenerationService.js');
 const MasterAnalysisOrchestrator = require('../../src/services/analysis/MasterAnalysisOrchestrator');
-const sampleBirthData = require('../fixtures/sample-birth-data.json');
+const sampleBirthData = require('../test-data/sample-birth-data.json');
 
 describe('System Test: Chart and Analysis Pipeline', () => {
 

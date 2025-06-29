@@ -1,7 +1,7 @@
 const request = require('supertest');
 const express = require('express');
 const chartRoutes = require('../../../src/api/routes/chart');
-const sampleData = require('../../fixtures/sample-birth-data.json');
+const sampleData = require('../../test-data/sample-birth-data.json');
 
 // Extract first test case birth data and flatten structure for the service
 const testCase = sampleData.testCases[0];

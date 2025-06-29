@@ -1,5 +1,5 @@
 const TransitCalculator = require('../../../src/core/calculations/transits/TransitCalculator');
-const { sampleBirthData } = require('../../fixtures/sample-birth-data.json');
+const { sampleBirthData } = require('../../test-data/sample-birth-data.json');
 
 describe('TransitCalculator', () => {
   let calculator;

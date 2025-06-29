@@ -5,7 +5,7 @@
  * This allows for the creation of specific astrological scenarios to test
  * various components of the analysis engine.
  */
-const { sampleChart, sampleBirthData, sampleChartWithYogas } = require('../fixtures/sample-chart-data');
+const { sampleChart, sampleBirthData, sampleChartWithYogas } = require('../test-data/sample-chart-data');
 
 class TestChartFactory {
   /**

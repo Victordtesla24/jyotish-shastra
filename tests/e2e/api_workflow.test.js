@@ -6,7 +6,7 @@
 const request = require('supertest');
 // Remove direct import that causes port conflicts
 // const app = require('../../src/index');
-const { testCases } = require('../fixtures/sample-birth-data.json');
+const { testCases } = require('../test-data/sample-birth-data.json');
 const sampleBirthData = testCases[0].birthData;
 const invalidBirthData = { ...sampleBirthData, dateOfBirth: '' };
 

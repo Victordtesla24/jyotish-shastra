@@ -1,7 +1,7 @@
 const request = require('supertest');
 const express = require('express');
 const analysisRoutes = require('../../../src/api/routes/comprehensiveAnalysis');
-const sampleBirthDataFixture = require('../../fixtures/sample-birth-data.json');
+const sampleBirthDataFixture = require('../../test-data/sample-birth-data.json');
 
 // Create proper birth data format for comprehensive analysis
 const testCase = sampleBirthDataFixture.testCases[0];

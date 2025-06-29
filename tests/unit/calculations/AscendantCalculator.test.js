@@ -1,5 +1,5 @@
 const AscendantCalculator = require('../../../src/core/calculations/chart-casting/AscendantCalculator');
-const { testCases } = require('../../fixtures/sample-birth-data.json');
+const { testCases } = require('../../test-data/sample-birth-data.json');
 const swisseph = require('swisseph');
 
 describe('AscendantCalculator', () => {

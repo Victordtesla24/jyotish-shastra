@@ -1,5 +1,5 @@
 const MasterAnalysisOrchestrator = require('../../../src/services/analysis/MasterAnalysisOrchestrator');
-const sampleBirthData = require('../../fixtures/sample-birth-data.json');
+const sampleBirthData = require('../../test-data/sample-birth-data.json');
 
 // Mock all the service modules that MasterAnalysisOrchestrator uses
 jest.mock('../../../src/services/analysis/BirthDataAnalysisService');

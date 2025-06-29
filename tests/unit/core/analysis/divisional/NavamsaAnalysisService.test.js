@@ -1,6 +1,6 @@
 const NavamsaAnalysisService = require('../../../../../src/core/analysis/divisional/NavamsaAnalysisService');
 const TestChartFactory = require('../../../../utils/TestChartFactory');
-const sampleBirthData = require('../../../../fixtures/sample-birth-data.json');
+const sampleBirthData = require('../../../../test-data/sample-birth-data.json');
 
 describe('NavamsaAnalysisService', () => {
   let service;

@@ -1,5 +1,5 @@
 const DetailedDashaAnalysisService = require('../../../../../src/services/analysis/DetailedDashaAnalysisService');
-const sampleBirthData = require('../../../../fixtures/sample-birth-data.json');
+const sampleBirthData = require('../../../../test-data/sample-birth-data.json');
 
 describe('DetailedDashaAnalysisService', () => {
     let service;
