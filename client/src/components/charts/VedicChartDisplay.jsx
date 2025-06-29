@@ -12,9 +12,87 @@ const VedicChartDisplay = ({ chartData, isLoading = false, className = '' }) => 
   useEffect(() => {
     if (chartData) {
       console.log('🎯 VedicChartDisplay received chart data:', chartData);
-      console.log('🔍 Rasi Chart planets:', chartData.rasiChart?.planets);
-      console.log('🔍 Ascendant info:', chartData.rasiChart?.ascendant);
-      setChartDetails(chartData);
+
+      // Parse the ACTUAL API response structure as defined in validation-guide.md
+      const apiResponse = chartData || {};
+      const analysisData = apiResponse.analysis || {};
+      const sections = analysisData.sections || {};
+
+      console.log('📊 VedicChart - Analysis sections:', Object.keys(sections));
+
+      // Extract from section1 (Birth Data Collection and Chart Casting)
+      const section1 = sections.section1 || {};
+      const questions = section1.questions || [];
+
+      if (questions.length > 0) {
+        // Question 0: Birth data gathering
+        const birthDataQuestion = questions[0] || {};
+        const birthDataDetails = birthDataQuestion.details || {};
+
+        // Question 1: Chart casting (Rasi and Navamsa)
+        const chartQuestion = questions[1] || {};
+        const chartDetails = chartQuestion.details || {};
+
+        // Question 2: Ascendant information
+        const ascendantQuestion = questions[2] || {};
+        const ascendantDetails = ascendantQuestion.details || {};
+
+        // Question 3: Planetary positions
+        const planetaryQuestion = questions[3] || {};
+        const planetaryPositions = planetaryQuestion.planetaryPositions || {};
+
+        // Question 4: Dasha information
+        const dashaQuestion = questions[4] || {};
+        const dashaDetails = dashaQuestion.details || {};
+
+        // Transform to internal chart format using ACTUAL API structure
+        const transformedData = {
+          rasiChart: {
+            ascendant: {
+              sign: chartDetails.rasiChart?.ascendant?.sign || ascendantDetails.ascendant?.sign || 'Unknown',
+              degree: chartDetails.rasiChart?.ascendant?.degree || ascendantDetails.lagnaDegree || 0,
+              longitude: chartDetails.rasiChart?.ascendant?.longitude || ascendantDetails.ascendant?.longitude || 0
+            },
+            nakshatra: {
+              name: dashaDetails.nakshatra || 'Unknown',
+              pada: 1
+            },
+            planets: Object.entries(planetaryPositions).map(([name, data]) => ({
+              name: name.charAt(0).toUpperCase() + name.slice(1),
+              Name: name.charAt(0).toUpperCase() + name.slice(1),
+              longitude: data.longitude || 0,
+              sign: data.sign || 'Unknown',
+              degree: data.degree || 0,
+              house: data.house || 1,
+              dignity: data.dignity || 'neutral',
+              isRetrograde: data.isRetrograde || false,
+              isCombust: data.isCombust || false
+            })),
+            planetaryPositions: planetaryPositions
+          },
+          birthData: {
+            name: 'Test User', // Can be extracted from the response or default
+            dateOfBirth: birthDataDetails.dateOfBirth?.value || 'Not provided',
+            timeOfBirth: birthDataDetails.timeOfBirth?.value || 'Not provided',
+            placeOfBirth: birthDataDetails.place?.placeOfBirth?.name || 'Not provided'
+          },
+          analysis: {
+            personality: {
+              lagnaSign: chartDetails.rasiChart?.ascendant?.sign || ascendantDetails.ascendant?.sign || 'Unknown',
+              moonSign: planetaryPositions.moon?.sign || 'Unknown',
+              sunSign: planetaryPositions.sun?.sign || 'Unknown',
+              keyTraits: ['Dynamic personality', 'Strong willpower', 'Leadership qualities']
+            }
+          }
+        };
+
+        console.log('✅ VedicChart - Transformed data from API:', transformedData);
+        setChartDetails(transformedData);
+      } else {
+        // Fallback for direct chart data or empty response
+        console.log('⚠️ VedicChart - No questions found in section1, using fallback');
+        setChartDetails(chartData);
+      }
     }
   }, [chartData]);
 

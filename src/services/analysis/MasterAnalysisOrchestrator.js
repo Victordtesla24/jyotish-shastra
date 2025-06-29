@@ -526,9 +526,22 @@ class MasterAnalysisOrchestrator {
       // Create a mutable copy to avoid side effects on the original object
       const finalBirthData = { ...birthData };
 
-      // If coordinates are missing but a place name is provided, perform geocoding
+      // Extract coordinates from placeOfBirth if they exist there
+      if (finalBirthData.placeOfBirth && typeof finalBirthData.placeOfBirth === 'object') {
+        if (finalBirthData.placeOfBirth.latitude && finalBirthData.placeOfBirth.longitude) {
+          finalBirthData.latitude = finalBirthData.placeOfBirth.latitude;
+          finalBirthData.longitude = finalBirthData.placeOfBirth.longitude;
+          finalBirthData.timezone = finalBirthData.placeOfBirth.timezone;
+        }
+      }
+
+      // If coordinates are still missing but a place name is provided, perform geocoding
       if ((!finalBirthData.latitude || !finalBirthData.longitude) && finalBirthData.placeOfBirth) {
-        const geoData = await this.geocodingService.geocodeLocation({ placeOfBirth: finalBirthData.placeOfBirth });
+        const placeQuery = typeof finalBirthData.placeOfBirth === 'object'
+          ? finalBirthData.placeOfBirth.name
+          : finalBirthData.placeOfBirth;
+
+        const geoData = await this.geocodingService.geocodeLocation({ placeOfBirth: placeQuery });
         finalBirthData.latitude = geoData.latitude;
         finalBirthData.longitude = geoData.longitude;
         finalBirthData.timezone = geoData.timezone;

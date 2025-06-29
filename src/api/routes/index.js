@@ -7,6 +7,7 @@ const express = require('express');
 const chartRoutes = require('./chart');
 const comprehensiveAnalysisRoutes = require('./comprehensiveAnalysis');
 const geocodingRoutes = require('./geocoding');
+const clientErrorLogRoutes = require('./clientErrorLog');
 
 const router = express.Router();
 
@@ -21,6 +22,9 @@ router.use(`${API_VERSION}/analysis`, comprehensiveAnalysisRoutes);
 
 // Geocoding routes
 router.use(`${API_VERSION}/geocoding`, geocodingRoutes);
+
+// Client error logging
+router.use('', clientErrorLogRoutes);
 
 // Health check endpoint
 router.get('/health', (req, res) => {

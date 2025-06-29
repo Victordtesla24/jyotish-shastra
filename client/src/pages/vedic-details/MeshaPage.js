@@ -1,15 +1,9 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 
 const MeshaPage = () => {
   return (
-    <div className="bg-sacred-white dark:bg-dark-bg-primary text-earth-brown dark:text-sacred-white p-8">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="max-w-4xl mx-auto"
-      >
+    <div className="bg-sacred-white dark:bg-dark-bg-primary text-earth-brown dark:text-dark-text-primary p-8">
+      <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-accent font-bold text-vedic-saffron mb-4">Mesha (Aries)</h1>
         <p className="text-lg text-wisdom-gray mb-6">
           Mesha, or Aries, is the first sign of the zodiac. It is a fire sign ruled by Mars, and it represents new beginnings, courage, and leadership.
@@ -33,7 +27,7 @@ const MeshaPage = () => {
             </p>
           </div>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 };

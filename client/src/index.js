@@ -7,6 +7,9 @@ import App from './App';
 // Performance monitoring
 import { performanceMonitor } from './utils/performance';
 
+// Client-side error logging
+import './utils/errorLogger';
+
 // Start performance monitoring
 performanceMonitor.recordMetric('app-start', performance.now());
 

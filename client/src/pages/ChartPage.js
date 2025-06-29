@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, Button } from '../components/ui';
 import BirthDataForm from '../components/forms/BirthDataForm';
-import ChartDisplay from '../components/charts/ChartDisplay';
 import VedicChartDisplay from '../components/charts/VedicChartDisplay';
 import chartService from '../services/chartService';
 import ChartDataManager from '../utils/chartDataManager';
@@ -10,7 +9,7 @@ const ChartPage = () => {
   const [chartData, setChartData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [analysisType, setAnalysisType] = useState('birth-data');
+  const [, setAnalysisType] = useState('birth-data');
 
   const handleChartGeneration = async (birthData) => {
     setIsLoading(true);
