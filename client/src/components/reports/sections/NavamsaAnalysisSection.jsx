@@ -14,7 +14,7 @@ const NavamsaAnalysisSection = ({ data }) => {
     );
   }
 
-  const { chartData, planetaryStrengths, relationshipAnalysis, spiritualInsights, lifePartners } = data;
+  const { chartData, planetaryStrengths, relationshipAnalysis, spiritualInsights } = data;
 
   const renderChartData = () => {
     if (!chartData) {
