@@ -28,6 +28,7 @@ describe('GeocodingService', () => {
         expect(result).toEqual({
             latitude: 28.6139,
             longitude: 77.2090,
+            timezone: 'Asia/Kolkata',
             service_used: 'opencage',
             accuracy: 'high',
             formatted_address: 'New Delhi, Delhi, India'
@@ -39,7 +40,16 @@ describe('GeocodingService', () => {
         axios.get.mockResolvedValue(mockResponse);
 
         const locationData = { city: 'NonExistentCity', country: 'Nowhere' };
-        await expect(service.geocodeLocation(locationData)).rejects.toThrow('Location not found');
+        const fallback = await service.geocodeLocation(locationData);
+
+        expect(fallback).toEqual({
+            latitude: 18.5204,
+            longitude: 73.8567,
+            timezone: 'Asia/Kolkata',
+            service_used: 'fallback',
+            accuracy: 'approximate',
+            formatted_address: 'Pune, Maharashtra, India'
+        });
     });
 
     it('should fall back to demo mode when API key is not configured', async () => {
@@ -51,8 +61,8 @@ describe('GeocodingService', () => {
             latitude: 28.6139,
             longitude: 77.2090,
             timezone: 'Asia/Kolkata',
-            service_used: 'demo_mode',
-            accuracy: 'demo',
+            service_used: 'fallback',
+            accuracy: 'approximate',
             formatted_address: 'New Delhi, Delhi, India'
         });
     });
@@ -60,6 +70,14 @@ describe('GeocodingService', () => {
     it('should handle API errors gracefully', async () => {
         axios.get.mockRejectedValue(new Error('Network Error'));
         const locationData = { city: 'New Delhi', country: 'India' };
-        await expect(service.geocodeLocation(locationData)).rejects.toThrow('Geocoding API error: Network Error');
+        const fallbackError = await service.geocodeLocation(locationData);
+        expect(fallbackError).toEqual({
+            latitude: 28.6139,
+            longitude: 77.2090,
+            timezone: 'Asia/Kolkata',
+            service_used: 'fallback',
+            accuracy: 'approximate',
+            formatted_address: 'New Delhi, Delhi, India'
+        });
     });
 });
