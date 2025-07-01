@@ -345,7 +345,11 @@ const VedicHoverCard = ({ children, variant = "default", className = "" }) => {
 // Sacred Reveal Animation
 const VedicRevealOnScroll = ({ children, direction = "up", delay = 0 }) => {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.3 });
+  const isInView = useInView(ref, {
+    once: true,
+    amount: 0.3,
+    fallback: true
+  });
 
   const variants = {
     up: {
@@ -475,7 +479,10 @@ const VedicStaggeredList = ({ children, stagger = 0.1 }) => {
 const SacredCounter = ({ end, duration = 2, prefix = "", suffix = "" }) => {
   const [count, setCount] = useState(0);
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true });
+  const isInView = useInView(ref, {
+    once: true,
+    fallback: true
+  });
 
   useEffect(() => {
     if (!isInView) return;

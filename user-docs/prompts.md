@@ -1672,6 +1672,49 @@ Create ASCII-based flowchart in markdown format showing:
 
 ------------------------------------------------
 
-
+***ERROR FIXING PROMPT***
 
 ------------------------------------------------
+
+### **Role:** 10x Senior Software Engineer
+
+### **Objective**
+  - **Fix** the specified Front-End Console Log Errors by implementing a minimal, precise, and effective code solution that has been validated through comprehensive online research.
+
+### **Pre-requisites**
+  - **Errors to Resolve:** The following console log errors need to be fixed:
+    ```bash
+      [PASTE FULL CONSOLE ERROR LOGS HERE]
+    ```
+
+### **Analysis & Research Tasks**
+  1.  **Root Cause Analysis (RCA):** Systematically analyze the provided error logs to identify the precise root cause(s) of each error.
+  2.  **Comprehensive Research:** Conduct targeted online research for each identified root cause. Validate potential solutions against official documentation, well-regarded technical forums, and relevant GitHub issue discussions.
+  3.  **Solution Validation:** Prioritize solutions that require minimal, targeted code changes. Verify that the proposed fix represents the current best practice and does not introduce deprecated methods or security vulnerabilities.
+
+### **Core Implementation Tasks**
+  1.  **Follow Protocols:** Strictly adhere to all procedures detailed in the following documents:
+    - `@002-error-fixing-protocols.mdc`
+    - `@001-directory-management-protocols.mdc`
+    - `@cline-token-optimization.md`
+  2.  **Targeted Implementation:** Apply the validated code fix. Modify **only** the essential code segments in the files directly impacted by the errors.
+  3.  **Verification:** After applying the fix, confirm that the original errors are resolved and that the application runs without any new issues.
+
+### **Deliverables**
+  - Provide **only** the updated code segments for the modified files. Use a format that indicates where unchanged code has been omitted (e.g., `// ... existing code ...`).
+  - For each change, provide a concise, one-sentence explanation of what the fix accomplishes.
+
+### **Constraints**
+  - **ZERO New Issues:** The fix **must not** introduce any new errors, warnings, runtime exceptions, or test failures.
+  - **NO Duplication:** **Do not** create any new files, scripts, or duplicate code blocks.
+  - **Scope Limitation:** **Do not** modify any code, files, or functionality outside the direct scope of fixing the specified errors. Keep everything else absolutely intact.
+  - **No Assumptions:** If the errors are ambiguous or require more context, ask for clarification before proceeding.
+  - **Minimalism:** The implemented solution must be the most minimal and efficient fix possible.
+
+### **Success Criteria**
+  - **Complete Resolution:** All specified front-end console errors are fully resolved.
+  - **Protocol Adherence:** All steps in the referenced protocol documents have been followed precisely.
+  - **No Regressions:** The application's existing functionality remains unchanged and fully operational. No new errors or warnings are present in the console.
+  - **Code Integrity:** No unnecessary or duplicate files or code have been created.
+
+**Remember:** Think step-by-step and approach this task with the precision and focus of a senior developer. Your goal is a robust, production-quality fix and not just to make the Tests Pass.

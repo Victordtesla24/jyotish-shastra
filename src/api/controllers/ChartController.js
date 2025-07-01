@@ -11,6 +11,7 @@ const HouseAnalysisService = require('../../core/analysis/houses/HouseAnalysisSe
 const BirthDataAnalysisService = require('../../services/analysis/BirthDataAnalysisService');
 const { v4: uuidv4 } = require('uuid');
 const { validateChartRequest } = require('../validators/birthDataValidator');
+const crypto = require('crypto');
 
 class ChartController {
   constructor() {
@@ -30,11 +31,13 @@ class ChartController {
     try {
       const birthData = req.body;
 
-      // Validate birth data
-      if (!this.validateBirthData(birthData)) {
+      // Validate birth data using flexible schema
+      const validationResult = validateChartRequest(birthData);
+      if (!validationResult.isValid) {
         return res.status(400).json({
           success: false,
-          message: 'Invalid birth data provided'
+          message: 'Invalid birth data provided',
+          errors: validationResult.errors
         });
       }
 
@@ -88,10 +91,24 @@ class ChartController {
       // Process timezone format conversion
       const processedBirthData = this.processTimezoneFormat(validationResult.data);
 
-      // Geocode location if coordinates are not provided
-      if (!processedBirthData.latitude || !processedBirthData.longitude) {
+      // Extract coordinates from nested or flat structure
+      let latitude = processedBirthData.latitude;
+      let longitude = processedBirthData.longitude;
+
+      // Check for nested placeOfBirth structure
+      if (!latitude && !longitude && processedBirthData.placeOfBirth) {
+        latitude = processedBirthData.placeOfBirth.latitude;
+        longitude = processedBirthData.placeOfBirth.longitude;
+      }
+
+      // Geocode location only if coordinates are not provided
+      if (!latitude || !longitude) {
         const geocodedData = await this.geocodingService.geocodeLocation(processedBirthData);
         Object.assign(processedBirthData, geocodedData);
+      } else {
+        // Ensure flat structure for downstream processing
+        processedBirthData.latitude = latitude;
+        processedBirthData.longitude = longitude;
       }
 
       // Generate comprehensive chart
@@ -106,7 +123,6 @@ class ChartController {
 
             // CRITICAL FIX: Generate chartId for E2E workflow (minimal approach)
       // Use temporary in-memory storage for E2E tests to avoid complex schema mapping
-      const crypto = require('crypto');
       const chartId = crypto.randomUUID();
 
       // Store chart data temporarily for E2E workflow (could be enhanced with Redis/cache later)
@@ -311,7 +327,7 @@ class ChartController {
       const { id } = req.params;
 
       // Use static method from ChartRepository
-      const ChartRepository = require('../../data/repositories/ChartRepository');
+      const ChartRepository = (await import('../../data/repositories/ChartRepository.js')).default;
       const chartData = await ChartRepository.findById(id);
 
       if (!chartData) {
@@ -323,7 +339,7 @@ class ChartController {
 
       // Enhance chart with current transits if requested
       if (req.query.includeTransits === 'true') {
-        const TransitCalculator = require('../../core/calculations/transits/TransitCalculator');
+        const TransitCalculator = (await import('../../core/calculations/transits/TransitCalculator.js')).default;
         const transitCalculator = new TransitCalculator();
 
         chartData.currentTransits = await transitCalculator.calculateCurrentTransits(
@@ -357,7 +373,7 @@ class ChartController {
       const { id } = req.params;
 
       // Use static method from ChartRepository
-      const ChartRepository = require('../../data/repositories/ChartRepository');
+      const ChartRepository = (await import('../../data/repositories/ChartRepository.js')).default;
       const baseChart = await ChartRepository.findById(id);
 
       if (!baseChart) {
@@ -368,7 +384,7 @@ class ChartController {
       }
 
       // Generate or retrieve Navamsa chart with complete analysis
-      const NavamsaAnalyzer = require('../../core/analysis/divisional/NavamsaAnalyzer');
+      const NavamsaAnalyzer = (await import('../../core/analysis/divisional/NavamsaAnalyzer.js')).default;
 
       const navamsaChart = await NavamsaAnalyzer.generateComprehensiveNavamsaChart(
         baseChart.birthData,
@@ -494,15 +510,18 @@ class ChartController {
     try {
       const { birthData } = req.body;
 
-      if (!birthData || !this.validateBirthData(birthData)) {
+      // Validate birth data using flexible schema
+      const validationResult = validateChartRequest(birthData);
+      if (!validationResult.isValid) {
         return res.status(400).json({
           success: false,
-          message: 'Invalid birth data provided'
+          message: 'Invalid birth data provided',
+          errors: validationResult.errors
         });
       }
 
       // Use MasterAnalysisOrchestrator for comprehensive analysis
-      const MasterAnalysisOrchestrator = require('../../services/analysis/MasterAnalysisOrchestrator');
+      const MasterAnalysisOrchestrator = (await import('../../services/analysis/MasterAnalysisOrchestrator.js')).default;
       const masterOrchestrator = new MasterAnalysisOrchestrator();
 
       const comprehensiveAnalysis = await masterOrchestrator.performComprehensiveAnalysis(birthData);
@@ -605,47 +624,6 @@ class ChartController {
    * @param {Object} birthData - Birth data
    * @returns {boolean} Validation result
    */
-  validateBirthData(birthData) {
-    const required = ['dateOfBirth', 'timeOfBirth'];
-
-    for (const field of required) {
-      if (!birthData[field]) {
-        return false;
-      }
-    }
-
-    // Check if either coordinates or place information is provided
-    const hasCoordinates = birthData.latitude && birthData.longitude;
-    const hasPlace = birthData.placeOfBirth || (birthData.city && birthData.country) || birthData.city;
-
-    if (!hasCoordinates && !hasPlace) {
-      return false;
-    }
-
-    // Validate date format
-    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-    if (!dateRegex.test(birthData.dateOfBirth)) {
-      return false;
-    }
-
-    // Validate time format
-    const timeRegex = /^\d{2}:\d{2}$/;
-    if (!timeRegex.test(birthData.timeOfBirth)) {
-      return false;
-    }
-
-    // Validate coordinates if provided
-    if (hasCoordinates) {
-      const lat = parseFloat(birthData.latitude);
-      const lon = parseFloat(birthData.longitude);
-
-      if (isNaN(lat) || isNaN(lon) || lat < -90 || lat > 90 || lon < -180 || lon > 180) {
-        return false;
-      }
-    }
-
-    return true;
-  }
 
   /**
    * Get systematic birth data analysis (Section 1 questions)
@@ -656,10 +634,12 @@ class ChartController {
     try {
       const birthData = req.body;
 
-      if (!this.validateBirthData(birthData)) {
+      const validationResult = validateChartRequest(birthData);
+      if (!validationResult.isValid) {
         return res.status(400).json({
           success: false,
-          message: 'Invalid birth data provided'
+          message: 'Invalid birth data provided',
+          errors: validationResult.errors
         });
       }
 

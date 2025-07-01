@@ -4,12 +4,13 @@ import BirthDataForm from '../components/forms/BirthDataForm';
 import VedicChartDisplay from '../components/charts/VedicChartDisplay';
 import chartService from '../services/chartService';
 import ChartDataManager from '../utils/chartDataManager';
+import { useNavigate } from 'react-router-dom';
 
 const ChartPage = () => {
   const [chartData, setChartData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [, setAnalysisType] = useState('birth-data');
+  const navigate = useNavigate();
 
   const handleChartGeneration = async (birthData) => {
     setIsLoading(true);
@@ -169,12 +170,23 @@ const ChartPage = () => {
                 <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                   <Button
                     className="flex-1 bg-saffron text-white hover:bg-saffron/90 btn-responsive"
-                    onClick={() => setAnalysisType('birth-data')}
+                    onClick={() => {
+                      const cid = chartData?._id || chartData?.id;
+                      if (cid) {
+                        navigate(`/analysis?chartId=${cid}`);
+                      }
+                    }}
                   >
                     📋 View Analysis
                   </Button>
                   <Button
                     className="flex-1 bg-saffron text-white hover:bg-saffron/90 btn-responsive"
+                    onClick={() => {
+                      const cid = chartData?._id || chartData?.id;
+                      if (cid) {
+                        navigate(`/report?chartId=${cid}`);
+                      }
+                    }}
                   >
                     📄 Generate Full Report
                   </Button>
@@ -186,19 +198,19 @@ const ChartPage = () => {
 
         {/* Information Section */}
         <div className="mt-12 sm:mt-16">
-          <Card variant="cosmic">
+          <Card variant="elevated" className="bg-white ring-1 ring-amber-200">
             <CardContent className="p-6 sm:p-8">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 items-center">
                 <div>
-                  <h3 className="font-accent text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4">
+                  <h3 className="font-accent text-xl sm:text-2xl font-bold text-earth-brown mb-3 sm:mb-4">
                     Why Accurate Birth Time Matters
                   </h3>
-                  <p className="text-white/90 leading-relaxed mb-3 sm:mb-4 text-sm sm:text-base">
+                  <p className="text-earth-brown/90 leading-relaxed mb-3 sm:mb-4 text-sm sm:text-base">
                     In Vedic astrology, precise birth time is crucial for accurate chart casting.
                     Even a 4-minute difference can change your Lagna (ascendant), affecting the
                     entire interpretation of your chart.
                   </p>
-                  <ul className="text-white/80 space-y-1 sm:space-y-2 text-xs sm:text-sm">
+                  <ul className="text-earth-brown/80 space-y-1 sm:space-y-2 text-xs sm:text-sm">
                     <li>• Determines your exact Lagna and house positions</li>
                     <li>• Affects planetary strength calculations</li>
                     <li>• Essential for accurate Dasha periods</li>
@@ -206,8 +218,8 @@ const ChartPage = () => {
                   </ul>
                 </div>
                 <div className="text-center mt-4 lg:mt-0">
-                  <div className="text-4xl sm:text-6xl text-white/80 mb-3 sm:mb-4">⏰</div>
-                  <p className="text-white/60 italic text-sm sm:text-base">
+                  <div className="text-4xl sm:text-6xl text-amber-700 mb-3 sm:mb-4">⏰</div>
+                  <p className="text-earth-brown/70 italic text-sm sm:text-base">
                     "Time is the most precious element in astrological calculations"
                   </p>
                 </div>

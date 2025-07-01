@@ -1,12 +1,36 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Card, CardHeader, CardTitle, CardContent, Button } from '../components/ui';
 import ComprehensiveAnalysisDisplay from '../components/reports/ComprehensiveAnalysisDisplay';
 import EnhancedPersonalityProfile from '../components/reports/EnhancedPersonalityProfile';
+import analysisService from '../services/analysisService';
 
 const AnalysisPage = () => {
   const [analysisData, setAnalysisData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [activeAnalysisType, setActiveAnalysisType] = useState('personality');
+  const location = useLocation();
+  const [chartId, setChartId] = useState(null);
+
+  // Extract chartId from query params if present
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const id = params.get('chartId');
+    if (id) {
+      setChartId(id);
+      (async () => {
+        try {
+          setIsLoading(true);
+          const data = await analysisService.getComprehensiveAnalysis(id);
+          setAnalysisData(data);
+        } catch (err) {
+          console.error('Failed to load comprehensive analysis', err);
+        } finally {
+          setIsLoading(false);
+        }
+      })();
+    }
+  }, [location.search]);
 
   const analysisTypes = [
     {
@@ -58,20 +82,13 @@ const AnalysisPage = () => {
     setActiveAnalysisType(analysisType);
 
     try {
-      // This would typically call your comprehensive analysis API
-      const response = await fetch(`/api/comprehensive-analysis?type=${analysisType}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setAnalysisData(data);
-      } else {
-        console.error('Failed to get analysis');
+      if (!chartId) {
+        console.warn('No chartId available for analysis request');
+        return;
       }
+
+      const data = await analysisService.getComprehensiveAnalysis(chartId);
+      setAnalysisData(data);
     } catch (error) {
       console.error('Error getting analysis:', error);
     } finally {
@@ -164,11 +181,83 @@ const AnalysisPage = () => {
           )}
 
           {!isLoading && analysisData && activeAnalysisType === 'personality' && (
-            <EnhancedPersonalityProfile analysisData={analysisData} />
+            <div className="space-y-6">
+              {/* Enhanced Navigation Header */}
+              <Card variant="elevated" className="p-4">
+                <div className="flex flex-col sm:flex-row items-center justify-between">
+                  <div className="flex items-center space-x-4 mb-4 sm:mb-0">
+                    <div className="w-8 h-8 bg-gradient-to-br from-cosmic-purple to-vedic-gold rounded-full flex items-center justify-center">
+                      <span className="text-white text-sm">🧠</span>
+                    </div>
+                    <div>
+                      <h3 className="font-accent font-bold text-earth-brown">Personality Analysis</h3>
+                      <p className="text-sm text-wisdom-gray">Deep insights into your character</p>
+                    </div>
+                  </div>
+                  <div className="flex space-x-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="border-cosmic-purple text-cosmic-purple hover:bg-cosmic-purple hover:text-white"
+                      onClick={() => window.print()}
+                    >
+                      📄 Print Report
+                    </Button>
+                    <Button
+                      size="sm"
+                      className="bg-gradient-to-r from-cosmic-purple to-vedic-primary"
+                      onClick={() => window.location.href = `/report?chartId=${chartId}`}
+                    >
+                      📋 Full Report
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+              <EnhancedPersonalityProfile analysisData={analysisData} />
+            </div>
           )}
 
           {!isLoading && analysisData && activeAnalysisType !== 'personality' && (
-            <ComprehensiveAnalysisDisplay data={analysisData} />
+            <div className="space-y-6">
+              {/* Enhanced Navigation Header */}
+              <Card variant="elevated" className="p-4">
+                <div className="flex flex-col sm:flex-row items-center justify-between">
+                  <div className="flex items-center space-x-4 mb-4 sm:mb-0">
+                    <div className="w-8 h-8 bg-gradient-to-br from-cosmic-purple to-vedic-gold rounded-full flex items-center justify-center">
+                      <span className="text-white text-sm">
+                        {analysisTypes.find(t => t.id === activeAnalysisType)?.icon}
+                      </span>
+                    </div>
+                    <div>
+                      <h3 className="font-accent font-bold text-earth-brown">
+                        {analysisTypes.find(t => t.id === activeAnalysisType)?.title}
+                      </h3>
+                      <p className="text-sm text-wisdom-gray">
+                        {analysisTypes.find(t => t.id === activeAnalysisType)?.description}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex space-x-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="border-cosmic-purple text-cosmic-purple hover:bg-cosmic-purple hover:text-white"
+                      onClick={() => window.print()}
+                    >
+                      📄 Print Report
+                    </Button>
+                    <Button
+                      size="sm"
+                      className="bg-gradient-to-r from-cosmic-purple to-vedic-primary"
+                      onClick={() => window.location.href = `/report?chartId=${chartId}`}
+                    >
+                      📋 Full Report
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+              <ComprehensiveAnalysisDisplay data={analysisData} />
+            </div>
           )}
         </div>
 

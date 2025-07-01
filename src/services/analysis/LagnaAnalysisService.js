@@ -350,25 +350,17 @@ class LagnaAnalysisService {
    * @returns {Object} Lagna lord analysis
    */
   analyzeLagnaLord(lagnaLord, placement) {
-    if (!lagnaLord || !placement) {
-      return {
-        planet: lagnaLord || 'Unknown',
-        sign: 'Unknown',
-        dignity: 'Unknown',
-        strength: 0,
-        effects: ['Lagna lord placement data not available']
-      };
-    }
-
-    const dignityInfo = this.analyzePlanetaryDignity(lagnaLord, placement);
+    const dignity = this.dignityCalculator.getDignity(lagnaLord, placement.longitude);
     const strength = this.calculatePlanetaryStrength(lagnaLord, placement);
+    const effects = this.getLagnaLordEffects(lagnaLord, placement);
 
     return {
       planet: lagnaLord,
+      house: placement.house,
       sign: placement.sign,
-      dignity: dignityInfo.dignityType,
-      strength: strength,
-      effects: this.getLagnaLordEffects(lagnaLord, placement)
+      dignity: dignity.dignityType,
+      strength,
+      effects
     };
   }
 

@@ -1,23 +1,24 @@
-const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
-const compression = require('compression');
-const rateLimit = require('express-rate-limit');
-const morgan = require('morgan');
-const fs = require('fs');
-const path = require('path');
-require('dotenv').config();
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import compression from 'compression';
+import rateLimit from 'express-rate-limit';
+import morgan from 'morgan';
+import fs from 'fs';
+import path from 'path';
+import 'dotenv/config';
 
 // Import routes
-const chartRoutes = require('./api/routes/chart');
-const comprehensiveAnalysisRoutes = require('./api/routes/comprehensiveAnalysis');
-const geocodingRoutes = require('./api/routes/geocoding');
-const indexRoutes = require('./api/routes/index');
+import chartRoutes from './api/routes/chart.js';
+import comprehensiveAnalysisRoutes from './api/routes/comprehensiveAnalysis.js';
+import geocodingRoutes from './api/routes/geocoding.js';
+import indexRoutes from './api/routes/index.js';
 
 // Import middleware
-const errorHandling = require('./api/middleware/errorHandling');
+import errorHandling from './api/middleware/errorHandling.js';
 
 const app = express();
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const PORT = process.env.PORT || 3001;
 
 // Rate limiting with proper proxy configuration
@@ -165,4 +166,4 @@ process.on('unhandledRejection', (err) => {
   });
 });
 
-module.exports = app;
+export default app;

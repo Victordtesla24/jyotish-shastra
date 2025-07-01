@@ -152,10 +152,21 @@ class AnalysisService {
    */
   async getComprehensiveAnalysis(chartId) {
     try {
-      const response = await this.api.get(`/comprehensive-analysis/${chartId}`);
+      // Prefer new standardized endpoint as per validation-guide.md (POST /v1/analysis/comprehensive)
+      const response = await this.api.post('/v1/analysis/comprehensive', { chartId });
       return response.data;
-    } catch (error) {
-      throw new Error(`Comprehensive analysis failed: ${error.response?.data?.message || error.message}`);
+    } catch (primaryError) {
+      // Fallback to legacy GET endpoint for backward compatibility
+      try {
+        const fallbackResponse = await this.api.get(`/comprehensive-analysis/${chartId}`);
+        return fallbackResponse.data;
+      } catch (fallbackError) {
+        throw new Error(
+          `Comprehensive analysis failed: ${
+            fallbackError.response?.data?.message || primaryError.response?.data?.message || primaryError.message
+          }`
+        );
+      }
     }
   }
 

@@ -260,9 +260,31 @@
     overflow: hidden;
   }
 
+  .btn-vedic-primary::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.3), transparent 70%);
+    transition: all var(--animation-normal) ease;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+  }
+
   .btn-vedic-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-vedic-strong);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: var(--shadow-vedic-strong), var(--shadow-golden);
+  }
+
+  .btn-vedic-primary:hover::before {
+    width: 120%;
+    height: 120%;
+  }
+
+  .btn-vedic-primary:active {
+    transform: translateY(-1px) scale(0.98);
   }
 
   .dark .btn-vedic-primary {
@@ -271,7 +293,7 @@
   }
 
   .dark .btn-vedic-primary:hover {
-    box-shadow: var(--dark-shadow-vedic-strong);
+    box-shadow: var(--dark-shadow-vedic-strong), var(--dark-shadow-golden);
   }
 
   .btn-vedic-secondary {
@@ -588,7 +610,7 @@
   }
 
   .planet-symbol {
-    @apply text-cosmic-purple font-vedic text-lg;
+    @apply text-cosmic-purple font-serif text-lg;
   }
 
   .chart-legend {
@@ -663,6 +685,74 @@
     animation: sacred-pulse 3s ease-in-out infinite;
   }
 
+  /* Cultural Animation Utilities */
+  .animate-lotus-bloom {
+    animation: lotus-bloom 4s ease-in-out infinite;
+  }
+
+  .animate-om-vibration {
+    animation: om-vibration 3s ease-in-out infinite;
+  }
+
+  .animate-sacred-geometry {
+    animation: sacred-geometry-rotate 8s linear infinite;
+  }
+
+  .animate-spiritual-breathe {
+    animation: spiritual-breathe 4s ease-in-out infinite;
+  }
+
+  .animate-golden-aura {
+    animation: golden-aura 2s ease-in-out infinite alternate;
+  }
+
+  .animate-cosmic-dance {
+    animation: cosmic-dance 6s linear infinite;
+  }
+
+  .animate-mantra-wave {
+    animation: mantra-wave 2s ease-in-out infinite;
+  }
+
+  .animate-celestial-orbit {
+    animation: celestial-orbit 10s linear infinite;
+  }
+
+  /* Cultural Loading Spinners */
+  .spinner-lotus {
+    @apply w-8 h-8 relative;
+    animation: lotus-bloom 2s ease-in-out infinite;
+  }
+
+  .spinner-lotus::before {
+    content: '🪷';
+    @apply absolute inset-0 flex items-center justify-center text-2xl;
+  }
+
+  .spinner-om {
+    @apply w-8 h-8 relative;
+    animation: om-vibration 2s ease-in-out infinite;
+  }
+
+  .spinner-om::before {
+    content: 'ॐ';
+    @apply absolute inset-0 flex items-center justify-center text-2xl text-vedic-saffron;
+    font-family: 'Noto Sans Devanagari', serif;
+  }
+
+  .dark .spinner-om::before {
+    @apply text-dark-vedic-saffron;
+  }
+
+  .spinner-sacred-geometry {
+    @apply w-8 h-8 border-2 border-vedic-saffron border-t-transparent rounded-full;
+    animation: sacred-geometry-rotate 1.5s linear infinite;
+  }
+
+  .dark .spinner-sacred-geometry {
+    @apply border-dark-vedic-saffron;
+  }
+
   /* Enhanced Background Utilities */
   .bg-vedic-radial {
     background: radial-gradient(circle at center, var(--vedic-saffron), var(--vedic-gold));
@@ -672,10 +762,74 @@
     background: radial-gradient(circle at center, var(--cosmic-purple), var(--stellar-blue));
   }
 
+  /* Sacred Geometry Backgrounds */
+  .bg-lotus-pattern {
+    background-image:
+      radial-gradient(circle at 20% 20%, rgba(255, 153, 51, 0.1) 2px, transparent 2px),
+      radial-gradient(circle at 80% 80%, rgba(255, 215, 0, 0.1) 2px, transparent 2px),
+      radial-gradient(circle at 40% 60%, rgba(255, 153, 51, 0.05) 3px, transparent 3px);
+    background-size: 40px 40px, 60px 60px, 80px 80px;
+  }
+
+  .bg-om-subtle {
+    position: relative;
+  }
+
+  .bg-om-subtle::before {
+    content: 'ॐ';
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 1.5rem;
+    opacity: 0.05;
+    font-family: 'Noto Sans Devanagari', serif;
+    color: var(--vedic-saffron);
+    pointer-events: none;
+  }
+
+  .dark .bg-om-subtle::before {
+    color: var(--dark-vedic-saffron);
+  }
+
+  .bg-mandala-pattern {
+    background-image:
+      radial-gradient(circle at center, transparent 30%, rgba(107, 70, 193, 0.05) 30%, rgba(107, 70, 193, 0.05) 35%, transparent 35%),
+      radial-gradient(circle at center, transparent 50%, rgba(255, 153, 51, 0.03) 50%, rgba(255, 153, 51, 0.03) 55%, transparent 55%);
+    background-size: 120px 120px, 80px 80px;
+  }
+
   /* Enhanced Border Utilities */
   .border-vedic-gradient {
     border: 2px solid;
     border-image: linear-gradient(135deg, var(--vedic-saffron), var(--vedic-gold)) 1;
+  }
+
+  .border-lotus-petals {
+    border: 3px solid transparent;
+    border-radius: 50%;
+    background:
+      linear-gradient(white, white) padding-box,
+      linear-gradient(45deg, var(--vedic-saffron), var(--vedic-gold), var(--vedic-lotus), var(--vedic-saffron)) border-box;
+  }
+
+  .dark .border-lotus-petals {
+    background:
+      linear-gradient(var(--dark-surface), var(--dark-surface)) padding-box,
+      linear-gradient(45deg, var(--dark-vedic-saffron), var(--vedic-gold), var(--vedic-lotus), var(--dark-vedic-saffron)) border-box;
+  }
+
+  .border-sacred-geometry {
+    border: 2px solid transparent;
+    background:
+      linear-gradient(white, white) padding-box,
+      conic-gradient(from 0deg, var(--cosmic-purple), var(--stellar-blue), var(--vedic-saffron), var(--vedic-gold), var(--cosmic-purple)) border-box;
+    border-radius: 12px;
+  }
+
+  .dark .border-sacred-geometry {
+    background:
+      linear-gradient(var(--dark-surface), var(--dark-surface)) padding-box,
+      conic-gradient(from 0deg, var(--dark-cosmic), var(--stellar-blue), var(--dark-vedic-saffron), var(--vedic-gold), var(--dark-cosmic)) border-box;
   }
 
   /* Enhanced Transform Utilities */
@@ -763,6 +917,203 @@
   .mobile-show {
     @apply block;
   }
+
+  /* Enhanced Mobile Touch Interactions */
+  .mobile-touch-feedback {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .mobile-touch-feedback::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 153, 51, 0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s ease, height 0.3s ease;
+    pointer-events: none;
+  }
+
+  .mobile-touch-feedback:active::after {
+    width: 200%;
+    height: 200%;
+  }
+
+  /* Enhanced Mobile Button Sizes */
+  .btn-vedic-primary,
+  .btn-cosmic,
+  .btn-vedic-secondary {
+    @apply min-h-[48px] min-w-[48px] px-8 py-4 text-lg;
+  }
+
+  /* Mobile-Optimized Cards */
+  .card-vedic {
+    @apply p-4 mx-2;
+  }
+
+  /* Mobile Typography Enhancements */
+  .text-responsive-xl {
+    @apply text-lg;
+  }
+
+  .text-responsive-2xl {
+    @apply text-xl;
+  }
+
+  .text-responsive-3xl {
+    @apply text-2xl;
+  }
+
+  .text-responsive-4xl {
+    @apply text-3xl;
+  }
+
+  /* Mobile Navigation Enhancements */
+  .nav-link-vedic {
+    @apply px-6 py-4 text-base;
+  }
+
+  /* Mobile-Optimized Spacing */
+  .section-spacing {
+    @apply py-8 md:py-12;
+  }
+
+  .container-vedic {
+    @apply px-3 sm:px-4;
+  }
+
+  /* Mobile Chart Optimizations */
+  .chart-container {
+    @apply h-80 mx-2;
+  }
+
+  .house-number {
+    @apply w-10 h-10 text-base;
+  }
+
+  .planet-symbol {
+    @apply text-xl;
+  }
+
+  /* Mobile Input Optimizations */
+  .input-vedic {
+    @apply py-4 text-base;
+  }
+
+  /* Mobile Animation Performance */
+  .animate-float,
+  .animate-sacred-pulse,
+  .animate-lotus-bloom {
+    animation-duration: 3s;
+  }
+
+  /* Mobile Scroll Enhancements */
+  .mobile-scroll-snap {
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mobile-scroll-item {
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+  }
+}
+
+/* Enhanced Mobile Landscape Optimizations */
+@media (max-width: 896px) and (orientation: landscape) {
+  .landscape-stack {
+    @apply flex flex-row space-x-4 space-y-0;
+  }
+
+  .landscape-hide {
+    @apply hidden;
+  }
+
+  .landscape-compact {
+    @apply py-2;
+  }
+
+  .section-spacing {
+    @apply py-6;
+  }
+}
+
+/* Tablet Optimizations */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .tablet-grid {
+    @apply grid grid-cols-2 gap-4;
+  }
+
+  .tablet-full {
+    @apply col-span-2;
+  }
+
+  .tablet-stack {
+    @apply flex flex-col space-y-6;
+  }
+
+  /* Tablet Touch Enhancements */
+  .btn-vedic-primary,
+  .btn-cosmic,
+  .btn-vedic-secondary {
+    @apply min-h-[44px] px-6 py-3;
+  }
+
+  .nav-link-vedic {
+    @apply px-5 py-3;
+  }
+}
+
+/* Enhanced Performance Optimizations for Mobile */
+@media (max-width: 640px) {
+  /* Reduce animation complexity on mobile */
+  .animate-cosmic-dance,
+  .animate-celestial-orbit {
+    animation: none;
+  }
+
+  /* Simplify gradients for better mobile performance */
+  .bg-lotus-pattern,
+  .bg-mandala-pattern {
+    background-image: none;
+    background-color: rgba(255, 153, 51, 0.02);
+  }
+
+  /* Optimize box-shadows for mobile */
+  .card-vedic:hover {
+    transform: none;
+    box-shadow: var(--shadow-vedic-soft);
+  }
+
+  /* Reduce backdrop blur for performance */
+  .backdrop-vedic {
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+  }
+}
+
+/* High-DPI Mobile Display Optimizations */
+@media (max-width: 640px) and (-webkit-min-device-pixel-ratio: 2) {
+  /* Enhanced text rendering for retina displays */
+  body {
+    -webkit-font-smoothing: subpixel-antialiased;
+  }
+
+  /* Sharper borders for high-DPI */
+  .border-vedic-gradient,
+  .border-lotus-petals,
+  .border-sacred-geometry {
+    border-width: 1px;
+  }
+
+  /* Optimized shadows for high-DPI */
+  .card-vedic {
+    box-shadow: 0 1px 3px rgba(139, 69, 19, 0.15);
+  }
 }
 
 /* Enhanced Keyframes */
@@ -822,5 +1173,116 @@
   }
   100% {
     transform: rotate(360deg) scale(1);
+  }
+}
+
+/* Enhanced Cultural Animations */
+@keyframes lotus-bloom {
+  0% {
+    transform: scale(0.8) rotate(0deg);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.1) rotate(180deg);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1) rotate(360deg);
+    opacity: 1;
+  }
+}
+
+@keyframes om-vibration {
+  0%, 100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  25% {
+    transform: scale(1.02);
+    filter: brightness(1.1);
+  }
+  50% {
+    transform: scale(1.05);
+    filter: brightness(1.2);
+  }
+  75% {
+    transform: scale(1.02);
+    filter: brightness(1.1);
+  }
+}
+
+@keyframes sacred-geometry-rotate {
+  0% {
+    transform: rotate(0deg) scale(1);
+    opacity: 0.7;
+  }
+  33% {
+    transform: rotate(120deg) scale(1.05);
+    opacity: 0.9;
+  }
+  66% {
+    transform: rotate(240deg) scale(1.05);
+    opacity: 0.9;
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+    opacity: 0.7;
+  }
+}
+
+@keyframes spiritual-breathe {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+}
+
+@keyframes golden-aura {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.6), 0 0 40px rgba(255, 215, 0, 0.3);
+  }
+}
+
+@keyframes cosmic-dance {
+  0% {
+    transform: rotate(0deg) translateX(0px) rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg) translateX(20px) rotate(-360deg);
+  }
+}
+
+@keyframes mantra-wave {
+  0%, 100% {
+    transform: translateX(0px);
+    opacity: 1;
+  }
+  25% {
+    transform: translateX(5px);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translateX(0px);
+    opacity: 0.9;
+  }
+  75% {
+    transform: translateX(-5px);
+    opacity: 0.8;
+  }
+}
+
+@keyframes celestial-orbit {
+  0% {
+    transform: rotate(0deg) translateX(30px) rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg) translateX(30px) rotate(-360deg);
   }
 }

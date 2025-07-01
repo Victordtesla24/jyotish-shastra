@@ -42,20 +42,20 @@ const mockLagnaService = {
 };
 
 const mockHouseService = {
-  analyzeHouses: jest.fn().mockReturnValue({
-    house1: { analysis: 'House 1 analysis complete', occupants: [], strength: 'strong' },
-    house2: { analysis: 'House 2 analysis complete', occupants: [], strength: 'medium' },
-    house3: { analysis: 'House 3 analysis complete', occupants: [], strength: 'weak' },
-    house4: { analysis: 'House 4 analysis complete', occupants: [], strength: 'medium' },
-    house5: { analysis: 'House 5 analysis complete', occupants: [], strength: 'strong' },
-    house6: { analysis: 'House 6 analysis complete', occupants: [], strength: 'weak' },
-    house7: { analysis: 'House 7 analysis complete', occupants: [], strength: 'medium' },
-    house8: { analysis: 'House 8 analysis complete', occupants: [], strength: 'weak' },
-    house9: { analysis: 'House 9 analysis complete', occupants: [], strength: 'strong' },
-    house10: { analysis: 'House 10 analysis complete', occupants: [], strength: 'medium' },
-    house11: { analysis: 'House 11 analysis complete', occupants: [], strength: 'strong' },
-    house12: { analysis: 'House 12 analysis complete', occupants: [], strength: 'weak' }
-  }),
+  analyzeAllHouses: jest.fn().mockReturnValue([
+    { houseNumber: 1, analysis: 'House 1 analysis complete', occupants: [], strength: 'strong' },
+    { houseNumber: 2, analysis: 'House 2 analysis complete', occupants: [], strength: 'medium' },
+    { houseNumber: 3, analysis: 'House 3 analysis complete', occupants: [], strength: 'weak' },
+    { houseNumber: 4, analysis: 'House 4 analysis complete', occupants: [], strength: 'medium' },
+    { houseNumber: 5, analysis: 'House 5 analysis complete', occupants: [], strength: 'strong' },
+    { houseNumber: 6, analysis: 'House 6 analysis complete', occupants: [], strength: 'weak' },
+    { houseNumber: 7, analysis: 'House 7 analysis complete', occupants: [], strength: 'medium' },
+    { houseNumber: 8, analysis: 'House 8 analysis complete', occupants: [], strength: 'weak' },
+    { houseNumber: 9, analysis: 'House 9 analysis complete', occupants: [], strength: 'strong' },
+    { houseNumber: 10, analysis: 'House 10 analysis complete', occupants: [], strength: 'medium' },
+    { houseNumber: 11, analysis: 'House 11 analysis complete', occupants: [], strength: 'strong' },
+    { houseNumber: 12, analysis: 'House 12 analysis complete', occupants: [], strength: 'weak' }
+  ]),
   crossVerifyHouseIndications: jest.fn().mockReturnValue({
     consistency: 'Good'
   })
@@ -188,7 +188,7 @@ describe('MasterAnalysisOrchestrator Integration Test', () => {
 
     // Verify that the orchestrator called each service
     expect(mockLagnaService.analyzeLagna).toHaveBeenCalled();
-    expect(mockHouseService.analyzeHouses).toHaveBeenCalled();
+    expect(mockHouseService.analyzeAllHouses).toHaveBeenCalled();
     expect(mockYogaService.detectAllYogas).toHaveBeenCalled();
     expect(mockLuminariesService.analyzeLuminaries).toHaveBeenCalled();
 

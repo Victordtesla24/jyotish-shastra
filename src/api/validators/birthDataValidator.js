@@ -176,12 +176,11 @@ const flexibleBirthDataSchema = Joi.object({
   }).optional()
 }).custom((value, helpers) => {
   // Ensure either coordinates or place information is provided
-  const hasCoordinates = value.latitude && value.longitude;
-  const hasPlaceInfo = value.placeOfBirth &&
-    (typeof value.placeOfBirth === 'string' ||
-     (typeof value.placeOfBirth === 'object' && (value.placeOfBirth.latitude && value.placeOfBirth.longitude)));
+  const hasTopLevelCoordinates = value.latitude && value.longitude;
+  const hasNestedCoordinates = value.placeOfBirth && typeof value.placeOfBirth === 'object' && value.placeOfBirth.latitude && value.placeOfBirth.longitude;
+  const hasPlaceString = value.placeOfBirth && typeof value.placeOfBirth === 'string';
 
-  if (!hasCoordinates && !hasPlaceInfo) {
+  if (!hasTopLevelCoordinates && !hasNestedCoordinates && !hasPlaceString) {
     return helpers.error('custom.multifield', {
       errors: [
         { field: 'latitude', message: 'Latitude is required when place information is not provided' },
@@ -232,12 +231,11 @@ const comprehensiveAnalysisSchema = Joi.object({
   }).optional()
 }).custom((value, helpers) => {
   // Ensure either coordinates or place information is provided
-  const hasCoordinates = value.latitude && value.longitude;
-  const hasPlaceInfo = value.placeOfBirth &&
-    (typeof value.placeOfBirth === 'string' ||
-     (typeof value.placeOfBirth === 'object' && (value.placeOfBirth.latitude && value.placeOfBirth.longitude)));
+  const hasTopLevelCoordinates = value.latitude && value.longitude;
+  const hasNestedCoordinates = value.placeOfBirth && typeof value.placeOfBirth === 'object' && value.placeOfBirth.latitude && value.placeOfBirth.longitude;
+  const hasPlaceString = value.placeOfBirth && typeof value.placeOfBirth === 'string';
 
-  if (!hasCoordinates && !hasPlaceInfo) {
+  if (!hasTopLevelCoordinates && !hasNestedCoordinates && !hasPlaceString) {
     return helpers.error('custom.multifield', {
       errors: [
         { field: 'latitude', message: 'Latitude is required when place information is not provided' },
@@ -1131,12 +1129,11 @@ const analysisRequiredSchema = Joi.object({
   }).optional()
 }).custom((value, helpers) => {
   // PRODUCTION-GRADE: Ensure either coordinates or place information is provided
-  const hasCoordinates = value.latitude && value.longitude;
-  const hasPlaceInfo = value.placeOfBirth &&
-    (typeof value.placeOfBirth === 'string' ||
-     (typeof value.placeOfBirth === 'object' && (value.placeOfBirth.latitude && value.placeOfBirth.longitude)));
+  const hasTopLevelCoordinates = value.latitude && value.longitude;
+  const hasNestedCoordinates = value.placeOfBirth && typeof value.placeOfBirth === 'object' && value.placeOfBirth.latitude && value.placeOfBirth.longitude;
+  const hasPlaceString = value.placeOfBirth && typeof value.placeOfBirth === 'string';
 
-  if (!hasCoordinates && !hasPlaceInfo) {
+  if (!hasTopLevelCoordinates && !hasNestedCoordinates && !hasPlaceString) {
     return helpers.error('custom.multifield', {
       errors: [
         { field: 'latitude', message: 'Latitude is required when place information is not provided' },

@@ -3,11 +3,11 @@
  * Main router configuration for all API endpoints
  */
 
-const express = require('express');
-const chartRoutes = require('./chart');
-const comprehensiveAnalysisRoutes = require('./comprehensiveAnalysis');
-const geocodingRoutes = require('./geocoding');
-const clientErrorLogRoutes = require('./clientErrorLog');
+import express from 'express';
+import chartRoutes from './chart.js';
+import comprehensiveAnalysisRoutes from './comprehensiveAnalysis.js';
+import geocodingRoutes from './geocoding.js';
+import clientErrorLogRoutes from './clientErrorLog.js';
 
 const router = express.Router();
 
@@ -77,4 +77,4 @@ router.get('/', (req, res) => {
   });
 });
 
-module.exports = router;
+export default router;

@@ -1,3 +1,4 @@
+"use client";
 import React, { forwardRef } from 'react';
 import { motion } from 'framer-motion';
 import { cva } from 'class-variance-authority';
@@ -66,6 +67,7 @@ const Card = forwardRef(({
   hover = false,
   padding,
   children,
+  decorative,
   ...props
 }, ref) => {
   return (

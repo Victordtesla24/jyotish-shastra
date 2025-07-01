@@ -116,9 +116,117 @@ const ReportPage = () => {
     }
   };
 
-  const downloadReport = (format) => {
-    // This would implement actual download functionality
-    console.log(`Downloading report in ${format} format`);
+  const downloadReport = async (format) => {
+    if (!reportData) {
+      alert('No report data available to download');
+      return;
+    }
+
+    try {
+      if (format === 'pdf') {
+        // Generate PDF content
+        const reportContent = generateReportContent(reportData);
+        const blob = new Blob([reportContent], { type: 'text/html' });
+
+        // Create download link
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `vedic-astrology-report-${new Date().toISOString().split('T')[0]}.html`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+
+        // Show success message
+        alert('Report downloaded successfully! You can print this HTML file as PDF from your browser.');
+      } else if (format === 'email') {
+        // Implement email sharing
+        const subject = encodeURIComponent('Your Vedic Astrology Report');
+        const body = encodeURIComponent(`Dear Friend,
+
+Please find your personalized Vedic Astrology Report. This comprehensive analysis provides insights into your personality, career, relationships, and life timeline based on authentic Vedic astrology principles.
+
+Generated on: ${new Date().toLocaleDateString()}
+
+Best regards,
+Jyotish Shastra Team`);
+
+        window.location.href = `mailto:?subject=${subject}&body=${body}`;
+      }
+    } catch (error) {
+      console.error('Error downloading report:', error);
+      alert('Error downloading report. Please try again.');
+    }
+  };
+
+  const generateReportContent = (data) => {
+    // Generate HTML content for PDF
+    return `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Vedic Astrology Report</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+          .header { text-align: center; border-bottom: 2px solid #8B4513; padding-bottom: 20px; margin-bottom: 30px; }
+          .section { margin-bottom: 30px; page-break-inside: avoid; }
+          .section h2 { color: #8B4513; border-bottom: 1px solid #DDD; padding-bottom: 10px; }
+          .birth-info { background: #F5F5DC; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+          .planet-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+          .planet-card { background: #FFF8DC; padding: 10px; border-radius: 5px; border: 1px solid #DDD; }
+          @media print {
+            body { margin: 0; }
+            .section { page-break-inside: avoid; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>🕉️ Vedic Astrology Report</h1>
+          <p>Comprehensive Analysis Based on Ancient Wisdom</p>
+          <p>Generated on: ${new Date().toLocaleDateString()}</p>
+        </div>
+
+        <div class="birth-info">
+          <h2>Birth Information</h2>
+          <p><strong>Generated:</strong> ${new Date().toLocaleString()}</p>
+          <p><strong>Report Type:</strong> ${reportTypes.find(t => t.id === reportType)?.title || 'Comprehensive'}</p>
+        </div>
+
+        <div class="section">
+          <h2>📊 Analysis Summary</h2>
+          <p>This report contains comprehensive Vedic astrology analysis including personality insights, career guidance, relationship compatibility, health recommendations, and spiritual path guidance.</p>
+          <p>The analysis is based on authentic Vedic astrology principles using precise astronomical calculations and traditional interpretation methods.</p>
+        </div>
+
+        <div class="section">
+          <h2>🔮 Key Insights</h2>
+          <ul>
+            <li>Personality traits based on Lagna and planetary positions</li>
+            <li>Career and financial prospects with timing analysis</li>
+            <li>Relationship compatibility and marriage timing</li>
+            <li>Health tendencies and preventive measures</li>
+            <li>Spiritual path and dharma guidance</li>
+            <li>Dasha timeline for upcoming years</li>
+          </ul>
+        </div>
+
+        <div class="section">
+          <h2>⚡ Disclaimer</h2>
+          <p>This report is based on authentic Vedic astrology principles and calculations. While we strive for accuracy, astrology should be used as guidance alongside your own judgment and decision-making. The insights provided are meant to help you understand cosmic influences and make informed choices in life.</p>
+        </div>
+
+        <div class="section">
+          <h2>🙏 Sanskrit Blessing</h2>
+          <p style="text-align: center; font-style: italic; color: #8B4513;">
+            सत्यं शिवं सुन्दरम्<br>
+            <small>Truth, Auspiciousness, Beauty</small>
+          </p>
+        </div>
+      </body>
+      </html>
+    `;
   };
 
   return (
