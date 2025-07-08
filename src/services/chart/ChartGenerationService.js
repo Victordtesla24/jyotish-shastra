@@ -4,21 +4,23 @@
  * Enhanced with geocoding integration and comprehensive analysis
  */
 
-const swisseph = require('swisseph');
-const { v4: uuidv4 } = require('uuid');
-const moment = require('moment-timezone');
-const GeocodingService = require('../geocoding/GeocodingService');
-const astroConfig = require('../../config/astro-config');
-const {
+import swisseph from 'swisseph';
+import { v4 as uuidv4 } from 'uuid';
+import moment from 'moment-timezone';
+import GeocodingService from '../geocoding/GeocodingService.js';
+import astroConfig from '../../config/astro-config.js';
+import {
   getSign,
   getSignName,
   calculateNavamsa,
   getNakshatra,
   calculatePlanetaryDignity,
   calculateHouseNumber,
-} = require('../../utils/helpers/astrologyHelpers');
-const { SWISS_EPHEMERIS, PLANETARY_DATA, ZODIAC_SIGNS } = require('../../utils/constants/astronomicalConstants');
-const BirthDataAnalysisService = require('../analysis/BirthDataAnalysisService');
+} from '../../utils/helpers/astrologyHelpers.js';
+import { SWISS_EPHEMERIS, PLANETARY_DATA, ZODIAC_SIGNS } from '../../utils/constants/astronomicalConstants.js';
+import BirthDataAnalysisService from '../analysis/BirthDataAnalysisService.js';
+import DetailedDashaAnalysisService from '../analysis/DetailedDashaAnalysisService.js';
+import AscendantCalculator from '../../core/calculations/chart-casting/AscendantCalculator.js';
 
 class ChartGenerationService {
   constructor(geocodingService) {
@@ -305,7 +307,7 @@ class ChartGenerationService {
    */
   async calculateAscendant(jd, placeOfBirth) {
     try {
-      const ascendantCalculator = new (require('../../core/calculations/chart-casting/AscendantCalculator'))();
+      const ascendantCalculator = new AscendantCalculator();
       const ascendantData = ascendantCalculator.calculate(jd, placeOfBirth.latitude, placeOfBirth.longitude);
       return ascendantData;
     } catch (error) {
@@ -554,7 +556,6 @@ class ChartGenerationService {
    */
   calculateDashaInfo(rasiChart) {
     // Use DetailedDashaAnalysisService for consistent Dasha calculations
-    const DetailedDashaAnalysisService = require('../analysis/DetailedDashaAnalysisService');
     const dashaService = new DetailedDashaAnalysisService();
 
     // Calculate comprehensive Dasha analysis
@@ -1098,4 +1099,4 @@ class ChartGenerationService {
 
 }
 
-module.exports = ChartGenerationService;
+export default ChartGenerationService;

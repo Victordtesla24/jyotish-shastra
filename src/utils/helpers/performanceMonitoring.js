@@ -332,12 +332,12 @@ class PerformanceMonitor {
 
   // Helper methods
   categorizeEndpoint(endpoint) {
-    if (endpoint.includes('/chart/generate')) return 'chartGeneration';
-    if (endpoint.includes('/analysis/comprehensive')) return 'comprehensiveAnalysis';
-    if (endpoint.includes('/analysis/dasha')) return 'dashaAnalysis';
-    if (endpoint.includes('/analysis/navamsa')) return 'navamsaAnalysis';
-    if (endpoint.includes('/analysis/houses')) return 'houseAnalysis';
-    if (endpoint.includes('/analysis/')) return 'comprehensiveAnalysis'; // Default for analysis
+    if (endpoint.includes('/v1/chart/generate')) return 'chartGeneration';
+    if (endpoint.includes('/v1/analysis/comprehensive')) return 'comprehensiveAnalysis';
+    if (endpoint.includes('/v1/analysis/dasha')) return 'dashaAnalysis';
+    if (endpoint.includes('/v1/analysis/navamsa')) return 'navamsaAnalysis';
+    if (endpoint.includes('/v1/analysis/houses')) return 'houseAnalysis';
+    if (endpoint.includes('/v1/analysis/')) return 'comprehensiveAnalysis'; // Default for analysis
     return 'validation';
   }
 

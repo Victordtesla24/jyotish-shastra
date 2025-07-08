@@ -2046,4 +2046,4 @@ class PredictiveAccuracyScorer {
   }
 }
 
-module.exports = PredictiveAccuracyScorer;
+export default PredictiveAccuracyScorer;

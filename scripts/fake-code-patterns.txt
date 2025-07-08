@@ -1,0 +1,54 @@
+## PATTERNS TO DETECT FAKE CODE
+
+Mock
+This is a simplified
+fake
+placeholder
+stub
+in practice
+in production
+placeholder implementation
+mock data
+MOCK_MODE
+DEBUG_MODE
+##TEST_MODE
+conceptual
+
+## GREP COMMAND TO DETECT FAKE CODE IN THE CODEBASE
+
+grep -rin --color=never   --exclude-dir={node_modules,tests,dist,logs,docs,user-docs,templates,scripts,.cursor,.vscode,.clinerules,.github,.git,cypress,build,ephemeris,public}   --exclude=package-lock.json --exclude=package.json --exclude=*.env --exclude=.cursor-rules.json --exclude=jest.config.js --exclude=cypress.config.js  --exclude=manifest.json --exclude=tsconfig.json --exclude=.gitignore --exclude=README.md --exclude=babel.config.js --exclude=.txt --exclude=*.log --exclude=LICENSE --exclude=nodemon.json --exclude=.DS_Store --exclude=tailwind.config.js --exclude=.env.local --exclude=*.html --exclude=*.svg --exclude=postcss.config.js --exclude=ThemeContext.js  -e 'This is a simplified' -e 'mock' -e 'placeholder' -e 'conceptual' -e 'in practice' -e 'mock data' -e 'in production' -e 'DEBUG_MODE' -e 'MOCK_MODE' . > logs/scripts/fake-code-detected.log
+
+
+grep -rin --color=always \
+  --exclude-dir={node_modules,tests,dist,logs,docs,user-docs,templates,scripts,.cursor,.vscode,.clinerules,.github,.git,cypress,build,ephemeris,public} \
+  --exclude=package-lock.json --exclude=package.json --exclude=*.env --exclude=.cursor-rules.json --exclude=jest.config.js --exclude=cypress.config.js \
+  --exclude=manifest.json --exclude=tsconfig.json --exclude=.gitignore --exclude=README.md --exclude=babel.config.js --exclude=.txt --exclude=*.log --exclude=LICENSE --exclude=nodemon.json --exclude=.DS_Store --exclude=tailwind.config.js --exclude=.env.local --exclude=*.html --exclude=*.svg --exclude=postcss.config.js --exclude=ThemeContext.js \
+  -e 'This is a simplified' -e 'mock' -e 'placeholder' -e 'conceptual' -e 'in practice' -e 'mock data' -e 'in production' -e 'DEBUG_MODE' -e 'MOCK_MODE' \
+  . | grep -i -v \
+      -e 'No mock' \
+      -e 'never use mock data' \
+      -e 'determination in practice' \
+      -e 'Silent fallback to eliminate console noise in production/test' \
+      -e 'Only log alerts in production to avoid test noise' \
+      -e 'Start resource monitoring if in production' \
+      -e 'placeholder: () ' \
+      -e 'no mock data' \
+      -e 'placeholder="' \
+      -e 'placeholder= ()' \
+      -e 'placeholder={placeholder}' \
+      -e 'placeholder:text-vedic-text-muted' \
+      -e 'Silent fallback' \
+      -e 'placeholder: (' \
+      -e 'no mock compatibility' \
+      -e 'no mock calculation' \
+  | sed $'s/\033\\[[0-9;]*[mK]//g' > logs/scripts/fake-code-detected.log
+
+
+
+
+grep -rin --color=always \
+  --exclude-dir={node_modules,tests,dist,logs,docs,user-docs,templates,scripts,.cursor,.vscode,.clinerules,.github,.git,cypress,build,ephemeris,public} \
+  --exclude=package-lock.json --exclude=package.json --exclude=*.env --exclude=.cursor-rules.json --exclude=jest.config.js --exclude=cypress.config.js \
+  --exclude=manifest.json --exclude=tsconfig.json --exclude=.gitignore --exclude=README.md --exclude=babel.config.js --exclude=.txt --exclude=*.log --exclude=LICENSE --exclude=nodemon.json --exclude=.DS_Store --exclude=tailwind.config.js --exclude=.env.local --exclude=*.html --exclude=*.svg --exclude=postcss.config.js --exclude=ThemeContext.js \
+  -e '/chart/generate'  \
+  . | sed $'s/\033\\[[0-9;]*[mK]//g'

@@ -3,7 +3,7 @@
  * Configuration constants for Vedic astrological calculations
  */
 
-const swisseph = require('swisseph');
+import swisseph from 'swisseph';
 
 const SWISS_EPHEMERIS = {
   // Calendar types
@@ -359,7 +359,7 @@ const SIGNS = {
   PISCES: 'Pisces'
 };
 
-module.exports = {
+export {
   SWISS_EPHEMERIS,
   PLANETARY_DATA,
   ZODIAC_SIGNS,
@@ -368,5 +368,5 @@ module.exports = {
   VIMSHOTTARI_DASHA,
   CLASSICAL_YOGAS,
   PLANETS,
-  ZODIAC_SIGNS: SIGNS
+  ZODIAC_SIGNS as SIGNS
 };

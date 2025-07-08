@@ -26,59 +26,22 @@ const DailyHoroscopeWidget = ({ userSign, onSignChange }) => {
 
   const currentSignData = zodiacSigns.find(sign => sign.value === selectedSign);
 
-  // Mock horoscope data - in production, this would come from an API
-  const generateHoroscope = (sign, date) => {
-    const horoscopes = {
-      aries: {
-        overall: "Today brings dynamic energy and new opportunities. Your natural leadership qualities will be in the spotlight.",
-        love: "Venus favors romantic connections. Single Aries may encounter someone special.",
-        career: "Mars energizes your professional sector. Take initiative on important projects.",
-        health: "High energy levels support physical activities. Stay hydrated throughout the day.",
-        lucky: {
-          number: 7,
-          color: "Red",
-          time: "10:00 AM - 12:00 PM",
-          direction: "East"
-        },
-        rating: {
-          overall: 8,
-          love: 7,
-          career: 9,
-          health: 8
-        }
-      },
-      // Add more signs as needed - this is a simplified example
-    };
-
-    return horoscopes[sign] || {
-      overall: "The cosmic energies are aligned favorably for you today. Trust your intuition and embrace new possibilities.",
-      love: "Planetary alignments suggest harmony in relationships and potential for meaningful connections.",
-      career: "Professional matters receive cosmic support. Focus on your goals with determination.",
-      health: "Maintain balance in all aspects of life. Listen to your body's needs.",
-      lucky: {
-        number: Math.floor(Math.random() * 9) + 1,
-        color: currentSignData?.color || "#4CAF50",
-        time: "9:00 AM - 11:00 AM",
-        direction: "North"
-      },
-      rating: {
-        overall: Math.floor(Math.random() * 3) + 7,
-        love: Math.floor(Math.random() * 3) + 6,
-        career: Math.floor(Math.random() * 3) + 7,
-        health: Math.floor(Math.random() * 3) + 7
-      }
-    };
+  // Real API integration - no mock data
+  const fetchHoroscopeFromAPI = async (sign, date) => {
+    // This should integrate with real horoscope API when available
+    throw new Error('Daily horoscope API integration not yet implemented');
   };
 
   const fetchHoroscope = async (sign) => {
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      const horoscopeData = generateHoroscope(sign, currentDate);
+      // Real API integration - no mock data
+      const horoscopeData = await fetchHoroscopeFromAPI(sign, currentDate);
       setHoroscope(horoscopeData);
     } catch (error) {
       console.error('Error fetching horoscope:', error);
+      // Show error state instead of mock data
+      setHoroscope(null);
     } finally {
       setIsLoading(false);
     }

@@ -26,54 +26,20 @@ const DashaCalculator = ({ birthData, onDashaSelect }) => {
 
   const dashaOrder = ['Sun', 'Moon', 'Mars', 'Rahu', 'Jupiter', 'Saturn', 'Mercury', 'Ketu', 'Venus'];
 
-  // Mock calculation - in production, this would use the backend service
-  const calculateDashaTimeline = (birthDate, currentDate) => {
-    const birth = new Date(birthDate);
-    const current = new Date(currentDate);
-    const ageInYears = (current - birth) / (365.25 * 24 * 60 * 60 * 1000);
+  // Real backend service integration - no mock calculation
+  const fetchDashaFromAPI = async (birthData) => {
+    const response = await fetch('/api/v1/analysis/dasha', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(birthData)
+    });
 
-    // Start with Moon dasha (simplified - normally calculated from nakshatra)
-    let currentAge = 0;
-    let dashaIndex = 1; // Start with Moon
-    const timeline = [];
-    let currentDashaInfo = null;
-
-    // Generate dasha sequence for 120 years (full Vimshottari cycle)
-    while (currentAge < 120) {
-      const planet = dashaOrder[dashaIndex % 9];
-      const period = dashaPeriods[planet].period;
-      const startAge = currentAge;
-      const endAge = currentAge + period;
-      const isCurrent = ageInYears >= startAge && ageInYears < endAge;
-
-      const dashaEntry = {
-        planet,
-        startAge,
-        endAge,
-        period,
-        isCurrent,
-        startDate: new Date(birth.getTime() + startAge * 365.25 * 24 * 60 * 60 * 1000),
-        endDate: new Date(birth.getTime() + endAge * 365.25 * 24 * 60 * 60 * 1000),
-        remainingYears: isCurrent ? endAge - ageInYears : null,
-        progress: isCurrent ? ((ageInYears - startAge) / period) * 100 : 0
-      };
-
-      timeline.push(dashaEntry);
-
-      if (isCurrent) {
-        currentDashaInfo = dashaEntry;
-      }
-
-      currentAge += period;
-      dashaIndex++;
+    if (!response.ok) {
+      throw new Error(`Dasha API error: ${response.status}`);
     }
 
-    return {
-      timeline,
-      currentDasha: currentDashaInfo,
-      currentAge: ageInYears,
-      birthDate: birth
-    };
+    const data = await response.json();
+    return data.analysis?.dashaAnalysis || null;
   };
 
   const calculateDasha = async () => {
@@ -83,13 +49,13 @@ const DashaCalculator = ({ birthData, onDashaSelect }) => {
 
     setIsCalculating(true);
     try {
-      // Simulate calculation time
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      const result = calculateDashaTimeline(birthData.dateOfBirth, selectedDate);
+      // Real API integration - no mock calculation
+      const result = await fetchDashaFromAPI(birthData);
       setDashaData(result);
     } catch (error) {
       console.error('Error calculating dasha:', error);
+      // Show error state instead of mock data
+      setDashaData(null);
     } finally {
       setIsCalculating(false);
     }

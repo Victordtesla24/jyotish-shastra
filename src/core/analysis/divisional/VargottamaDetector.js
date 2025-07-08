@@ -29,4 +29,4 @@ class VargottamaDetector {
   }
 }
 
-module.exports = VargottamaDetector;
+export default VargottamaDetector;

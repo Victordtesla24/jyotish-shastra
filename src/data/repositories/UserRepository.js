@@ -3,9 +3,9 @@
  * Handles all database operations for User model
  */
 
-const User = require('../models/User');
-const bcrypt = require('bcryptjs');
-const crypto = require('crypto');
+import User from '../models/User.js';
+import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 
 class UserRepository {
   /**
@@ -669,4 +669,4 @@ class UserRepository {
   }
 }
 
-module.exports = UserRepository;
+export default UserRepository;

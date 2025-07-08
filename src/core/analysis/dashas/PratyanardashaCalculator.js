@@ -731,4 +731,4 @@ class PratyanardashaCalculator {
   }
 }
 
-module.exports = PratyanardashaCalculator;
+export default PratyanardashaCalculator;

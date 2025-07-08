@@ -265,20 +265,126 @@ export const parseBirthData = (birthDataString) => {
     return result;
   }
 
-  // Try to extract date, time, and place from the string
-  // This is a simplified parser - in practice, you'd want more robust parsing
-  const parts = birthDataString.split(',').map(part => part.trim());
+  // Comprehensive parser supporting multiple formats
+  try {
+    // Normalize input - remove extra spaces and common separators
+    const normalized = birthDataString.trim().replace(/\s+/g, ' ');
 
-  if (parts.length >= 3) {
-    result.date = parts[0];
-    result.time = parts[1];
-    result.place = parts[2];
-    result.isValid = true;
-  } else {
-    result.errors.push('Invalid birth data format. Expected: Date, Time, Place');
+    // Pattern 1: "DD/MM/YYYY, HH:MM, Place"
+    const pattern1 = /^(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4}),\s*(\d{1,2}:\d{2}(?::\d{2})?),\s*(.+)$/;
+    const match1 = normalized.match(pattern1);
+
+    if (match1) {
+      result.date = match1[1];
+      result.time = match1[2];
+      result.place = match1[3];
+      result.isValid = validateParsedComponents(result);
+      return result;
+    }
+
+    // Pattern 2: "YYYY-MM-DD HH:MM Place"
+    const pattern2 = /^(\d{4}-\d{1,2}-\d{1,2})\s+(\d{1,2}:\d{2}(?::\d{2})?)\s+(.+)$/;
+    const match2 = normalized.match(pattern2);
+
+    if (match2) {
+      result.date = match2[1];
+      result.time = match2[2];
+      result.place = match2[3];
+      result.isValid = validateParsedComponents(result);
+      return result;
+    }
+
+    // Pattern 3: "DD Month YYYY, HH:MM AM/PM, Place"
+    const pattern3 = /^(\d{1,2}\s+\w+\s+\d{4}),\s*(\d{1,2}:\d{2}(?::\d{2})?\s*(?:AM|PM|am|pm)?),\s*(.+)$/;
+    const match3 = normalized.match(pattern3);
+
+    if (match3) {
+      result.date = match3[1];
+      result.time = match3[2];
+      result.place = match3[3];
+      result.isValid = validateParsedComponents(result);
+      return result;
+    }
+
+    // Pattern 4: Comma-separated format with flexible ordering
+    const parts = normalized.split(',').map(part => part.trim());
+
+    if (parts.length >= 3) {
+      // Try to identify date, time, and place from parts
+      let dateIndex = -1, timeIndex = -1, placeIndex = -1;
+
+      for (let i = 0; i < parts.length; i++) {
+        const part = parts[i];
+
+        // Check if part looks like a date
+        if (/^\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4}$/.test(part) ||
+            /^\d{4}-\d{1,2}-\d{1,2}$/.test(part) ||
+            /^\d{1,2}\s+\w+\s+\d{4}$/.test(part)) {
+          dateIndex = i;
+        }
+        // Check if part looks like a time
+        else if (/^\d{1,2}:\d{2}(?::\d{2})?(?:\s*(?:AM|PM|am|pm))?$/.test(part)) {
+          timeIndex = i;
+        }
+        // Remaining parts are likely place
+        else if (dateIndex === -1 && timeIndex === -1) {
+          placeIndex = i;
+        }
+      }
+
+      if (dateIndex !== -1 && timeIndex !== -1) {
+        result.date = parts[dateIndex];
+        result.time = parts[timeIndex];
+
+        // Combine remaining parts as place
+        const placeParts = parts.filter((_, index) => index !== dateIndex && index !== timeIndex);
+        result.place = placeParts.join(', ');
+
+        result.isValid = validateParsedComponents(result);
+        return result;
+      }
+    }
+
+    // If no pattern matched, provide helpful error
+    result.errors.push('Unable to parse birth data format. Supported formats: DD/MM/YYYY, HH:MM, Place | YYYY-MM-DD HH:MM Place | DD Month YYYY, HH:MM AM/PM, Place');
+
+  } catch (error) {
+    result.errors.push(`Parsing error: ${error.message}`);
   }
 
   return result;
+};
+
+/**
+ * Validate parsed birth data components
+ * @private
+ * @param {Object} components - Parsed components
+ * @returns {boolean} True if valid
+ */
+const validateParsedComponents = (components) => {
+  const { date, time, place } = components;
+
+  // Validate date format
+  const dateValidation = validateBirthDate(date);
+  if (!dateValidation.isValid) {
+    components.errors.push(`Date validation failed: ${dateValidation.error}`);
+    return false;
+  }
+
+  // Validate time format
+  const timeValidation = validateBirthTime(time);
+  if (!timeValidation.isValid) {
+    components.errors.push(`Time validation failed: ${timeValidation.error}`);
+    return false;
+  }
+
+  // Validate place
+  if (!place || place.trim().length < 2) {
+    components.errors.push('Place must be at least 2 characters long');
+    return false;
+  }
+
+  return true;
 };
 
 /**

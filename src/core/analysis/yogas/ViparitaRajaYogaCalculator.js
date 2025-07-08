@@ -116,4 +116,4 @@ class ViparitaRajaYogaCalculator {
   }
 }
 
-module.exports = ViparitaRajaYogaCalculator;
+export default ViparitaRajaYogaCalculator;

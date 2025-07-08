@@ -1,0 +1,29 @@
+{
+  "timestamp": "2025-07-08T00:08:11.393Z",
+  "testResults": {
+    "chartGeneration": false
+  },
+  "apiResponses": 0,
+  "validation": {
+    "chartPageAPIData": false,
+    "analysisPageAPIData": false,
+    "reportPageAPIData": false,
+    "apiCallsSuccessful": 0,
+    "totalAPICalls": 0
+  },
+  "screenshots": [
+    "01-chart-page-initial.png",
+    "02-chart-form-filled.png",
+    "03-chart-error.png",
+    "03-chart-generated.png",
+    "04-analysis-page-initial.png",
+    "05-analysis-error.png",
+    "06-report-page-initial.png",
+    "07-report-error.png"
+  ],
+  "recommendations": [
+    "Fix chart page API data display",
+    "Fix analysis page API data display",
+    "Fix report page API data display"
+  ]
+}

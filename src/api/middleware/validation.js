@@ -1,6 +1,6 @@
-const Joi = require('joi');
+import Joi from 'joi';
 
-module.exports = function validation(schema) {
+export default function validation(schema) {
   return (req, res, next) => {
     const { error } = schema.validate(req.body, { abortEarly: false });
     if (error) {

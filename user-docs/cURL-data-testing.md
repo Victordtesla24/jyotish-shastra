@@ -190,17 +190,25 @@ Gender: Male
 ```bash
 # Test Commands (Name field optional for ALL endpoints)
 
+# GeoCode & Time Zone Generation (Works - No Changes Needed)
+curl -X POST http://localhost:3001/api/v1/geocoding/location \
+  -H "Content-Type: application/json" \
+  -d '{
+      "placeOfBirth": "Sialkot, Pakistan"
+  }' | jq .
+
 # Chart Generation (Works - No Changes Needed)
 curl -X POST http://localhost:3001/api/v1/chart/generate \
   -H "Content-Type: application/json" \
   -d '{
-    "dateOfBirth": "1985-10-24",
-    "timeOfBirth": "14:30",
-    "latitude": 18.5204,
-    "longitude": 73.8567,
-    "timezone": "Asia/Kolkata",
-    "gender": "male"
-  }'
+      "name": "Farhan",
+      "dateOfBirth": "1997-12-18",
+      "timeOfBirth": "02:30",
+      "latitude": 32.4935378,
+      "longitude": 74.5411575,
+      "timezone": "Asia/Karachi",
+      "gender": "male"
+  }' | jq .
 
 # Comprehensive Analysis (Should work without name after fix)
 curl -X POST http://localhost:3001/api/v1/analysis/comprehensive \
@@ -212,10 +220,10 @@ curl -X POST http://localhost:3001/api/v1/analysis/comprehensive \
     "longitude": 73.8567,
     "timezone": "Asia/Kolkata",
     "gender": "male"
-  }'
+  }' | jq .
 
 # Dasha Analysis (Should return consistent results after fix)
-curl -X POST http://localhost:3001/api/v1/analysis/dasha \
+  curl -X POST http://localhost:3001/api/v1/analysis/dasha \
   -H "Content-Type: application/json" \
   -d '{
     "dateOfBirth": "1985-10-24",
@@ -224,7 +232,7 @@ curl -X POST http://localhost:3001/api/v1/analysis/dasha \
     "longitude": 73.8567,
     "timezone": "Asia/Kolkata",
     "gender": "male"
-  }'
+  }' | jq .
 
 # Houses Analysis (Should work without name and return populated data after fix)
 curl -X POST http://localhost:3001/api/v1/analysis/houses \
@@ -236,7 +244,7 @@ curl -X POST http://localhost:3001/api/v1/analysis/houses \
     "longitude": 73.8567,
     "timezone": "Asia/Kolkata",
     "gender": "male"
-  }'
+  }' | jq .
 
 # Navamsa Analysis (Should return populated data after fix)
 curl -X POST http://localhost:3001/api/v1/analysis/navamsa \
@@ -248,7 +256,7 @@ curl -X POST http://localhost:3001/api/v1/analysis/navamsa \
     "longitude": 73.8567,
     "timezone": "Asia/Kolkata",
     "gender": "male"
-  }'
+  }' | jq .
 ```
 
 ## **Final Assessment**

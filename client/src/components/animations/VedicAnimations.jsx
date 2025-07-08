@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence, useInView, useMotionValue, useSpring } from 'framer-motion';
+import { motion, AnimatePresence, useInView, useSpring } from 'framer-motion';
 import SacredGeometry from '../patterns/SacredGeometry';
 
 // Enhanced Page Transition Wrapper
@@ -263,8 +263,6 @@ const VedicLoadingOverlay = ({ isVisible, message = "Sacred calculations in prog
 const VedicHoverCard = ({ children, variant = "default", className = "" }) => {
   const [isHovered, setIsHovered] = useState(false);
   const ref = useRef(null);
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
   const rotateX = useSpring(0, { stiffness: 300, damping: 30 });
   const rotateY = useSpring(0, { stiffness: 300, damping: 30 });
 
@@ -488,7 +486,6 @@ const SacredCounter = ({ end, duration = 2, prefix = "", suffix = "" }) => {
     if (!isInView) return;
 
     let startTime;
-    const startValue = 0;
 
     const animate = (currentTime) => {
       if (!startTime) startTime = currentTime;

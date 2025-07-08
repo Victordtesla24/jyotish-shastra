@@ -3,7 +3,7 @@
  * Contains constants and settings for Vedic astrology calculations
  */
 
-module.exports = {
+export default {
   // Zodiac Signs (Rashis)
   ZODIAC_SIGNS: {
     ARIES: { id: 1, name: 'Aries', sanskrit: 'Mesha', element: 'Fire', quality: 'Cardinal' },

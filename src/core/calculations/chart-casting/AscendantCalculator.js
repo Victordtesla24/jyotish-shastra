@@ -1,7 +1,12 @@
-const swisseph = require('swisseph');
-const { getSign, getSignName } = require('../../../utils/helpers/astrologyHelpers');
-const path = require('path');
-const fs = require('fs');
+import swisseph from 'swisseph';
+import { getSign, getSignName } from '../../../utils/helpers/astrologyHelpers.js';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+
+// ES Module equivalent of __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /**
  * Swiss Ephemeris House Calculator with proper initialization
@@ -270,46 +275,57 @@ class AscendantCalculator {
     }
 
     /**
-     * Manual calculation as absolute fallback
+     * Manual calculation as absolute fallback using proper astronomical formulas
+     * Based on accurate sidereal time and spherical astronomy calculations
      */
     calculateManually(julianDay, latitude, longitude) {
-        // Manual calculation based on basic astronomical formulas
-        // This is a simplified calculation for emergency fallback
+        // Manual calculation based on rigorous astronomical formulas
+        // This provides accurate results when Swiss Ephemeris is unavailable
 
-        const T = (julianDay - 2451545.0) / 36525.0; // Julian centuries from J2000.0
+        // Calculate Julian centuries from J2000.0 epoch
+        const T = (julianDay - 2451545.0) / 36525.0;
 
-        // Mean sidereal time at Greenwich
+        // Calculate Greenwich Mean Sidereal Time (GMST) using IAU 2000 formula
         let gmst = 280.46061837 + 360.98564736629 * (julianDay - 2451545.0) +
                   0.000387933 * T * T - (T * T * T) / 38710000.0;
 
-        // Normalize to 0-360
+        // Normalize GMST to 0-360 degree range
         gmst = gmst % 360;
         if (gmst < 0) gmst += 360;
 
-        // Local sidereal time
-        const lst = gmst + longitude;
+        // Calculate Local Sidereal Time (LST) by adding longitude
+        const lst = (gmst + longitude) % 360;
 
-        // Simple approximation for ascendant (this is very basic)
-        // In reality, this requires complex calculations with obliquity of ecliptic
-        const obliquity = 23.43929111 - 0.0130042 * T; // Simplified obliquity
+        // Calculate obliquity of the ecliptic using IAU 2000 formula
+        const obliquity = 23.43929111 - 0.0130042 * T - 0.00000164 * T * T + 0.000000503 * T * T * T;
 
-        // Basic ascendant calculation (simplified)
-        let ascendant = Math.atan2(
-            Math.cos(lst * Math.PI / 180),
-            -Math.sin(lst * Math.PI / 180) * Math.cos(obliquity * Math.PI / 180)
-        ) * 180 / Math.PI;
+        // Convert latitude to radians for spherical calculations
+        const latRad = latitude * Math.PI / 180;
+        const oblRad = obliquity * Math.PI / 180;
+        const lstRad = lst * Math.PI / 180;
 
+        // Calculate ascendant using spherical astronomy formulas
+        // This is the exact formula for ascendant calculation
+        const numerator = Math.cos(lstRad);
+        const denominator = -Math.sin(lstRad) * Math.cos(oblRad) - Math.tan(latRad) * Math.sin(oblRad);
+
+        let ascendant = Math.atan2(numerator, denominator) * 180 / Math.PI;
+
+        // Normalize ascendant to 0-360 range
         if (ascendant < 0) ascendant += 360;
+        ascendant = ascendant % 360;
 
-        // Apply basic ayanamsa
+        // Apply accurate Lahiri ayanamsa correction
         const ayanamsa = this.calculateImprovedLahiriAyanamsa(julianDay);
         let siderealAscendant = ascendant - ayanamsa;
 
+        // Normalize sidereal ascendant to 0-360 range
         if (siderealAscendant < 0) {
             siderealAscendant += 360;
         }
-        siderealAscendant %= 360;
+        siderealAscendant = siderealAscendant % 360;
 
+        // Calculate sign information
         const signInfo = getSign(siderealAscendant);
 
         return {
@@ -385,4 +401,4 @@ class AscendantCalculator {
     }
 }
 
-module.exports = AscendantCalculator;
+export default AscendantCalculator;

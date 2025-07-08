@@ -1131,4 +1131,4 @@ class UserAuthenticationService {
   }
 }
 
-module.exports = UserAuthenticationService;
+export default UserAuthenticationService;

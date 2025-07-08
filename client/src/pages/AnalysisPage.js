@@ -1,94 +1,91 @@
-import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import React, { useEffect, useState, Suspense } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { Card, CardHeader, CardTitle, CardContent, Button } from '../components/ui';
-import ComprehensiveAnalysisDisplay from '../components/reports/ComprehensiveAnalysisDisplay';
-import EnhancedPersonalityProfile from '../components/reports/EnhancedPersonalityProfile';
+
 import analysisService from '../services/analysisService';
+import ChartDataManager from '../utils/chartDataManager';
+
+
+
+// Lazy load ComprehensiveAnalysisDisplay
+const ComprehensiveAnalysisDisplay = React.lazy(() =>
+  import('../components/reports/ComprehensiveAnalysisDisplay').catch(err => {
+    console.error('Error loading ComprehensiveAnalysisDisplay:', err);
+    return Promise.resolve({
+      default: () => (
+        <div className="card-cosmic text-center p-8">
+          <h3 className="text-sacred-white text-xl mb-4">📊 Analysis Loading Error</h3>
+          <p className="text-sacred-white/80 mb-6">
+            Please refresh the page to try again.
+          </p>
+          <button onClick={() => window.location.reload()} className="btn-vedic">
+            Refresh Page
+          </button>
+        </div>
+      )
+    });
+  })
+);
 
 const AnalysisPage = () => {
   const [analysisData, setAnalysisData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [activeAnalysisType, setActiveAnalysisType] = useState('personality');
   const location = useLocation();
+  const navigate = useNavigate();
   const [chartId, setChartId] = useState(null);
 
-  // Extract chartId from query params if present
+  // Extract chartId from query params or location state
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    const id = params.get('chartId');
-    if (id) {
-      setChartId(id);
-      (async () => {
-        try {
-          setIsLoading(true);
-          const data = await analysisService.getComprehensiveAnalysis(id);
-          setAnalysisData(data);
-        } catch (err) {
-          console.error('Failed to load comprehensive analysis', err);
-        } finally {
-          setIsLoading(false);
-        }
-      })();
-    }
-  }, [location.search]);
+    const urlChartId = params.get('chartId');
+    const stateData = location.state;
 
-  const analysisTypes = [
-    {
-      id: 'personality',
-      title: 'Personality Analysis',
-      description: 'Deep insights into your character, strengths, and natural tendencies.',
-      icon: '🧠',
-      color: 'from-cosmic-purple to-vedic-primary'
-    },
-    {
-      id: 'career',
-      title: 'Career & Finance',
-      description: 'Professional path, wealth indicators, and timing for success.',
-      icon: '💼',
-      color: 'from-vedic-gold to-saffron-bright'
-    },
-    {
-      id: 'relationships',
-      title: 'Relationships',
-      description: 'Marriage, partnerships, and compatibility analysis.',
-      icon: '💕',
-      color: 'from-rose-500 to-pink-500'
-    },
-    {
-      id: 'health',
-      title: 'Health & Wellness',
-      description: 'Physical constitution, health tendencies, and remedial measures.',
-      icon: '🌿',
-      color: 'from-green-500 to-emerald-500'
-    },
-    {
-      id: 'spiritual',
-      title: 'Spiritual Path',
-      description: 'Dharma, spiritual inclinations, and path to enlightenment.',
-      icon: '🕉️',
-      color: 'from-indigo-500 to-purple-600'
-    },
-    {
-      id: 'timing',
-      title: 'Life Timeline',
-      description: 'Dasha analysis and major life event predictions.',
-      icon: '⏳',
-      color: 'from-orange-500 to-red-500'
+    if (urlChartId) {
+      setChartId(urlChartId);
+    } else if (stateData?.birthData) {
+      ChartDataManager.storeBirthData(stateData.birthData);
+    } else {
+      const storedChartData = ChartDataManager.getChartData();
+      if (storedChartData?.chartId) {
+        setChartId(storedChartData.chartId);
+      }
     }
-  ];
+  }, [location.search, location.state]);
 
-  const handleAnalysisRequest = async (analysisType) => {
+  // Load analysis data when chartId is available
+  useEffect(() => {
+    if (!chartId) return;
+
+    const loadAnalysisData = async () => {
+      try {
+        setIsLoading(true);
+        const data = await analysisService.getComprehensiveAnalysis(chartId);
+        setAnalysisData(data);
+      } catch (err) {
+        console.error('Failed to load comprehensive analysis:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadAnalysisData();
+  }, [chartId]);
+
+  const handleAnalysisRequest = async () => {
     setIsLoading(true);
-    setActiveAnalysisType(analysisType);
 
     try {
-      if (!chartId) {
-        console.warn('No chartId available for analysis request');
-        return;
+      if (chartId) {
+        const data = await analysisService.getComprehensiveAnalysis(chartId);
+        setAnalysisData(data);
+      } else {
+        const birthData = ChartDataManager.getFormattedBirthData();
+        if (birthData) {
+          const data = await analysisService.generateBirthDataAnalysis(birthData);
+          setAnalysisData(data);
+        }
       }
-
-      const data = await analysisService.getComprehensiveAnalysis(chartId);
-      setAnalysisData(data);
     } catch (error) {
       console.error('Error getting analysis:', error);
     } finally {
@@ -97,229 +94,201 @@ const AnalysisPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sacred-white to-gray-50">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 bg-gradient-to-br from-cosmic-purple to-vedic-gold rounded-full flex items-center justify-center">
-              <span className="text-2xl text-white">🔮</span>
+    <motion.div
+      className="min-h-screen bg-vedic-pattern"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.8 }}
+    >
+      <div className="container-vedic py-8">
+        {/* Enhanced Header */}
+        <motion.div
+          className="text-center mb-12"
+          initial={{ y: -50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+        >
+          <motion.div
+            className="flex justify-center mb-6"
+            animate={{ rotate: [0, 5, -5, 0] }}
+            transition={{ duration: 4, repeat: Infinity }}
+          >
+            <div className="w-20 h-20 bg-gradient-cosmic rounded-full flex items-center justify-center cosmic-glow">
+              <span className="text-3xl text-sacred-white">🔮</span>
             </div>
-          </div>
-          <h1 className="font-accent text-4xl md:text-5xl font-bold text-earth-brown mb-4">
-            Comprehensive Analysis
+          </motion.div>
+          <h1 className="font-accent text-4xl md:text-6xl font-bold text-earth-brown mb-4">
+            ॐ Vedic Analysis ॐ
           </h1>
-          <p className="text-lg text-wisdom-gray max-w-3xl mx-auto">
+          <div className="sanskrit-text text-lg mb-4">
+            ज्योतिष शास्त्र विश्लेषण
+          </div>
+          <p className="text-lg text-wisdom-gray max-w-3xl mx-auto leading-relaxed">
             Explore the depths of your cosmic blueprint through authentic Vedic analysis.
-            Each section reveals different aspects of your life's journey and potential.
+            Each section reveals different aspects of your life's journey and divine potential.
           </p>
-        </div>
 
-        {/* Analysis Type Selection */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-          {analysisTypes.map((type) => (
-            <Card
-              key={type.id}
-              variant="elevated"
-              className={`cursor-pointer transition-all duration-300 hover:shadow-cosmic group ${
-                activeAnalysisType === type.id ? 'ring-2 ring-cosmic-purple shadow-cosmic' : ''
-              }`}
-              onClick={() => handleAnalysisRequest(type.id)}
+          {/* Generate Chart Notice */}
+          {!chartId && (
+            <motion.div
+              className="card-cosmic mt-8 max-w-2xl mx-auto"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.5 }}
             >
-              <CardContent className="p-6 text-center">
-                <div className={`w-16 h-16 bg-gradient-to-br ${type.color} rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform`}>
-                  <span className="text-2xl text-white">{type.icon}</span>
+              <div className="text-center py-6">
+                <div className="text-4xl mb-3">🌟</div>
+                <h3 className="font-accent text-xl text-sacred-white mb-3">
+                  Generate Your Birth Chart First
+                </h3>
+                <p className="text-sacred-white/80 mb-6">
+                  To access your personalized analysis, please generate your birth chart first.
+                </p>
+                <Button
+                  className="btn-vedic"
+                  onClick={() => navigate('/chart')}
+                >
+                  Create Birth Chart
+                </Button>
+              </div>
+            </motion.div>
+          )}
+        </motion.div>
+
+        {/* Analysis Request Section */}
+        {chartId && !analysisData && !isLoading && (
+          <div className="text-center mb-12">
+            <Card variant="elevated" className="max-w-2xl mx-auto">
+              <CardContent className="p-8">
+                <div className="w-16 h-16 bg-gradient-to-br from-cosmic-purple to-vedic-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl text-white">🔮</span>
                 </div>
                 <h3 className="font-accent text-lg font-bold text-earth-brown mb-2">
-                  {type.title}
+                  Complete Analysis
                 </h3>
-                <p className="text-wisdom-gray text-sm leading-relaxed">
-                  {type.description}
+                <p className="text-wisdom-gray text-sm leading-relaxed mb-6">
+                  Full 8-section comprehensive Vedic analysis with all life areas covered.
                 </p>
-                {activeAnalysisType === type.id && (
-                  <div className="mt-4">
-                    <div className="w-2 h-2 bg-cosmic-purple rounded-full mx-auto animate-pulse"></div>
-                  </div>
-                )}
+                <Button
+                  className="bg-gradient-to-r from-cosmic-purple to-vedic-primary text-white"
+                  onClick={handleAnalysisRequest}
+                >
+                  Generate Comprehensive Analysis
+                </Button>
               </CardContent>
             </Card>
-          ))}
-        </div>
+          </div>
+        )}
+
+        {/* Loading State */}
+        {isLoading && (
+          <Card variant="elevated" className="py-16">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-gradient-to-br from-cosmic-purple to-vedic-gold rounded-full flex items-center justify-center mx-auto mb-6 animate-spin">
+                <span className="text-xl text-white">🕉️</span>
+              </div>
+              <h3 className="font-accent text-xl font-bold text-earth-brown mb-2">
+                Analyzing Your Cosmic Blueprint
+              </h3>
+              <p className="text-wisdom-gray">
+                Consulting the stars and calculating your comprehensive analysis...
+              </p>
+            </div>
+          </Card>
+        )}
 
         {/* Analysis Results */}
-        <div className="space-y-8">
-          {isLoading && (
-            <Card variant="elevated" className="py-16">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-gradient-to-br from-cosmic-purple to-vedic-gold rounded-full flex items-center justify-center mx-auto mb-6 animate-spin">
-                  <span className="text-xl text-white">🕉️</span>
+        {!isLoading && analysisData && (
+          <div className="space-y-6">
+            {/* Navigation Header */}
+            <Card variant="elevated" className="p-4">
+              <div className="flex flex-col sm:flex-row items-center justify-between">
+                <div className="flex items-center space-x-4 mb-4 sm:mb-0">
+                  <div className="w-10 h-10 bg-gradient-cosmic rounded-full flex items-center justify-center">
+                    <span className="text-sacred-white text-lg">🔮</span>
+                  </div>
+                  <div>
+                    <h3 className="font-accent font-bold text-earth-brown text-lg">
+                      Comprehensive Analysis
+                    </h3>
+                    <p className="text-sm text-wisdom-gray">
+                      Complete 8-section Vedic analysis
+                    </p>
+                  </div>
                 </div>
-                <h3 className="font-accent text-xl font-bold text-earth-brown mb-2">
-                  Analyzing Your Cosmic Blueprint
-                </h3>
-                <p className="text-wisdom-gray">
-                  Consulting the stars and calculating your {analysisTypes.find(t => t.id === activeAnalysisType)?.title.toLowerCase()}...
-                </p>
+                <div className="flex space-x-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="btn-sacred"
+                    onClick={() => window.print()}
+                  >
+                    📄 Print Report
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="btn-cosmic"
+                    onClick={() => navigate(`/report?chartId=${chartId}`)}
+                  >
+                    📋 Full Report
+                  </Button>
+                </div>
               </div>
             </Card>
-          )}
 
-          {!isLoading && !analysisData && (
-            <Card variant="cosmic" className="py-16">
-              <div className="text-center">
-                <div className="text-6xl text-white/80 mb-6">🌟</div>
-                <h3 className="font-accent text-2xl font-bold text-white mb-4">
-                  Ready for Deep Analysis
+            {/* Analysis Display */}
+            <Suspense fallback={
+              <div className="card-cosmic text-center py-16">
+                <h3 className="font-accent text-xl text-sacred-white mb-2">
+                  Loading Analysis...
                 </h3>
-                <p className="text-white/90 max-w-2xl mx-auto leading-relaxed">
-                  Select any analysis type above to begin your journey into the profound wisdom
-                  of Vedic astrology. Each analysis provides detailed insights based on your
-                  unique planetary positions and cosmic influences.
+                <p className="text-sacred-white/80">
+                  Interpreting planetary influences in your chart
                 </p>
               </div>
-            </Card>
-          )}
-
-          {!isLoading && analysisData && activeAnalysisType === 'personality' && (
-            <div className="space-y-6">
-              {/* Enhanced Navigation Header */}
-              <Card variant="elevated" className="p-4">
-                <div className="flex flex-col sm:flex-row items-center justify-between">
-                  <div className="flex items-center space-x-4 mb-4 sm:mb-0">
-                    <div className="w-8 h-8 bg-gradient-to-br from-cosmic-purple to-vedic-gold rounded-full flex items-center justify-center">
-                      <span className="text-white text-sm">🧠</span>
-                    </div>
-                    <div>
-                      <h3 className="font-accent font-bold text-earth-brown">Personality Analysis</h3>
-                      <p className="text-sm text-wisdom-gray">Deep insights into your character</p>
-                    </div>
-                  </div>
-                  <div className="flex space-x-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="border-cosmic-purple text-cosmic-purple hover:bg-cosmic-purple hover:text-white"
-                      onClick={() => window.print()}
-                    >
-                      📄 Print Report
-                    </Button>
-                    <Button
-                      size="sm"
-                      className="bg-gradient-to-r from-cosmic-purple to-vedic-primary"
-                      onClick={() => window.location.href = `/report?chartId=${chartId}`}
-                    >
-                      📋 Full Report
-                    </Button>
-                  </div>
-                </div>
-              </Card>
-              <EnhancedPersonalityProfile analysisData={analysisData} />
-            </div>
-          )}
-
-          {!isLoading && analysisData && activeAnalysisType !== 'personality' && (
-            <div className="space-y-6">
-              {/* Enhanced Navigation Header */}
-              <Card variant="elevated" className="p-4">
-                <div className="flex flex-col sm:flex-row items-center justify-between">
-                  <div className="flex items-center space-x-4 mb-4 sm:mb-0">
-                    <div className="w-8 h-8 bg-gradient-to-br from-cosmic-purple to-vedic-gold rounded-full flex items-center justify-center">
-                      <span className="text-white text-sm">
-                        {analysisTypes.find(t => t.id === activeAnalysisType)?.icon}
-                      </span>
-                    </div>
-                    <div>
-                      <h3 className="font-accent font-bold text-earth-brown">
-                        {analysisTypes.find(t => t.id === activeAnalysisType)?.title}
-                      </h3>
-                      <p className="text-sm text-wisdom-gray">
-                        {analysisTypes.find(t => t.id === activeAnalysisType)?.description}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex space-x-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="border-cosmic-purple text-cosmic-purple hover:bg-cosmic-purple hover:text-white"
-                      onClick={() => window.print()}
-                    >
-                      📄 Print Report
-                    </Button>
-                    <Button
-                      size="sm"
-                      className="bg-gradient-to-r from-cosmic-purple to-vedic-primary"
-                      onClick={() => window.location.href = `/report?chartId=${chartId}`}
-                    >
-                      📋 Full Report
-                    </Button>
-                  </div>
-                </div>
-              </Card>
+            }>
               <ComprehensiveAnalysisDisplay data={analysisData} />
-            </div>
-          )}
-        </div>
+            </Suspense>
+          </div>
+        )}
 
-        {/* Sample Analysis Preview */}
-        {!analysisData && !isLoading && (
+        {/* Information Section */}
+        {!analysisData && !isLoading && chartId && (
           <div className="mt-16">
             <Card variant="vedic">
               <CardHeader>
                 <CardTitle className="text-white text-center flex items-center justify-center">
                   <span className="text-2xl mr-3">📖</span>
-                  What You'll Discover
+                  Analysis Features
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="space-y-4">
-                    <h4 className="font-accent font-bold text-white text-lg">🎯 Precise Insights</h4>
+                    <h4 className="font-accent font-bold text-white text-lg">🎯 Detailed Insights</h4>
                     <ul className="text-white/80 space-y-2 text-sm">
-                      <li>• Detailed personality traits and behavioral patterns</li>
+                      <li>• Personality traits and behavioral patterns</li>
                       <li>• Career guidance based on planetary strengths</li>
-                      <li>• Relationship compatibility and marriage timing</li>
-                      <li>• Health tendencies and preventive measures</li>
+                      <li>• Relationship compatibility analysis</li>
+                      <li>• Health tendencies and remedial measures</li>
                     </ul>
                   </div>
                   <div className="space-y-4">
-                    <h4 className="font-accent font-bold text-white text-lg">⏰ Perfect Timing</h4>
+                    <h4 className="font-accent font-bold text-white text-lg">⏰ Timing Analysis</h4>
                     <ul className="text-white/80 space-y-2 text-sm">
                       <li>• Dasha periods and their influences</li>
-                      <li>• Auspicious times for major decisions</li>
-                      <li>• Transit effects and their duration</li>
-                      <li>• Remedial measures and their timing</li>
+                      <li>• Auspicious timing for major decisions</li>
+                      <li>• Transit effects and duration</li>
+                      <li>• Vedic remedies and their application</li>
                     </ul>
                   </div>
                 </div>
-                              </CardContent>
+              </CardContent>
             </Card>
           </div>
         )}
-
-        {/* Action Buttons */}
-        {analysisData && (
-          <div className="mt-12 text-center space-y-4">
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button
-                variant="outline"
-                className="border-cosmic-purple text-cosmic-purple hover:bg-cosmic-purple hover:text-white"
-              >
-                Download Analysis
-              </Button>
-              <Button
-                className="bg-gradient-to-r from-cosmic-purple to-vedic-primary"
-              >
-                Get Full Report
-              </Button>
-            </div>
-            <p className="text-wisdom-gray text-sm">
-              Want more insights? Generate a complete astrological report with all analysis types.
-            </p>
-          </div>
-        )}
       </div>
-    </div>
+    </motion.div>
   );
 };
 

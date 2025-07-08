@@ -3,7 +3,7 @@
  * Validates birth data input for chart generation
  */
 
-const Joi = require('joi');
+import Joi from 'joi';
 
 // Date validation schema
 const dateSchema = Joi.date()
@@ -714,6 +714,8 @@ function validateComprehensiveAnalysis(data, isStandardization = false, isTechni
     stripUnknown: false
   });
 
+
+
   if (error) {
     const errors = [];
 
@@ -1116,7 +1118,7 @@ const analysisRequiredSchema = Joi.object({
     // String format
     Joi.string().min(2).max(100)
   ).optional(),
-  gender: genderSchema,
+  gender: genderSchema.optional(),
   calculationSettings: Joi.object({
     ayanamsa: ayanamsaSchema,
     chartStyle: chartStyleSchema,
@@ -1148,7 +1150,7 @@ const analysisRequiredSchema = Joi.object({
   'custom.multifield': 'Either coordinates (latitude, longitude) or place of birth information must be provided'
 });
 
-module.exports = {
+export {
   validateBirthData,
   validateChartRequest,
   validateComprehensiveAnalysis,

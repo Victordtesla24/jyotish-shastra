@@ -1910,4 +1910,4 @@ class TwelveHouseAnalyzer {
   }
 }
 
-module.exports = TwelveHouseAnalyzer;
+export default TwelveHouseAnalyzer;

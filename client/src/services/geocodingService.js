@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { axiosResponseInterceptor, axiosErrorInterceptor } from '../utils/apiErrorHandler';
 
 // Environment-based API configuration (no hardcoded endpoints)
 const API_BASE_URL = process.env.REACT_APP_API_URL || (
@@ -15,23 +16,19 @@ class GeocodingService {
   constructor() {
     this.api = axios.create({
       baseURL: API_BASE_URL,
-      timeout: 15000, // Increased timeout for better reliability
+      timeout: 5000, // Reduced timeout to fail faster and not block UI
       headers: {
         'Content-Type': 'application/json',
       },
     });
 
     this.api.interceptors.response.use(
-      (response) => response,
-      (error) => {
-        const errorMessage = error.response?.data?.message || error.message;
-        console.error('Geocoding API Error:', errorMessage);
-        return Promise.reject(new Error(errorMessage));
-      }
+      axiosResponseInterceptor,
+      axiosErrorInterceptor
     );
 
     this.retryCount = 0;
-    this.maxRetries = 3;
+    this.maxRetries = 1; // Reduced retries to prevent API overload
   }
 
   /**
@@ -124,10 +121,13 @@ class GeocodingService {
     } catch (error) {
       console.error(`❌ Geocoding attempt ${attempt} failed:`, error.message);
 
-      // Retry logic
-      if (attempt < this.maxRetries && !error.response?.status) {
+      // Retry logic - but not for rate limiting or server errors
+      if (attempt < this.maxRetries &&
+          !error.response?.status &&
+          !error.message.includes('rate limit') &&
+          !error.message.includes('500')) {
         console.log(`🔄 Retrying geocoding (${attempt + 1}/${this.maxRetries})...`);
-        await this._delay(1000 * attempt); // Exponential backoff
+        await this._delay(2000 * attempt); // Longer backoff
         return this._geocodeWithRetry(trimmedPlace, attempt + 1);
       }
 
@@ -136,6 +136,8 @@ class GeocodingService {
         throw new Error('Location not found. Please try a more specific address (e.g., "City, State, Country").');
       } else if (error.response?.status === 429) {
         throw new Error('Too many requests. Please try again in a moment.');
+      } else if (error.response?.status === 500) {
+        throw new Error('Server temporarily overloaded. Please wait and try again.');
       } else if (error.response?.status === 503) {
         throw new Error('Geocoding service temporarily unavailable. Please try again later.');
       } else if (error.code === 'ECONNREFUSED') {

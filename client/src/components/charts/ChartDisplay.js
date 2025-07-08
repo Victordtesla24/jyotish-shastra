@@ -1,9 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import BirthDataAnalysis from '../BirthDataAnalysis';
-import ComprehensiveAnalysisDisplay from '../reports/ComprehensiveAnalysisDisplay';
 import BasicAnalysisDisplay from '../reports/BasicAnalysisDisplay';
 import MobileOptimizedChart from '../enhanced/MobileOptimizedChart';
 import { Button } from '../ui';
+import { VedicLoadingSpinner } from '../ui';
+
+// Lazy load with error boundary to prevent chunk loading issues
+const ComprehensiveAnalysisDisplay = React.lazy(() =>
+  import('../reports/ComprehensiveAnalysisDisplay').catch(err => {
+    console.error('Error loading ComprehensiveAnalysisDisplay:', err);
+    // Return a fallback component
+    return Promise.resolve({
+      default: () => (
+        <div className="card-cosmic text-center p-8">
+          <h3 className="text-sacred-white text-xl mb-4">📊 Analysis Component Loading Error</h3>
+          <p className="text-sacred-white/80 mb-6">
+            There was an issue loading the analysis display. Please refresh the page to try again.
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="btn-vedic"
+          >
+            Refresh Page
+          </button>
+        </div>
+      )
+    });
+  })
+);
 
 const ChartDisplay = ({ chartData, analysisType, useComprehensive }) => {
   const [viewMode, setViewMode] = useState('analysis'); // 'analysis' or 'interactive'
@@ -88,7 +112,11 @@ const ChartDisplay = ({ chartData, analysisType, useComprehensive }) => {
             return <BirthDataAnalysis analysis={data.birthDataAnalysis} />;
           } else if (data.analysis) {
             // Fall back to comprehensive analysis if birthDataAnalysis not available
-            return <ComprehensiveAnalysisDisplay data={data} />;
+            return (
+              <Suspense fallback={<VedicLoadingSpinner text="Loading comprehensive analysis..." />}>
+                <ComprehensiveAnalysisDisplay data={data} />
+              </Suspense>
+            );
           } else {
             // Fall back to basic analysis
             return <BasicAnalysisDisplay data={data} />;
@@ -96,7 +124,11 @@ const ChartDisplay = ({ chartData, analysisType, useComprehensive }) => {
         }
 
         if (useComprehensive && data?.analysis) {
-          return <ComprehensiveAnalysisDisplay data={data} />;
+          return (
+            <Suspense fallback={<VedicLoadingSpinner text="Loading comprehensive analysis..." />}>
+              <ComprehensiveAnalysisDisplay data={data} />
+            </Suspense>
+          );
         } else if (data) {
           return <BasicAnalysisDisplay data={data} />;
         }

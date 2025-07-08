@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '../../ui';
+import { Card, CardContent, CardHeader, CardTitle } from '../../ui/cards/Card';
 
 const LagnaLuminariesSection = ({ data }) => {
   const [activeSubTab, setActiveSubTab] = useState('lagna');
 
-  if (!data) {
+  if (!data || !data.analyses) {
     return (
       <Card className="p-6">
         <CardContent>
@@ -14,291 +14,126 @@ const LagnaLuminariesSection = ({ data }) => {
     );
   }
 
-  const { lagna, luminaries } = data.analyses || {};
-
-  const renderLagnaAnalysis = () => {
-    if (!lagna) return <p>No Lagna analysis available</p>;
-
-    const { lagnaSign, lagnaLord, overallStrength, summary } = lagna;
+  const { lagna, luminaries } = data.analyses;
 
     return (
-      <div className="space-y-6">
-        <div className="grid md:grid-cols-2 gap-6">
-          <Card>
+    <div className="lagna-luminaries-section">
+      <Card className="mb-6">
             <CardHeader>
-              <CardTitle className="text-lg text-amber-800">Lagna Sign Analysis</CardTitle>
+          <CardTitle className="text-xl text-amber-800">Section 2: Lagna & Luminaries Analysis</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                <div>
-                  <strong className="text-amber-700">Sign:</strong> {lagnaSign?.sign}
+          {/* Sub-navigation */}
+          <div className="flex space-x-4 mb-6 border-b">
+            <button
+              onClick={() => setActiveSubTab('lagna')}
+              className={`pb-2 px-4 ${activeSubTab === 'lagna' ? 'border-b-2 border-amber-600 text-amber-800' : 'text-gray-600'}`}
+            >
+              Lagna Analysis
+            </button>
+            <button
+              onClick={() => setActiveSubTab('luminaries')}
+              className={`pb-2 px-4 ${activeSubTab === 'luminaries' ? 'border-b-2 border-amber-600 text-amber-800' : 'text-gray-600'}`}
+            >
+              Luminaries (Sun & Moon)
+            </button>
                 </div>
-                <div>
-                  <strong className="text-amber-700">Element:</strong> {lagnaSign?.element}
-                </div>
-                <div>
-                  <strong className="text-amber-700">Quality:</strong> {lagnaSign?.quality}
-                </div>
-                <div>
-                  <strong className="text-amber-700">Ruler:</strong> {lagnaSign?.ruler}
-                </div>
-                <div>
-                  <strong className="text-amber-700">Nature:</strong> {lagnaSign?.nature}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg text-amber-800">Lagna Lord</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
+          {/* Lagna Analysis Tab */}
+          {activeSubTab === 'lagna' && lagna && (
+            <div className="space-y-4">
+              <div className="bg-amber-50 p-4 rounded-lg">
+                <h3 className="font-semibold text-amber-800 mb-2">Lagna (Ascendant)</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <strong className="text-amber-700">Planet:</strong> {lagnaLord?.planet}
+                    <p><strong>Sign:</strong> {lagna.lagnaSign?.sign}</p>
+                    <p><strong>Degree:</strong> {lagna.lagnaSign?.degree}°</p>
+                    <p><strong>Nakshatra:</strong> {lagna.lagnaSign?.nakshatra}</p>
                 </div>
                 <div>
-                  <strong className="text-amber-700">Position:</strong> {lagnaLord?.sign} (House {lagnaLord?.house})
+                    <p><strong>Ruler:</strong> {lagna.lagnaSign?.ruler}</p>
+                    <p><strong>Element:</strong> {lagna.lagnaSign?.element}</p>
+                    <p><strong>Quality:</strong> {lagna.lagnaSign?.quality}</p>
                 </div>
-                <div>
-                  <strong className="text-amber-700">Dignity:</strong> {lagnaLord?.dignity}
-                </div>
-                <div>
-                  <strong className="text-amber-700">Strength:</strong> {lagnaLord?.strength}/10
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg text-amber-800">Personality Characteristics</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-2 gap-6">
+              {lagna.lagnaLord && (
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <h3 className="font-semibold text-blue-800 mb-2">Lagna Lord</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                      <p><strong>Planet:</strong> {lagna.lagnaLord.planet}</p>
+                      <p><strong>Position:</strong> {lagna.lagnaLord.position}</p>
+                      <p><strong>House:</strong> {lagna.lagnaLord.house}</p>
+                </div>
+                <div>
+                      <p><strong>Strength:</strong> {lagna.lagnaLord.strength}</p>
+                      <p><strong>Dignity:</strong> {lagna.lagnaLord.dignity}</p>
+                    </div>
+                </div>
+                </div>
+              )}
+
+              {lagna.interpretation && (
+                <div className="bg-green-50 p-4 rounded-lg">
+                  <h3 className="font-semibold text-green-800 mb-2">Interpretation</h3>
+                  <p className="text-gray-700">{lagna.interpretation}</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Luminaries Analysis Tab */}
+          {activeSubTab === 'luminaries' && luminaries && (
+            <div className="space-y-4">
+              {luminaries.sun && (
+                <div className="bg-orange-50 p-4 rounded-lg">
+                  <h3 className="font-semibold text-orange-800 mb-2">Sun Analysis</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <h4 className="font-semibold text-amber-700 mb-2">Strengths</h4>
-                <ul className="list-disc list-inside space-y-1">
-                  {lagnaSign?.strengths?.map((strength, index) => (
-                    <li key={index} className="text-sm">{strength}</li>
-                  ))}
-                </ul>
+                      <p><strong>Sign:</strong> {luminaries.sun.sign}</p>
+                      <p><strong>Degree:</strong> {luminaries.sun.degree}°</p>
+                      <p><strong>House:</strong> {luminaries.sun.house}</p>
               </div>
               <div>
-                <h4 className="font-semibold text-amber-700 mb-2">Challenges</h4>
-                <ul className="list-disc list-inside space-y-1">
-                  {lagnaSign?.challenges?.map((challenge, index) => (
-                    <li key={index} className="text-sm">{challenge}</li>
-                  ))}
-                </ul>
+                      <p><strong>Strength:</strong> {luminaries.sun.strength}</p>
+                      <p><strong>Dignity:</strong> {luminaries.sun.dignity}</p>
               </div>
             </div>
-            <div className="mt-4">
-              <h4 className="font-semibold text-amber-700 mb-2">Physical Traits</h4>
-              <div className="grid md:grid-cols-2 gap-2">
-                {lagnaSign?.physicalTraits?.map((trait, index) => (
-                  <span key={index} className="text-sm bg-amber-50 px-2 py-1 rounded">{trait}</span>
-                ))}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg text-amber-800">Overall Assessment</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div>
-                <strong className="text-amber-700">Overall Strength:</strong> {overallStrength}/10
-              </div>
-              <div>
-                <strong className="text-amber-700">Summary:</strong>
-                <p className="mt-1 text-gray-700">{summary}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+                  {luminaries.sun.interpretation && (
+                    <div className="mt-3">
+                      <p className="text-gray-700">{luminaries.sun.interpretation}</p>
       </div>
-    );
-  };
+                  )}
+                </div>
+              )}
 
-  const renderLuminariesAnalysis = () => {
-    if (!luminaries) return <p>No Luminaries analysis available</p>;
-
-    const { sunAnalysis, moonAnalysis, luminariesRelationship, overallPersonality } = luminaries;
-
-    return (
-      <div className="space-y-6">
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* Sun Analysis */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg text-amber-800">Sun Analysis</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
+              {luminaries.moon && (
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <h3 className="font-semibold text-blue-800 mb-2">Moon Analysis</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <strong className="text-amber-700">Position:</strong> {sunAnalysis?.position?.sign} (House {sunAnalysis?.position?.house})
+                      <p><strong>Sign:</strong> {luminaries.moon.sign}</p>
+                      <p><strong>Degree:</strong> {luminaries.moon.degree}°</p>
+                      <p><strong>House:</strong> {luminaries.moon.house}</p>
                 </div>
                 <div>
-                  <strong className="text-amber-700">Degree:</strong> {sunAnalysis?.position?.degree?.toFixed(2)}°
+                      <p><strong>Strength:</strong> {luminaries.moon.strength}</p>
+                      <p><strong>Nakshatra:</strong> {luminaries.moon.nakshatra}</p>
                 </div>
-                <div>
-                  <strong className="text-amber-700">Nakshatra:</strong> {sunAnalysis?.position?.nakshatra}
-                </div>
-                <div>
-                  <strong className="text-amber-700">Dignity:</strong> {sunAnalysis?.dignity?.dignity}
-                </div>
-                <div>
-                  <strong className="text-amber-700">Strength:</strong> {sunAnalysis?.strength?.overallStrength}/10
-                </div>
-                <div>
-                  <strong className="text-amber-700">Interpretation:</strong> {sunAnalysis?.strength?.interpretation}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Moon Analysis */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg text-amber-800">Moon Analysis</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div>
-                  <strong className="text-amber-700">Position:</strong> {moonAnalysis?.position?.sign} (House {moonAnalysis?.position?.house})
-                </div>
-                <div>
-                  <strong className="text-amber-700">Degree:</strong> {moonAnalysis?.position?.degree?.toFixed(2)}°
-                </div>
-                <div>
-                  <strong className="text-amber-700">Nakshatra:</strong> {moonAnalysis?.position?.nakshatra}
-                </div>
-                <div>
-                  <strong className="text-amber-700">Dignity:</strong> {moonAnalysis?.dignity?.dignity}
-                </div>
-                <div>
-                  <strong className="text-amber-700">Strength:</strong> {moonAnalysis?.strength?.overallStrength}/10
-                </div>
-                <div>
-                  <strong className="text-amber-700">Interpretation:</strong> {moonAnalysis?.strength?.interpretation}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Luminaries Relationship */}
-        {luminariesRelationship && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg text-amber-800">Sun-Moon Relationship</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div>
-                  <strong className="text-amber-700">Lunar Phase:</strong> {luminariesRelationship.lunarPhase?.phase}
-                </div>
-                <div>
-                  <strong className="text-amber-700">Separation:</strong> {luminariesRelationship.separation?.degrees?.toFixed(1)}°
-                </div>
-                <div>
-                  <strong className="text-amber-700">Integration:</strong> {luminariesRelationship.personalityIntegration?.integration}
-                </div>
-                <div>
-                  <strong className="text-amber-700">Balance:</strong> {luminariesRelationship.egoMindBalance?.balance}
-                </div>
-                {luminariesRelationship.recommendations && (
-                  <div>
-                    <strong className="text-amber-700">Recommendations:</strong>
-                    <ul className="list-disc list-inside mt-2">
-                      {luminariesRelationship.recommendations.map((rec, index) => (
-                        <li key={index} className="text-sm">{rec}</li>
-                      ))}
-                    </ul>
                   </div>
-                )}
+                  {luminaries.moon.interpretation && (
+                    <div className="mt-3">
+                      <p className="text-gray-700">{luminaries.moon.interpretation}</p>
               </div>
+                  )}
+                </div>
+              )}
+                </div>
+          )}
             </CardContent>
           </Card>
-        )}
-
-        {/* Overall Personality */}
-        {overallPersonality && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg text-amber-800">Overall Personality Pattern</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <strong className="text-amber-700">Core Personality:</strong>
-                  <ul className="list-disc list-inside mt-1">
-                    {overallPersonality.corePersonality?.map((trait, index) => (
-                      <li key={index} className="text-sm">{trait}</li>
-                    ))}
-                  </ul>
-                </div>
-                <div>
-                  <strong className="text-amber-700">Main Challenges:</strong>
-                  <ul className="list-disc list-inside mt-1">
-                    {overallPersonality.mainChallenges?.map((challenge, index) => (
-                      <li key={index} className="text-sm">{challenge}</li>
-                    ))}
-                  </ul>
-                </div>
-                <div>
-                  <strong className="text-amber-700">Development Path:</strong>
-                  <ul className="list-disc list-inside mt-1">
-                    {overallPersonality.developmentPath?.map((path, index) => (
-                      <li key={index} className="text-sm">{path}</li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-      </div>
-    );
-  };
-
-  return (
-    <div className="space-y-6">
-      {/* Sub-navigation */}
-      <div className="flex border-b border-gray-200">
-        <button
-          className={`px-4 py-2 font-medium ${
-            activeSubTab === 'lagna'
-              ? 'border-b-2 border-amber-500 text-amber-600'
-              : 'text-gray-500 hover:text-amber-600'
-          }`}
-          onClick={() => setActiveSubTab('lagna')}
-        >
-          Lagna Analysis
-        </button>
-        <button
-          className={`px-4 py-2 font-medium ${
-            activeSubTab === 'luminaries'
-              ? 'border-b-2 border-amber-500 text-amber-600'
-              : 'text-gray-500 hover:text-amber-600'
-          }`}
-          onClick={() => setActiveSubTab('luminaries')}
-        >
-          Sun & Moon Analysis
-        </button>
-      </div>
-
-      {/* Content */}
-      <div>
-        {activeSubTab === 'lagna' && renderLagnaAnalysis()}
-        {activeSubTab === 'luminaries' && renderLuminariesAnalysis()}
-      </div>
     </div>
   );
 };

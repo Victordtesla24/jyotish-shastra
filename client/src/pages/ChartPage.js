@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, Button } from '../components/ui';
 import BirthDataForm from '../components/forms/BirthDataForm';
 import VedicChartDisplay from '../components/charts/VedicChartDisplay';
+
 import chartService from '../services/chartService';
 import ChartDataManager from '../utils/chartDataManager';
 import { useNavigate } from 'react-router-dom';
@@ -15,31 +16,44 @@ const ChartPage = () => {
   const handleChartGeneration = async (birthData) => {
     setIsLoading(true);
     setError(null);
-    try {
-      console.log('🔮 Generating chart with data:', birthData);
 
-      // Store birth data for later use in reports
+    try {
+      // Store birth data before API call
       ChartDataManager.storeBirthData(birthData);
 
       const data = await chartService.generateChart(birthData);
-      console.log('📊 Chart generation result:', data);
 
-      if (data.success) {
-        console.log('✅ Chart generation successful, setting chart data:', data.data);
+      console.log('🔍 CHART PAGE DEBUG - API Response:', data);
+      console.log('🔍 CHART PAGE DEBUG - Has success?', !!data?.success);
+      console.log('🔍 CHART PAGE DEBUG - Has data?', !!data?.data);
+      console.log('🔍 CHART PAGE DEBUG - Data structure:', data?.data ? Object.keys(data.data) : 'N/A');
+
+      if (data && data.success) {
+        if (!data.data) {
+          console.error('❌ CHART PAGE DEBUG - API returned success but missing chart data');
+          throw new Error('API returned success but missing chart data');
+        }
+
+        console.log('✅ CHART PAGE DEBUG - Setting chart data:', data.data);
         setChartData(data.data);
-
-        // Store chart data for later use in reports
         ChartDataManager.storeChartData(data.data);
-
-        console.log('💾 Chart data set and stored successfully');
       } else {
-        console.error('❌ Chart generation failed:', data.error);
-        setError(data.error || 'An unexpected error occurred.');
+        const errorMsg = data?.error || data?.message || 'Chart generation failed';
+        console.error('❌ CHART PAGE DEBUG - Chart generation failed:', errorMsg);
+        setError(errorMsg);
         setChartData(null);
       }
     } catch (err) {
-      console.error('💥 Error generating chart:', err);
-      setError(err.message || 'An unexpected error occurred.');
+      let userError = 'An error occurred during chart generation.';
+      if (err.message.includes('Network Error')) {
+        userError = 'Unable to connect to the server. Please check your connection.';
+      } else if (err.response?.status === 400) {
+        userError = `Invalid birth data: ${err.response.data?.message || err.message}`;
+      } else if (err.response?.status === 500) {
+        userError = 'Server error during chart calculation. Please try again.';
+      }
+
+      setError(userError);
       setChartData(null);
     } finally {
       setIsLoading(false);
@@ -81,8 +95,7 @@ const ChartPage = () => {
             Birth Chart Generation
           </h1>
           <p className="text-base sm:text-lg text-earth-brown max-w-2xl mx-auto px-4">
-            Create your authentic Vedic birth chart with precise astronomical calculations
-            based on traditional Indian astrology principles.
+            Create your authentic Vedic birth chart with precise Swiss Ephemeris calculations
           </p>
         </div>
 
@@ -140,7 +153,7 @@ const ChartPage = () => {
                     Ready to Generate Your Chart
                   </h3>
                   <p className="text-vedic-saffron text-sm sm:text-base">
-                    Fill in your birth details to begin your cosmic journey.
+                    Fill in your birth details to begin chart generation.
                   </p>
                 </div>
               </Card>
@@ -154,41 +167,52 @@ const ChartPage = () => {
                     Generating Your Chart
                   </h3>
                   <p className="text-vedic-saffron text-sm sm:text-base">
-                    Calculating planetary positions and cosmic influences...
+                    Calculating planetary positions with Swiss Ephemeris...
                   </p>
                 </div>
               </Card>
             ) : (
               <div className="space-y-4 sm:space-y-6">
-                {/* Enhanced Vedic Chart Display */}
                 <VedicChartDisplay
                   chartData={chartData}
                   isLoading={false}
                 />
 
-                {/* Chart Actions */}
+                {/* Navigation Actions */}
                 <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                   <Button
-                    className="flex-1 bg-saffron text-white hover:bg-saffron/90 btn-responsive"
+                    className="flex-1 bg-saffron text-white hover:bg-saffron/90"
                     onClick={() => {
-                      const cid = chartData?._id || chartData?.id;
-                      if (cid) {
-                        navigate(`/analysis?chartId=${cid}`);
+                      const storedChartData = ChartDataManager.getChartData();
+                      const birthData = ChartDataManager.getBirthData();
+
+                      if (storedChartData?.chartId) {
+                        navigate(`/analysis?chartId=${storedChartData.chartId}`);
+                      } else if (birthData) {
+                        navigate('/analysis', { state: { birthData } });
+                      } else {
+                        setError('Could not find chart data to start analysis.');
                       }
                     }}
                   >
                     📋 View Analysis
                   </Button>
                   <Button
-                    className="flex-1 bg-saffron text-white hover:bg-saffron/90 btn-responsive"
+                    className="flex-1 bg-saffron text-white hover:bg-saffron/90"
                     onClick={() => {
-                      const cid = chartData?._id || chartData?.id;
-                      if (cid) {
-                        navigate(`/report?chartId=${cid}`);
+                      const storedChartData = ChartDataManager.getChartData();
+                      const birthData = ChartDataManager.getBirthData();
+
+                      if (storedChartData?.chartId) {
+                        navigate(`/report?chartId=${storedChartData.chartId}`);
+                      } else if (birthData) {
+                        navigate('/report', { state: { birthData } });
+                      } else {
+                        setError('Could not find chart data to generate report.');
                       }
                     }}
                   >
-                    📄 Generate Full Report
+                    📄 Generate Report
                   </Button>
                 </div>
               </div>

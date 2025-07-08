@@ -1,4 +1,4 @@
-const GeocodingService = require('../../services/geocoding/GeocodingService');
+import GeocodingService from '../../services/geocoding/GeocodingService.js';
 
 class GeocodingController {
   constructor() {
@@ -39,13 +39,6 @@ class GeocodingController {
         });
       }
 
-      if (lower.includes('rate limit')) {
-        return res.status(429).json({
-          success: false,
-          message: 'Geocoding rate-limit exceeded',
-          details: error.message
-        });
-      }
 
       // Fall back to generic 500 for unexpected errors
       next(error);
@@ -94,4 +87,4 @@ class GeocodingController {
   }
 }
 
-module.exports = GeocodingController;
+export default GeocodingController;

@@ -2,12 +2,14 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
 import { Button, Input, OmIcon } from './ui';
+import ChartDataManager from '../utils/chartDataManager';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [scrolled, setScrolled] = useState(false);
+  const [birthData, setBirthData] = useState(null);
   const { theme, setTheme } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
@@ -18,6 +20,8 @@ const Header = () => {
     { name: 'Home', href: '/' },
     { name: 'Birth Chart', href: '/chart' },
     { name: 'Analysis', href: '/analysis' },
+    { name: 'Personality Profile', href: '/personality-analysis' },
+    { name: 'Enhanced Analysis', href: '/enhanced-analysis' },
     { name: 'Reports', href: '/report' },
   ];
 
@@ -33,6 +37,24 @@ const Header = () => {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Load birth data from ChartDataManager
+  useEffect(() => {
+    const loadBirthData = () => {
+      const storedBirthData = ChartDataManager.getDisplayBirthData();
+      if (storedBirthData) {
+        setBirthData(storedBirthData);
+      }
+    };
+    loadBirthData();
+
+    // Listen for storage changes to update birth data
+    const handleStorageChange = () => {
+      loadBirthData();
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [location.pathname]);
 
   const [searchResults, setSearchResults] = useState([]);
 
@@ -177,6 +199,31 @@ const Header = () => {
           </div>
         )}
       </div>
+
+      {/* Birth Data Display Bar */}
+      {birthData && (
+        <div className="bg-gradient-to-r from-vedic-saffron/10 to-vedic-gold/10 border-b border-vedic-saffron/20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between py-2 text-sm">
+              <div className="flex items-center space-x-4">
+                <span className="text-vedic-saffron font-medium">🌟 Current Chart:</span>
+                <span className="text-earth-brown dark:text-sacred-white">
+                  {birthData.name || 'User'}
+                </span>
+                <span className="text-wisdom-gray">
+                  {birthData.date} • {birthData.time} • {birthData.place}
+                </span>
+              </div>
+              <button
+                onClick={() => navigate('/analysis')}
+                className="text-vedic-saffron hover:text-vedic-gold transition-colors"
+              >
+                View Analysis →
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 };

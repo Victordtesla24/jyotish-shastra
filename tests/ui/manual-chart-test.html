@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual Chart API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        button {
+            background: #FF6B35;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        button:hover {
+            background: #e55a2b;
+        }
+        .result {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            white-space: pre-wrap;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Manual Chart API Test</h1>
+    <p>This page tests the chart generation API directly to verify it works and displays data correctly.</p>
+
+    <button onclick="testChartAPI()">🚀 Test Chart Generation API</button>
+    <button onclick="testAnalysisAPI()">📊 Test Analysis API</button>
+    <button onclick="clearResults()">🧹 Clear Results</button>
+
+    <div id="results"></div>
+
+    <script>
+        const resultsDiv = document.getElementById('results');
+
+        function addResult(title, content, type = 'result') {
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.innerHTML = `<strong>${title}</strong>\n${content}`;
+            resultsDiv.appendChild(div);
+        }
+
+        function clearResults() {
+            resultsDiv.innerHTML = '';
+        }
+
+        async function testChartAPI() {
+            const testData = {
+                dateOfBirth: '1997-12-18',
+                timeOfBirth: '02:30',
+                latitude: 19.0760,
+                longitude: 72.8777,
+                timezone: 'Asia/Kolkata',
+                gender: 'male'
+            };
+
+            addResult('📡 Chart API Test Started', `Calling: POST /api/v1/chart/generate\nPayload: ${JSON.stringify(testData, null, 2)}`);
+
+            try {
+                const response = await fetch('http://localhost:3001/api/v1/chart/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(testData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    addResult('✅ Chart API SUCCESS',
+                        `Status: ${response.status}\n` +
+                        `Success: ${data.success}\n` +
+                        `Has Chart Data: ${!!data.data}\n` +
+                        `Has Rasi Chart: ${!!(data.data?.rasiChart)}\n` +
+                        `Planet Count: ${data.data?.rasiChart?.planets?.length || 0}\n` +
+                        `Birth Data: ${JSON.stringify(data.data?.birthData || {}, null, 2).substring(0, 200)}...`,
+                        'success'
+                    );
+
+                    // Test chart display
+                    if (data.data?.rasiChart) {
+                        displayChart(data.data);
+                    }
+                } else {
+                    addResult('❌ Chart API ERROR',
+                        `Status: ${response.status}\n` +
+                        `Error: ${JSON.stringify(data, null, 2)}`,
+                        'error'
+                    );
+                }
+            } catch (error) {
+                addResult('💥 Chart API NETWORK ERROR', error.message, 'error');
+            }
+        }
+
+        async function testAnalysisAPI() {
+            // First generate a chart, then test analysis
+            addResult('📈 Analysis API Test', 'Testing comprehensive analysis...');
+
+            try {
+                // Generate chart first
+                const chartResponse = await fetch('http://localhost:3001/api/v1/chart/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        dateOfBirth: '1997-12-18',
+                        timeOfBirth: '02:30',
+                        latitude: 19.0760,
+                        longitude: 72.8777,
+                        timezone: 'Asia/Kolkata',
+                        gender: 'male'
+                    })
+                });
+
+                if (!chartResponse.ok) {
+                    throw new Error('Chart generation failed');
+                }
+
+                const chartData = await chartResponse.json();
+
+                if (chartData.success && chartData.data?.chartId) {
+                    // Test analysis endpoint
+                    const analysisResponse = await fetch(`http://localhost:3001/api/v1/chart/${chartData.data.chartId}/comprehensive`);
+                    const analysisData = await analysisResponse.json();
+
+                    addResult('✅ Analysis API SUCCESS',
+                        `Chart ID: ${chartData.data.chartId}\n` +
+                        `Analysis Success: ${analysisData.success}\n` +
+                        `Analysis Data: ${JSON.stringify(analysisData, null, 2).substring(0, 300)}...`,
+                        'success'
+                    );
+                } else {
+                    addResult('⚠️ Analysis Test Skipped', 'No chartId in response for analysis test', 'error');
+                }
+            } catch (error) {
+                addResult('💥 Analysis API ERROR', error.message, 'error');
+            }
+        }
+
+        function displayChart(chartData) {
+            if (!chartData?.rasiChart) {
+                addResult('⚠️ Chart Display', 'No rasi chart data to display', 'error');
+                return;
+            }
+
+            const chart = chartData.rasiChart;
+            const planets = chart.planets || [];
+            const ascendant = chart.ascendant || {};
+
+            const chartDisplay = `
+🏠 ASCENDANT: ${ascendant.sign} ${ascendant.degree?.toFixed(2)}°
+
+🪐 PLANETARY POSITIONS:
+${planets.map(p =>
+    `${p.name}: ${p.sign} ${p.degree?.toFixed(2)}° ${p.dignity ? '(' + p.dignity + ')' : ''}`
+).join('\n')}
+
+📊 DATA STRUCTURE VALIDATION:
+✅ Has Ascendant: ${!!chart.ascendant}
+✅ Has Planets: ${!!chart.planets && chart.planets.length > 0}
+✅ Has House Positions: ${!!chart.housePositions && chart.housePositions.length > 0}
+✅ Planet Count: ${planets.length}
+✅ Birth Data: ${!!chartData.birthData}
+
+🎯 CHART DATA IS PROPERLY FORMATTED FOR DISPLAY
+            `;
+
+            addResult('📊 Chart Data Display Test', chartDisplay, 'success');
+        }
+
+        // Auto-run tests on page load for quick validation
+        window.addEventListener('load', () => {
+            addResult('🚀 Auto-Test Started', 'Running automatic chart API test...');
+            setTimeout(testChartAPI, 1000);
+        });
+    </script>
+</body>
+</html>

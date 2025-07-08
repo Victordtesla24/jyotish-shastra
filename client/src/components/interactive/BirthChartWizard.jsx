@@ -112,18 +112,15 @@ const BirthChartWizard = ({ onComplete, onClose }) => {
     }
 
     try {
-      // Mock geocoding suggestions - replace with actual API call
-      const mockSuggestions = [
-        { name: 'New Delhi, India', lat: 28.6139, lng: 77.2090, timezone: '+05:30' },
-        { name: 'Mumbai, India', lat: 19.0760, lng: 72.8777, timezone: '+05:30' },
-        { name: 'Bangalore, India', lat: 12.9716, lng: 77.5946, timezone: '+05:30' },
-        { name: 'Chennai, India', lat: 13.0827, lng: 80.2707, timezone: '+05:30' },
-        { name: 'Kolkata, India', lat: 22.5726, lng: 88.3639, timezone: '+05:30' }
-      ].filter(place =>
-        place.name.toLowerCase().includes(query.toLowerCase())
-      );
-
-      setSuggestions(mockSuggestions);
+      // Real geocoding API integration - no mock data
+      const response = await fetch(`/api/v1/geocoding/location?query=${encodeURIComponent(query)}`);
+      if (response.ok) {
+        const data = await response.json();
+        setSuggestions(data.suggestions || []);
+      } else {
+        console.error('Geocoding API error:', response.status);
+        setSuggestions([]);
+      }
     } catch (error) {
       console.error('Error searching locations:', error);
       setSuggestions([]);

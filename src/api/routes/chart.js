@@ -4,8 +4,8 @@
  * Enhanced with geocoding integration and comprehensive analysis
  */
 
-const express = require('express');
-const ChartController = require('../controllers/ChartController');
+import express from 'express';
+import ChartController from '../controllers/ChartController.js';
 
 const router = express.Router();
 const chartController = new ChartController();
@@ -22,4 +22,4 @@ router.post('/analysis/lagna', chartController.analyzeLagna.bind(chartController
 router.post('/analysis/house/:houseNumber', chartController.analyzeHouse.bind(chartController));
 router.post('/analysis/comprehensive', chartController.getComprehensiveAnalysis.bind(chartController));
 
-module.exports = router;
+export default router;

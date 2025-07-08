@@ -120,4 +120,4 @@ class NeechaBhangaYogaCalculator {
   }
 }
 
-module.exports = NeechaBhangaYogaCalculator;
+export default NeechaBhangaYogaCalculator;

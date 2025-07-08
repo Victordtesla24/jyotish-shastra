@@ -98,14 +98,54 @@ class ChartDataManager {
     const birthData = this.getBirthData();
     if (!birthData) return null;
 
+    // Handle nested placeOfBirth structure
+    let latitude, longitude, timezone;
+    if (birthData.placeOfBirth && typeof birthData.placeOfBirth === 'object') {
+      latitude = birthData.placeOfBirth.latitude;
+      longitude = birthData.placeOfBirth.longitude;
+      timezone = birthData.placeOfBirth.timezone || birthData.timezone;
+    } else {
+      latitude = birthData.latitude;
+      longitude = birthData.longitude;
+      timezone = birthData.timezone;
+    }
+
     return {
       name: birthData.name || 'User',
       dateOfBirth: birthData.dateOfBirth,
       timeOfBirth: birthData.timeOfBirth,
       placeOfBirth: birthData.placeOfBirth,
-      latitude: parseFloat(birthData.latitude),
-      longitude: parseFloat(birthData.longitude),
-      timezone: birthData.timezone
+      latitude: parseFloat(latitude),
+      longitude: parseFloat(longitude),
+      timezone: timezone,
+      gender: birthData.gender
+    };
+  }
+
+  /**
+   * Get display birth data for UI components
+   * @returns {Object|null} Display formatted birth data or null
+   */
+  static getDisplayBirthData() {
+    const birthData = this.getBirthData();
+    if (!birthData) return null;
+
+    // Handle nested placeOfBirth structure for display
+    let placeName = 'Not provided';
+    if (birthData.placeOfBirth) {
+      if (typeof birthData.placeOfBirth === 'object') {
+        placeName = birthData.placeOfBirth.name || 'Not provided';
+      } else {
+        placeName = birthData.placeOfBirth;
+      }
+    }
+
+    return {
+      name: birthData.name || 'User',
+      date: birthData.dateOfBirth || 'Not provided',
+      time: birthData.timeOfBirth || 'Not provided',
+      place: placeName,
+      gender: birthData.gender || 'Not provided'
     };
   }
 }

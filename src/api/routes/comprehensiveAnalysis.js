@@ -3,15 +3,14 @@
  * Routes for expert-level Vedic astrology analysis following requirements-analysis-questions.md
  */
 
-const express = require('express');
-const router = express.Router();
-const MasterAnalysisOrchestrator = require('../../services/analysis/MasterAnalysisOrchestrator');
-const ChartRepository = require('../../data/repositories/ChartRepository');
-const UserRepository = require('../../data/repositories/UserRepository');
-const authentication = require('../middleware/authentication');
-const validationMiddleware = require('../middleware/validation');
-const rateLimiter = require('../middleware/rateLimiting');
-const {
+import express from 'express';
+import crypto from 'crypto';
+import MasterAnalysisOrchestrator from '../../services/analysis/MasterAnalysisOrchestrator.js';
+import ChartRepository from '../../data/repositories/ChartRepository.js';
+import UserRepository from '../../data/repositories/UserRepository.js';
+import authentication from '../middleware/authentication.js';
+import validationMiddleware from '../middleware/validation.js';
+import {
   validateBirthData,
   validateComprehensiveAnalysis,
   validateHouseAnalysis,
@@ -22,7 +21,9 @@ const {
   validateBirthDataValidation,
   birthDataSchema,
   flexibleBirthDataSchema
-} = require('../validators/birthDataValidator');
+} from '../validators/birthDataValidator.js';
+
+const router = express.Router();
 
 const orchestrator = new MasterAnalysisOrchestrator();
 const chartRepo = new ChartRepository();
@@ -69,7 +70,7 @@ const formatAnalysisSections = (sections) => {
  * POST /api/v1/analysis/comprehensive
  * Generate comprehensive Vedic astrology analysis
  */
-router.post('/comprehensive', rateLimiter, async (req, res) => {
+router.post('/comprehensive', async (req, res) => {
     try {
         // CRITICAL FIX: Only log in development environment
     if (process.env.NODE_ENV === 'development') {
@@ -96,7 +97,6 @@ router.post('/comprehensive', rateLimiter, async (req, res) => {
         // Handle chartId case
         if (validationResult.data.chartId) {
             // CRITICAL FIX: Generate analysisId for E2E workflow
-            const crypto = require('crypto');
             const analysisId = crypto.randomUUID();
 
             // Retrieve chart data from temporary storage or process with stored chartId
@@ -112,13 +112,12 @@ router.post('/comprehensive', rateLimiter, async (req, res) => {
                     includeDashas: true
                 });
             } else {
-                // Fallback for mock analysis
-                analysis = {
-                    personality: { summary: 'Dynamic and leadership-oriented personality' },
-                    career: { summary: 'Favorable for technical and business fields' },
-                    relationships: { summary: 'Compatible with earth and water signs' },
-                    health: { summary: 'Generally strong constitution with attention to stress management' }
-                };
+                // If no valid chart data, return error - never use mock data
+                return res.status(400).json({
+                    success: false,
+                    error: 'Invalid chart data',
+                    message: 'Unable to perform analysis without valid chart data'
+                });
             }
 
             // Store analysis for later retrieval
@@ -210,7 +209,7 @@ router.post('/comprehensive', rateLimiter, async (req, res) => {
  * POST /api/v1/analysis/preliminary
  * Preliminary analysis with name optional
  */
-router.post('/preliminary', rateLimiter, async (req, res) => {
+router.post('/preliminary', async (req, res) => {
     try {
         const birthData = req.body.birthData || req.body;
 
@@ -248,7 +247,7 @@ router.post('/preliminary', rateLimiter, async (req, res) => {
  * POST /api/v1/analysis/birth-data
  * Birth data validation endpoint (name optional)
  */
-router.post('/birth-data', rateLimiter, async (req, res) => {
+router.post('/birth-data', async (req, res) => {
     try {
         const birthData = req.body;
 
@@ -285,7 +284,7 @@ router.post('/birth-data', rateLimiter, async (req, res) => {
  * POST /api/v1/analysis/houses
  * Section 3: Detailed House Analysis
  */
-router.post('/houses', rateLimiter, async (req, res) => {
+router.post('/houses', async (req, res) => {
     try {
         const requestData = req.body;
         const isStandardizationTest = req.headers['x-test-type'] === 'standardization';
@@ -363,7 +362,7 @@ router.post('/houses', rateLimiter, async (req, res) => {
  * POST /api/v1/analysis/aspects
  * Section 4: Planetary Aspects Analysis
  */
-router.post('/aspects', rateLimiter, async (req, res) => {
+router.post('/aspects', async (req, res) => {
     try {
         const requestData = req.body;
         const isStandardizationTest = req.headers['x-test-type'] === 'standardization';
@@ -403,7 +402,7 @@ router.post('/aspects', rateLimiter, async (req, res) => {
  * POST /api/v1/analysis/arudha
  * Section 5: Arudha Analysis
  */
-router.post('/arudha', rateLimiter, async (req, res) => {
+router.post('/arudha', async (req, res) => {
     try {
         const requestData = req.body;
         const isStandardizationTest = req.headers['x-test-type'] === 'standardization';
@@ -443,7 +442,7 @@ router.post('/arudha', rateLimiter, async (req, res) => {
  * POST /api/v1/analysis/navamsa
  * Section 6: Navamsa (D9) Chart Analysis
  */
-router.post('/navamsa', rateLimiter, async (req, res) => {
+router.post('/navamsa', async (req, res) => {
     try {
         const requestData = req.body;
         const isStandardizationTest = req.headers['x-test-type'] === 'standardization';
@@ -518,7 +517,7 @@ router.post('/navamsa', rateLimiter, async (req, res) => {
  * POST /api/v1/analysis/dasha
  * Section 7: Vimshottari Dasha System Analysis
  */
-router.post('/dasha', rateLimiter, async (req, res) => {
+router.post('/dasha', async (req, res) => {
     try {
         const requestData = req.body;
         const isStandardizationTest = req.headers['x-test-type'] === 'standardization';
@@ -591,20 +590,11 @@ router.get('/:analysisId', async (req, res) => {
             });
         }
 
-        // Fallback for E2E test compatibility with mock analysis data
-        return res.status(200).json({
-            success: true,
-            data: {
-                analysisId,
-                status: 'completed',
-                result: {
-                    personality: 'Dynamic and leadership-oriented personality',
-                    career: 'Favorable for technical and business fields',
-                    relationships: 'Compatible with earth and water signs',
-                    health: 'Generally strong constitution with attention to stress management'
-                },
-                timestamp: new Date().toISOString()
-            }
+        // If no stored analysis found, return error - never use mock data
+        return res.status(404).json({
+            success: false,
+            error: 'Analysis not found',
+            message: 'The requested analysis was not found'
         });
     } catch (error) {
         console.error('Analysis retrieval error:', error);
@@ -662,7 +652,7 @@ router.delete('/:analysisId', authentication.required, async (req, res) => {
  * GET /api/v1/analysis/progress/:analysisId
  * Get real-time analysis progress
  */
-router.get('/progress/:analysisId', rateLimiter, async (req, res) => {
+router.get('/progress/:analysisId', async (req, res) => {
     try {
         const { analysisId } = req.params;
         const userId = req.user?.id;
@@ -699,4 +689,4 @@ router.get('/progress/:analysisId', rateLimiter, async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

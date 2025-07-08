@@ -154,4 +154,4 @@ class GajaKesariYogaCalculator {
   }
 }
 
-module.exports = GajaKesariYogaCalculator;
+export default GajaKesariYogaCalculator;

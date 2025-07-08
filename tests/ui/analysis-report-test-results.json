@@ -1,0 +1,137 @@
+{
+  "timestamp": "2025-07-08T03:32:18.146Z",
+  "testData": {
+    "name": "Farhan",
+    "dateOfBirth": "1997-12-18",
+    "timeOfBirth": "02:30",
+    "latitude": 32.4935378,
+    "longitude": 74.5411575,
+    "timezone": "Asia/Karachi",
+    "gender": "male"
+  },
+  "workflow": "Home Page → Birth Chart → Analysis Page → Comprehensive Analysis Report",
+  "apiValidation": [
+    {
+      "url": "http://localhost:3001/api/v1/geocoding/location",
+      "status": 200,
+      "validation": {
+        "isRealData": true,
+        "issues": [],
+        "checks": {
+          "hasCalculationData": false,
+          "hasPrecisePositions": false,
+          "hasVariedData": false
+        }
+      },
+      "timestamp": "2025-07-08T03:32:41.078Z"
+    }
+  ],
+  "screenshots": [
+    "04-analysis-page-sections.png",
+    "05-report-generation.png"
+  ],
+  "errors": [
+    {
+      "step": "Analysis Sections Verification",
+      "error": "Missing section: Lagna & Luminaries Analysis",
+      "timestamp": "2025-07-08T03:32:37.229Z"
+    },
+    {
+      "step": "Analysis Sections Verification",
+      "error": "Missing section: House Analysis",
+      "timestamp": "2025-07-08T03:32:37.229Z"
+    },
+    {
+      "step": "Analysis Sections Verification",
+      "error": "Missing section: Planetary Aspects Analysis",
+      "timestamp": "2025-07-08T03:32:37.229Z"
+    },
+    {
+      "step": "Analysis Sections Verification",
+      "error": "Missing section: Arudha Lagna Analysis",
+      "timestamp": "2025-07-08T03:32:37.230Z"
+    },
+    {
+      "step": "Analysis Sections Verification",
+      "error": "Missing section: Navamsa Analysis",
+      "timestamp": "2025-07-08T03:32:37.230Z"
+    },
+    {
+      "step": "Analysis Sections Verification",
+      "error": "Missing section: Dasha Analysis",
+      "timestamp": "2025-07-08T03:32:37.230Z"
+    },
+    {
+      "step": "Analysis Sections Verification",
+      "error": "Missing section: Yoga Analysis",
+      "timestamp": "2025-07-08T03:32:37.230Z"
+    },
+    {
+      "step": "Analysis Sections Verification",
+      "error": "Missing section: Synthesis & Remedies",
+      "timestamp": "2025-07-08T03:32:37.231Z"
+    }
+  ],
+  "dataFlow": [
+    {
+      "step": "Birth Chart Form Submission",
+      "status": "completed",
+      "timestamp": "2025-07-08T03:32:33.304Z",
+      "data": {
+        "name": "Farhan",
+        "dateOfBirth": "1997-12-18",
+        "timeOfBirth": "02:30",
+        "latitude": 32.4935378,
+        "longitude": 74.5411575,
+        "timezone": "Asia/Karachi",
+        "gender": "male"
+      }
+    },
+    {
+      "step": "Data Propagation Check",
+      "status": "completed",
+      "visibility": {
+        "nameVisible": false,
+        "dateVisible": false,
+        "timeVisible": false,
+        "locationVisible": false
+      },
+      "timestamp": "2025-07-08T03:32:37.231Z"
+    },
+    {
+      "step": "Analysis Page Load",
+      "status": "completed",
+      "timestamp": "2025-07-08T03:32:37.231Z",
+      "sectionsFound": []
+    },
+    {
+      "step": "Report Page Load",
+      "status": "completed",
+      "timestamp": "2025-07-08T03:32:41.078Z"
+    }
+  ],
+  "apiResponses": {
+    "http://localhost:3001/api/v1/geocoding/location": {
+      "status": 200,
+      "statusText": "OK",
+      "data": {
+        "success": true,
+        "latitude": 32.4935378,
+        "longitude": 74.5411575,
+        "timezone": "Asia/Karachi",
+        "service_used": "opencage",
+        "accuracy": "high",
+        "formatted_address": "Sialkot Tehsil, Sialkot 51430, Pakistan"
+      },
+      "timestamp": "2025-07-08T03:32:27.993Z"
+    }
+  },
+  "analysisSections": [],
+  "summary": {
+    "totalErrors": 8,
+    "screenshotsCaptured": 2,
+    "apiCallsMonitored": 1,
+    "dataFlowSteps": 4,
+    "successRate": 20
+  }
+}

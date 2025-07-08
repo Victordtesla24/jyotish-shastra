@@ -1,5 +1,5 @@
-const express = require('express');
-const GeocodingController = require('../controllers/GeocodingController');
+import express from 'express';
+import GeocodingController from '../controllers/GeocodingController.js';
 
 const router = express.Router();
 const geocodingController = new GeocodingController();
@@ -18,4 +18,4 @@ router.post('/location', geocodingController.geocode.bind(geocodingController));
  */
 router.get('/validate', geocodingController.validateCoordinates.bind(geocodingController));
 
-module.exports = router;
+export default router;

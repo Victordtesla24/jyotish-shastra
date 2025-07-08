@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
@@ -6,13 +6,20 @@ import usePWA from './hooks/usePWA';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import { VedicLoadingSpinner, Button } from './components/ui';
+import { initializeErrorHandling } from './utils/apiErrorHandler';
 
 // Lazy load pages for better performance
 const HomePage = React.lazy(() => import('./pages/HomePage'));
 const ChartPage = React.lazy(() => import('./pages/ChartPage'));
 const AnalysisPage = React.lazy(() => import('./pages/AnalysisPage'));
+const EnhancedAnalysisPage = React.lazy(() => import('./pages/EnhancedAnalysisPage'));
 const ReportPage = React.lazy(() => import('./pages/ReportPage'));
+const PersonalityAnalysisPage = React.lazy(() => import('./pages/PersonalityAnalysisPage'));
 const MeshaPage = React.lazy(() => import('./pages/vedic-details/MeshaPage'));
+const TempChartTest = React.lazy(() => import('./temp/TempChartTest'));
+
+// Direct Chart Test for debugging
+const DirectChartTest = React.lazy(() => import('./pages/DirectChartTest'));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -167,6 +174,11 @@ class ErrorBoundary extends React.Component {
 }
 
 function App() {
+  // Initialize enhanced error handling
+  useEffect(() => {
+    initializeErrorHandling();
+  }, []);
+
   return (
     <ErrorBoundary>
       <ThemeProvider defaultTheme="system">
@@ -184,9 +196,15 @@ function App() {
                     <Route path="/" element={<HomePage />} />
                     <Route path="/chart" element={<ChartPage />} />
                     <Route path="/analysis" element={<AnalysisPage />} />
+                    <Route path="/personality-analysis" element={<PersonalityAnalysisPage />} />
+                    <Route path="/enhanced-analysis" element={<EnhancedAnalysisPage />} />
                     <Route path="/report" element={<ReportPage />} />
                     <Route path="/report/:id" element={<ReportPage />} />
                     <Route path="/rashi/mesha" element={<MeshaPage />} />
+                    <Route path="/temp-chart-test" element={<TempChartTest />} />
+
+                    {/* Direct Chart Test for debugging */}
+                    <Route path="/direct-chart-test" element={<DirectChartTest />} />
 
                     {/* Enhanced 404 Page */}
                     <Route path="*" element={

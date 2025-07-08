@@ -7,6 +7,8 @@
  * Reference: Vimshottari Dasha system from Brihat Parashara Hora Shastra
  */
 
+import PratyanardashaCalculator from "./PratyanardashaCalculator";
+
 class AntardashaCalculator {
     constructor() {
         // Mahadasha periods in years for each planet
@@ -528,4 +530,4 @@ class AntardashaCalculator {
     }
 }
 
-module.exports = AntardashaCalculator;
+export default AntardashaCalculator;

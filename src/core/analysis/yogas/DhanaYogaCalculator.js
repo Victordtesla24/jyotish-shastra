@@ -197,4 +197,4 @@ class DhanaYogaCalculator {
   }
 }
 
-module.exports = DhanaYogaCalculator;
+export default DhanaYogaCalculator;

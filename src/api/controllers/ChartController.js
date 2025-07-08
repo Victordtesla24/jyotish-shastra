@@ -4,14 +4,14 @@
  * Enhanced with geocoding integration and comprehensive analysis
  */
 
-const ChartGenerationService = require('../../services/chart/ChartGenerationService');
-const GeocodingService = require('../../services/geocoding/GeocodingService');
-const LagnaAnalysisService = require('../../services/analysis/LagnaAnalysisService');
-const HouseAnalysisService = require('../../core/analysis/houses/HouseAnalysisService');
-const BirthDataAnalysisService = require('../../services/analysis/BirthDataAnalysisService');
-const { v4: uuidv4 } = require('uuid');
-const { validateChartRequest } = require('../validators/birthDataValidator');
-const crypto = require('crypto');
+import ChartGenerationService from '../../services/chart/ChartGenerationService.js';
+import GeocodingService from '../../services/geocoding/GeocodingService.js';
+import LagnaAnalysisService from '../../services/analysis/LagnaAnalysisService.js';
+import HouseAnalysisService from '../../core/analysis/houses/HouseAnalysisService.js';
+import BirthDataAnalysisService from '../../services/analysis/BirthDataAnalysisService.js';
+import { v4 as uuidv4 } from 'uuid';
+import { validateChartRequest } from '../validators/birthDataValidator.js';
+import crypto from 'crypto';
 
 class ChartController {
   constructor() {
@@ -672,4 +672,4 @@ class ChartController {
   }
 }
 
-module.exports = ChartController;
+export default ChartController;

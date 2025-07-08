@@ -109,13 +109,11 @@ class TransitCalculator {
   checkSadeSati(date) {
     const transitingPlanets = this.getTransitingPlanets(date);
 
-    // Handle both mocked array format and real object format
-    let saturn;
-    if (Array.isArray(transitingPlanets)) {
-      saturn = transitingPlanets.find(p => p.name === 'Saturn');
-    } else {
-      saturn = transitingPlanets['saturn'] || transitingPlanets['Saturn'];
+    // Only handle real object format - no mock compatibility
+    if (!transitingPlanets || typeof transitingPlanets !== 'object') {
+      throw new Error('Invalid transiting planets data structure');
     }
+    const saturn = transitingPlanets['saturn'] || transitingPlanets['Saturn'];
 
     // Handle both data structures: planets array and planetaryPositions object/array
     let moon;
