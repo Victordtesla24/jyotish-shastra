@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect } from 'react';
-import { QueryClient, QueryClientProvider } from 'react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
 import usePWA from './hooks/usePWA';
@@ -16,7 +16,7 @@ const EnhancedAnalysisPage = React.lazy(() => import('./pages/EnhancedAnalysisPa
 const ReportPage = React.lazy(() => import('./pages/ReportPage'));
 const PersonalityAnalysisPage = React.lazy(() => import('./pages/PersonalityAnalysisPage'));
 const MeshaPage = React.lazy(() => import('./pages/vedic-details/MeshaPage'));
-const TempChartTest = React.lazy(() => import('./temp/TempChartTest'));
+// TempChartTest removed - file doesn't exist
 
 // Direct Chart Test for debugging
 const DirectChartTest = React.lazy(() => import('./pages/DirectChartTest'));
@@ -201,7 +201,6 @@ function App() {
                     <Route path="/report" element={<ReportPage />} />
                     <Route path="/report/:id" element={<ReportPage />} />
                     <Route path="/rashi/mesha" element={<MeshaPage />} />
-                    <Route path="/temp-chart-test" element={<TempChartTest />} />
 
                     {/* Direct Chart Test for debugging */}
                     <Route path="/direct-chart-test" element={<DirectChartTest />} />

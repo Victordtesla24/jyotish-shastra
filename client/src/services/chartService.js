@@ -1,5 +1,10 @@
 import axios from 'axios';
 import { axiosResponseInterceptor, axiosErrorInterceptor } from '../utils/apiErrorHandler';
+import { APIResponseInterpreter, APIError } from '../utils/APIResponseInterpreter';
+import { processChartData } from '../utils/dataTransformers';
+import { validateChartResponse } from '../utils/responseSchemas';
+import { ResponseCache } from '../utils/ResponseCache';
+import errorFramework from '../utils/errorHandlingFramework';
 
 // Environment-based API configuration (eliminates hardcoded endpoints)
 const API_BASE_URL = process.env.REACT_APP_API_URL || (
@@ -22,6 +27,23 @@ class ChartService {
       },
     });
 
+    // Initialize response cache
+    this.cache = new ResponseCache({
+      ttl: 15 * 60 * 1000, // 15 minutes for chart data
+      maxSize: 20,
+      useLocalStorage: true,
+      storageKey: 'chart_service_cache'
+    });
+
+    // Register retry configurations with error framework
+    errorFramework.registerRetryConfig('/v1/chart/generate', {
+      maxRetries: 3,
+      shouldRetry: (error) => {
+        return error instanceof APIError &&
+               ['NETWORK_ERROR', 'TIMEOUT', 'SERVER_ERROR', 'CALCULATION_ERROR'].includes(error.code);
+      }
+    });
+
     // Enhanced response interceptor for better error handling
     this.api.interceptors.response.use(
       axiosResponseInterceptor,
@@ -42,81 +64,53 @@ class ChartService {
   }
 
   /**
-   * Generate a birth chart with enhanced data validation
+   * Generate a birth chart with enhanced data validation, caching, and transformation
    * @param {Object} birthData - Birth data including name, date, time, and geocoded location
-   * @returns {Promise<Object>} Chart data
+   * @returns {Promise<Object>} Processed chart data
    */
   async generateChart(birthData) {
-    try {
+    return errorFramework.withErrorBoundary(async () => {
       // Validate required fields before sending
       this.validateBirthDataLocally(birthData);
 
-      console.log('🚀 CHART GENERATION DEBUG - Sending request to backend');
-      console.log('📊 Request URL:', `${this.api.defaults.baseURL}/v1/chart/generate`);
-      console.log('📋 Request Headers:', this.api.defaults.headers);
-      console.log('💾 Request Payload:', JSON.stringify(birthData, null, 2));
-      console.log('🔍 Payload Structure Analysis:', {
-        hasLatitude: !!birthData.latitude,
-        hasLongitude: !!birthData.longitude,
-        hasTimezone: !!birthData.timezone,
-        hasDate: !!birthData.dateOfBirth,
-        hasTime: !!birthData.timeOfBirth,
-        latitudeType: typeof birthData.latitude,
-        longitudeType: typeof birthData.longitude,
-        latitudeValue: birthData.latitude,
-        longitudeValue: birthData.longitude,
-        allFields: Object.keys(birthData)
-      });
+      const endpoint = '/v1/chart/generate';
+      const cacheKey = this.generateCacheKey(birthData);
 
-      const response = await this.api.post('/v1/chart/generate', birthData);
+      // Check cache first
+      const cachedData = this.cache.get(endpoint, { cacheKey });
+      if (cachedData) {
+        console.log('🎯 Chart data found in cache');
+        return cachedData;
+      }
+
+      console.log('🚀 CHART GENERATION - Sending request to backend');
+      console.log('📊 Request URL:', `${this.api.defaults.baseURL}${endpoint}`);
+      console.log('💾 Request Payload:', JSON.stringify(birthData, null, 2));
+
+      const originalRequest = () => this.api.post(endpoint, birthData);
+
+      const response = await originalRequest();
 
       console.log('✅ CHART GENERATION SUCCESS');
       console.log('📈 Response Status:', response.status);
-      console.log('📋 Response Headers:', response.headers);
-      console.log('💾 Response Data:', JSON.stringify(response.data, null, 2));
 
-      if (!response.data.success) {
-        throw new Error(response.data.message || 'Chart generation failed');
-      }
+      // Process response with validation and transformation
+      const processedData = APIResponseInterpreter.processSuccessfulResponse(response.data, {
+        schema: { success: 'boolean', data: 'object' }, // Basic validation first
+        transformer: processChartData
+      });
 
-      console.log('Chart generated successfully:', response.data);
-      return response.data;
+      // Cache the processed data
+      this.cache.set(endpoint, { cacheKey }, processedData);
 
-    } catch (error) {
-      console.error('💥 CHART GENERATION ERROR - Detailed debugging');
-      console.error('🔴 Error Type:', error.constructor.name);
-      console.error('📛 Error Message:', error.message);
-      console.error('🌐 Network Error:', error.code);
+      console.log('📊 Chart data processed and cached successfully');
+      return processedData;
 
-      if (error.response) {
-        console.error('📡 Response Status:', error.response.status);
-        console.error('📋 Response Headers:', error.response.headers);
-        console.error('💾 Response Data:', JSON.stringify(error.response.data, null, 2));
-        console.error('🔍 Backend Validation Errors:', error.response.data?.errors);
-        console.error('💡 Backend Suggestions:', error.response.data?.suggestions);
-        console.error('❓ Backend Help Text:', error.response.data?.helpText);
-      } else if (error.request) {
-        console.error('📡 Request made but no response received');
-        console.error('🔍 Request Details:', error.request);
-      } else {
-        console.error('⚙️ Error in request setup:', error.message);
-      }
-
-      if (error.response?.status === 400) {
-        const backendErrors = error.response.data?.errors || error.response.data?.details || [];
-        const errorDetails = backendErrors.length > 0
-          ? backendErrors.map(err => `${err.field}: ${err.message}`).join(', ')
-          : error.response.data?.message || error.response.data?.error;
-
-        throw new Error(`Backend validation failed: ${errorDetails}`);
-      } else if (error.response?.status === 500) {
-        throw new Error('Server error during chart calculation. Please try again.');
-      } else if (error.response?.status === 503) {
-        throw new Error('Chart generation service temporarily unavailable. Please try again later.');
-      } else {
-        throw new Error(`Chart generation failed: ${error.response?.data?.message || error.message}`);
-      }
-    }
+    }, {
+      endpoint: '/v1/chart/generate',
+      operation: 'generateChart',
+      originalRequest: () => this.api.post('/v1/chart/generate', birthData)
+    });
   }
 
   /**

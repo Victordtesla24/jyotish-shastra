@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-07-08T06:23:33.255Z",
+  "timestamp": "2025-07-09T05:22:23.250Z",
   "testData": {
     "name": "Farhan",
     "dateOfBirth": "1997-12-18",
@@ -14,7 +14,7 @@
     "homePage": {
       "url": "http://localhost:3002/",
       "status": "success",
-      "loadTime": 2928,
+      "loadTime": 2863,
       "navigation": {
         "hasChartNavigation": true,
         "chartLinksCount": 5,
@@ -22,12 +22,12 @@
         "hasContent": true
       },
       "screenshot": "/Users/Shared/cursor/jyotish-shastra/tests/ui/production-ui-screenshots/01-home-page-initial.png",
-      "timestamp": "2025-07-08T06:23:38.581Z"
+      "timestamp": "2025-07-09T05:22:28.286Z"
     },
     "chartPage": {
       "url": "http://localhost:3002/chart",
       "status": "partial",
-      "loadTime": 25084,
+      "loadTime": 24983,
       "formFilled": true,
       "submissionSuccess": true,
       "apiCalls": [],
@@ -51,12 +51,12 @@
         "/Users/Shared/cursor/jyotish-shastra/tests/ui/production-ui-screenshots/02-chart-form-filled.png",
         "/Users/Shared/cursor/jyotish-shastra/tests/ui/production-ui-screenshots/03-chart-generated.png"
       ],
-      "timestamp": "2025-07-08T06:24:03.665Z"
+      "timestamp": "2025-07-09T05:22:53.270Z"
     },
     "analysisPage": {
       "url": "http://localhost:3002/analysis",
       "status": "success",
-      "loadTime": 7851,
+      "loadTime": 7774,
       "storedDataCheck": {
         "hasChart": false,
         "hasBirth": false,
@@ -157,12 +157,12 @@
         "hasAnalysisCards": 0
       },
       "screenshot": "/Users/Shared/cursor/jyotish-shastra/tests/ui/production-ui-screenshots/04-analysis-page-sections.png",
-      "timestamp": "2025-07-08T06:24:11.517Z"
+      "timestamp": "2025-07-09T05:23:01.044Z"
     },
     "reportPage": {
       "url": "http://localhost:3002/report",
       "status": "success",
-      "loadTime": 2238,
+      "loadTime": 2195,
       "reportFeatures": {
         "hasPdfGeneration": false,
         "hasEmailSharing": false,
@@ -170,21 +170,32 @@
         "hasGenerateButton": true
       },
       "screenshot": "/Users/Shared/cursor/jyotish-shastra/tests/ui/production-ui-screenshots/05-report-generation.png",
-      "timestamp": "2025-07-08T06:24:13.756Z"
+      "timestamp": "2025-07-09T05:23:03.240Z"
     }
   },
   "apiValidation": {},
   "screenshots": {},
-  "errors": [],
+  "errors": [
+    {
+      "type": "console_error",
+      "message": "[APIResponseInterpreter Error] JSHandle@object",
+      "timestamp": "2025-07-09T05:22:42.131Z"
+    },
+    {
+      "type": "console_error",
+      "message": "[APIResponseInterpreter Error] JSHandle@object",
+      "timestamp": "2025-07-09T05:22:42.131Z"
+    }
+  ],
   "summary": {
     "totalPages": 4,
     "successfulPages": 3,
     "failedPages": 1,
     "successRate": "75.00%",
-    "totalErrors": 0,
-    "testDuration": 40502,
+    "totalErrors": 2,
+    "testDuration": 39990,
     "recommendedActions": [
-      "All tests passed - proceed to test suite enhancement phase"
+      "Fix identified errors using RCA protocol from .cursor/rules/002-error-fixing-protocols.mdc"
     ]
   }
 }
