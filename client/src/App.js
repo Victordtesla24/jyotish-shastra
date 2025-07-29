@@ -1,25 +1,25 @@
-import React, { Suspense, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { ChartProvider } from './contexts/ChartContext';
+import { AnalysisProvider } from './contexts/AnalysisContext';
 import usePWA from './hooks/usePWA';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import { VedicLoadingSpinner, Button } from './components/ui';
 import { initializeErrorHandling } from './utils/apiErrorHandler';
+import './styles/vedic-design-system.css';
 
-// Lazy load pages for better performance
-const HomePage = React.lazy(() => import('./pages/HomePage'));
-const ChartPage = React.lazy(() => import('./pages/ChartPage'));
-const AnalysisPage = React.lazy(() => import('./pages/AnalysisPage'));
-const EnhancedAnalysisPage = React.lazy(() => import('./pages/EnhancedAnalysisPage'));
-const ReportPage = React.lazy(() => import('./pages/ReportPage'));
-const PersonalityAnalysisPage = React.lazy(() => import('./pages/PersonalityAnalysisPage'));
-const MeshaPage = React.lazy(() => import('./pages/vedic-details/MeshaPage'));
-// TempChartTest removed - file doesn't exist
+// Import pages directly instead of lazy loading to fix mounting issues
+import HomePage from './pages/HomePage';
+import ChartPage from './pages/ChartPage';
+import AnalysisPage from './pages/AnalysisPage';
+import ComprehensiveAnalysisPage from './pages/ComprehensiveAnalysisPage';
+import ReportPage from './pages/ReportPage';
 
-// Direct Chart Test for debugging
-const DirectChartTest = React.lazy(() => import('./pages/DirectChartTest'));
+// Details pages
+import MeshaPage from './pages/vedic-details/MeshaPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -181,75 +181,75 @@ function App() {
 
   return (
     <ErrorBoundary>
-      <ThemeProvider defaultTheme="system">
-        <QueryClientProvider client={queryClient}>
-            <div className="app-container min-h-screen bg-gradient-to-br from-sacred-white to-gray-50 dark:from-dark-bg-primary dark:to-dark-bg-secondary transition-colors duration-300">
-              {/* PWA Status Banners */}
-              <PWAUpdateBanner />
-              <OfflineBanner />
+      <BrowserRouter>
+        <ThemeProvider defaultTheme="system">
+          <ChartProvider>
+            <AnalysisProvider>
+              <QueryClientProvider client={queryClient}>
+                <div className="app-container min-h-screen bg-gradient-to-br from-sacred-white to-gray-50 dark:from-dark-bg-primary dark:to-dark-bg-secondary transition-colors duration-300">
+                {/* PWA Status Banners */}
+                <PWAUpdateBanner />
+                <OfflineBanner />
 
-              <Header />
+                <Header />
 
-              <main className="flex-grow" id="main-content">
-                <Suspense fallback={<AppLoadingFallback />}>
+                <main className="flex-grow" id="main-content">
                   <Routes>
-                    <Route path="/" element={<HomePage />} />
-                    <Route path="/chart" element={<ChartPage />} />
-                    <Route path="/analysis" element={<AnalysisPage />} />
-                    <Route path="/personality-analysis" element={<PersonalityAnalysisPage />} />
-                    <Route path="/enhanced-analysis" element={<EnhancedAnalysisPage />} />
-                    <Route path="/report" element={<ReportPage />} />
-                    <Route path="/report/:id" element={<ReportPage />} />
-                    <Route path="/rashi/mesha" element={<MeshaPage />} />
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/chart" element={<ChartPage />} />
+                  <Route path="/analysis" element={<AnalysisPage />} />
+                  <Route path="/comprehensive-analysis" element={<ComprehensiveAnalysisPage />} />
+                  <Route path="/report" element={<ReportPage />} />
+                  <Route path="/report/:id" element={<ReportPage />} />
+                  <Route path="/rashi/mesha" element={<MeshaPage />} />
 
-                    {/* Direct Chart Test for debugging */}
-                    <Route path="/direct-chart-test" element={<DirectChartTest />} />
-
-                    {/* Enhanced 404 Page */}
-                    <Route path="*" element={
-                      <div className="min-h-screen flex items-center justify-center p-4">
-                        <div className="text-center max-w-md">
-                          <div className="text-8xl mb-6 animate-float">🌌</div>
-                          <h1 className="font-accent text-4xl text-earth-brown dark:text-dark-text-primary mb-4">
-                            404 - Lost in the Cosmos
-                          </h1>
-                          <p className="text-lg text-wisdom-gray dark:text-dark-text-secondary mb-8 leading-relaxed">
-                            The cosmic path you seek does not exist in our realm.
-                            Let us guide you back to the sacred knowledge.
-                          </p>
-                          <div className="space-y-4">
-                            <Button
-                              variant="cosmic"
-                              size="lg"
-                              onClick={() => window.history.back()}
-                              className="w-full sm:w-auto"
-                            >
-                              ← Return to Previous Path
-                            </Button>
-                            <br />
-                            <Button
-                              variant="secondary"
-                              size="lg"
-                              onClick={() => window.location.href = '/'}
-                              className="w-full sm:w-auto"
-                            >
-                              🏠 Return to Sacred Home
-                            </Button>
-                          </div>
+                  {/* Enhanced 404 Page */}
+                  <Route path="*" element={
+                    <div className="min-h-screen flex items-center justify-center p-4">
+                      <div className="text-center max-w-md">
+                        <div className="text-8xl mb-6 animate-float">🌌</div>
+                        <h1 className="font-accent text-4xl text-earth-brown dark:text-dark-text-primary mb-4">
+                          404 - Lost in the Cosmos
+                        </h1>
+                        <p className="text-lg text-wisdom-gray dark:text-dark-text-secondary mb-8 leading-relaxed">
+                          The cosmic path you seek does not exist in our realm.
+                          Let us guide you back to the sacred knowledge.
+                        </p>
+                        <div className="space-y-4">
+                          <Button
+                            variant="cosmic"
+                            size="lg"
+                            onClick={() => window.history.back()}
+                            className="w-full sm:w-auto"
+                          >
+                            ← Return to Previous Path
+                          </Button>
+                          <br />
+                          <Button
+                            variant="secondary"
+                            size="lg"
+                            onClick={() => window.location.href = '/'}
+                            className="w-full sm:w-auto"
+                          >
+                            🏠 Return to Sacred Home
+                          </Button>
                         </div>
                       </div>
-                    } />
-                  </Routes>
-                </Suspense>
+                    </div>
+                  } />
+                </Routes>
               </main>
 
               <Footer />
 
               {/* PWA Install Banner */}
               <PWAInstallBanner />
-            </div>
-          </QueryClientProvider>
-      </ThemeProvider>
+                </div>
+              </QueryClientProvider>
+            </AnalysisProvider>
+          </ChartProvider>
+        </ThemeProvider>
+      </BrowserRouter>
     </ErrorBoundary>
   );
 }

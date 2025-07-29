@@ -48,26 +48,58 @@ class ChartGenerationService {
    * @returns {Object} Complete chart data
    */
   async generateComprehensiveChart(birthData) {
+    console.log('🚀 CHART GENERATION SERVICE - Starting comprehensive chart generation...');
+    console.log('📊 Input Birth Data:', JSON.stringify(birthData, null, 2));
+
     try {
       // Validate birth data
-      this.validateBirthData(birthData);
+      console.log('🔍 Step 1: Validating birth data...');
+      const isValid = this.validateBirthData(birthData);
+      if (!isValid) {
+        throw new Error('Birth data validation failed');
+      }
+      console.log('✅ Birth data validation passed');
 
       // Geocode location if coordinates not provided
+      console.log('🔍 Step 2: Processing location data...');
       const geocodedData = await this.processLocationData(birthData);
+      console.log('✅ Location data processed:', {
+        latitude: geocodedData.latitude,
+        longitude: geocodedData.longitude,
+        geocodingInfo: geocodedData.geocodingInfo
+      });
 
       // Generate Rasi chart
+      console.log('🔍 Step 3: Generating Rasi chart...');
       const rasiChart = await this.generateRasiChart(geocodedData);
+      console.log('✅ Rasi chart generated:', {
+        ascendant: rasiChart.ascendant,
+        planetsCount: Object.keys(rasiChart.planetaryPositions || {}).length,
+        housesCount: rasiChart.housePositions?.length || 0
+      });
 
       // Generate Navamsa chart
+      console.log('🔍 Step 4: Generating Navamsa chart...');
       const navamsaChart = await this.generateNavamsaChart(geocodedData);
+      console.log('✅ Navamsa chart generated:', {
+        ascendant: navamsaChart.ascendant,
+        planetsCount: Object.keys(navamsaChart.planetaryPositions || {}).length
+      });
 
       // Calculate Dasha information
+      console.log('🔍 Step 5: Calculating Dasha information...');
       const dashaInfo = this.calculateDashaInfo(rasiChart);
+      console.log('✅ Dasha info calculated:', {
+        birthDasha: dashaInfo.birthDasha,
+        currentDasha: dashaInfo.currentDasha
+      });
 
       // Generate comprehensive analysis
+      console.log('🔍 Step 6: Generating comprehensive analysis...');
       const analysis = await this.generateComprehensiveAnalysis(rasiChart, navamsaChart);
+      console.log('✅ Analysis generated:', Object.keys(analysis));
 
-      return {
+      const result = {
         birthData: geocodedData,
         rasiChart,
         navamsaChart,
@@ -75,7 +107,21 @@ class ChartGenerationService {
         analysis,
         generatedAt: new Date().toISOString()
       };
+
+      console.log('🎉 CHART GENERATION SERVICE - Comprehensive chart generation completed successfully!');
+      console.log('📈 Result structure:', {
+        hasBirthData: !!result.birthData,
+        hasRasiChart: !!result.rasiChart,
+        hasNavamsaChart: !!result.navamsaChart,
+        hasDashaInfo: !!result.dashaInfo,
+        hasAnalysis: !!result.analysis,
+        generatedAt: result.generatedAt
+      });
+
+      return result;
     } catch (error) {
+      console.error('❌ CHART GENERATION SERVICE - Error during chart generation:', error);
+      console.error('❌ Error stack:', error.stack);
       throw new Error(`Failed to generate comprehensive chart: ${error.message}`);
     }
   }

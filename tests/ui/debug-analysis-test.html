@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Analysis Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .error {
+            background: #fee;
+            border: 1px solid #fcc;
+            padding: 15px;
+            border-radius: 5px;
+            color: #900;
+        }
+        .success {
+            background: #efe;
+            border: 1px solid #cfc;
+            padding: 15px;
+            border-radius: 5px;
+            color: #090;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        .qa-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-left: 3px solid #007bff;
+        }
+        .qa-item h4 {
+            margin-top: 0;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Debug Analysis Test</h1>
+
+        <div class="section">
+            <h2>Test Status</h2>
+            <div id="status">Loading...</div>
+        </div>
+
+        <div class="section">
+            <h2>Analysis Data</h2>
+            <div id="analysisData">Loading...</div>
+        </div>
+
+        <div class="section">
+            <h2>Console Errors</h2>
+            <div id="errors"></div>
+        </div>
+    </div>
+
+    <script>
+        // Capture console errors
+        const errors = [];
+        window.addEventListener('error', (e) => {
+            errors.push({
+                message: e.message,
+                source: e.filename,
+                line: e.lineno,
+                col: e.colno,
+                error: e.error
+            });
+            updateErrors();
+        });
+
+        function updateErrors() {
+            const errorsDiv = document.getElementById('errors');
+            if (errors.length === 0) {
+                errorsDiv.innerHTML = '<div class="success">No console errors detected</div>';
+            } else {
+                errorsDiv.innerHTML = errors.map(err =>
+                    `<div class="error">
+                        <strong>${err.message}</strong><br>
+                        at ${err.source}:${err.line}:${err.col}<br>
+                        ${err.error ? err.error.stack : ''}
+                    </div>`
+                ).join('');
+            }
+        }
+
+        // Fetch analysis data
+        async function testAnalysisFlow() {
+            const statusDiv = document.getElementById('status');
+            const dataDiv = document.getElementById('analysisData');
+
+            try {
+                // First, let's check if we have saved data
+                const savedBirthData = localStorage.getItem('jyotish_birth_data');
+                const savedChartData = localStorage.getItem('jyotish_chart_data');
+
+                if (!savedBirthData) {
+                    statusDiv.innerHTML = '<div class="error">No birth data in localStorage</div>';
+                    return;
+                }
+
+                statusDiv.innerHTML = '<div class="success">Birth data found in localStorage</div>';
+
+                // Try to fetch comprehensive analysis
+                const birthData = JSON.parse(savedBirthData);
+                const response = await fetch('http://localhost:3001/api/analysis/comprehensive', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(birthData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    statusDiv.innerHTML = '<div class="success">Analysis fetched successfully!</div>';
+
+                    // Display the data structure
+                    dataDiv.innerHTML = `
+                        <h3>Data Structure:</h3>
+                        <pre>${JSON.stringify(data, null, 2).substring(0, 1000)}...</pre>
+
+                        <h3>Sections Found:</h3>
+                        <ul>
+                            ${Object.keys(data.analysis?.sections || {}).map(key =>
+                                `<li>${key}: ${data.analysis.sections[key].name}</li>`
+                            ).join('')}
+                        </ul>
+
+                        <h3>Sample Section (section1):</h3>
+                        ${renderSection(data.analysis?.sections?.section1)}
+                    `;
+                } else {
+                    statusDiv.innerHTML = `<div class="error">Analysis failed: ${data.error}</div>`;
+                }
+
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+                console.error('Test error:', error);
+            }
+
+            updateErrors();
+        }
+
+        function renderSection(section) {
+            if (!section) return '<p>No section data</p>';
+
+            if (section.questions && Array.isArray(section.questions)) {
+                return section.questions.map(qa => `
+                    <div class="qa-item">
+                        <h4>${qa.question}</h4>
+                        <p>${qa.answer}</p>
+                        ${qa.completeness !== undefined ?
+                            `<p><strong>Completeness:</strong> ${qa.completeness}%</p>` : ''
+                        }
+                    </div>
+                `).join('');
+            }
+
+            return '<p>Section has no questions</p>';
+        }
+
+        // Run the test
+        testAnalysisFlow();
+    </script>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Analysis Display</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .error {
+            background: #fee;
+            border: 1px solid #fcc;
+            padding: 15px;
+            border-radius: 5px;
+            color: #900;
+        }
+        .success {
+            background: #efe;
+            border: 1px solid #cfc;
+            padding: 15px;
+            border-radius: 5px;
+            color: #090;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        .loading {
+            text-align: center;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Test Analysis Display</h1>
+
+        <div class="section">
+            <h2>Page Status</h2>
+            <div id="status" class="loading">Loading...</div>
+        </div>
+
+        <div class="section">
+            <h2>Console Errors</h2>
+            <div id="errors">No errors detected</div>
+        </div>
+
+        <div class="section">
+            <h2>Navigation Test</h2>
+            <button onclick="navigateToAnalysis()">Go to Analysis Page</button>
+            <button onclick="navigateToComprehensive()">Go to Comprehensive Analysis</button>
+        </div>
+
+        <div class="section">
+            <h2>LocalStorage Data</h2>
+            <div id="localStorage">Checking...</div>
+        </div>
+    </div>
+
+    <script>
+        // Capture console errors
+        const errors = [];
+        window.addEventListener('error', (e) => {
+            errors.push({
+                message: e.message,
+                source: e.filename,
+                line: e.lineno,
+                col: e.colno
+            });
+            updateErrors();
+        });
+
+        function updateErrors() {
+            const errorsDiv = document.getElementById('errors');
+            if (errors.length === 0) {
+                errorsDiv.innerHTML = '<div class="success">No console errors detected</div>';
+            } else {
+                errorsDiv.innerHTML = errors.map(err =>
+                    `<div class="error">
+                        <strong>${err.message}</strong><br>
+                        at ${err.source}:${err.line}:${err.col}
+                    </div>`
+                ).join('');
+            }
+        }
+
+        function checkLocalStorage() {
+            const div = document.getElementById('localStorage');
+            const birthData = localStorage.getItem('jyotish_birth_data');
+            const chartData = localStorage.getItem('jyotish_chart_data');
+            const analysisData = localStorage.getItem('jyotish_analysis_data');
+
+            let html = '<h3>Stored Data:</h3>';
+
+            if (birthData) {
+                html += '<div class="success">✓ Birth Data Found</div>';
+                html += `<pre>${JSON.stringify(JSON.parse(birthData), null, 2).substring(0, 200)}...</pre>`;
+            } else {
+                html += '<div class="error">✗ No Birth Data</div>';
+            }
+
+            if (chartData) {
+                html += '<div class="success">✓ Chart Data Found</div>';
+            } else {
+                html += '<div class="error">✗ No Chart Data</div>';
+            }
+
+            if (analysisData) {
+                html += '<div class="success">✓ Analysis Data Found</div>';
+            } else {
+                html += '<div class="error">✗ No Analysis Data</div>';
+            }
+
+            div.innerHTML = html;
+        }
+
+        function navigateToAnalysis() {
+            window.location.href = 'http://localhost:3002/analysis';
+        }
+
+        function navigateToComprehensive() {
+            window.location.href = 'http://localhost:3002/comprehensive';
+        }
+
+        // Check status
+        function checkStatus() {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = '<div class="success">Page loaded successfully</div>';
+            checkLocalStorage();
+        }
+
+        // Initialize
+        window.onload = checkStatus;
+        updateErrors();
+    </script>
+</body>
+</html>

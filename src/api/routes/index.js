@@ -27,12 +27,18 @@ router.use(`${API_VERSION}/geocoding`, geocodingRoutes);
 router.use('', clientErrorLogRoutes);
 
 // Health check endpoint
-router.get('/health', (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: 'Vedic Astrology API is running',
+router.get('/v1/health', (req, res) => {
+  res.json({
+    status: 'OK',
     timestamp: new Date().toISOString(),
-    version: '1.0.0'
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV || 'development',
+    version: '1.0.0',
+    services: {
+      geocoding: 'active',
+      chartGeneration: 'active',
+      analysis: 'active'
+    }
   });
 });
 

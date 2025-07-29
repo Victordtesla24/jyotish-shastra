@@ -1,65 +1,15 @@
 {
-  "name": "Jyotish Shastra - Vedic Astrology Platform",
   "short_name": "Jyotish Shastra",
-  "description": "Experience authentic Vedic astrology analysis with AI-powered insights. Generate birth charts, get detailed predictions, and discover your cosmic blueprint.",
-  "version": "2.0.0",
-  "start_url": "/",
-  "scope": "/",
-  "display": "standalone",
-  "orientation": "portrait-primary",
-  "theme_color": "#FF9933",
-  "background_color": "#0F0F23",
-  "categories": ["lifestyle", "education", "wellness"],
-  "lang": "en",
-  "dir": "ltr",
+  "name": "Jyotish Shastra - Vedic Astrology Application",
   "icons": [
     {
-      "src": "favicon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "favicon.svg",
-      "sizes": "144x144",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
     }
   ],
-  "shortcuts": [
-    {
-      "name": "Generate Birth Chart",
-      "short_name": "New Chart",
-      "description": "Generate a new Vedic birth chart",
-      "url": "/chart"
-    },
-    {
-      "name": "Get Analysis",
-      "short_name": "Analysis",
-      "description": "Get detailed astrological analysis",
-      "url": "/analysis"
-    },
-    {
-      "name": "View Reports",
-      "short_name": "Reports",
-      "description": "Access your astrological reports",
-      "url": "/report"
-    }
-  ],
-  "screenshots": [],
-  "related_applications": [],
-  "prefer_related_applications": false,
-  "edge_side_panel": {
-    "preferred_width": 400
-  },
-  "handle_links": "preferred",
-  "launch_handler": {
-    "client_mode": "navigate-existing"
-  },
-  "protocol_handlers": [
-    {
-      "protocol": "web+jyotish",
-      "url": "/chart?data=%s"
-    }
-  ]
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
 }

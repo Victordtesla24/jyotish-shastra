@@ -82,9 +82,12 @@ const Input = forwardRef(
       >
         {/* Label */}
         {label && (
-          <label className="block mb-2 text-sm font-medium text-vedic-text">
+          <label
+            htmlFor={props.id || props.name}
+            className="block mb-2 text-sm font-medium text-vedic-text"
+          >
             {label}
-            {required && <span className="ml-1 text-red-500">*</span>}
+            {required && <span className="ml-1 text-red-500" aria-label="required">*</span>}
           </label>
         )}
 
@@ -101,6 +104,7 @@ const Input = forwardRef(
           <input
             ref={ref}
             type={type}
+            id={props.id || props.name}
             className={cn(
               inputVariants({ variant: inputVariant, inputSize }),
               leftIcon && 'pl-10',
@@ -111,6 +115,9 @@ const Input = forwardRef(
             onBlur={handleBlur}
             onChange={handleChange}
             maxLength={maxLength}
+            aria-invalid={!!error}
+            aria-describedby={error ? `${props.id || props.name}-error` : helperText ? `${props.id || props.name}-helper` : undefined}
+            aria-required={required}
             {...props}
           />
 
@@ -152,12 +159,17 @@ const Input = forwardRef(
               transition={{ duration: 0.2 }}
               className="mt-1 flex justify-between items-center"
             >
-              <p className={cn(
-                'text-sm',
-                error && 'text-red-500',
-                success && 'text-green-500',
-                !error && !success && 'text-vedic-text-muted'
-              )}>
+              <p
+                id={error ? `${props.id || props.name}-error` : helperText ? `${props.id || props.name}-helper` : undefined}
+                className={cn(
+                  'text-sm',
+                  error && 'text-red-500',
+                  success && 'text-green-500',
+                  !error && !success && 'text-vedic-text-muted'
+                )}
+                role={error ? 'alert' : undefined}
+                aria-live={error ? 'polite' : undefined}
+              >
                 {error || success || helperText}
               </p>
 

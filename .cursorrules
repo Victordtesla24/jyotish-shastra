@@ -1,0 +1,263 @@
+{
+  "version": "2025-01-15",
+  "changelog": "Major refactoring: Enhanced security rules, improved code quality standards, and comprehensive refactoring guidelines based on professional best practices from industry-standard code refactoring methodologies.",
+  "codeStyle": {
+    "preferredFrameworks": [
+      "react",
+      "next.js",
+      "bash"
+    ],
+    "preferredLanguages": [
+      "typescript",
+      "javascript"
+    ],
+    "indentationStyle": "spaces",
+    "indentationSize": 2,
+    "maxLineLength": 80,
+    "namingConventions": {
+      "variables": "camelCase",
+      "functions": "camelCase",
+      "classes": "PascalCase",
+      "constants": "SCREAMING_SNAKE_CASE",
+      "files": "kebab-case"
+    }
+  },
+  "refactoring": {
+    "philosophy": {
+      "boyScoutRule": "Always leave code cleaner than found - even small improvements compound over time",
+      "continuousImprovement": "Integrate refactoring into regular development workflow, not as separate cleanup phase",
+      "preserveBehavior": "Change structure, not functionality - refactoring must preserve external behavior",
+      "iterativeApproach": "Focus on high-impact, low-risk improvements first with time-boxed sessions"
+    },
+    "codeSmells": {
+      "structural": [
+        "long methods/functions (>20 lines) - extract method for complex logic",
+        "large classes (>200 lines) - extract class for large objects with multiple responsibilities",
+        "duplicate code blocks - eliminate repeated logic across codebase",
+        "dead/unused code - remove unused variables, methods, or classes",
+        "deeply nested conditionals (>3 levels) - decompose complex conditionals",
+        "god objects with too many responsibilities - apply single responsibility principle"
+      ],
+      "naming": [
+        "mysterious names (x, data, temp) - use meaningful variable and function names",
+        "inconsistent naming conventions - maintain consistent naming across codebase",
+        "misleading variable names - rename variables/methods for clarity",
+        "abbreviations without context - use descriptive names over cryptic abbreviations"
+      ],
+      "logic": [
+        "complex conditionals without extraction - simplify conditional expressions",
+        "switch statement abuse - consider polymorphism for long switch statements",
+        "primitive obsession - replace magic numbers with named constants",
+        "feature envy between classes - proper separation of concerns",
+        "inappropriate intimacy - encapsulate field access"
+      ]
+    },
+    "techniques": [
+      "extract method for functions exceeding 20 lines",
+      "extract class when objects exceed 200 lines or have multiple responsibilities",
+      "rename variables/methods for improved clarity and context",
+      "eliminate duplicate code and functionality consolidation",
+      "simplify conditional expressions through decomposition",
+      "replace magic numbers with named constants",
+      "encapsulate field access with proper getters/setters",
+      "decompose complex conditionals into readable chunks",
+      "apply SOLID principles systematically",
+      "implement defensive programming practices"
+    ],
+    "prerequisites": {
+      "testCoverage": "Comprehensive unit tests with >90% coverage before refactoring",
+      "documentationReview": "Ensure existing functionality is well-documented",
+      "backupStrategy": "Version control checkpoints and rollback procedures",
+      "monitoringSetup": "Performance and error monitoring during refactoring"
+    },
+    "measurementCriteria": {
+      "cyclomaticComplexity": "Track complexity reduction metrics",
+      "maintainabilityIndex": "Measure code maintainability improvements",
+      "technicalDebtReduction": "Quantify technical debt elimination",
+      "performanceImpact": "Monitor performance before/after refactoring"
+    }
+  },
+  "strictEnforcements": {
+    "rootCauseAnalysis": {
+      "mandatoryPractice": "No superficial error fixing - all errors must be addressed at their root cause in production files",
+      "prohibitedApproaches": [
+        "mocking tests to pass without fixing underlying issues",
+        "hardcoded values as temporary fixes",
+        "simulated/fake/mock code to bypass errors",
+        "superficial patches that hide symptoms"
+      ],
+      "requiredProcess": "Apply systematic root cause analysis using 5-whys technique and hypothesis-driven debugging",
+      "goalDefinition": "The goal is not to pass tests but to eliminate the fundamental cause of every error without exceptions"
+    },
+    "directoryManagement": {
+      "strictPolicy": "Files must be created only in their respective directories following 002-directory-management-protocols.mdc",
+      "mandatoryStructure": {
+        "tests": "All test files must be placed in tests/ directory",
+        "logs": "All log files must be placed in logs/ directory",
+        "noExceptions": "Zero tolerance for files placed in incorrect directories"
+      }
+    },
+    "memoryBankProtocols": {
+      "adherenceRequirement": "Strict adherence with 001-memory-bank-protocols.mdc for every task context and task execution",
+      "accuracyStandard": "100% accuracy in error fixing and task execution context retention"
+    },
+    "taskCompletion": {
+      "prohibitedAssumptions": "No premature or self-assuring assumptions of task as COMPLETE",
+      "verificationRequired": "All tasks must be thoroughly verified before marking as complete",
+      "continuousValidation": "Ongoing validation of task completion criteria"
+    }
+  },
+  "aiGeneration": {
+    "prohibitedPatterns": [
+      "TODO",
+      "FIXME",
+      "console.log",
+      "mock",
+      "dummy",
+      "fake",
+      "dry run",
+      "stub",
+      "for future implementation",
+      "for future production implementation",
+      "placeholder",
+      "simulate",
+      "simulation",
+      "basic function",
+      "basic functionality",
+      "basic code",
+      "temp function",
+      "temp code",
+      "temp functionality",
+      "temp code implementation",
+      "temp function implementation",
+      "ts-ignore",
+      "eslint-disable",
+      "eslint-disable-next-line",
+      "@suppresswarnings",
+      "#pragma",
+      "#pragma warning disable",
+      "System.Diagnostics.Debug",
+      "print(",
+      "warn-disable",
+      "conceptual",
+      "in production implementation",
+      "in full implementation",
+      "in real implementation",
+      "magic numbers without constants",
+      "hardcoded strings",
+      "deep nesting without extraction"
+    ],
+    "enforcedPatterns": [
+      "strict shellcheck, typescript, syntax checking with zero tolerance",
+      "comprehensive error handling with specific error types and root cause analysis",
+      "extensive research-based solutions for recurring errors (>2 occurrences)",
+      "robust input validation with comprehensive sanitization",
+      "typescript strict mode with no-any enforcement",
+      "eslint no-console, no-debugger, complexity limits enforced",
+      "shellcheck compliance with SC2086, SC2034 standards",
+      "unit tests with mandatory >90% coverage threshold",
+      "comprehensive inline JSDoc/TSDoc with examples",
+      "OWASP secure coding practices implementation",
+      "zero warning suppression directives allowed",
+      "production-ready code with defensive programming",
+      "single responsibility principle strict adherence",
+      "meaningful variable and function names mandatory",
+      "extracted methods for any complex logic blocks",
+      "proper separation of concerns architecture",
+      "no over-engineering beyond requirements",
+      "zero code or functionality duplication tolerance"
+    ],
+    "codeComplexity": "low-to-moderate with measurable complexity metrics",
+    "documentationLevel": "comprehensive with examples and usage patterns",
+    "testingRequirements": {
+      "unitTests": "mandatory with descriptive test names",
+      "integrationTests": "required for complex interactions",
+      "coverageThreshold": 90,
+      "testNaming": "descriptive test names following BDD patterns",
+      "testDocumentation": "test cases must include purpose and expected outcomes"
+    }
+  },
+  "allowList": {
+    "languages": [
+      "typescript",
+      "javascript",
+      "bash"
+    ],
+    "logging": [
+      "structured logger with levels (winston, pino)",
+      "live dev server logger for development",
+      "no console.log in production code"
+    ],
+    "testing": [
+      "jest",
+      "vitest",
+      "puppeteer",
+      "@testing-library/react",
+      "supertest"
+    ],
+    "linting": [
+      "eslint with strict configuration",
+      "prettier for consistent formatting",
+      "shellcheck for bash scripts",
+      "typescript-eslint for TypeScript specific rules"
+    ]
+  },
+  "security": {
+    "enforceInputValidation": true,
+    "preventInjectionVulnerabilities": true,
+    "secureDataHandling": true,
+    "preventXSS": true,
+    "preventSQLInjection": true,
+    "preventCSRF": true,
+    "preventOpenRedirect": true,
+    "sanitizeUserInput": true,
+    "useParameterizedQueries": true,
+    "validateFileUploads": true,
+    "enforceHTTPS": true,
+    "secureHeaders": [
+      "Content-Security-Policy",
+      "X-Frame-Options",
+      "X-Content-Type-Options",
+      "Strict-Transport-Security"
+    ],
+    "auditRequirements": {
+      "regularSecurityReviews": "Monthly security audits for critical components",
+      "dependencyScanning": "Automated vulnerability scanning for dependencies",
+      "codeSecurityAnalysis": "Static analysis for security vulnerabilities"
+    }
+  },
+  "codeQuality": {
+    "metrics": {
+      "cyclomaticComplexity": "low (<10 per function)",
+      "maintainabilityIndex": "high (>20 on Microsoft scale)",
+      "technicalDebt": "minimal with regular debt tracking",
+      "codeChurn": "monitored for refactoring effectiveness"
+    },
+    "standards": [
+      "SOLID principles strict adherence",
+      "DRY principle - no code duplication",
+      "KISS principle - no functionality duplication",
+      "clean code practices from Robert C. Martin",
+      "consistent formatting via automated tools",
+      "meaningful abstractions with clear boundaries",
+      "proper error boundaries and exception handling",
+      "performance considerations with profiling"
+    ],
+    "reviewCriteria": [
+      "readability and clarity assessment",
+      "performance implications analysis",
+      "security vulnerabilities scan",
+      "test coverage adequacy verification",
+      "documentation completeness review",
+      "adherence to coding conventions",
+      "technical debt impact evaluation",
+      "maintainability score improvement"
+    ],
+    "refactoringSchedule": {
+      "routine": "Integrate into daily development workflow",
+      "focused": "Dedicated refactoring sessions for complex modules",
+      "measurement": "Track before/after metrics for all refactoring efforts",
+      "documentation": "Document refactoring decisions and outcomes"
+    }
+  }
+}

@@ -8,14 +8,12 @@ import path from 'path';
 import 'dotenv/config';
 
 // Import routes
-import chartRoutes from './api/routes/chart.js';
-import comprehensiveAnalysisRoutes from './api/routes/comprehensiveAnalysis.js';
-import geocodingRoutes from './api/routes/geocoding.js';
 import indexRoutes from './api/routes/index.js';
 import clientErrorLogRoutes from './api/routes/clientErrorLog.js';
 
 // Import middleware
 import errorHandling from './api/middleware/errorHandling.js';
+import { jsonParsingErrorHandler } from './api/middleware/jsonSanitizer.js';
 
 const app = express();
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
@@ -88,9 +86,6 @@ app.get('/health', (req, res) => {
 // API routes
 app.use('/api', indexRoutes);
 app.use('/api', clientErrorLogRoutes);
-app.use('/api/chart', chartRoutes);
-app.use('/api/comprehensive-analysis', comprehensiveAnalysisRoutes);
-app.use('/api/geocoding', geocodingRoutes);
 
 // Handle static file requests that should go to frontend
 app.use('/static', (req, res) => {
@@ -108,12 +103,15 @@ app.use('/api/*', (req, res) => {
     message: `Cannot ${req.method} ${req.originalUrl}`,
     available_endpoints: {
       'health': 'GET /health',
-      'chart': 'GET|POST /api/chart',
-      'analysis': 'GET|POST /api/comprehensive-analysis',
-      'geocoding': 'POST /api/geocoding/location, POST /api/geocoding/timezone'
+      'chart': 'POST /api/v1/chart/generate',
+      'analysis': 'POST /api/v1/analysis/comprehensive',
+      'geocoding': 'POST /api/v1/geocoding/location'
     }
   });
 });
+
+// JSON parsing error handling middleware (before general error handler)
+app.use(jsonParsingErrorHandler);
 
 // Global error handling middleware
 app.use(errorHandling);

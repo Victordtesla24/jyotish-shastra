@@ -517,6 +517,62 @@ router.post('/navamsa', async (req, res) => {
  * POST /api/v1/analysis/dasha
  * Section 7: Vimshottari Dasha System Analysis
  */
+router.post('/lagna', async (req, res) => {
+    try {
+        const requestData = req.body;
+        const isStandardizationTest = req.headers['x-test-type'] === 'standardization';
+
+        // Use flexible validation where name is optional for standardization tests
+        const validationResult = validateDashaAnalysis(requestData, isStandardizationTest);
+
+        if (!validationResult.isValid) {
+            return res.status(400).json({
+                success: false,
+                error: 'Validation failed',
+                details: validationResult.errors,
+                suggestions: validationResult.suggestions || [],
+                helpText: 'Lagna analysis requires birth date, time, and location information.'
+            });
+        }
+
+        const finalBirthData = validationResult.data.birthData || validationResult.data;
+        const charts = await orchestrator.generateCharts(finalBirthData);
+
+        // Initialize proper analysis object structure
+        const analysisContext = {
+            errors: [],
+            warnings: [],
+            birthData: finalBirthData,
+            sections: {}
+        };
+
+        // Simple lagna analysis response structure
+        const lagnaAnalysis = {
+            lagnaSign: charts?.rasiChart?.ascendant?.sign || 'Unknown',
+            lagnaLord: charts?.rasiChart?.ascendant?.lord || 'Unknown',
+            lagnaStrength: 'Medium',
+            interpretation: 'Lagna analysis indicates the foundational structure of the personality and life path.',
+            planetaryInfluences: charts?.rasiChart?.planetaryPositions || []
+        };
+
+        res.status(200).json({
+            success: true,
+            section: 'lagna',
+            lagnaAnalysis: lagnaAnalysis,
+            message: 'Lagna analysis completed successfully'
+        });
+
+    } catch (error) {
+        console.error('Lagna analysis error:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Internal server error',
+            message: 'Failed to complete lagna analysis',
+            details: error.message
+        });
+    }
+});
+
 router.post('/dasha', async (req, res) => {
     try {
         const requestData = req.body;

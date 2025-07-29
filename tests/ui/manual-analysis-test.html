@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual Analysis Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .success {
+            background: #efe;
+            border: 1px solid #cfc;
+            padding: 15px;
+            border-radius: 5px;
+            color: #090;
+            margin-top: 10px;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            max-height: 300px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Manual Analysis Test</h1>
+
+        <div class="section">
+            <h2>Step 1: Populate Test Data</h2>
+            <button onclick="populateTestData()">Populate Valid Test Data</button>
+            <button onclick="clearAllData()">Clear All Data</button>
+            <div id="dataStatus"></div>
+        </div>
+
+        <div class="section">
+            <h2>Step 2: Navigate to Analysis Pages</h2>
+            <button onclick="goToAnalysis()">Go to Analysis Page</button>
+            <button onclick="goToComprehensive()">Go to Comprehensive Analysis</button>
+        </div>
+
+        <div class="section">
+            <h2>Current LocalStorage Data</h2>
+            <div id="currentData"></div>
+        </div>
+    </div>
+
+    <script>
+        // Test data from the JSON file
+        const testBirthData = {
+            name: "Test User",
+            dateOfBirth: "1985-10-24",
+            timeOfBirth: "14:30",
+            placeOfBirth: "Mumbai, India",
+            latitude: 19.0760,
+            longitude: 72.8777,
+            timezone: "Asia/Kolkata",
+            gender: "male",
+            formatted: true
+        };
+
+        const testChartData = {
+            success: true,
+            rasiChart: {
+                ascendant: {
+                    longitude: 184.69766813232675,
+                    sign: "Libra",
+                    signId: 7,
+                    signIndex: 6,
+                    degree: 4.697668132326726
+                },
+                planets: [
+                    {
+                        name: "Sun",
+                        longitude: 242.15937359251723,
+                        degree: 2.159373592517227,
+                        sign: "Sagittarius",
+                        signId: 9,
+                        isRetrograde: false,
+                        isCombust: false,
+                        dignity: "neutral"
+                    },
+                    {
+                        name: "Moon",
+                        longitude: 108.0378450824482,
+                        degree: 18.0378450824482,
+                        sign: "Cancer",
+                        signId: 4,
+                        isRetrograde: false,
+                        isCombust: false,
+                        dignity: "own"
+                    },
+                    {
+                        name: "Mars",
+                        longitude: 275.8760317763135,
+                        degree: 5.876031776313501,
+                        sign: "Capricorn",
+                        signId: 10,
+                        isRetrograde: false,
+                        isCombust: false,
+                        dignity: "exalted"
+                    }
+                ]
+            },
+            houses: [
+                { number: 1, sign: "Libra", lord: "Venus", significations: "Self, personality" },
+                { number: 2, sign: "Scorpio", lord: "Mars", significations: "Wealth, family" },
+                { number: 3, sign: "Sagittarius", lord: "Jupiter", significations: "Siblings, courage" }
+            ],
+            aspects: [
+                { type: "conjunction", planets: ["Sun", "Mercury"], strength: "strong" },
+                { type: "opposition", planets: ["Moon", "Saturn"], strength: "moderate" }
+            ]
+        };
+
+        const testAnalysisData = {
+            success: true,
+            analysis: {
+                sections: {
+                    section1: {
+                        name: "Birth Data Collection and Chart Casting",
+                        questions: [
+                            {
+                                question: "What is the birth data?",
+                                answer: "Born on October 24, 1985 at 14:30 in Mumbai, India",
+                                completeness: 100
+                            }
+                        ]
+                    },
+                    section2: {
+                        name: "Lagna and Luminaries",
+                        questions: [
+                            {
+                                question: "What is the Lagna (Ascendant)?",
+                                answer: "The Lagna is Libra at 4°69', ruled by Venus. This gives a balanced and harmonious personality.",
+                                completeness: 95
+                            }
+                        ]
+                    },
+                    section3: {
+                        name: "Planetary Positions",
+                        questions: [
+                            {
+                                question: "What are the planetary positions?",
+                                answer: "Sun in Sagittarius (2°), Moon in Cancer (18°), Mars exalted in Capricorn (5°)",
+                                completeness: 90
+                            }
+                        ]
+                    }
+                }
+            }
+        };
+
+        function populateTestData() {
+            // Save all test data to localStorage
+            localStorage.setItem('jyotish_birth_data', JSON.stringify(testBirthData));
+            localStorage.setItem('jyotish_chart_data', JSON.stringify(testChartData));
+            localStorage.setItem('jyotish_analysis_data', JSON.stringify(testAnalysisData));
+            localStorage.setItem('jyotish_session_id', 'test_session_' + Date.now());
+
+            const statusDiv = document.getElementById('dataStatus');
+            statusDiv.innerHTML = '<div class="success">✓ Test data populated successfully!</div>';
+
+            showCurrentData();
+        }
+
+        function clearAllData() {
+            localStorage.removeItem('jyotish_birth_data');
+            localStorage.removeItem('jyotish_chart_data');
+            localStorage.removeItem('jyotish_analysis_data');
+            localStorage.removeItem('jyotish_session_id');
+
+            const statusDiv = document.getElementById('dataStatus');
+            statusDiv.innerHTML = '<div class="success">✓ All data cleared!</div>';
+
+            showCurrentData();
+        }
+
+        function showCurrentData() {
+            const dataDiv = document.getElementById('currentData');
+            const birthData = localStorage.getItem('jyotish_birth_data');
+            const chartData = localStorage.getItem('jyotish_chart_data');
+            const analysisData = localStorage.getItem('jyotish_analysis_data');
+
+            let html = '<h3>Birth Data:</h3>';
+            html += birthData ? `<pre>${JSON.stringify(JSON.parse(birthData), null, 2)}</pre>` : '<p>No birth data</p>';
+
+            html += '<h3>Chart Data:</h3>';
+            html += chartData ? '<pre>Chart data present (truncated for display)</pre>' : '<p>No chart data</p>';
+
+            html += '<h3>Analysis Data:</h3>';
+            html += analysisData ? '<pre>Analysis data present (truncated for display)</pre>' : '<p>No analysis data</p>';
+
+            dataDiv.innerHTML = html;
+        }
+
+        function goToAnalysis() {
+            window.location.href = 'http://localhost:3002/analysis';
+        }
+
+        function goToComprehensive() {
+            window.location.href = 'http://localhost:3002/comprehensive';
+        }
+
+        // Show current data on load
+        window.onload = showCurrentData;
+    </script>
+</body>
+</html>

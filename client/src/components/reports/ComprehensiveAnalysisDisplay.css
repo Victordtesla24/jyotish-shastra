@@ -1,0 +1,425 @@
+/* Comprehensive Analysis Display Styles */
+
+.comprehensive-analysis-display {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Inter', -apple-system, system-ui, sans-serif;
+}
+
+.main-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.section-progress {
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.sections-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Section Wrapper */
+.section-wrapper {
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.section-wrapper.expanded {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.section-header {
+  padding: 1rem 1.5rem;
+  background: #f8f9fa;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.2s ease;
+}
+
+.section-header:hover {
+  background: #e9ecef;
+}
+
+.section-header h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.toggle-icon {
+  font-size: 1.5rem;
+  color: #666;
+}
+
+.section-content {
+  padding: 1.5rem;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Questions Container */
+.questions-container {
+  margin-bottom: 2rem;
+}
+
+.questions-container h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+}
+
+.question-item {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}
+
+.question {
+  font-weight: 600;
+  color: #34495e;
+  margin-bottom: 0.5rem;
+}
+
+.answer {
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 0.5rem;
+}
+
+.details {
+  margin-top: 0.5rem;
+}
+
+.details h5 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.detail-object {
+  padding-left: 1rem;
+  border-left: 2px solid #e0e0e0;
+}
+
+.detail-item {
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
+}
+
+.detail-item strong {
+  color: #555;
+  font-weight: 600;
+}
+
+.completeness {
+  margin-top: 0.5rem;
+  color: #27ae60;
+  font-weight: 600;
+}
+
+/* Analyses Container */
+.analyses-container {
+  margin-bottom: 2rem;
+}
+
+.analyses-container h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+}
+
+.analysis-item {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: #fafafa;
+  border-radius: 6px;
+}
+
+.analysis-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #34495e;
+  margin-bottom: 0.5rem;
+}
+
+.analysis-text {
+  color: #555;
+  line-height: 1.6;
+}
+
+.analysis-list {
+  list-style: disc;
+  padding-left: 1.5rem;
+  color: #555;
+}
+
+.analysis-list li {
+  margin: 0.25rem 0;
+}
+
+/* Planetary Data */
+.planetary-data {
+  background: #f0f8ff;
+  padding: 1rem;
+  border-radius: 6px;
+  border: 1px solid #d0e0f0;
+}
+
+.planetary-data .position,
+.planetary-data .strength,
+.planetary-data .dignity {
+  margin-bottom: 0.5rem;
+}
+
+/* Houses Container */
+.houses-container {
+  margin-bottom: 2rem;
+}
+
+.houses-container h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+}
+
+.house-item {
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.house-item h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2980b9;
+  margin-bottom: 0.5rem;
+}
+
+.house-details p {
+  margin: 0.25rem 0;
+  color: #555;
+}
+
+.lord-placement,
+.house-analysis,
+.occupants {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #eee;
+}
+
+.occupants ul {
+  list-style: circle;
+  padding-left: 1.5rem;
+  margin-top: 0.25rem;
+}
+
+/* Aspects Container */
+.aspects-container {
+  margin-bottom: 2rem;
+}
+
+.aspects-container h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+}
+
+.aspect-item {
+  background: #fef9f3;
+  border: 1px solid #f0e0d0;
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.aspect-item h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #d35400;
+  margin-bottom: 0.5rem;
+}
+
+.aspect-details p {
+  margin: 0.25rem 0;
+  color: #555;
+}
+
+.interpretation {
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+/* Arudha Analysis */
+.arudha-analysis {
+  background: #f5f3ff;
+  padding: 1rem;
+  border-radius: 6px;
+  border: 1px solid #e0d0f0;
+}
+
+.arudha-lagna,
+.public-image {
+  margin-bottom: 1rem;
+}
+
+.arudha-lagna h4,
+.public-image h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #6c5ce7;
+  margin-bottom: 0.5rem;
+}
+
+/* Navamsa Analysis */
+.navamsa-analysis {
+  background: #fff0f5;
+  padding: 1rem;
+  border-radius: 6px;
+  border: 1px solid #f0d0e0;
+}
+
+.navamsa-chart,
+.marriage-indications {
+  margin-bottom: 1rem;
+}
+
+.navamsa-chart h4,
+.marriage-indications h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #e91e63;
+  margin-bottom: 0.5rem;
+}
+
+/* Dasha Analysis */
+.dasha-analysis {
+  background: #f0fff4;
+  padding: 1rem;
+  border-radius: 6px;
+  border: 1px solid #d0f0e0;
+}
+
+.current-dasha,
+.upcoming-dashas {
+  margin-bottom: 1rem;
+}
+
+.current-dasha h4,
+.upcoming-dashas h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #27ae60;
+  margin-bottom: 0.5rem;
+}
+
+.dasha-item {
+  background: white;
+  padding: 0.5rem;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+}
+
+/* Summary Container */
+.summary-container {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 6px;
+  border: 1px solid #dee2e6;
+}
+
+.summary-container h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+}
+
+/* Generic Content */
+.generic-content {
+  margin-top: 1rem;
+}
+
+.generic-item {
+  margin-bottom: 1.5rem;
+}
+
+.generic-item h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #34495e;
+  margin-bottom: 0.5rem;
+}
+
+/* Error States */
+.analysis-empty {
+  text-align: center;
+  padding: 3rem;
+  color: #666;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .comprehensive-analysis-display {
+    padding: 10px;
+  }
+
+  .main-title {
+    font-size: 1.5rem;
+  }
+
+  .section-header {
+    padding: 0.75rem 1rem;
+  }
+
+  .section-header h2 {
+    font-size: 1.1rem;
+  }
+
+  .section-content {
+    padding: 1rem;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .toggle-icon {
+    display: none;
+  }
+
+  .section-wrapper {
+    page-break-inside: avoid;
+  }
+
+  .section-header {
+    cursor: default;
+  }
+}

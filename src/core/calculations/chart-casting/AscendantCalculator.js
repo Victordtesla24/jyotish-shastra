@@ -1,5 +1,5 @@
 import swisseph from 'swisseph';
-import { getSign, getSignName } from '../../../utils/helpers/astrologyHelpers.js';
+import { getSign, getSignName, getSignId } from '../../../utils/helpers/astrologyHelpers.js';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
@@ -209,6 +209,7 @@ class AscendantCalculator {
             return {
                 longitude: siderealAscendant,
                 sign: getSignName(signInfo.signIndex),
+                signId: getSignId(signInfo.signIndex),
                 signIndex: signInfo.signIndex,
                 degree: signInfo.degreeInSign,
             };
@@ -264,6 +265,7 @@ class AscendantCalculator {
             return {
                 longitude: siderealAscendant,
                 sign: getSignName(signInfo.signIndex),
+                signId: getSignId(signInfo.signIndex),
                 signIndex: signInfo.signIndex,
                 degree: signInfo.degreeInSign,
             };
@@ -331,6 +333,7 @@ class AscendantCalculator {
         return {
             longitude: siderealAscendant,
             sign: getSignName(signInfo.signIndex),
+            signId: getSignId(signInfo.signIndex),
             signIndex: signInfo.signIndex,
             degree: signInfo.degreeInSign,
         };

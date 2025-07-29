@@ -1311,36 +1311,11 @@ class HouseAnalysisService {
 
       return allHousesAnalysis;
     } catch (error) {
-      // Ultimate fallback if entire analysis fails
-      console.error('All houses analysis failed:', error.message);
-      return this.getFallbackHousesAnalysis();
+      // PRODUCTION REQUIREMENT: NO FAKE DATA GENERATION
+      // Throw error instead of returning fake analysis data
+      console.error('❌ Houses analysis failed:', error.message);
+      throw new Error(`Houses analysis failed: ${error.message}. Please ensure valid chart data is provided.`);
     }
-  }
-
-  /**
-   * Get fallback houses analysis when main analysis fails
-   * @returns {Array} Basic houses analysis
-   */
-  getFallbackHousesAnalysis() {
-    const fallbackAnalysis = [];
-
-    for (let houseNumber = 1; houseNumber <= 12; houseNumber++) {
-      fallbackAnalysis.push({
-        houseNumber,
-        houseData: this.houseSignifications[houseNumber],
-        houseSign: { sign: 'Unknown' },
-        houseLord: 'Unknown',
-        houseOccupants: [],
-        analysis: {
-          summary: `House ${houseNumber} requires complete chart data for analysis`,
-          strengths: [],
-          challenges: [],
-          recommendations: []
-        }
-      });
-    }
-
-    return fallbackAnalysis;
   }
 }
 

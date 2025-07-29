@@ -58,6 +58,8 @@ coverage/
 .Trashes
 ehthumbs.db
 Thumbs.db
+coverage/
+ephemeris/
 
 # Windows
 Thumbs.db
@@ -129,6 +131,10 @@ yarn-error.log*
 .pnpm-debug.log*
 .yarn-integrity
 .npm
+.vscode/
+.github/
+cypress/
+
 
 # Python
 __pycache__/
