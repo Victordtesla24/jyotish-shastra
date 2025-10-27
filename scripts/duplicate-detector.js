@@ -17,6 +17,12 @@ class DuplicateDetector {
       similar: new Map()     // Pattern -> [files]
     };
 
+    this.fakeCode = {
+      mock: new Map(),      // Mock/fake patterns
+      placeholder: new Map(), // Placeholder code
+      nonProduction: new Map() // Non-production code
+    };
+
     this.protectedFiles = new Set([
       'package.json',
       'package-lock.json',
@@ -26,7 +32,12 @@ class DuplicateDetector {
       'setupTests.js'
     ]);
 
-    this.scanDirectories = ['src', 'client/src'];
+    // Use current workspace as project root
+    this.projectRoot = process.cwd();
+    this.scanDirectories = [
+      `${this.projectRoot}/src`, 
+      `${this.projectRoot}/client/src`
+    ];
     this.allowedExtensions = ['.js', '.jsx', '.ts', '.tsx', '.json', '.css'];
     this.minFileSize = 50; // bytes
 
@@ -36,7 +47,10 @@ class DuplicateDetector {
       functionalDuplicates: 0,
       similarFiles: 0,
       duplicatesRemoved: 0,
-      spaceRecovered: 0
+      spaceRecovered: 0,
+      mockCode: 0,
+      placeholderCode: 0,
+      nonProductionCode: 0
     };
   }
 
@@ -54,6 +68,7 @@ class DuplicateDetector {
         case 'scan':
           await this.scanForDuplicates();
           this.generateReport();
+          await this.generateMarkdownReport();
           break;
         case 'remove':
           await this.scanForDuplicates();
@@ -65,6 +80,10 @@ class DuplicateDetector {
           break;
         case 'interactive':
           await this.interactiveMode();
+          break;
+        case 'generate-report':
+          await this.scanForDuplicates();
+          await this.generateMarkdownReport();
           break;
         default:
           this.showHelp();
@@ -100,6 +119,9 @@ class DuplicateDetector {
 
     // Phase 3: Similar files (by pattern matching)
     await this.findSimilarFiles(allFiles);
+
+    // Phase 4: Fake/Mock/Non-production code detection
+    await this.findFakeCode(allFiles);
 
     this.stats.filesScanned = allFiles.length;
   }
@@ -438,6 +460,517 @@ class DuplicateDetector {
   }
 
   /**
+   * Find fake, mock, and non-production code
+   */
+  async findFakeCode(files) {
+    console.log('🔸 Phase 4: Finding fake, mock, and non-production code...');
+
+    const codeFiles = files.filter(f => ['.js', '.jsx', '.ts', '.tsx'].includes(path.extname(f)));
+
+    for (const file of codeFiles) {
+      try {
+        const content = fs.readFileSync(file, 'utf8');
+        const results = this.analyzeFakeCode(content, file);
+
+        if (results.mock.length > 0) {
+          this.fakeCode.mock.set(file, results.mock);
+          this.stats.mockCode++;
+        }
+
+        if (results.placeholder.length > 0) {
+          this.fakeCode.placeholder.set(file, results.placeholder);
+          this.stats.placeholderCode++;
+        }
+
+        if (results.nonProduction.length > 0) {
+          this.fakeCode.nonProduction.set(file, results.nonProduction);
+          this.stats.nonProductionCode++;
+        }
+      } catch (error) {
+        console.warn(`⚠️ Could not analyze fake code in file: ${file}`);
+      }
+    }
+
+    console.log(`   Found ${this.stats.mockCode} files with mock code`);
+    console.log(`   Found ${this.stats.placeholderCode} files with placeholder code`);
+    console.log(`   Found ${this.stats.nonProductionCode} files with non-production code`);
+  }
+
+  /**
+   * Analyze content for fake, mock, and non-production patterns
+   */
+  analyzeFakeCode(content, filePath) {
+    const results = {
+      mock: [],
+      placeholder: [],
+      nonProduction: []
+    };
+
+    const lines = content.split('\n');
+
+    // Patterns for mock/fake code
+    const mockPatterns = [
+      /mock\w*\s*[:=]/i,
+      /fake\w*\s*[:=]/i,
+      /stub\w*\s*[:=]/i,
+      /jest\.mock/i,
+      /sinon\./i,
+      /mockImplementation/i,
+      /mockReturnValue/i,
+      /createMock/i,
+      /mockResolvedValue/i,
+      /spyOn/i
+    ];
+
+    // Patterns for placeholder code
+    const placeholderPatterns = [
+      /TODO:/i,
+      /FIXME:/i,
+      /HACK:/i,
+      /TEMP:/i,
+      /placeholder/i,
+      /not implemented/i,
+      /coming soon/i,
+      /under construction/i,
+      /throw new Error\(['"`]not implemented/i,
+      /console\.log\(['"`]debug/i,
+      /console\.log\(['"`]test/i,
+      /\/\/ TODO/i,
+      /\/\/ FIXME/i,
+      /\/\* TODO/i,
+      /\/\* FIXME/i
+    ];
+
+    // Patterns for non-production code
+    const nonProductionPatterns = [
+      /console\.log(?!\(['"`](?:info|warn|error))/i,
+      /console\.debug/i,
+      /console\.trace/i,
+      /console\.table/i,
+      /debugger\s*;?/i,
+      /alert\s*\(/i,
+      /confirm\s*\(/i,
+      /prompt\s*\(/i,
+      /localhost/i,
+      /127\.0\.0\.1/i,
+      /\.dev\b/i,
+      /\.test\b/i,
+      /development/i,
+      /hardcoded/i,
+      /sample\s*data/i,
+      /test\s*data/i,
+      /dummy\s*data/i,
+      /example\s*data/i
+    ];
+
+    lines.forEach((line, index) => {
+      const lineNumber = index + 1;
+      const trimmedLine = line.trim();
+
+      // Skip empty lines and pure comments
+      if (!trimmedLine || trimmedLine.startsWith('//') || trimmedLine.startsWith('/*') || trimmedLine.startsWith('*')) {
+        return;
+      }
+
+      // Check for mock patterns
+      mockPatterns.forEach(pattern => {
+        if (pattern.test(line)) {
+          results.mock.push({
+            line: lineNumber,
+            content: line.trim(),
+            pattern: pattern.source,
+            type: 'mock'
+          });
+        }
+      });
+
+      // Check for placeholder patterns
+      placeholderPatterns.forEach(pattern => {
+        if (pattern.test(line)) {
+          results.placeholder.push({
+            line: lineNumber,
+            content: line.trim(),
+            pattern: pattern.source,
+            type: 'placeholder'
+          });
+        }
+      });
+
+      // Check for non-production patterns
+      nonProductionPatterns.forEach(pattern => {
+        if (pattern.test(line)) {
+          // Skip if it's in a test file or mock file
+          const fileName = path.basename(filePath).toLowerCase();
+          const isTestFile = fileName.includes('test') || fileName.includes('spec') || fileName.includes('mock');
+          
+          if (!isTestFile) {
+            results.nonProduction.push({
+              line: lineNumber,
+              content: line.trim(),
+              pattern: pattern.source,
+              type: 'non-production'
+            });
+          }
+        }
+      });
+    });
+
+    return results;
+  }
+
+  /**
+   * Generate markdown report in user-docs directory
+   */
+  async generateMarkdownReport() {
+    console.log('📝 Generating markdown report...');
+
+    const reportContent = this.buildMarkdownContent();
+    const reportPath = path.join(this.projectRoot, 'user-docs', 'duplicate-detection-report.md');
+
+    try {
+      // Ensure user-docs directory exists
+      const userDocsDir = path.dirname(reportPath);
+      if (!fs.existsSync(userDocsDir)) {
+        fs.mkdirSync(userDocsDir, { recursive: true });
+      }
+
+      fs.writeFileSync(reportPath, reportContent, 'utf8');
+      
+      const relativeReportPath = path.relative(this.projectRoot, reportPath);
+      console.log(`✅ Markdown report generated: ${relativeReportPath}`);
+      
+      return reportPath;
+    } catch (error) {
+      console.error('❌ Failed to generate markdown report:', error.message);
+      throw error;
+    }
+  }
+
+  /**
+   * Build markdown content for the report
+   */
+  buildMarkdownContent() {
+    const timestamp = new Date().toISOString();
+    const scanDirsRelative = this.scanDirectories.map(dir => path.relative(this.projectRoot, dir));
+
+    let content = `# Duplicate Detection Report
+
+**Generated:** ${timestamp}  
+**Project:** Jyotish Shastra  
+**Scanned Directories:** ${scanDirsRelative.join(', ')}  
+
+## Executive Summary
+
+| Metric | Count |
+|--------|-------|
+| Files Scanned | ${this.stats.filesScanned} |
+| Exact Duplicates | ${this.stats.exactDuplicates} |
+| Functional Duplicates | ${this.stats.functionalDuplicates} |
+| Similar Files | ${this.stats.similarFiles} |
+| Mock Code Files | ${this.stats.mockCode} |
+| Placeholder Code Files | ${this.stats.placeholderCode} |
+| Non-Production Code Files | ${this.stats.nonProductionCode} |
+
+---
+
+`;
+
+    // Add exact duplicates section
+    content += this.buildExactDuplicatesSection();
+    
+    // Add functional duplicates section
+    content += this.buildFunctionalDuplicatesSection();
+    
+    // Add similar files section
+    content += this.buildSimilarFilesSection();
+    
+    // Add fake/mock code section
+    content += this.buildFakeCodeSection();
+    
+    // Add recommendations
+    content += this.buildRecommendationsSection();
+
+    return content;
+  }
+
+  /**
+   * Build exact duplicates section
+   */
+  buildExactDuplicatesSection() {
+    if (this.duplicates.exact.size === 0) {
+      return `## 🟢 Exact Duplicates
+
+✅ **No exact duplicates found.**
+
+---
+
+`;
+    }
+
+    let content = `## 🔴 Exact Duplicates
+
+Found **${this.duplicates.exact.size}** groups of exact duplicates affecting **${this.stats.exactDuplicates}** files.
+
+`;
+
+    for (const [hash, files] of this.duplicates.exact) {
+      content += `### Duplicate Group - Hash: \`${hash.substring(0, 12)}\`
+
+**File Size:** ${this.formatBytes(files[0].size)}  
+**Files in Group:** ${files.length}
+
+| Status | File Path | Relative Path |
+|--------|-----------|---------------|
+`;
+
+      files.forEach((file, index) => {
+        const status = index === 0 ? '📁 **KEEP**' : '🗑️ **REMOVE**';
+        const relativePath = path.relative(this.projectRoot, file.path);
+        content += `| ${status} | \`${file.path}\` | \`${relativePath}\` |\n`;
+      });
+
+      content += '\n';
+    }
+
+    content += '---\n\n';
+    return content;
+  }
+
+  /**
+   * Build functional duplicates section
+   */
+  buildFunctionalDuplicatesSection() {
+    if (this.duplicates.functional.size === 0) {
+      return `## 🟢 Functional Duplicates
+
+✅ **No functional duplicates found.**
+
+---
+
+`;
+    }
+
+    let content = `## 🟡 Functional Duplicates
+
+Found **${this.duplicates.functional.size}** groups of functional duplicates affecting **${this.stats.functionalDuplicates}** files.
+
+`;
+
+    for (const [signature, files] of this.duplicates.functional) {
+      content += `### Functional Group - Signature: \`${signature.substring(0, 12)}\`
+
+| Status | File Path | Relative Path |
+|--------|-----------|---------------|
+`;
+
+      files.forEach((file, index) => {
+        const status = index === 0 ? '📁 **KEEP**' : '⚠️ **REVIEW**';
+        const relativePath = path.relative(this.projectRoot, file.path);
+        content += `| ${status} | \`${file.path}\` | \`${relativePath}\` |\n`;
+      });
+
+      content += '\n**Action Required:** Manual review needed to determine if these files share functionality that could be refactored.\n\n';
+    }
+
+    content += '---\n\n';
+    return content;
+  }
+
+  /**
+   * Build similar files section
+   */
+  buildSimilarFilesSection() {
+    if (this.duplicates.similar.size === 0) {
+      return `## 🟢 Similar Files
+
+✅ **No similar naming patterns found.**
+
+---
+
+`;
+    }
+
+    let content = `## 🟠 Similar Files (Naming Patterns)
+
+Found **${this.duplicates.similar.size}** groups of similar files affecting **${this.stats.similarFiles}** files.
+
+`;
+
+    let groupCount = 0;
+    for (const [pattern, files] of this.duplicates.similar) {
+      if (groupCount >= 10) { // Limit to top 10 groups in report
+        content += `\n*... and ${this.duplicates.similar.size - 10} more pattern groups*\n\n`;
+        break;
+      }
+
+      content += `### Pattern: \`${pattern}\`
+
+| File Path | Relative Path |
+|-----------|---------------|
+`;
+
+      files.forEach(file => {
+        const relativePath = path.relative(this.projectRoot, file.path);
+        content += `| \`${file.path}\` | \`${relativePath}\` |\n`;
+      });
+
+      content += '\n';
+      groupCount++;
+    }
+
+    content += '---\n\n';
+    return content;
+  }
+
+  /**
+   * Build fake/mock code section
+   */
+  buildFakeCodeSection() {
+    let content = `## 🔍 Code Quality Analysis
+
+### Mock/Test Code Detection
+
+`;
+
+    if (this.stats.mockCode === 0 && this.stats.placeholderCode === 0 && this.stats.nonProductionCode === 0) {
+      content += '✅ **No problematic code patterns detected.**\n\n';
+      content += '---\n\n';
+      return content;
+    }
+
+    // Mock code section
+    if (this.fakeCode.mock.size > 0) {
+      content += `#### 🧪 Mock Code (${this.stats.mockCode} files)
+
+`;
+      for (const [filePath, mockItems] of this.fakeCode.mock) {
+        const relativePath = path.relative(this.projectRoot, filePath);
+        content += `**File:** \`${relativePath}\`\n\n`;
+        
+        mockItems.forEach(item => {
+          content += `- **Line ${item.line}:** ${item.type.toUpperCase()}\n`;
+          content += `  \`\`\`javascript\n  ${item.content}\n  \`\`\`\n\n`;
+        });
+      }
+    }
+
+    // Placeholder code section
+    if (this.fakeCode.placeholder.size > 0) {
+      content += `#### 🚧 Placeholder Code (${this.stats.placeholderCode} files)
+
+`;
+      for (const [filePath, placeholderItems] of this.fakeCode.placeholder) {
+        const relativePath = path.relative(this.projectRoot, filePath);
+        content += `**File:** \`${relativePath}\`\n\n`;
+        
+        placeholderItems.forEach(item => {
+          content += `- **Line ${item.line}:** ${item.type.toUpperCase()}\n`;
+          content += `  \`\`\`javascript\n  ${item.content}\n  \`\`\`\n\n`;
+        });
+      }
+    }
+
+    // Non-production code section
+    if (this.fakeCode.nonProduction.size > 0) {
+      content += `#### ⚠️ Non-Production Code (${this.stats.nonProductionCode} files)
+
+`;
+      for (const [filePath, nonProdItems] of this.fakeCode.nonProduction) {
+        const relativePath = path.relative(this.projectRoot, filePath);
+        content += `**File:** \`${relativePath}\`\n\n`;
+        
+        nonProdItems.forEach(item => {
+          content += `- **Line ${item.line}:** ${item.type.toUpperCase()}\n`;
+          content += `  \`\`\`javascript\n  ${item.content}\n  \`\`\`\n\n`;
+        });
+      }
+    }
+
+    content += '---\n\n';
+    return content;
+  }
+
+  /**
+   * Build recommendations section
+   */
+  buildRecommendationsSection() {
+    let content = `## 💡 Recommendations
+
+### Immediate Actions
+
+`;
+
+    const recommendations = [];
+
+    if (this.duplicates.exact.size > 0) {
+      recommendations.push('🗑️ **Remove exact duplicates** immediately (safe operation)');
+      recommendations.push('🔧 **Update import statements** after removal');
+    }
+
+    if (this.duplicates.functional.size > 0) {
+      recommendations.push('👀 **Review functional duplicates** manually');
+      recommendations.push('♻️ **Consider refactoring** to share common functionality');
+    }
+
+    if (this.duplicates.similar.size > 0) {
+      recommendations.push('📋 **Review similar files** for consolidation opportunities');
+    }
+
+    if (this.stats.mockCode > 0) {
+      recommendations.push('🧪 **Review mock code** - ensure it\'s in appropriate test files');
+    }
+
+    if (this.stats.placeholderCode > 0) {
+      recommendations.push('🚧 **Complete placeholder implementations** or remove TODO items');
+    }
+
+    if (this.stats.nonProductionCode > 0) {
+      recommendations.push('⚠️ **Remove non-production code** (console.log, debugger, etc.)');
+    }
+
+    if (recommendations.length === 0) {
+      content += '✅ **Excellent!** No immediate actions required.\n\n';
+    } else {
+      recommendations.forEach((rec, index) => {
+        content += `${index + 1}. ${rec}\n`;
+      });
+      content += '\n';
+    }
+
+    content += `### Commands
+
+\`\`\`bash
+# Auto-remove exact duplicates
+npm run detect-duplicates remove
+
+# Generate fresh report
+npm run detect-duplicates scan
+
+# Interactive review mode
+npm run detect-duplicates interactive
+
+# Detailed analysis
+npm run detect-duplicates analyze
+\`\`\`
+
+### Safety Notes
+
+- ✅ Exact duplicates are safe to remove automatically
+- ⚠️ Functional duplicates require manual review
+- 📋 Similar files may need refactoring consideration
+- 🧪 Mock code should be in test files only
+- 🚧 Placeholder code needs completion
+- ⚠️ Non-production code should be removed
+
+---
+
+*Report generated by Jyotish Shastra Duplicate Detector v1.0*
+`;
+
+    return content;
+  }
+
+  /**
    * Generate comprehensive report
    */
   generateReport() {
@@ -449,6 +982,9 @@ class DuplicateDetector {
     console.log(`   Exact Duplicates: ${this.stats.exactDuplicates}`);
     console.log(`   Functional Duplicates: ${this.stats.functionalDuplicates}`);
     console.log(`   Similar Files: ${this.stats.similarFiles}`);
+    console.log(`   Mock Code Files: ${this.stats.mockCode}`);
+    console.log(`   Placeholder Code Files: ${this.stats.placeholderCode}`);
+    console.log(`   Non-Production Code Files: ${this.stats.nonProductionCode}`);
 
     // Exact duplicates
     if (this.duplicates.exact.size > 0) {
@@ -866,15 +1402,17 @@ class DuplicateDetector {
 Usage: npm run detect-duplicates [command]
 
 Commands:
-  scan        Scan for duplicates and show report (default)
-  remove      Scan and automatically remove exact duplicates
-  analyze     Detailed analysis of code similarity
-  interactive Interactive mode for manual review
+  scan           Scan for duplicates and show report (default)
+  remove         Scan and automatically remove exact duplicates
+  analyze        Detailed analysis of code similarity
+  interactive    Interactive mode for manual review
+  generate-report Generate markdown report in user-docs directory
 
 Examples:
   npm run detect-duplicates
   npm run detect-duplicates remove
   npm run detect-duplicates analyze
+  npm run detect-duplicates generate-report
 
 Safety Features:
 - Only removes exact duplicates automatically
@@ -883,10 +1421,16 @@ Safety Features:
 - Provides detailed reports before any changes
 
 Directory Coverage:
-- /src (backend implementation)
-- /client/src (frontend implementation)
+- ./src (backend implementation)
+- ./client/src (frontend implementation)
 - Respects .gitignore patterns
 - Skips node_modules, build dirs, etc.
+
+Code Quality Features:
+- Detects mock/fake code patterns
+- Identifies placeholder implementations (TODO, FIXME)
+- Finds non-production code (console.log, debugger)
+- Generates comprehensive markdown reports
 `);
   }
 
