@@ -1,4 +1,4 @@
-# Jyotish Shastra - Vedic Astrology Application
+# Jyotish Shastra - Vedic Astrology Application - Downloaded on 28 Oct 2025
 
 A comprehensive Vedic astrology application with automated geocoding integration, providing detailed birth chart analysis and cosmic insights.
 
