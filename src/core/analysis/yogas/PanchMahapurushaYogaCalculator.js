@@ -128,4 +128,4 @@ class PanchMahapurushaYogaCalculator {
   }
 }
 
-module.exports = PanchMahapurushaYogaCalculator;
+export default PanchMahapurushaYogaCalculator;

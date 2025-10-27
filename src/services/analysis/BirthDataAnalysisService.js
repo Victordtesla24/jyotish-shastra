@@ -4,9 +4,9 @@
  * "Birth Data Collection and Chart Casting"
  */
 
-const swisseph = require('swisseph');
-const moment = require('moment');
-const { getSign, getSignName } = require('../../utils/helpers/astrologyHelpers');
+import swisseph from 'swisseph';
+import moment from 'moment';
+import { getSign, getSignName } from '../../utils/helpers/astrologyHelpers.js';
 
 class BirthDataAnalysisService {
   constructor() {
@@ -443,4 +443,4 @@ class BirthDataAnalysisService {
   }
 }
 
-module.exports = BirthDataAnalysisService;
+export default BirthDataAnalysisService;

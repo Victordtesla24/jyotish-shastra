@@ -1,4 +1,4 @@
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
 
 // JWT secret should be set in environment variables
 const JWT_SECRET = process.env.JWT_SECRET || 'your-default-secret';
@@ -32,7 +32,7 @@ function optional(req, res, next) {
   next();
 }
 
-module.exports = {
+export default {
   required,
   optional
 };

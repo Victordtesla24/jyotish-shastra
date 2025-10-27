@@ -4,7 +4,7 @@
  * Covers Section 7: Dasha Analysis: Timeline of Life Events from requirements
  */
 
-const moment = require('moment-timezone');
+import moment from 'moment-timezone';
 
 class DetailedDashaAnalysisService {
   constructor() {
@@ -1120,4 +1120,4 @@ class DetailedDashaAnalysisService {
   }
 }
 
-module.exports = DetailedDashaAnalysisService;
+export default DetailedDashaAnalysisService;

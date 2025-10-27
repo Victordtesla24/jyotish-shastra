@@ -6,4 +6,4 @@ function analyzeDashamsaCareer(dashamsaChart) {
   return { tenthHouse, tenthLord };
 }
 
-module.exports = { analyzeDashamsaCareer };
+export default DashamasAnalyzer;

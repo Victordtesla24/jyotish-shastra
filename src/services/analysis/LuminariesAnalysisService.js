@@ -1284,4 +1284,4 @@ class LuminariesAnalysisService {
   }
 }
 
-module.exports = LuminariesAnalysisService;
+export default LuminariesAnalysisService;

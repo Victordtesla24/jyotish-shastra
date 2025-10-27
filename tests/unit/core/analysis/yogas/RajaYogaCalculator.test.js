@@ -1,4 +1,4 @@
-const RajaYogaCalculator = require('../../../../../src/core/analysis/yogas/RajaYogaCalculator');
+const RajaYogaCalculator = require('../../../../../src/core/analysis/yogas/RajaYogaCalculator').default;
 
 describe('RajaYogaCalculator', () => {
   let calculator;

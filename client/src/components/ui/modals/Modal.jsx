@@ -16,8 +16,12 @@ const Modal = ({
   showCloseButton = true,
   variant = 'default',
   className,
+  ariaLabelledBy,
+  ariaDescribedBy,
 }) => {
   const modalRef = useRef(null);
+  const titleId = useRef(`modal-title-${Math.random().toString(36).substr(2, 9)}`).current;
+  const descId = useRef(`modal-desc-${Math.random().toString(36).substr(2, 9)}`).current;
 
   // Handle escape key press
   useEffect(() => {
@@ -124,10 +128,14 @@ const Modal = ({
               className
             )}
             onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={ariaLabelledBy || (title ? titleId : undefined)}
+            aria-describedby={ariaDescribedBy || (description ? descId : undefined)}
           >
             {/* Decorative elements for cosmic/vedic variants */}
             {(variant === 'cosmic' || variant === 'vedic') && (
-              <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
+              <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none" aria-hidden="true">
                 <div className="absolute -top-20 -left-20 w-40 h-40 bg-white/10 rounded-full blur-3xl" />
                 <div className="absolute -bottom-20 -right-20 w-60 h-60 bg-white/10 rounded-full blur-3xl" />
               </div>
@@ -138,18 +146,24 @@ const Modal = ({
               <div className="flex items-start justify-between p-6 pb-4">
                 <div className="space-y-1">
                   {title && (
-                    <h2 className={cn(
+                    <h2
+                      id={titleId}
+                      className={cn(
                       'text-2xl font-cinzel font-bold',
                       variant === 'cosmic' || variant === 'vedic' ? 'text-white' : 'text-vedic-text'
-                    )}>
+                      )}
+                    >
                       {title}
                     </h2>
                   )}
                   {description && (
-                    <p className={cn(
+                    <p
+                      id={descId}
+                      className={cn(
                       'text-sm',
                       variant === 'cosmic' || variant === 'vedic' ? 'text-white/80' : 'text-vedic-text-muted'
-                    )}>
+                      )}
+                    >
                       {description}
                     </p>
                   )}
@@ -173,6 +187,7 @@ const Modal = ({
                       strokeWidth="2"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
+                      aria-hidden="true"
                     >
                       <path d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -181,7 +196,7 @@ const Modal = ({
               </div>
 
               {/* Content */}
-              <div className="px-6 pb-6 max-h-[60vh] overflow-y-auto scrollbar-vedic">
+              <div className="px-6 pb-6 max-h-[60vh] overflow-y-auto scrollbar-vedic" role="document">
                 {children}
               </div>
 

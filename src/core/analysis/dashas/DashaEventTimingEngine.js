@@ -1054,4 +1054,4 @@ class DashaEventTimingEngine {
   }
 }
 
-module.exports = DashaEventTimingEngine;
+export default DashaEventTimingEngine;

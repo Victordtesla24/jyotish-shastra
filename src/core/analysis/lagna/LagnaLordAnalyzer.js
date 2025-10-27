@@ -162,18 +162,298 @@ class LagnaLordAnalyzer {
   }
 
   /**
-   * Check for Neecha Bhanga Yoga
+   * Check for Neecha Bhanga Yoga (Complete Traditional Implementation)
    * @param {Object} planetPosition - Debilitated planet position
    * @param {Object} chart - Chart data
    * @returns {Object} - Neecha Bhanga status
    */
   static checkNeechaBhangaYoga(planetPosition, chart) {
-    // Simplified check - in practice would be more complex
-    return {
-      isPresent: false,
-      type: null,
-      description: 'Neecha Bhanga Yoga analysis would require more complex calculations'
+    const debilitatedPlanet = planetPosition.planet;
+    const debilitatedHouse = planetPosition.house;
+    const planetLongitude = planetPosition.longitude || 0;
+
+    // Define debilitation signs and degrees
+    const debilitationData = {
+      'Sun': { sign: 'Libra', exactDegree: 10, signIndex: 7 },
+      'Moon': { sign: 'Scorpio', exactDegree: 3, signIndex: 8 },
+      'Mars': { sign: 'Cancer', exactDegree: 28, signIndex: 4 },
+      'Mercury': { sign: 'Pisces', exactDegree: 15, signIndex: 12 },
+      'Jupiter': { sign: 'Capricorn', exactDegree: 5, signIndex: 10 },
+      'Venus': { sign: 'Virgo', exactDegree: 27, signIndex: 6 },
+      'Saturn': { sign: 'Aries', exactDegree: 20, signIndex: 1 }
     };
+
+    const debilData = debilitationData[debilitatedPlanet];
+    if (!debilData) {
+      return {
+        isPresent: false,
+        type: null,
+        description: `${debilitatedPlanet} is not a debilitable planet`
+      };
+    }
+
+    // Check if planet is actually debilitated
+    const currentSign = this.getSignFromLongitude(planetLongitude);
+    if (currentSign !== debilData.sign) {
+      return {
+        isPresent: false,
+        type: null,
+        description: `${debilitatedPlanet} is not in its debilitation sign`
+      };
+    }
+
+    const neechaBhangaTypes = [];
+    const planets = Array.isArray(chart.planetaryPositions) ?
+      chart.planetaryPositions : Object.values(chart.planetaryPositions);
+
+    // Rule 1: Lord of debilitation sign is in Kendra from Lagna or Moon
+    const debilSignLord = this.getSignRuler(debilData.sign);
+    const debilSignLordPosition = this.findPlanetPosition(planets, debilSignLord);
+
+    if (debilSignLordPosition) {
+      const kendraFromLagna = this.isInKendraFromReference(debilSignLordPosition.house, 1);
+      const moonPosition = this.findPlanetPosition(planets, 'Moon');
+      const kendraFromMoon = moonPosition ?
+        this.isInKendraFromReference(debilSignLordPosition.house, moonPosition.house) : false;
+
+      if (kendraFromLagna || kendraFromMoon) {
+        neechaBhangaTypes.push({
+          type: 'debil_sign_lord_kendra',
+          description: `${debilSignLord}, lord of ${debilData.sign} (debilitation sign), is in Kendra`,
+          strength: 85
+        });
+      }
+    }
+
+    // Rule 2: Lord of exaltation sign of debilitated planet is in Kendra
+    const exaltSignLord = this.getExaltationSignLord(debilitatedPlanet);
+    const exaltSignLordPosition = this.findPlanetPosition(planets, exaltSignLord);
+
+    if (exaltSignLordPosition) {
+      const kendraFromLagna = this.isInKendraFromReference(exaltSignLordPosition.house, 1);
+      const moonPosition = this.findPlanetPosition(planets, 'Moon');
+      const kendraFromMoon = moonPosition ?
+        this.isInKendraFromReference(exaltSignLordPosition.house, moonPosition.house) : false;
+
+      if (kendraFromLagna || kendraFromMoon) {
+        neechaBhangaTypes.push({
+          type: 'exalt_sign_lord_kendra',
+          description: `Lord of exaltation sign is in Kendra from Lagna or Moon`,
+          strength: 80
+        });
+      }
+    }
+
+    // Rule 3: Debilitated planet is aspected by its own sign lord or exaltation sign lord
+    const ownSignLord = this.getOwnSignLord(debilitatedPlanet);
+    const aspectingPlanets = this.findAspectingPlanets(chart, debilitatedHouse);
+
+    const aspectedByOwnLord = aspectingPlanets.some(asp => asp.planet === ownSignLord);
+    const aspectedByExaltLord = aspectingPlanets.some(asp => asp.planet === exaltSignLord);
+
+    if (aspectedByOwnLord) {
+      neechaBhangaTypes.push({
+        type: 'aspected_by_own_lord',
+        description: `${debilitatedPlanet} is aspected by its own sign lord ${ownSignLord}`,
+        strength: 75
+      });
+    }
+
+    if (aspectedByExaltLord) {
+      neechaBhangaTypes.push({
+        type: 'aspected_by_exalt_lord',
+        description: `${debilitatedPlanet} is aspected by its exaltation sign lord`,
+        strength: 75
+      });
+    }
+
+    // Rule 4: Debilitated planet is in conjunction with its own sign lord or exaltation sign lord
+    const conjunctions = this.analyzeConjunctions(planetPosition, planets);
+    const conjunctOwnLord = conjunctions.conjunctions.some(conj => conj.planet === ownSignLord);
+    const conjunctExaltLord = conjunctions.conjunctions.some(conj => conj.planet === exaltSignLord);
+
+    if (conjunctOwnLord) {
+      neechaBhangaTypes.push({
+        type: 'conjunct_own_lord',
+        description: `${debilitatedPlanet} is conjunct with its own sign lord ${ownSignLord}`,
+        strength: 90
+      });
+    }
+
+    if (conjunctExaltLord) {
+      neechaBhangaTypes.push({
+        type: 'conjunct_exalt_lord',
+        description: `${debilitatedPlanet} is conjunct with its exaltation sign lord`,
+        strength: 85
+      });
+    }
+
+    // Rule 5: Debilitated planet exchanges signs with another planet (Parivartana Yoga)
+    const parivartanaYoga = this.checkParivartanaYoga(planetPosition, chart);
+    if (parivartanaYoga.hasParivartana) {
+      neechaBhangaTypes.push({
+        type: 'parivartana_yoga',
+        description: `${debilitatedPlanet} is in Parivartana Yoga, creating Neecha Bhanga`,
+        strength: 80
+      });
+    }
+
+    // Rule 6: Debilitated planet is exalted in Navamsa
+    const navamsaSign = this.getNavamsaSign(planetLongitude, currentSign);
+    const exaltationSign = this.getExaltationSign(debilitatedPlanet);
+
+    if (navamsaSign === exaltationSign) {
+      neechaBhangaTypes.push({
+        type: 'exalted_navamsa',
+        description: `${debilitatedPlanet} is exalted in Navamsa (D9), creating powerful Neecha Bhanga`,
+        strength: 95
+      });
+    }
+
+    // Rule 7: Debilitated planet is in own sign in Navamsa
+    const ownSigns = this.getOwnSigns(debilitatedPlanet);
+    if (ownSigns.includes(navamsaSign)) {
+      neechaBhangaTypes.push({
+        type: 'own_sign_navamsa',
+        description: `${debilitatedPlanet} is in its own sign in Navamsa, creating Neecha Bhanga`,
+        strength: 70
+      });
+    }
+
+    // Calculate overall Neecha Bhanga strength
+    const overallStrength = neechaBhangaTypes.length > 0 ?
+      Math.max(...neechaBhangaTypes.map(t => t.strength)) : 0;
+
+    const isPresent = neechaBhangaTypes.length > 0;
+    const primaryType = isPresent ?
+      neechaBhangaTypes.reduce((prev, current) =>
+        (prev.strength > current.strength) ? prev : current
+      ) : null;
+
+    return {
+      isPresent,
+      type: primaryType?.type || null,
+      strength: overallStrength,
+      allTypes: neechaBhangaTypes,
+      description: isPresent ?
+        `Neecha Bhanga Yoga is present for ${debilitatedPlanet}. ${primaryType.description}. Strength: ${overallStrength}%` :
+        `No Neecha Bhanga Yoga found for ${debilitatedPlanet}`,
+      effects: isPresent ? this.getNeechaBhangaEffects(debilitatedPlanet, overallStrength) : null
+    };
+  }
+
+  /**
+   * Get sign from longitude
+   */
+  static getSignFromLongitude(longitude) {
+    const signs = [
+      'Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo',
+      'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'
+    ];
+    const signIndex = Math.floor(longitude / 30);
+    return signs[signIndex] || 'Aries';
+  }
+
+  /**
+   * Get sign ruler
+   */
+  static getSignRuler(sign) {
+    const rulers = {
+      'Aries': 'Mars', 'Taurus': 'Venus', 'Gemini': 'Mercury', 'Cancer': 'Moon',
+      'Leo': 'Sun', 'Virgo': 'Mercury', 'Libra': 'Venus', 'Scorpio': 'Mars',
+      'Sagittarius': 'Jupiter', 'Capricorn': 'Saturn', 'Aquarius': 'Saturn', 'Pisces': 'Jupiter'
+    };
+    return rulers[sign] || 'Sun';
+  }
+
+  /**
+   * Get exaltation sign lord
+   */
+  static getExaltationSignLord(planet) {
+    const exaltationSigns = {
+      'Sun': 'Aries', 'Moon': 'Taurus', 'Mars': 'Capricorn', 'Mercury': 'Virgo',
+      'Jupiter': 'Cancer', 'Venus': 'Pisces', 'Saturn': 'Libra'
+    };
+    const exaltSign = exaltationSigns[planet];
+    return exaltSign ? this.getSignRuler(exaltSign) : 'Sun';
+  }
+
+  /**
+   * Get own sign lord (returns the planet itself as it rules its own signs)
+   */
+  static getOwnSignLord(planet) {
+    return planet; // The planet is the lord of its own signs
+  }
+
+  /**
+   * Get exaltation sign
+   */
+  static getExaltationSign(planet) {
+    const exaltationSigns = {
+      'Sun': 'Aries', 'Moon': 'Taurus', 'Mars': 'Capricorn', 'Mercury': 'Virgo',
+      'Jupiter': 'Cancer', 'Venus': 'Pisces', 'Saturn': 'Libra'
+    };
+    return exaltationSigns[planet] || 'Aries';
+  }
+
+  /**
+   * Get own signs of a planet
+   */
+  static getOwnSigns(planet) {
+    const ownSigns = {
+      'Sun': ['Leo'],
+      'Moon': ['Cancer'],
+      'Mars': ['Aries', 'Scorpio'],
+      'Mercury': ['Gemini', 'Virgo'],
+      'Jupiter': ['Sagittarius', 'Pisces'],
+      'Venus': ['Taurus', 'Libra'],
+      'Saturn': ['Capricorn', 'Aquarius']
+    };
+    return ownSigns[planet] || [];
+  }
+
+  /**
+   * Check if house is in Kendra from reference
+   */
+  static isInKendraFromReference(house, referenceHouse) {
+    const kendraPositions = [1, 4, 7, 10];
+    const relativePosition = ((house - referenceHouse + 12) % 12) + 1;
+    return kendraPositions.includes(relativePosition);
+  }
+
+  /**
+   * Get Neecha Bhanga effects
+   */
+  static getNeechaBhangaEffects(planet, strength) {
+    const effects = {
+      positive: [],
+      negative: [],
+      timing: '',
+      remedies: []
+    };
+
+    if (strength >= 80) {
+      effects.positive.push('Transforms debilitation into strength');
+      effects.positive.push('Late bloomer success pattern');
+      effects.positive.push('Extraordinary achievements through struggle');
+      effects.timing = 'Effects manifest strongly after age 30-35';
+    } else if (strength >= 60) {
+      effects.positive.push('Partially neutralizes debilitation');
+      effects.positive.push('Mixed results with eventual improvement');
+      effects.timing = 'Gradual improvement throughout life';
+    } else {
+      effects.positive.push('Mild relief from debilitation effects');
+      effects.timing = 'Sporadic relief periods';
+    }
+
+    effects.negative.push('Initial struggles and setbacks');
+    effects.negative.push('Need for extra effort in related areas');
+
+    effects.remedies.push(`Strengthen ${planet} through appropriate remedies`);
+    effects.remedies.push('Practice patience and perseverance');
+    effects.remedies.push('Focus on spiritual growth');
+
+    return effects;
   }
 
   /**

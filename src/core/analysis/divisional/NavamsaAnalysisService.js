@@ -6,7 +6,7 @@
  * Based on classical Vedic astrology texts including Brihat Parashara Hora Shastra
  */
 
-const { getSign, getSignIndex, getSignLord, getHouseFromLongitude } = require('../../../utils/helpers/astrologyHelpers');
+import { getSign, getSignIndex, getSignLord, getHouseFromLongitude } from '../../../utils/helpers/astrologyHelpers.js';
 
 class NavamsaAnalysisService {
   constructor(d1Chart = null, d9Chart = null) {
@@ -1228,11 +1228,128 @@ class NavamsaAnalysisService {
   }
 
   /**
-   * PRODUCTION-GRADE: Basic combustion check to prevent undefined method calls
+   * PRODUCTION-GRADE: Complete combustion check with traditional astronomical calculations
    */
   isBasicCombust(planet) {
-    // Simplified combustion check - always return false to avoid complex calculations
-    // In production, this would check proximity to Sun
+    // Complete combustion calculation based on traditional Vedic astronomy
+    if (!planet || !planet.longitude || planet.name === 'Sun') {
+      return false;
+    }
+
+    // Find Sun's position in the chart
+    const sunPosition = this.findSunPosition(planet);
+    if (!sunPosition) {
+      return false;
+    }
+
+    const planetLongitude = planet.longitude;
+    const sunLongitude = sunPosition.longitude;
+
+    // Calculate angular distance between planet and Sun
+    const angularDistance = this.calculateAngularDistance(planetLongitude, sunLongitude);
+
+    // Traditional combustion distances for each planet (in degrees)
+    const combustionDistances = {
+      'Moon': 12,
+      'Mercury': 14,
+      'Venus': 10,
+      'Mars': 17,
+      'Jupiter': 11,
+      'Saturn': 15,
+      'Rahu': 5,
+      'Ketu': 5
+    };
+
+    const combustionDistance = combustionDistances[planet.name];
+    if (!combustionDistance) {
+      return false;
+    }
+
+    // Check if planet is within combustion distance
+    const isCombust = angularDistance <= combustionDistance;
+
+    if (isCombust) {
+      // Additional checks for special cases
+      return this.applySpecialCombustionRules(planet, sunPosition, angularDistance);
+    }
+
+    return false;
+  }
+
+  /**
+   * Find Sun's position from current planetary context
+   */
+  findSunPosition(planet) {
+    // Try to find Sun from chart context
+    if (this.d1Chart && this.d1Chart.planets) {
+      const sun = this.d1Chart.planets.find(p => p.name === 'Sun');
+      if (sun) return sun;
+    }
+
+    if (this.d9Chart && this.d9Chart.planets) {
+      const sun = this.d9Chart.planets.find(p => p.name === 'Sun');
+      if (sun) return sun;
+    }
+
+    // If we can't find Sun in chart, return null
+    return null;
+  }
+
+  /**
+   * Calculate angular distance between two longitudes
+   */
+  calculateAngularDistance(longitude1, longitude2) {
+    const diff = Math.abs(longitude1 - longitude2);
+    return Math.min(diff, 360 - diff);
+  }
+
+  /**
+   * Apply special combustion rules for certain conditions
+   */
+  applySpecialCombustionRules(planet, sunPosition, angularDistance) {
+    // Mercury is not combust when within 14 degrees if retrograde
+    if (planet.name === 'Mercury' && planet.isRetrograde) {
+      return angularDistance <= 12; // Reduced distance for retrograde Mercury
+    }
+
+    // Venus is not combust when within 10 degrees if retrograde
+    if (planet.name === 'Venus' && planet.isRetrograde) {
+      return angularDistance <= 8; // Reduced distance for retrograde Venus
+    }
+
+    // Moon is not combust during New Moon (exact conjunction)
+    if (planet.name === 'Moon' && angularDistance <= 1) {
+      return false; // New Moon is not considered combust
+    }
+
+    // Check for special yogas that cancel combustion
+    if (this.hasCombustionCancellingYoga(planet, sunPosition)) {
+      return false;
+    }
+
+    return true; // Standard combustion applies
+  }
+
+  /**
+   * Check for special yogas that cancel combustion
+   */
+  hasCombustionCancellingYoga(planet, sunPosition) {
+    // Budhaditya Yoga: Mercury with Sun can be beneficial
+    if (planet.name === 'Mercury') {
+      const angularDistance = this.calculateAngularDistance(planet.longitude, sunPosition.longitude);
+      if (angularDistance <= 2) {
+        return true; // Very close Mercury forms Budhaditya Yoga
+      }
+    }
+
+    // Check if planet is in own sign or exaltation
+    const planetSign = this.getSignFromLongitude(planet.longitude);
+    const dignity = this.calculateNavamsaDignity(planet);
+
+    if (dignity === 'Exalted' || dignity === 'Own Sign') {
+      return true; // Strong dignity can overcome combustion
+    }
+
     return false;
   }
 
@@ -2946,4 +3063,4 @@ getSpiritualIndication(planetName, strength) {
 
 }
 
-module.exports = NavamsaAnalysisService;
+export default NavamsaAnalysisService;

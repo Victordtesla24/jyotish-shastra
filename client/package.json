@@ -1,51 +1,30 @@
 {
   "name": "jyotish-shastra-client",
   "version": "1.0.0",
-  "description": "Frontend for Jyotish Shastra Vedic Astrology System",
+  "description": "Vedic Astrology Application - Frontend Client",
   "private": true,
+  "homepage": ".",
   "dependencies": {
-    "@heroicons/react": "^2.2.0",
-    "axios": "^1.6.2",
-    "class-variance-authority": "^0.7.0",
+    "@tanstack/react-query": "^5.83.0",
+    "axios": "^1.5.0",
+    "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "framer-motion": "^11.0.14",
-    "lodash": "^4.17.21",
-    "moment": "^2.29.4",
-    "moment-timezone": "^0.5.43",
-    "prop-types": "^15.8.1",
+    "framer-motion": "^12.23.9",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^3.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-hook-form": "^7.48.2",
-    "react-query": "^3.39.3",
-    "react-router-dom": "^6.20.1",
-    "react-select": "^5.10.1",
-    "recharts": "^2.8.0",
-    "tailwind-merge": "^3.3.1"
-  },
-  "devDependencies": {
-    "@testing-library/jest-dom": "^6.1.5",
-    "@testing-library/react": "^14.3.1",
-    "@testing-library/user-event": "^14.5.1",
-    "autoprefixer": "^10.4.21",
-    "eslint": "^8.55.0",
-    "eslint-config-react-app": "^7.0.1",
-    "identity-obj-proxy": "^3.0.0",
-    "postcss": "^8.5.6",
+    "react-router-dom": "^6.14.2",
     "react-scripts": "5.0.1",
-    "tailwindcss": "^3.4.17"
+    "react-select": "^5.10.2",
+    "react-to-print": "^3.1.1",
+    "web-vitals": "^3.0.0"
   },
   "scripts": {
-    "start": "PORT=3002 react-scripts start",
+    "start": "HOST=localhost react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "lint": "eslint src/",
-    "lint:fix": "eslint src/ --fix",
-    "dev:frontend": "npm start",
-    "dev:backend": "nodemon src/index.js",
-    "dev:logs": "tail -F logs/servers/front-end-server-logs.log | grep --line-buffered -iE 'error|warn|critical'",
-    "dev:backend-logs": "tail -F logs/servers/back-end-server-logs.log | grep --line-buffered -iE 'error|warn|404|stack'",
-    "dev:all": "npm run dev:backend & npm run dev:frontend & sleep 3 && npm run dev:logs & npm run dev:backend-logs"
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
@@ -65,9 +44,16 @@
       "last 1 safari version"
     ]
   },
-  "jest": {
-    "moduleNameMapper": {
-      "\\.(css|less)$": "identity-obj-proxy"
-    }
+  "proxy": "http://localhost:3001",
+  "devDependencies": {
+    "@babel/preset-env": "^7.28.0",
+    "@babel/preset-react": "^7.27.1",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.1.0",
+    "@testing-library/user-event": "^14.5.2",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "puppeteer": "^23.11.1",
+    "tailwindcss": "^3.4.17"
   }
 }

@@ -11,4 +11,4 @@ function calculateDivisionalStrength(planet, divisionalCharts) {
   return strengths;
 }
 
-module.exports = { calculateDivisionalStrength };
+export default DivisionalStrengthCalculator;

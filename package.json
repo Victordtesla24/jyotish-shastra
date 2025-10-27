@@ -1,117 +1,80 @@
 {
-  "name": "jyotish-shastra-backend",
-  "version": "1.0.0",
-  "description": "Expert-level Vedic Astrology Analysis System Backend",
-  "main": "src/index.js",
+  "name": "vedic-chart-app",
+  "type": "module",
   "scripts": {
+    "dev": "node src/index.js",
     "start": "node src/index.js",
-    "dev": "nodemon src/index.js",
-    "test": "jest",
-    "test:unit": "jest --testPathPattern=tests/unit",
-    "test:integration": "jest --testPathPattern=tests/integration",
-    "test:system": "jest --testPathPattern=tests/system",
-    "test:e2e": "cypress run",
-    "lint": "eslint .",
-    "format": "prettier --write .",
-    "setup": "bash scripts/setup.sh",
-    "dev:frontend": "cd client && npm start",
-    "dev:backend": "nodemon src/index.js",
-    "dev:logs": "tail -F logs/servers/front-end-server-logs.log | grep --line-buffered -iE 'error|warn|critical'",
-    "dev:backend-logs": "tail -F logs/servers/back-end-server-logs.log | grep --line-buffered -iE 'error|warn|404|stack'",
-    "dev:all": "npm run dev:backend & npm run dev:frontend & sleep 3 && npm run dev:logs & npm run dev:backend-logs",
-    "detect-duplicates": "node scripts/duplicate-detector.js",
-    "detect-duplicates:scan": "node scripts/duplicate-detector.js scan",
-    "detect-duplicates:remove": "node scripts/duplicate-detector.js remove",
-    "detect-duplicates:analyze": "node scripts/duplicate-detector.js analyze",
-    "detect-duplicates:interactive": "node scripts/duplicate-detector.js interactive",
-    "check-duplicates": "npm run detect-duplicates",
-    "clean-duplicates": "npm run detect-duplicates:remove",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test": "jest --verbose",
+    "test:transformers": "jest --testNamePattern=\"dataTransformers\" --verbose",
+    "test:chart": "jest src/components/__tests__/VedicChartDisplay.test.js --verbose",
+    "test:chart-watch": "jest src/components/__tests__/VedicChartDisplay.test.js --watch",
+    "test:chart-coverage": "jest src/components/__tests__/VedicChartDisplay.test.js --coverage",
+    "test:e2e": "cypress run --spec cypress/e2e/vedic-chart-e2e.cy.js",
+    "test:e2e-open": "cypress open",
+    "test:e2e-headed": "cypress run --spec cypress/e2e/vedic-chart-e2e.cy.js --headed",
+    "validate:chart": "node scripts/validate-chart.js",
+    "test:all-chart": "npm run validate:chart && npm run test:chart && npm run test:e2e",
+    "test:visual": "node scripts/visual-comparison.js",
+    "lint:chart": "eslint src/components/VedicChartDisplay.jsx",
+    "format:chart": "prettier --write src/components/VedicChartDisplay.jsx"
   },
-  "keywords": [
-    "vedic-astrology",
-    "jyotish",
-    "kundli",
-    "birth-chart",
-    "astrology-api"
-  ],
-  "author": "Vedic Astrology Team",
-  "license": "MIT",
   "dependencies": {
-    "@faker-js/faker": "^8.4.1",
-    "@google/generative-ai": "^0.16.0",
-    "axios": "^1.7.2",
+    "axios": "^1.10.0",
     "bcryptjs": "^2.4.3",
-    "body-parser": "^1.20.2",
-    "chai": "^5.1.1",
-    "chalk": "^5.3.0",
-    "clsx": "^2.1.1",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
-    "cross-env": "^7.0.3",
-    "date-fns": "^3.6.0",
-    "express": "^4.19.2",
-    "express-rate-limit": "^7.4.0",
-    "express-validator": "^7.1.0",
-    "faker": "^5.5.3",
+    "dotenv": "^16.6.1",
+    "express": "^4.18.2",
     "helmet": "^7.1.0",
-    "identity-obj-proxy": "^3.0.0",
     "joi": "^17.11.0",
     "jsonwebtoken": "^9.0.2",
-    "knex": "^3.1.0",
-    "lodash": "^4.17.21",
-    "luxon": "^3.4.4",
+    "moment": "^2.30.1",
     "moment-timezone": "^0.5.43",
-    "mongoose": "^8.0.3",
+    "mongoose": "^8.16.1",
     "morgan": "^1.10.0",
     "opencage-api-client": "^1.1.0",
-    "react-hook-form": "^7.58.1",
-    "react-query": "^3.39.3",
-    "redis": "^4.6.10",
-    "swisseph": "^0.5.17",
-    "tailwind-merge": "^3.3.1",
-    "uuid": "^11.1.0"
+    "swisseph": "^0.5.17"
   },
   "devDependencies": {
-    "@babel/core": "^7.25.2",
-    "@babel/preset-env": "^7.25.2",
-    "@babel/preset-react": "^7.24.7",
-    "@babel/preset-typescript": "^7.24.7",
-    "@cypress/webpack-preprocessor": "^6.0.4",
-    "cypress": "^14.5.0",
-    "dotenv": "^17.0.0",
+    "@babel/preset-env": "^7.28.0",
+    "@babel/preset-react": "^7.27.1",
+    "@babel/preset-typescript": "^7.27.1",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^14.3.1",
+    "@testing-library/user-event": "^14.6.1",
+    "babel-jest": "^30.0.5",
+    "cypress": "^13.6.0",
     "eslint": "^8.55.0",
-    "eslint-config-standard": "^17.1.0",
-    "eslint-plugin-import": "^2.29.0",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^6.1.1",
-    "eslint-plugin-react": "^7.35.0",
+    "husky": "^8.0.3",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
-    "jest-transform-css": "^6.0.1",
-    "nodemon": "^3.1.10",
-    "npm-run-all": "^4.1.5",
-    "supertest": "^7.0.0",
-    "typescript": "^5.8.3",
-    "wtfnode": "^0.10.0"
+    "jest-transform-css": "^6.0.3",
+    "lint-staged": "^15.2.0",
+    "prettier": "^3.1.0",
+    "puppeteer": "^24.15.0",
+    "supertest": "^7.1.4"
   },
-  "overrides": {
-    "util": ">=0.12.5",
-    "extend": ">=3.0.2",
-    "http-proxy": ">=1.18.1",
-    "strong-log-transformer": ">=2.1.0"
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged && npm run test:chart"
+    }
   },
-  "engines": {
-    "node": ">=18.0.0",
-    "npm": ">=8.0.0"
+  "lint-staged": {
+    "src/components/VedicChartDisplay.jsx": [
+      "eslint --fix",
+      "prettier --write"
+    ]
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/your-org/jyotish-shastra.git"
-  },
-  "bugs": {
-    "url": "https://github.com/your-org/jyotish-shastra/issues"
-  },
-  "homepage": "https://github.com/your-org/jyotish-shastra#readme"
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
 }

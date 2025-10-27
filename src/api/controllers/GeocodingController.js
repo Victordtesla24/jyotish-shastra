@@ -1,4 +1,4 @@
-const GeocodingService = require('../../services/geocoding/GeocodingService');
+import GeocodingService from '../../services/geocoding/GeocodingService.js';
 
 class GeocodingController {
   constructor() {
@@ -18,7 +18,10 @@ class GeocodingController {
         return res.status(400).json({ success: false, message: 'placeOfBirth is required' });
       }
       const locationData = await this.geocodingService.geocodeLocation({ placeOfBirth });
-      res.json({ success: true, ...locationData });
+      res.json({
+        success: true,
+        data: locationData
+      });
     } catch (error) {
       // Provide clearer HTTP status codes for known geocoding errors
       const lower = error.message.toLowerCase();
@@ -39,10 +42,48 @@ class GeocodingController {
         });
       }
 
-      if (lower.includes('rate limit')) {
-        return res.status(429).json({
+      // Fall back to generic 500 for unexpected errors
+      next(error);
+    }
+  }
+
+  /**
+   * Geocodes a location from query parameter to coordinates.
+   * @param {object} req - Express request object.
+   * @param {object} res - Express response object.
+   * @param {function} next - Express next middleware function.
+   */
+  async getCoordinates(req, res, next) {
+    try {
+      const { location } = req.query;
+      if (!location) {
+        return res.status(400).json({
           success: false,
-          message: 'Geocoding rate-limit exceeded',
+          message: 'location query parameter is required'
+        });
+      }
+
+      const locationData = await this.geocodingService.geocodeLocation({ placeOfBirth: location });
+      res.json({
+        success: true,
+        data: locationData
+      });
+    } catch (error) {
+      // Provide clearer HTTP status codes for known geocoding errors
+      const lower = error.message.toLowerCase();
+
+      if (lower.includes('location not found')) {
+        return res.status(404).json({
+          success: false,
+          message: 'Location not found',
+          details: error.message
+        });
+      }
+
+      if (lower.includes('api key')) {
+        return res.status(503).json({
+          success: false,
+          message: 'Geocoding service unavailable – API key issue',
           details: error.message
         });
       }
@@ -94,4 +135,4 @@ class GeocodingController {
   }
 }
 
-module.exports = GeocodingController;
+export default GeocodingController;

@@ -726,4 +726,4 @@ class ExaltationDebilitationCalculator {
   }
 }
 
-module.exports = ExaltationDebilitationCalculator;
+export default ExaltationDebilitationCalculator;

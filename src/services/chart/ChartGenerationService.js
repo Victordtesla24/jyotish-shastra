@@ -4,21 +4,23 @@
  * Enhanced with geocoding integration and comprehensive analysis
  */
 
-const swisseph = require('swisseph');
-const { v4: uuidv4 } = require('uuid');
-const moment = require('moment-timezone');
-const GeocodingService = require('../geocoding/GeocodingService');
-const astroConfig = require('../../config/astro-config');
-const {
+import swisseph from 'swisseph';
+import { v4 as uuidv4 } from 'uuid';
+import moment from 'moment-timezone';
+import GeocodingService from '../geocoding/GeocodingService.js';
+import astroConfig from '../../config/astro-config.js';
+import {
   getSign,
   getSignName,
   calculateNavamsa,
   getNakshatra,
   calculatePlanetaryDignity,
   calculateHouseNumber,
-} = require('../../utils/helpers/astrologyHelpers');
-const { SWISS_EPHEMERIS, PLANETARY_DATA, ZODIAC_SIGNS } = require('../../utils/constants/astronomicalConstants');
-const BirthDataAnalysisService = require('../analysis/BirthDataAnalysisService');
+} from '../../utils/helpers/astrologyHelpers.js';
+import { SWISS_EPHEMERIS, PLANETARY_DATA, ZODIAC_SIGNS } from '../../utils/constants/astronomicalConstants.js';
+import BirthDataAnalysisService from '../analysis/BirthDataAnalysisService.js';
+import DetailedDashaAnalysisService from '../analysis/DetailedDashaAnalysisService.js';
+import AscendantCalculator from '../../core/calculations/chart-casting/AscendantCalculator.js';
 
 class ChartGenerationService {
   constructor(geocodingService) {
@@ -46,26 +48,58 @@ class ChartGenerationService {
    * @returns {Object} Complete chart data
    */
   async generateComprehensiveChart(birthData) {
+    console.log('🚀 CHART GENERATION SERVICE - Starting comprehensive chart generation...');
+    console.log('📊 Input Birth Data:', JSON.stringify(birthData, null, 2));
+
     try {
       // Validate birth data
-      this.validateBirthData(birthData);
+      console.log('🔍 Step 1: Validating birth data...');
+      const isValid = this.validateBirthData(birthData);
+      if (!isValid) {
+        throw new Error('Birth data validation failed');
+      }
+      console.log('✅ Birth data validation passed');
 
       // Geocode location if coordinates not provided
+      console.log('🔍 Step 2: Processing location data...');
       const geocodedData = await this.processLocationData(birthData);
+      console.log('✅ Location data processed:', {
+        latitude: geocodedData.latitude,
+        longitude: geocodedData.longitude,
+        geocodingInfo: geocodedData.geocodingInfo
+      });
 
       // Generate Rasi chart
+      console.log('🔍 Step 3: Generating Rasi chart...');
       const rasiChart = await this.generateRasiChart(geocodedData);
+      console.log('✅ Rasi chart generated:', {
+        ascendant: rasiChart.ascendant,
+        planetsCount: Object.keys(rasiChart.planetaryPositions || {}).length,
+        housesCount: rasiChart.housePositions?.length || 0
+      });
 
       // Generate Navamsa chart
+      console.log('🔍 Step 4: Generating Navamsa chart...');
       const navamsaChart = await this.generateNavamsaChart(geocodedData);
+      console.log('✅ Navamsa chart generated:', {
+        ascendant: navamsaChart.ascendant,
+        planetsCount: Object.keys(navamsaChart.planetaryPositions || {}).length
+      });
 
       // Calculate Dasha information
+      console.log('🔍 Step 5: Calculating Dasha information...');
       const dashaInfo = this.calculateDashaInfo(rasiChart);
+      console.log('✅ Dasha info calculated:', {
+        birthDasha: dashaInfo.birthDasha,
+        currentDasha: dashaInfo.currentDasha
+      });
 
       // Generate comprehensive analysis
+      console.log('🔍 Step 6: Generating comprehensive analysis...');
       const analysis = await this.generateComprehensiveAnalysis(rasiChart, navamsaChart);
+      console.log('✅ Analysis generated:', Object.keys(analysis));
 
-      return {
+      const result = {
         birthData: geocodedData,
         rasiChart,
         navamsaChart,
@@ -73,7 +107,21 @@ class ChartGenerationService {
         analysis,
         generatedAt: new Date().toISOString()
       };
+
+      console.log('🎉 CHART GENERATION SERVICE - Comprehensive chart generation completed successfully!');
+      console.log('📈 Result structure:', {
+        hasBirthData: !!result.birthData,
+        hasRasiChart: !!result.rasiChart,
+        hasNavamsaChart: !!result.navamsaChart,
+        hasDashaInfo: !!result.dashaInfo,
+        hasAnalysis: !!result.analysis,
+        generatedAt: result.generatedAt
+      });
+
+      return result;
     } catch (error) {
+      console.error('❌ CHART GENERATION SERVICE - Error during chart generation:', error);
+      console.error('❌ Error stack:', error.stack);
       throw new Error(`Failed to generate comprehensive chart: ${error.message}`);
     }
   }
@@ -305,7 +353,7 @@ class ChartGenerationService {
    */
   async calculateAscendant(jd, placeOfBirth) {
     try {
-      const ascendantCalculator = new (require('../../core/calculations/chart-casting/AscendantCalculator'))();
+      const ascendantCalculator = new AscendantCalculator();
       const ascendantData = ascendantCalculator.calculate(jd, placeOfBirth.latitude, placeOfBirth.longitude);
       return ascendantData;
     } catch (error) {
@@ -554,7 +602,6 @@ class ChartGenerationService {
    */
   calculateDashaInfo(rasiChart) {
     // Use DetailedDashaAnalysisService for consistent Dasha calculations
-    const DetailedDashaAnalysisService = require('../analysis/DetailedDashaAnalysisService');
     const dashaService = new DetailedDashaAnalysisService();
 
     // Calculate comprehensive Dasha analysis
@@ -1098,4 +1145,4 @@ class ChartGenerationService {
 
 }
 
-module.exports = ChartGenerationService;
+export default ChartGenerationService;

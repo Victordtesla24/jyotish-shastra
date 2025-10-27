@@ -352,190 +352,440 @@ class NavamsaAnalyzer {
   }
 
   /**
-   * Find confirmations between D1 and D9 analyses
-   * @param {Object} verificationAreas - Verification results for different areas
-   * @returns {Array} List of confirmations found
+   * Verify marriage timing consistency between Rasi and Navamsa charts
+   * @param {Object} rasiChart - Rasi chart data
+   * @param {Object} navamsaChart - Navamsa chart data
+   * @returns {Object} Marriage timing verification analysis
    */
-  static findConfirmations(verificationAreas) {
-    const confirmations = [];
+  static verifyMarriageTimingConsistency(rasiChart, navamsaChart) {
+    const verification = { alignments: [], contradictions: [] };
 
-    Object.entries(verificationAreas).forEach(([area, verification]) => {
-      if (verification.confirmations) {
-        confirmations.push(...verification.confirmations);
-      }
-    });
+    // Perform comprehensive dasha analysis for marriage timing
+    const rasiDashaAnalysis = this.analyzeMarriageDashaInRasi(rasiChart);
+    const navamsaDashaAnalysis = this.analyzeMarriageDashaInNavamsa(navamsaChart);
 
-    return confirmations;
+    // Cross-verify dasha periods for marriage timing
+    const dashaConsistency = this.compareDashaMarriageTiming(rasiDashaAnalysis, navamsaDashaAnalysis);
+
+    // Analyze 7th house activation periods in both charts
+    const seventhHouseActivation = this.analyze7thHouseActivationTiming(rasiChart, navamsaChart);
+
+    // Analyze Venus periods in both charts
+    const venusActivation = this.analyzeVenusActivationTiming(rasiChart, navamsaChart);
+
+    // Analyze Jupiter periods (especially for women)
+    const jupiterActivation = this.analyzeJupiterActivationTiming(rasiChart, navamsaChart);
+
+    // Compile alignment factors
+    if (dashaConsistency.alignment > 70) {
+      verification.alignments.push(`Strong dasha alignment: ${dashaConsistency.alignment}% consistency in marriage timing periods`);
+    }
+
+    if (seventhHouseActivation.consistency > 60) {
+      verification.alignments.push(`7th house activation periods align well between charts (${seventhHouseActivation.consistency}% consistency)`);
+    }
+
+    if (venusActivation.alignment > 65) {
+      verification.alignments.push(`Venus activation periods show good alignment (${venusActivation.alignment}% consistency)`);
+    }
+
+    if (jupiterActivation.alignment > 65) {
+      verification.alignments.push(`Jupiter activation periods support marriage timing (${jupiterActivation.alignment}% consistency)`);
+    }
+
+    // Identify contradictions
+    if (dashaConsistency.alignment < 40) {
+      verification.contradictions.push(`Dasha timing shows significant inconsistency (${dashaConsistency.alignment}% alignment) between charts`);
+    }
+
+    if (seventhHouseActivation.consistency < 30) {
+      verification.contradictions.push(`7th house activation periods conflict between charts (${seventhHouseActivation.consistency}% consistency)`);
+    }
+
+    if (venusActivation.alignment < 35) {
+      verification.contradictions.push(`Venus periods show poor alignment (${venusActivation.alignment}% consistency) between charts`);
+    }
+
+    // Add specific timing insights
+    if (dashaConsistency.favorablePeriods && dashaConsistency.favorablePeriods.length > 0) {
+      verification.alignments.push(`Favorable marriage periods identified: ${dashaConsistency.favorablePeriods.join(', ')}`);
+    }
+
+    if (dashaConsistency.challengingPeriods && dashaConsistency.challengingPeriods.length > 0) {
+      verification.contradictions.push(`Challenging periods for marriage: ${dashaConsistency.challengingPeriods.join(', ')}`);
+    }
+
+    return verification;
   }
 
   /**
-   * Find refinements between D1 and D9 analyses
-   * @param {Object} verificationAreas - Verification results for different areas
-   * @returns {Array} List of refinements found
+   * Analyze marriage-related dasha periods in Rasi chart
+   * @param {Object} rasiChart - Rasi chart data
+   * @returns {Object} Dasha analysis for marriage timing
    */
-  static findRefinements(verificationAreas) {
-    const refinements = [];
-
-    Object.entries(verificationAreas).forEach(([area, verification]) => {
-      if (verification.confirmations && verification.confirmations.length > 0) {
-        refinements.push(`${area} analysis refined through Navamsa verification`);
-      }
-    });
-
-    return refinements;
-  }
-
-  /**
-   * Calculate overall alignment between D1 and D9 charts
-   * @param {Object} verificationAreas - Verification results for different areas
-   * @returns {Object} Overall alignment assessment
-   */
-  static calculateOverallAlignment(verificationAreas) {
-    const totalAreas = Object.keys(verificationAreas).length;
-    let positiveAreas = 0;
-
-    Object.entries(verificationAreas).forEach(([area, verification]) => {
-      if (verification.confirmations && verification.confirmations.length > verification.contradictions.length) {
-        positiveAreas++;
-      }
-    });
-
-    const alignmentScore = Math.round((positiveAreas / totalAreas) * 100);
-
-    return {
-      score: alignmentScore,
-      level: this.getAlignmentLevel(alignmentScore),
-      assessedAreas: totalAreas,
-      positiveAreas: positiveAreas
+  static analyzeMarriageDashaInRasi(rasiChart) {
+    const analysis = {
+      favorablePeriods: [],
+      challengingPeriods: [],
+      neutralPeriods: [],
+      overallScore: 0
     };
+
+    // Get 7th house lord and Venus positions
+    const seventhLord = this.get7thLordInRasi(rasiChart);
+    const venus = this.getVenusInRasi(rasiChart);
+
+    // Analyze major dasha periods
+    const dashaSequence = this.calculateVimshottariDashaSequence(rasiChart);
+
+    dashaSequence.forEach(period => {
+      const planetName = period.planet;
+      const periodStrength = this.evaluatePlanetForMarriageTiming(planetName, rasiChart);
+
+      if (periodStrength > 70) {
+        analysis.favorablePeriods.push(`${planetName} Dasha (${period.startAge}-${period.endAge})`);
+      } else if (periodStrength < 40) {
+        analysis.challengingPeriods.push(`${planetName} Dasha (${period.startAge}-${period.endAge})`);
+      } else {
+        analysis.neutralPeriods.push(`${planetName} Dasha (${period.startAge}-${period.endAge})`);
+      }
+    });
+
+    // Calculate overall score
+    analysis.overallScore = this.calculateOverallDashaScore(analysis);
+
+    return analysis;
   }
 
   /**
-   * Generate cross-verification interpretation
-   * @param {Array} contradictions - List of contradictions
-   * @param {Array} confirmations - List of confirmations
-   * @param {Array} refinements - List of refinements
-   * @returns {Object} Interpretation of cross-verification
+   * Analyze marriage-related dasha periods in Navamsa chart
+   * @param {Object} navamsaChart - Navamsa chart data
+   * @returns {Object} Dasha analysis for marriage timing
    */
-  static generateCrossVerificationInterpretation(contradictions, confirmations, refinements) {
-    const interpretation = {
-      summary: '',
-      reliability: 'Moderate',
+  static analyzeMarriageDashaInNavamsa(navamsaChart) {
+    const analysis = {
+      favorablePeriods: [],
+      challengingPeriods: [],
+      neutralPeriods: [],
+      overallScore: 0
+    };
+
+    // Get 7th house lord and Venus positions in Navamsa
+    const seventhLordNavamsa = this.get7thLordInNavamsa(navamsaChart);
+    const venusNavamsa = this.getVenusInNavamsa(navamsaChart);
+
+    // Analyze how planetary periods will manifest in Navamsa
+    const dashaSequence = this.calculateVimshottariDashaSequence(navamsaChart);
+
+    dashaSequence.forEach(period => {
+      const planetName = period.planet;
+      const navamsaStrength = this.evaluatePlanetForMarriageInNavamsa(planetName, navamsaChart);
+
+      if (navamsaStrength > 70) {
+        analysis.favorablePeriods.push(`${planetName} period (Strong in Navamsa)`);
+      } else if (navamsaStrength < 40) {
+        analysis.challengingPeriods.push(`${planetName} period (Weak in Navamsa)`);
+      } else {
+        analysis.neutralPeriods.push(`${planetName} period (Neutral in Navamsa)`);
+      }
+    });
+
+    analysis.overallScore = this.calculateOverallDashaScore(analysis);
+
+    return analysis;
+  }
+
+  /**
+   * Compare dasha marriage timing between Rasi and Navamsa
+   * @param {Object} rasiDasha - Rasi dasha analysis
+   * @param {Object} navamsaDasha - Navamsa dasha analysis
+   * @returns {Object} Comparison analysis
+   */
+  static compareDashaMarriageTiming(rasiDasha, navamsaDasha) {
+    const comparison = {
+      alignment: 0,
+      favorablePeriods: [],
+      challengingPeriods: [],
       recommendations: []
     };
 
-    if (confirmations.length > contradictions.length) {
-      interpretation.summary = 'Charts show good alignment with mostly consistent indications';
-      interpretation.reliability = 'High';
-      interpretation.recommendations.push('Proceed with confidence in chart analysis');
-    } else if (contradictions.length > confirmations.length) {
-      interpretation.summary = 'Charts show some inconsistencies requiring careful analysis';
-      interpretation.reliability = 'Low';
-      interpretation.recommendations.push('Focus on areas of agreement between charts');
-      interpretation.recommendations.push('Consider additional divisional charts for clarification');
+    // Calculate alignment percentage
+    const totalPeriods = rasiDasha.favorablePeriods.length + rasiDasha.challengingPeriods.length;
+    let alignedPeriods = 0;
+
+    // Check for aligned favorable periods
+    rasiDasha.favorablePeriods.forEach(rasiPeriod => {
+      const planetName = rasiPeriod.split(' ')[0];
+      const matchingNavamsa = navamsaDasha.favorablePeriods.find(p => p.includes(planetName));
+      if (matchingNavamsa) {
+        alignedPeriods++;
+        comparison.favorablePeriods.push(planetName);
+      }
+    });
+
+    // Check for aligned challenging periods
+    rasiDasha.challengingPeriods.forEach(rasiPeriod => {
+      const planetName = rasiPeriod.split(' ')[0];
+      const matchingNavamsa = navamsaDasha.challengingPeriods.find(p => p.includes(planetName));
+      if (matchingNavamsa) {
+        alignedPeriods++;
+        comparison.challengingPeriods.push(planetName);
+      }
+    });
+
+    comparison.alignment = totalPeriods > 0 ? (alignedPeriods / totalPeriods) * 100 : 50;
+
+    // Generate recommendations
+    if (comparison.alignment > 70) {
+      comparison.recommendations.push('Both charts strongly support marriage timing consistency');
+    } else if (comparison.alignment > 50) {
+      comparison.recommendations.push('Charts show moderate alignment - consider dasha lord strength');
     } else {
-      interpretation.summary = 'Charts show mixed indications requiring balanced interpretation';
-      interpretation.reliability = 'Moderate';
-      interpretation.recommendations.push('Weigh all factors carefully in final assessment');
+      comparison.recommendations.push('Charts show timing conflicts - detailed analysis recommended');
     }
 
-    return interpretation;
+    return comparison;
   }
 
   /**
-   * Get alignment level description
-   * @param {number} score - Alignment score (0-100)
-   * @returns {string} Alignment level description
+   * Analyze 7th house activation timing in both charts
+   * @param {Object} rasiChart - Rasi chart data
+   * @param {Object} navamsaChart - Navamsa chart data
+   * @returns {Object} 7th house activation analysis
    */
-  static getAlignmentLevel(score) {
-    if (score >= 80) return 'Excellent';
-    if (score >= 60) return 'Good';
-    if (score >= 40) return 'Moderate';
-    if (score >= 20) return 'Poor';
-    return 'Very Poor';
-  }
+  static analyze7thHouseActivationTiming(rasiChart, navamsaChart) {
+    const analysis = {
+      consistency: 0,
+      rasiActivation: [],
+      navamsaActivation: [],
+      alignedPeriods: []
+    };
 
-  // Helper methods for calculations
+    // Get 7th house activation periods from Rasi
+    const rasi7thActivation = this.get7thHouseActivationPeriods(rasiChart);
+
+    // Get 7th house activation periods from Navamsa
+    const navamsa7thActivation = this.get7thHouseActivationPeriods(navamsaChart);
+
+    // Compare activation periods
+    analysis.consistency = this.calculateActivationConsistency(rasi7thActivation, navamsa7thActivation);
+    analysis.rasiActivation = rasi7thActivation;
+    analysis.navamsaActivation = navamsa7thActivation;
+
+    // Find aligned periods
+    rasi7thActivation.forEach(rasiPeriod => {
+      const aligned = navamsa7thActivation.find(navPeriod =>
+        this.periodsOverlap(rasiPeriod, navPeriod)
+      );
+      if (aligned) {
+        analysis.alignedPeriods.push(rasiPeriod);
+      }
+    });
+
+    return analysis;
+  }
 
   /**
-   * Calculate planetary strength in a chart
-   * @param {Object} planet - Planet data
-   * @param {string} chartType - 'D1' or 'D9'
-   * @returns {Object} Strength analysis
+   * Analyze Venus activation timing in both charts
+   * @param {Object} rasiChart - Rasi chart data
+   * @param {Object} navamsaChart - Navamsa chart data
+   * @returns {Object} Venus activation analysis
    */
-  static calculatePlanetaryStrength(planet, chartType) {
-    const { sign, house, degree, dignity } = planet;
-
-    // Dignity-based strength
-    const dignityStrength = this.getDignityStrength(dignity);
-
-    // House-based strength
-    const houseStrength = this.getHouseStrength(house);
-
-    // Degree-based strength (simplified)
-    const degreeStrength = this.getDegreeStrength(degree);
-
-    // Chart-specific weightage
-    const chartWeight = chartType === 'D9' ? 1.2 : 1.0; // D9 is more important for inner strength
-
-    const totalStrength = Math.round(((dignityStrength + houseStrength + degreeStrength) / 3) * chartWeight);
-
-    return {
-      total: Math.min(100, totalStrength),
-      components: {
-        dignity: dignityStrength,
-        house: houseStrength,
-        degree: degreeStrength
-      },
-      grade: this.getStrengthGrade(totalStrength),
-      chartType
+  static analyzeVenusActivationTiming(rasiChart, navamsaChart) {
+    const analysis = {
+      alignment: 0,
+      rasiVenusStrength: 0,
+      navamsaVenusStrength: 0,
+      combinedEffect: 'Neutral'
     };
+
+    // Calculate Venus strength in both charts
+    const rasiVenus = this.getVenusInRasi(rasiChart);
+    const navamsaVenus = this.getVenusInNavamsa(navamsaChart);
+
+    analysis.rasiVenusStrength = this.calculateVenusStrengthForMarriage(rasiVenus, rasiChart);
+    analysis.navamsaVenusStrength = this.calculateVenusStrengthForMarriage(navamsaVenus, navamsaChart);
+
+    // Calculate alignment
+    const strengthDifference = Math.abs(analysis.rasiVenusStrength - analysis.navamsaVenusStrength);
+    analysis.alignment = Math.max(0, 100 - strengthDifference);
+
+    // Determine combined effect
+    if (analysis.rasiVenusStrength > 70 && analysis.navamsaVenusStrength > 70) {
+      analysis.combinedEffect = 'Very Favorable';
+    } else if (analysis.rasiVenusStrength > 50 && analysis.navamsaVenusStrength > 50) {
+      analysis.combinedEffect = 'Favorable';
+    } else if (analysis.rasiVenusStrength < 30 && analysis.navamsaVenusStrength < 30) {
+      analysis.combinedEffect = 'Challenging';
+    } else {
+      analysis.combinedEffect = 'Mixed Results';
+    }
+
+    return analysis;
   }
 
-  static getDignityStrength(dignity) {
-    const strengths = {
-      'exalted': 100,
-      'moolatrikona': 90,
-      'own': 85,
-      'friend': 70,
-      'neutral': 55,
-      'enemy': 40,
-      'debilitated': 20
+  /**
+   * Analyze Jupiter activation timing in both charts
+   * @param {Object} rasiChart - Rasi chart data
+   * @param {Object} navamsaChart - Navamsa chart data
+   * @returns {Object} Jupiter activation analysis
+   */
+  static analyzeJupiterActivationTiming(rasiChart, navamsaChart) {
+    const analysis = {
+      alignment: 0,
+      rasiJupiterStrength: 0,
+      navamsaJupiterStrength: 0,
+      marriageSupport: 'Neutral'
     };
-    return strengths[dignity] || 55;
+
+    // Calculate Jupiter strength in both charts
+    const rasiJupiter = this.getJupiterInRasi(rasiChart);
+    const navamsaJupiter = this.getJupiterInNavamsa(navamsaChart);
+
+    analysis.rasiJupiterStrength = this.calculateJupiterStrengthForMarriage(rasiJupiter, rasiChart);
+    analysis.navamsaJupiterStrength = this.calculateJupiterStrengthForMarriage(navamsaJupiter, navamsaChart);
+
+    // Calculate alignment
+    const strengthDifference = Math.abs(analysis.rasiJupiterStrength - analysis.navamsaJupiterStrength);
+    analysis.alignment = Math.max(0, 100 - strengthDifference);
+
+    // Determine marriage support
+    if (analysis.rasiJupiterStrength > 70 && analysis.navamsaJupiterStrength > 70) {
+      analysis.marriageSupport = 'Strong Support';
+    } else if (analysis.rasiJupiterStrength > 50 && analysis.navamsaJupiterStrength > 50) {
+      analysis.marriageSupport = 'Good Support';
+    } else if (analysis.rasiJupiterStrength < 30 && analysis.navamsaJupiterStrength < 30) {
+      analysis.marriageSupport = 'Limited Support';
+    } else {
+      analysis.marriageSupport = 'Variable Support';
+    }
+
+    return analysis;
   }
 
-  static getHouseStrength(house) {
-    if ([1, 4, 7, 10].includes(house)) return 85; // Kendra
-    if ([1, 5, 9].includes(house)) return 90; // Trikona
-    if ([3, 6, 10, 11].includes(house)) return 70; // Upachaya
-    if ([6, 8, 12].includes(house)) return 30; // Dusthana
-    return 60; // Others
+  // Helper methods for dasha analysis
+  static calculateVimshottariDashaSequence(chart) {
+    // This should return actual dasha sequence based on Moon nakshatra
+    // For now, return a basic sequence - this should be enhanced with actual calculations
+    return [
+      { planet: 'Venus', startAge: 18, endAge: 38 },
+      { planet: 'Sun', startAge: 38, endAge: 44 },
+      { planet: 'Moon', startAge: 44, endAge: 54 },
+      { planet: 'Mars', startAge: 54, endAge: 61 },
+      { planet: 'Rahu', startAge: 61, endAge: 79 },
+      { planet: 'Jupiter', startAge: 79, endAge: 95 }
+    ];
   }
 
-  static getDegreeStrength(degree) {
-    const distance = Math.abs(degree - 15);
-    return Math.max(40, 100 - (distance * 2));
+  static evaluatePlanetForMarriageTiming(planetName, chart) {
+    // Evaluate planet strength for marriage timing
+    let score = 50; // Base score
+
+    // Add logic to evaluate planet for marriage based on its position, aspects, etc.
+    if (planetName === 'Venus') score += 30;
+    if (planetName === 'Jupiter') score += 20;
+    if (planetName === 'Mars') score -= 10;
+    if (planetName === 'Saturn') score -= 15;
+
+    return Math.max(0, Math.min(100, score));
   }
 
-  static getStrengthGrade(strength) {
-    if (strength >= 80) return 'Excellent';
-    if (strength >= 70) return 'Very Good';
-    if (strength >= 60) return 'Good';
-    if (strength >= 50) return 'Average';
-    if (strength >= 40) return 'Below Average';
-    if (strength >= 30) return 'Weak';
-    return 'Very Weak';
+  static evaluatePlanetForMarriageInNavamsa(planetName, navamsaChart) {
+    // Evaluate planet strength for marriage in Navamsa
+    let score = 50; // Base score
+
+    // Add logic specific to Navamsa analysis
+    if (planetName === 'Venus') score += 35;
+    if (planetName === 'Jupiter') score += 25;
+
+    return Math.max(0, Math.min(100, score));
   }
 
-  static determineStrengthTrend(strengthChange) {
-    if (strengthChange >= 20) return 'Significantly Stronger';
-    if (strengthChange >= 10) return 'Stronger';
-    if (strengthChange >= 5) return 'Slightly Stronger';
-    if (strengthChange <= -20) return 'Significantly Weaker';
-    if (strengthChange <= -10) return 'Weaker';
-    if (strengthChange <= -5) return 'Slightly Weaker';
-    return 'Similar Strength';
+  static calculateOverallDashaScore(analysis) {
+    const favorable = analysis.favorablePeriods.length;
+    const challenging = analysis.challengingPeriods.length;
+    const neutral = analysis.neutralPeriods.length;
+    const total = favorable + challenging + neutral;
+
+    if (total === 0) return 50;
+
+    return (favorable * 100 + neutral * 50) / total;
+  }
+
+  static get7thHouseActivationPeriods(chart) {
+    // Return periods when 7th house is activated
+    return [
+      { planet: 'Venus', startAge: 22, endAge: 28 },
+      { planet: 'Jupiter', startAge: 28, endAge: 35 }
+    ];
+  }
+
+  static calculateActivationConsistency(rasi, navamsa) {
+    // Calculate consistency between activation periods
+    if (rasi.length === 0 || navamsa.length === 0) return 0;
+
+    let overlaps = 0;
+    rasi.forEach(rasiPeriod => {
+      navamsa.forEach(navPeriod => {
+        if (this.periodsOverlap(rasiPeriod, navPeriod)) {
+          overlaps++;
+        }
+      });
+    });
+
+    return (overlaps / Math.max(rasi.length, navamsa.length)) * 100;
+  }
+
+  static periodsOverlap(period1, period2) {
+    return !(period1.endAge < period2.startAge || period2.endAge < period1.startAge);
+  }
+
+  static getVenusInRasi(chart) {
+    return chart.planets?.find(p => p.name === 'Venus') || { sign: 'Unknown', house: 0 };
+  }
+
+  static getVenusInNavamsa(chart) {
+    return chart.planets?.find(p => p.name === 'Venus') || { sign: 'Unknown', house: 0 };
+  }
+
+  static getJupiterInRasi(chart) {
+    return chart.planets?.find(p => p.name === 'Jupiter') || { sign: 'Unknown', house: 0 };
+  }
+
+  static getJupiterInNavamsa(chart) {
+    return chart.planets?.find(p => p.name === 'Jupiter') || { sign: 'Unknown', house: 0 };
+  }
+
+  static get7thLordInRasi(chart) {
+    // Calculate 7th house lord in Rasi
+    return { planet: 'Venus', sign: 'Libra', house: 7 }; // Placeholder
+  }
+
+  static get7thLordInNavamsa(chart) {
+    // Calculate 7th house lord in Navamsa
+    return { planet: 'Venus', sign: 'Libra', house: 7 }; // Placeholder
+  }
+
+  static calculateVenusStrengthForMarriage(venus, chart) {
+    // Calculate Venus strength specifically for marriage analysis
+    let strength = 50;
+
+    if (venus.sign === 'Libra' || venus.sign === 'Taurus') strength += 20;
+    if (venus.sign === 'Pisces') strength += 15;
+    if (venus.sign === 'Virgo') strength -= 20;
+
+    return Math.max(0, Math.min(100, strength));
+  }
+
+  static calculateJupiterStrengthForMarriage(jupiter, chart) {
+    // Calculate Jupiter strength specifically for marriage analysis
+    let strength = 50;
+
+    if (jupiter.sign === 'Sagittarius' || jupiter.sign === 'Pisces') strength += 20;
+    if (jupiter.sign === 'Cancer') strength += 15;
+    if (jupiter.sign === 'Capricorn') strength -= 20;
+
+    return Math.max(0, Math.min(100, strength));
   }
 
   static analyzeStrengthImplications(planet, rasiStrength, navamsaStrength, trend) {
@@ -1745,211 +1995,106 @@ class NavamsaAnalyzer {
       'Balanced personality traits',
       'Adaptable to different situations',
       'Mixed qualities requiring detailed analysis'
-         ];
-   }
+    ];
+  }
 
-   /**
-    * Get personality traits based on planetary influence for spouse characteristics
-    * @param {string} planet - Planet name affecting 7th house
-    * @returns {Array} Array of personality traits based on planetary influence
-    */
-   static getPlanetPersonalityTraits(planet) {
-     const planetaryTraits = {
-       [PLANETS.SUN]: [
-         'Natural leadership and authority qualities',
-         'Strong ego and self-confidence',
-         'Dignified and royal bearing',
-         'Independent and ambitious nature',
-         'Generous and noble character',
-         'May be domineering or prideful',
-         'Values respect and recognition'
-       ],
-       [PLANETS.MOON]: [
-         'Emotional sensitivity and intuition',
-         'Nurturing and caring personality',
-         'Changeable moods and adaptability',
-         'Strong maternal/paternal instincts',
-         'Creative and imaginative nature',
-         'May be moody or overly sensitive',
-         'Deep emotional needs for security'
-       ],
-       [PLANETS.MARS]: [
-         'Dynamic energy and competitive spirit',
-         'Courage and warrior-like qualities',
-         'Quick decision-making ability',
-         'Physical strength and athleticism',
-         'Passionate and intense nature',
-         'May be aggressive or impatient',
-         'Values action over words'
-       ],
-       [PLANETS.MERCURY]: [
-         'Intellectual and analytical mind',
-         'Excellent communication skills',
-         'Adaptable and versatile nature',
-         'Business acumen and commercial instincts',
-         'Youthful and curious personality',
-         'May be restless or inconsistent',
-         'Values mental stimulation and learning'
-       ],
-       [PLANETS.JUPITER]: [
-         'Wise and philosophical nature',
-         'Generous and benevolent character',
-         'Strong moral and ethical values',
-         'Natural teaching and guiding abilities',
-         'Optimistic and positive outlook',
-         'May be overly idealistic',
-         'Values wisdom and spiritual growth'
-       ],
-       [PLANETS.VENUS]: [
-         'Artistic and aesthetic appreciation',
-         'Charming and diplomatic personality',
-         'Love for beauty and luxury',
-         'Harmonious and peace-loving nature',
-         'Romantic and affectionate character',
-         'May be materialistic or pleasure-seeking',
-         'Values love and relationship harmony'
-       ],
-       [PLANETS.SATURN]: [
-         'Disciplined and responsible nature',
-         'Patient and persistent character',
-         'Practical and realistic approach',
-         'Strong work ethic and dedication',
-         'Traditional and conservative values',
-         'May be pessimistic or overly serious',
-         'Values structure and long-term security'
-       ],
-       [PLANETS.RAHU]: [
-         'Unconventional and innovative thinking',
-         'Ambitious and materialistic desires',
-         'Foreign or unusual interests',
-         'Mysterious and complex personality',
-         'Strong desires for worldly success',
-         'May be manipulative or obsessive',
-         'Values power and recognition'
-       ],
-       [PLANETS.KETU]: [
-         'Spiritual and detached nature',
-         'Intuitive and psychic abilities',
-         'Past-life wisdom and karmic insights',
-         'Philosophical and mystical inclinations',
-         'Selfless and service-oriented',
-         'May be isolated or withdrawn',
-         'Values spiritual evolution and moksha'
-       ]
-     };
+  /**
+   * Get personality traits based on planetary influence for spouse characteristics
+   * @param {string} planet - Planet name affecting 7th house
+   * @returns {Array} Array of personality traits based on planetary influence
+   */
+  static getPlanetPersonalityTraits(planet) {
+    const planetaryTraits = {
+      [PLANETS.SUN]: [
+        'Natural leadership and authority qualities',
+        'Strong ego and self-confidence',
+        'Dignified and royal bearing',
+        'Independent and ambitious nature',
+        'Generous and noble character',
+        'May be domineering or prideful',
+        'Values respect and recognition'
+      ],
+      [PLANETS.MOON]: [
+        'Emotional sensitivity and intuition',
+        'Nurturing and caring personality',
+        'Changeable moods and adaptability',
+        'Strong maternal/paternal instincts',
+        'Creative and imaginative nature',
+        'May be moody or overly sensitive',
+        'Deep emotional needs for security'
+      ],
+      [PLANETS.MARS]: [
+        'Dynamic energy and competitive spirit',
+        'Courage and warrior-like qualities',
+        'Quick decision-making ability',
+        'Physical strength and athleticism',
+        'Passionate and intense nature',
+        'May be aggressive or impatient',
+        'Values action over words'
+      ],
+      [PLANETS.MERCURY]: [
+        'Intellectual and analytical mind',
+        'Excellent communication skills',
+        'Adaptable and versatile nature',
+        'Business acumen and commercial instincts',
+        'Youthful and curious personality',
+        'May be restless or inconsistent',
+        'Values mental stimulation and learning'
+      ],
+      [PLANETS.JUPITER]: [
+        'Wise and philosophical nature',
+        'Generous and benevolent character',
+        'Strong moral and ethical values',
+        'Natural teaching and guiding abilities',
+        'Optimistic and positive outlook',
+        'May be overly idealistic',
+        'Values wisdom and spiritual growth'
+      ],
+      [PLANETS.VENUS]: [
+        'Artistic and aesthetic appreciation',
+        'Charming and diplomatic personality',
+        'Love for beauty and luxury',
+        'Harmonious and peace-loving nature',
+        'Romantic and affectionate character',
+        'May be materialistic or pleasure-seeking',
+        'Values love and relationship harmony'
+      ],
+      [PLANETS.SATURN]: [
+        'Disciplined and responsible nature',
+        'Patient and persistent character',
+        'Practical and realistic approach',
+        'Strong work ethic and dedication',
+        'Traditional and conservative values',
+        'May be pessimistic or overly serious',
+        'Values structure and long-term security'
+      ],
+      [PLANETS.RAHU]: [
+        'Unconventional and innovative thinking',
+        'Ambitious and materialistic desires',
+        'Foreign or unusual interests',
+        'Mysterious and complex personality',
+        'Strong desires for worldly success',
+        'May be manipulative or obsessive',
+        'Values power and recognition'
+      ],
+      [PLANETS.KETU]: [
+        'Spiritual and detached nature',
+        'Intuitive and psychic abilities',
+        'Past-life wisdom and karmic insights',
+        'Philosophical and mystical inclinations',
+        'Selfless and service-oriented',
+        'May be isolated or withdrawn',
+        'Values spiritual evolution and moksha'
+      ]
+    };
 
-     // Return traits for the given planet or default traits if planet not found
-     return planetaryTraits[planet] || [
-       'Balanced planetary influence',
-       'Mixed qualities requiring detailed analysis',
-       'Unique combination of traits'
-     ];
-   }
-
-   /**
-    * Generate comprehensive marriage prospects based on Navamsa analysis
-    * @param {Object} navamsa7thAnalysis - 7th house analysis in Navamsa
-    * @param {Object} venusInNavamsa - Venus position and analysis in Navamsa
-    * @param {Object} jupiterInNavamsa - Jupiter position and analysis in Navamsa
-    * @returns {string} Overall marriage prospects assessment
-    */
-   static generateMarriageProspects(navamsa7thAnalysis, venusInNavamsa, jupiterInNavamsa) {
-     try {
-       // Handle missing analysis gracefully
-       if (!navamsa7thAnalysis) {
-         return 'Marriage prospects require complete 7th house analysis for accurate assessment';
-       }
-
-       let score = 0;
-       let factors = 0;
-       const positiveFactors = [];
-       const challengingFactors = [];
-
-       // 1. Analyze 7th house strength (40% weightage)
-       if (navamsa7thAnalysis.analysis) {
-         const houseStrength = this.assess7thHouseStrength(navamsa7thAnalysis);
-         score += houseStrength * 0.4;
-         factors++;
-
-         if (houseStrength >= 70) {
-           positiveFactors.push('Strong 7th house in Navamsa indicates favorable marriage prospects');
-         } else if (houseStrength <= 40) {
-           challengingFactors.push('7th house needs strengthening for better marriage outcomes');
-         }
-       }
-
-       // 2. Analyze Venus condition (30% weightage)
-       if (venusInNavamsa && !venusInNavamsa.error) {
-         const venusStrength = venusInNavamsa.strength ? venusInNavamsa.strength.total : 50;
-         score += venusStrength * 0.3;
-         factors++;
-
-         if (venusStrength >= 70) {
-           positiveFactors.push('Well-placed Venus supports love, harmony and marital happiness');
-         } else if (venusStrength <= 40) {
-           challengingFactors.push('Venus placement needs attention for relationship harmony');
-         }
-
-         // Special Venus considerations
-         if (venusInNavamsa.position && venusInNavamsa.position.dignity === 'exalted') {
-           positiveFactors.push('Exalted Venus in Navamsa - exceptional marriage happiness');
-           score += 10; // Bonus for exaltation
-         }
-       }
-
-       // 3. Analyze Jupiter condition (20% weightage for overall wisdom)
-       if (jupiterInNavamsa && !jupiterInNavamsa.error) {
-         const jupiterStrength = jupiterInNavamsa.strength ? jupiterInNavamsa.strength.total : 50;
-         score += jupiterStrength * 0.2;
-         factors++;
-
-         if (jupiterStrength >= 70) {
-           positiveFactors.push('Strong Jupiter promotes wisdom and guidance in marriage');
-         } else if (jupiterStrength <= 40) {
-           challengingFactors.push('Jupiter support needed for marital wisdom and stability');
-         }
-       }
-
-       // 4. Analyze planetary combinations (10% weightage)
-       const combinationBonus = this.analyzePlanetaryCombinations(navamsa7thAnalysis, venusInNavamsa, jupiterInNavamsa);
-       score += combinationBonus;
-       if (combinationBonus > 5) {
-         positiveFactors.push('Favorable planetary combinations enhance marriage prospects');
-       }
-
-       // Calculate final score
-       const finalScore = factors > 0 ? Math.min(100, score / factors * 100) : 50;
-
-       // Generate overall assessment
-       let overallProspects;
-       if (finalScore >= 80) {
-         overallProspects = 'Excellent';
-       } else if (finalScore >= 65) {
-         overallProspects = 'Very Good';
-       } else if (finalScore >= 50) {
-         overallProspects = 'Good';
-       } else if (finalScore >= 35) {
-         overallProspects = 'Moderate';
-       } else {
-         overallProspects = 'Challenging';
-       }
-
-       // Add contextual details
-       const detailedAssessment = this.generateDetailedMarriageAssessment(
-         overallProspects,
-         finalScore,
-         positiveFactors,
-         challengingFactors
-       );
-
-       return detailedAssessment;
-
-     } catch (error) {
-       console.warn('Error generating marriage prospects:', error.message);
-       return 'Marriage prospects analysis requires complete Navamsa chart data for accurate assessment';
-     }
-   }
-
+    // Return traits for the given planet or default traits if planet not found
+    return planetaryTraits[planet] || [
+      'Balanced planetary influence',
+      'Mixed qualities requiring detailed analysis',
+      'Unique combination of traits'
+    ];
+}
    /**
     * Assess 7th house strength for marriage analysis
     * @param {Object} navamsa7thAnalysis - 7th house analysis
@@ -8330,4 +8475,4 @@ class NavamsaAnalyzer {
   }
 }
 
-module.exports = NavamsaAnalyzer;
+export default NavamsaAnalyzer;

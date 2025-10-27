@@ -3,8 +3,8 @@
  * Handles all database operations for Chart model
  */
 
-const Chart = require('../models/Chart');
-const mongoose = require('mongoose');
+import Chart from '../models/Chart.js';
+import mongoose from 'mongoose';
 
 class ChartRepository {
   /**
@@ -458,4 +458,4 @@ class ChartRepository {
   }
 }
 
-module.exports = ChartRepository;
+export default ChartRepository;

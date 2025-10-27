@@ -189,4 +189,4 @@ class RajaYogaCalculator {
   }
 }
 
-module.exports = RajaYogaCalculator;
+export default RajaYogaCalculator;

@@ -68,25 +68,46 @@ const Card = forwardRef(({
   padding,
   children,
   decorative,
+  onClick,
+  as = 'div',
+  role,
+  'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledBy,
+  'aria-describedby': ariaDescribedBy,
   ...props
 }, ref) => {
+  const Component = motion[as] || motion.div;
+  const isInteractive = hover || onClick;
+
   return (
-    <motion.div
+    <Component
       ref={ref}
       className={cn(cardVariants({ variant, hover, padding, className }))}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
       whileHover={hover ? { scale: 1.02, y: -4 } : {}}
+      onClick={onClick}
+      role={role || (isInteractive ? 'button' : 'article')}
+      tabIndex={isInteractive ? 0 : undefined}
+      aria-label={ariaLabel}
+      aria-labelledby={ariaLabelledBy}
+      aria-describedby={ariaDescribedBy}
+      onKeyDown={isInteractive ? (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClick?.(e);
+        }
+      } : undefined}
       {...props}
     >
       {children}
-    </motion.div>
+    </Component>
   );
 });
 
 const CardHeader = forwardRef(({ className, ...props }, ref) => (
-  <div
+  <header
     ref={ref}
     className={cn('flex flex-col space-y-1.5 p-6 pb-4', className)}
     {...props}
@@ -98,6 +119,7 @@ const CardTitle = forwardRef(({
   size = 'lg',
   gradient = false,
   children,
+  id,
   ...props
 }, ref) => {
   const sizeClasses = {
@@ -111,6 +133,7 @@ const CardTitle = forwardRef(({
   return (
     <h3
       ref={ref}
+      id={id}
       className={cn(
         'font-accent font-bold leading-none tracking-tight',
         sizeClasses[size],
@@ -124,9 +147,10 @@ const CardTitle = forwardRef(({
   );
 });
 
-const CardDescription = forwardRef(({ className, ...props }, ref) => (
+const CardDescription = forwardRef(({ className, id, ...props }, ref) => (
   <p
     ref={ref}
+    id={id}
     className={cn('text-wisdom-gray leading-relaxed', className)}
     {...props}
   />
@@ -137,7 +161,7 @@ const CardContent = forwardRef(({ className, ...props }, ref) => (
 ));
 
 const CardFooter = forwardRef(({ className, ...props }, ref) => (
-  <div
+  <footer
     ref={ref}
     className={cn('flex items-center p-6 pt-0', className)}
     {...props}

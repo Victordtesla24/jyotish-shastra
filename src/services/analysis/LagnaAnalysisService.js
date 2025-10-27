@@ -3,8 +3,8 @@
  * Handles analysis of Ascendant (Lagna) and its lord
  */
 
-const astroConfig = require('../../config/astro-config');
-const ExaltationDebilitationCalculator = require('../../core/calculations/planetary/ExaltationDebilitationCalculator');
+import astroConfig from '../../config/astro-config.js';
+import ExaltationDebilitationCalculator from '../../core/calculations/planetary/ExaltationDebilitationCalculator.js';
 
 class LagnaAnalysisService {
   constructor() {
@@ -2246,4 +2246,4 @@ class LagnaAnalysisService {
   }
 }
 
-module.exports = LagnaAnalysisService;
+export default LagnaAnalysisService;

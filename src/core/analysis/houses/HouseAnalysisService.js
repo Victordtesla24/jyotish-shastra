@@ -4,7 +4,7 @@
  * Analyzes all 12 houses, their lords, occupying planets, and significations
  */
 
-const { getSignLord, getHouseFromLongitude } = require('../../../utils/helpers/astrologyHelpers');
+import { getSignLord, getHouseFromLongitude } from '../../../utils/helpers/astrologyHelpers.js';
 
 class HouseAnalysisService {
   constructor(chart = null) {
@@ -644,14 +644,7 @@ class HouseAnalysisService {
         }
     };
 
-    // Handle test mock compatibility - prioritize test data if available
-    if (chartToUse.houses && chartToUse.houses[houseNumber - 1] && chartToUse.houses[houseNumber - 1].occupants && chartToUse.houses[houseNumber - 1].occupants.length > 0) {
-        analysis.occupants = chartToUse.houses[houseNumber - 1].occupants.map(occupantName => ({
-            planet: occupantName,
-            analysis: this.getPlanetInHouseAnalysis(occupantName, houseNumber)
-        }));
-        analysis.houseOccupants = chartToUse.houses[houseNumber - 1].occupants;
-    }
+    // No mock compatibility - only use real chart data structure
 
     return analysis;
   }
@@ -839,26 +832,268 @@ class HouseAnalysisService {
   }
 
   getHouseAspects(houseNumber) {
-    // This is a simplified implementation - in practice, this would calculate actual aspects
-    if (houseNumber === 7) {
-      return [
-        {
-          from: 'Saturn',
-          to: `${houseNumber}th House`,
-          type: 'opposition',
-          analysis: `Saturn's aspect on the 7th house can cause delays in marriage but brings stability later`
-        }
-      ];
+    // Complete aspects calculation based on actual chart data
+    const aspects = [];
+
+    if (!this.chart || !this.chart.planets) {
+      return aspects;
     }
 
-    return [
-      {
-        from: 'Saturn',
-        to: `${houseNumber}th House`,
-        type: 'opposition',
-        analysis: `Saturn's aspect on the ${houseNumber}th house brings delays but also stability`
-      }
+    const houseCenter = this.calculateHouseCenter(houseNumber);
+    const aspectOrbs = {
+      conjunction: 8,
+      opposition: 8,
+      trine: 8,
+      square: 8,
+      sextile: 6
+    };
+
+    // Calculate aspects from each planet to the house
+    this.chart.planets.forEach(planet => {
+      const planetLongitude = planet.longitude;
+      const aspectsToHouse = this.calculatePlanetaryAspectsToHouse(
+        planetLongitude,
+        houseCenter,
+        planet.name
+      );
+
+      aspectsToHouse.forEach(aspect => {
+        if (aspect.orb <= aspectOrbs[aspect.type]) {
+          aspects.push({
+            from: planet.name,
+            to: `${houseNumber}th House`,
+            type: aspect.type,
+            orb: aspect.orb,
+            strength: aspect.strength,
+            analysis: this.getAspectAnalysis(planet.name, houseNumber, aspect.type, aspect.strength)
+          });
+        }
+      });
+    });
+
+    // Calculate special Vedic aspects (Graha Drishti)
+    const specialAspects = this.calculateSpecialVedicAspects(houseNumber);
+    aspects.push(...specialAspects);
+
+    // Sort aspects by strength (strongest first)
+    aspects.sort((a, b) => (b.strength || 0) - (a.strength || 0));
+
+    return aspects;
+  }
+
+  /**
+   * Calculate house center longitude
+   */
+  calculateHouseCenter(houseNumber) {
+    if (!this.chart || !this.chart.ascendant) {
+      return (houseNumber - 1) * 30; // Default equal house calculation
+    }
+
+    const ascendantLongitude = this.chart.ascendant.longitude;
+
+    // For equal house system (can be enhanced for other systems)
+    const houseCenter = (ascendantLongitude + (houseNumber - 1) * 30) % 360;
+    return houseCenter;
+  }
+
+  /**
+   * Calculate planetary aspects to a house
+   */
+  calculatePlanetaryAspectsToHouse(planetLongitude, houseCenter, planetName) {
+    const aspects = [];
+    const distance = this.calculateAngularDistance(planetLongitude, houseCenter);
+
+    // Standard Western aspects
+    const aspectTypes = [
+      { name: 'conjunction', degree: 0, orb: 8 },
+      { name: 'sextile', degree: 60, orb: 6 },
+      { name: 'square', degree: 90, orb: 8 },
+      { name: 'trine', degree: 120, orb: 8 },
+      { name: 'opposition', degree: 180, orb: 8 }
     ];
+
+    aspectTypes.forEach(aspectType => {
+      const orb = Math.abs(distance - aspectType.degree);
+      const alternateOrb = Math.abs((360 - distance) - aspectType.degree);
+      const actualOrb = Math.min(orb, alternateOrb);
+
+      if (actualOrb <= aspectType.orb) {
+        const strength = this.calculateAspectStrength(actualOrb, aspectType.orb);
+        aspects.push({
+          type: aspectType.name,
+          orb: actualOrb,
+          strength: strength
+        });
+      }
+    });
+
+    return aspects;
+  }
+
+  /**
+   * Calculate special Vedic aspects (Graha Drishti)
+   */
+  calculateSpecialVedicAspects(houseNumber) {
+    const specialAspects = [];
+
+    if (!this.chart || !this.chart.planets) {
+      return specialAspects;
+    }
+
+    const houseCenter = this.calculateHouseCenter(houseNumber);
+
+    this.chart.planets.forEach(planet => {
+      const planetLongitude = planet.longitude;
+      const planetHouse = this.calculatePlanetHouse(planetLongitude);
+
+      // Mars aspects: 4th, 7th, 8th houses from its position
+      if (planet.name === 'Mars') {
+        const marsAspects = [4, 7, 8];
+        marsAspects.forEach(aspectHouse => {
+          const targetHouse = ((planetHouse + aspectHouse - 1) % 12) + 1;
+          if (targetHouse === houseNumber) {
+            specialAspects.push({
+              from: 'Mars',
+              to: `${houseNumber}th House`,
+              type: 'special_mars_aspect',
+              orb: 0,
+              strength: 75,
+              analysis: `Mars casts its special ${aspectHouse}th house aspect on the ${houseNumber}th house, bringing energy, drive, and potential conflicts to matters of this house.`
+            });
+          }
+        });
+      }
+
+      // Jupiter aspects: 5th, 7th, 9th houses from its position
+      if (planet.name === 'Jupiter') {
+        const jupiterAspects = [5, 7, 9];
+        jupiterAspects.forEach(aspectHouse => {
+          const targetHouse = ((planetHouse + aspectHouse - 1) % 12) + 1;
+          if (targetHouse === houseNumber) {
+            specialAspects.push({
+              from: 'Jupiter',
+              to: `${houseNumber}th House`,
+              type: 'special_jupiter_aspect',
+              orb: 0,
+              strength: 80,
+              analysis: `Jupiter casts its special ${aspectHouse}th house aspect on the ${houseNumber}th house, bringing wisdom, expansion, and protective influences to matters of this house.`
+            });
+          }
+        });
+      }
+
+      // Saturn aspects: 3rd, 7th, 10th houses from its position
+      if (planet.name === 'Saturn') {
+        const saturnAspects = [3, 7, 10];
+        saturnAspects.forEach(aspectHouse => {
+          const targetHouse = ((planetHouse + aspectHouse - 1) % 12) + 1;
+          if (targetHouse === houseNumber) {
+            specialAspects.push({
+              from: 'Saturn',
+              to: `${houseNumber}th House`,
+              type: 'special_saturn_aspect',
+              orb: 0,
+              strength: 70,
+              analysis: `Saturn casts its special ${aspectHouse}th house aspect on the ${houseNumber}th house, bringing discipline, delays, and long-term structure to matters of this house.`
+            });
+          }
+        });
+      }
+
+      // Rahu and Ketu aspects: 5th, 7th, 9th houses from their positions
+      if (planet.name === 'Rahu' || planet.name === 'Ketu') {
+        const nodeAspects = [5, 7, 9];
+        nodeAspects.forEach(aspectHouse => {
+          const targetHouse = ((planetHouse + aspectHouse - 1) % 12) + 1;
+          if (targetHouse === houseNumber) {
+            specialAspects.push({
+              from: planet.name,
+              to: `${houseNumber}th House`,
+              type: `special_${planet.name.toLowerCase()}_aspect`,
+              orb: 0,
+              strength: 60,
+              analysis: `${planet.name} casts its special ${aspectHouse}th house aspect on the ${houseNumber}th house, bringing karmic influences and transformative energy to matters of this house.`
+            });
+          }
+        });
+      }
+    });
+
+    return specialAspects;
+  }
+
+  /**
+   * Calculate angular distance between two longitudes
+   */
+  calculateAngularDistance(long1, long2) {
+    const diff = Math.abs(long1 - long2);
+    return Math.min(diff, 360 - diff);
+  }
+
+  /**
+   * Calculate aspect strength based on orb
+   */
+  calculateAspectStrength(orb, maxOrb) {
+    return Math.max(0, Math.round(100 - (orb / maxOrb) * 100));
+  }
+
+  /**
+   * Calculate which house a planet is in
+   */
+  calculatePlanetHouse(planetLongitude) {
+    if (!this.chart || !this.chart.ascendant) {
+      return 1; // Default
+    }
+
+    const ascendantLongitude = this.chart.ascendant.longitude;
+    const relativePosition = (planetLongitude - ascendantLongitude + 360) % 360;
+    return Math.floor(relativePosition / 30) + 1;
+  }
+
+  /**
+   * Get detailed aspect analysis
+   */
+  getAspectAnalysis(planetName, houseNumber, aspectType, strength) {
+    const planetNatures = {
+      'Sun': 'authoritative and ego-driven',
+      'Moon': 'emotional and nurturing',
+      'Mars': 'energetic and potentially aggressive',
+      'Mercury': 'intellectual and communicative',
+      'Jupiter': 'wise and expansive',
+      'Venus': 'harmonious and pleasure-seeking',
+      'Saturn': 'disciplined and restrictive',
+      'Rahu': 'ambitious and transformative',
+      'Ketu': 'spiritual and detached'
+    };
+
+    const aspectEffects = {
+      'conjunction': 'directly influences',
+      'sextile': 'harmoniously supports',
+      'square': 'creates tension and challenges in',
+      'trine': 'flows beneficially into',
+      'opposition': 'creates opposing forces affecting'
+    };
+
+    const houseSignifications = {
+      1: 'personality, self-image, and physical appearance',
+      2: 'wealth, speech, and family values',
+      3: 'communication, siblings, and courage',
+      4: 'home, mother, and emotional security',
+      5: 'creativity, children, and intelligence',
+      6: 'health, service, and daily routines',
+      7: 'partnerships, marriage, and open enemies',
+      8: 'transformation, occult, and hidden matters',
+      9: 'wisdom, higher learning, and fortune',
+      10: 'career, reputation, and public image',
+      11: 'gains, friendships, and aspirations',
+      12: 'losses, spirituality, and foreign connections'
+    };
+
+    const strengthDescriptor = strength >= 80 ? 'very strongly' :
+                             strength >= 60 ? 'strongly' :
+                             strength >= 40 ? 'moderately' : 'mildly';
+
+    return `${planetName}, with its ${planetNatures[planetName]} nature, ${strengthDescriptor} ${aspectEffects[aspectType]} ${houseSignifications[houseNumber]}. This ${aspectType} aspect (${strength}% strength) brings ${planetName}'s energy into matters of the ${houseNumber}th house.`;
   }
 
   getHouseInterpretation(houseNumber, chart) {
@@ -1076,37 +1311,12 @@ class HouseAnalysisService {
 
       return allHousesAnalysis;
     } catch (error) {
-      // Ultimate fallback if entire analysis fails
-      console.error('All houses analysis failed:', error.message);
-      return this.getFallbackHousesAnalysis();
+      // PRODUCTION REQUIREMENT: NO FAKE DATA GENERATION
+      // Throw error instead of returning fake analysis data
+      console.error('❌ Houses analysis failed:', error.message);
+      throw new Error(`Houses analysis failed: ${error.message}. Please ensure valid chart data is provided.`);
     }
-  }
-
-  /**
-   * Get fallback houses analysis when main analysis fails
-   * @returns {Array} Basic houses analysis
-   */
-  getFallbackHousesAnalysis() {
-    const fallbackAnalysis = [];
-
-    for (let houseNumber = 1; houseNumber <= 12; houseNumber++) {
-      fallbackAnalysis.push({
-        houseNumber,
-        houseData: this.houseSignifications[houseNumber],
-        houseSign: { sign: 'Unknown' },
-        houseLord: 'Unknown',
-        houseOccupants: [],
-        analysis: {
-          summary: `House ${houseNumber} requires complete chart data for analysis`,
-          strengths: [],
-          challenges: [],
-          recommendations: []
-        }
-      });
-    }
-
-    return fallbackAnalysis;
   }
 }
 
-module.exports = HouseAnalysisService;
+export default HouseAnalysisService;

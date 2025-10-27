@@ -2,35 +2,23 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
-import rateLimit from 'express-rate-limit';
 import morgan from 'morgan';
 import fs from 'fs';
 import path from 'path';
 import 'dotenv/config';
 
 // Import routes
-import chartRoutes from './api/routes/chart.js';
-import comprehensiveAnalysisRoutes from './api/routes/comprehensiveAnalysis.js';
-import geocodingRoutes from './api/routes/geocoding.js';
 import indexRoutes from './api/routes/index.js';
+import clientErrorLogRoutes from './api/routes/clientErrorLog.js';
 
 // Import middleware
 import errorHandling from './api/middleware/errorHandling.js';
+import { jsonParsingErrorHandler } from './api/middleware/jsonSanitizer.js';
 
 const app = express();
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const PORT = process.env.PORT || 3001;
 
-// Rate limiting with proper proxy configuration
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP, please try again later.',
-  standardHeaders: true,
-  legacyHeaders: false,
-  // Skip rate limiting in development to avoid X-Forwarded-For warnings
-  skip: (req) => process.env.NODE_ENV === 'development'
-});
 
 // Security middleware
 app.use(helmet({
@@ -54,10 +42,13 @@ app.use(cors({
   origin: process.env.NODE_ENV === 'production'
     ? process.env.FRONTEND_URL || 'https://your-domain.com'
     : [
+        'http://localhost:3002', // Primary frontend development port
         process.env.CORS_ORIGIN || 'http://localhost:3000',
-        'http://localhost:3002',
+        'http://localhost:3000', // Common React dev port
+        'http://localhost:3003', // Legacy fallback
+        'http://127.0.0.1:3002',
         'http://127.0.0.1:3000',
-        'http://127.0.0.1:3002'
+        'http://127.0.0.1:3003'
       ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -66,9 +57,6 @@ app.use(cors({
 
 // Compression middleware
 app.use(compression());
-
-// Apply rate limiting to all requests
-app.use(limiter);
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
@@ -97,9 +85,7 @@ app.get('/health', (req, res) => {
 
 // API routes
 app.use('/api', indexRoutes);
-app.use('/api/chart', chartRoutes);
-app.use('/api/comprehensive-analysis', comprehensiveAnalysisRoutes);
-app.use('/api/geocoding', geocodingRoutes);
+app.use('/api', clientErrorLogRoutes);
 
 // Handle static file requests that should go to frontend
 app.use('/static', (req, res) => {
@@ -117,12 +103,15 @@ app.use('/api/*', (req, res) => {
     message: `Cannot ${req.method} ${req.originalUrl}`,
     available_endpoints: {
       'health': 'GET /health',
-      'chart': 'GET|POST /api/chart',
-      'analysis': 'GET|POST /api/comprehensive-analysis',
-      'geocoding': 'POST /api/geocoding/location, POST /api/geocoding/timezone'
+      'chart': 'POST /api/v1/chart/generate',
+      'analysis': 'POST /api/v1/analysis/comprehensive',
+      'geocoding': 'POST /api/v1/geocoding/location'
     }
   });
 });
+
+// JSON parsing error handling middleware (before general error handler)
+app.use(jsonParsingErrorHandler);
 
 // Global error handling middleware
 app.use(errorHandling);

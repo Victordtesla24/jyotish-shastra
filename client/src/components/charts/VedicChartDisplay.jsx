@@ -1,540 +1,558 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Card } from '../ui/cards/Card';
+import React, { useState, useEffect } from 'react';
+import VedicLoadingSpinner from '../ui/loading/VedicLoadingSpinner';
 
 /**
- * Enhanced VedicChartDisplay Component
- * Displays generated Vedic birth chart in traditional North Indian Kundli square format
- * Following authentic Vedic template design with enhanced interactivity and animations
- * TASK 5: UI Enhancement Implementation - Interactive Elements & Animations
+ * Traditional Vedic Chart Display - North Indian Diamond Style
+ * ============================================================
+ * Displays birth charts in authentic North Indian kundli format
+ * - Diamond-shaped layout with fixed house positions
+ * - Traditional planetary abbreviations (Su, Mo, Ma, etc.)
+ * - Clean text display without decorative elements
+ * - Proper house numbering (1st house always at top center)
+ * ============================================================
  */
-const VedicChartDisplay = ({ chartData, isLoading = false, className = '' }) => {
-  const [selectedHouse, setSelectedHouse] = useState(null);
-  const [chartDetails, setChartDetails] = useState(null);
-  const [hoveredHouse, setHoveredHouse] = useState(null);
-  const [isChartVisible, setIsChartVisible] = useState(false);
-  const [animationStage, setAnimationStage] = useState(0);
 
-  useEffect(() => {
-    if (chartData) {
-      console.log('🎯 VedicChartDisplay received chart data:', chartData);
+// Chart dimensions - Increased for better visibility
+const CHART_SIZE = 500;
+const PADDING = 60;
+const CENTER_X = CHART_SIZE / 2;
+const CENTER_Y = CHART_SIZE / 2;
 
-      // Parse the ACTUAL API response structure as defined in validation-guide.md
-      const apiResponse = chartData || {};
-      const analysisData = apiResponse.analysis || {};
-      const sections = analysisData.sections || {};
+// Traditional planetary abbreviations
+const PLANET_CODES = {
+  Sun: "Su", Moon: "Mo", Mars: "Ma", Mercury: "Me", Jupiter: "Ju",
+  Venus: "Ve", Saturn: "Sa", Rahu: "Ra", Ketu: "Ke", Ascendant: "As"
+};
 
-      console.log('📊 VedicChart - Analysis sections:', Object.keys(sections));
+// Rasi (Zodiac Sign) to Number mapping - Using real API sign names
+const RASI_NUMBERS = {
+  'Aries': 1, 'Taurus': 2, 'Gemini': 3, 'Cancer': 4,
+  'Leo': 5, 'Virgo': 6, 'Libra': 7, 'Scorpio': 8,
+  'Sagittarius': 9, 'Capricorn': 10, 'Aquarius': 11, 'Pisces': 12
+};
 
-      // Extract from section1 (Birth Data Collection and Chart Casting)
-      const section1 = sections.section1 || {};
-      const questions = section1.questions || [];
+/**
+ * Get Rasi number from API sign name
+ */
+function getRasiNumberFromSign(signName) {
+  return RASI_NUMBERS[signName] || 1; // Default to Aries if not found
+}
 
-      if (questions.length > 0) {
-        // Question 0: Birth data gathering
-        const birthDataQuestion = questions[0] || {};
-        const birthDataDetails = birthDataQuestion.details || {};
+/**
+ * Calculate which Rasi occupies each house position based on ascendant
+ * Uses authentic Vedic calculation: each house spans one Rasi (30°)
+ * CORRECTED for proper North Indian chart sequence
+ */
+function calculateRasiForHouse(houseNumber, ascendantRasi) {
+  if (!ascendantRasi || houseNumber < 1 || houseNumber > 12) {
+    console.warn('⚠️ Invalid Rasi calculation inputs:', { houseNumber, ascendantRasi });
+    return houseNumber; // Fallback to house number if invalid data
+  }
 
-        // Question 1: Chart casting (Rasi and Navamsa)
-        const chartQuestion = questions[1] || {};
-        const chartDetails = chartQuestion.details || {};
+  // CORRECT Vedic calculation:
+  // House 1 = ascendant Rasi (e.g., if ascendant is Libra=7, house 1 = 7)
+  // House 2 = next Rasi (house 2 = 8)
+  // House 3 = next Rasi (house 3 = 9), etc.
 
-        // Question 2: Ascendant information
-        const ascendantQuestion = questions[2] || {};
-        const ascendantDetails = ascendantQuestion.details || {};
+  // Simple formula: (ascendantRasi + houseNumber - 1 - 1) % 12 + 1
+  let rasiNumber = (ascendantRasi + houseNumber - 2) % 12 + 1;
 
-        // Question 3: Planetary positions
-        const planetaryQuestion = questions[3] || {};
-        const planetaryPositions = planetaryQuestion.planetaryPositions || {};
+  // Handle wrap-around: if result is 0 or negative, add 12
+  if (rasiNumber <= 0) {
+    rasiNumber += 12;
+  }
 
-        // Question 4: Dasha information
-        const dashaQuestion = questions[4] || {};
-        const dashaDetails = dashaQuestion.details || {};
+  // Ensure final result is in 1-12 range
+  if (rasiNumber > 12) {
+    rasiNumber = rasiNumber - 12;
+  }
 
-        // Transform to internal chart format using ACTUAL API structure
-        const transformedData = {
-          rasiChart: {
-            ascendant: {
-              sign: chartDetails.rasiChart?.ascendant?.sign || ascendantDetails.ascendant?.sign || 'Unknown',
-              degree: chartDetails.rasiChart?.ascendant?.degree || ascendantDetails.lagnaDegree || 0,
-              longitude: chartDetails.rasiChart?.ascendant?.longitude || ascendantDetails.ascendant?.longitude || 0
-            },
-            nakshatra: {
-              name: dashaDetails.nakshatra || 'Unknown',
-              pada: 1
-            },
-            planets: Object.entries(planetaryPositions).map(([name, data]) => ({
-              name: name.charAt(0).toUpperCase() + name.slice(1),
-              Name: name.charAt(0).toUpperCase() + name.slice(1),
-              longitude: data.longitude || 0,
-              sign: data.sign || 'Unknown',
-              degree: data.degree || 0,
-              house: data.house || 1,
-              dignity: data.dignity || 'neutral',
-              isRetrograde: data.isRetrograde || false,
-              isCombust: data.isCombust || false
-            })),
-            planetaryPositions: planetaryPositions
-          },
-          birthData: {
-            name: 'Test User', // Can be extracted from the response or default
-            dateOfBirth: birthDataDetails.dateOfBirth?.value || 'Not provided',
-            timeOfBirth: birthDataDetails.timeOfBirth?.value || 'Not provided',
-            placeOfBirth: birthDataDetails.place?.placeOfBirth?.name || 'Not provided'
-          },
-          analysis: {
-            personality: {
-              lagnaSign: chartDetails.rasiChart?.ascendant?.sign || ascendantDetails.ascendant?.sign || 'Unknown',
-              moonSign: planetaryPositions.moon?.sign || 'Unknown',
-              sunSign: planetaryPositions.sun?.sign || 'Unknown',
-              keyTraits: ['Dynamic personality', 'Strong willpower', 'Leadership qualities']
-            }
-          }
-        };
+  console.log('🔢 CORRECTED Rasi calculation:', {
+    house: houseNumber,
+    ascendantRasi: ascendantRasi,
+    calculation: `(${ascendantRasi} + ${houseNumber} - 2) % 12 + 1`,
+    finalRasi: rasiNumber
+  });
 
-        console.log('✅ VedicChart - Transformed data from API:', transformedData);
-        setChartDetails(transformedData);
-      } else {
-        // Fallback for direct chart data or empty response
-        console.log('⚠️ VedicChart - No questions found in section1, using fallback');
-        setChartDetails(chartData);
-      }
-    }
-  }, [chartData]);
+  return rasiNumber;
+}
 
 
-  const planetSymbols = {
-    'Sun': '☉',
-    'Moon': '☽',
-    'Mars': '♂',
-    'Mercury': '☿',
-    'Jupiter': '♃',
-    'Venus': '♀',
-    'Saturn': '♄',
-    'Rahu': '☊',
-    'Ketu': '☋',
-    'Ascendant': 'As'
-  };
+// North Indian chart house positions (diamond layout) - Optimized for better text visibility
+const HOUSE_POSITIONS = {
+  1:  { x: CENTER_X, y: PADDING + 30 },           // Top center
+  2:  { x: CENTER_X + 80, y: PADDING + 60 },      // Top right
+  3:  { x: CHART_SIZE - PADDING - 30, y: CENTER_Y - 80 }, // Right top
+  4:  { x: CHART_SIZE - PADDING - 30, y: CENTER_Y },      // Right center
+  5:  { x: CHART_SIZE - PADDING - 30, y: CENTER_Y + 80 }, // Right bottom
+  6:  { x: CENTER_X + 80, y: CHART_SIZE - PADDING - 60 }, // Bottom right
+  7:  { x: CENTER_X, y: CHART_SIZE - PADDING - 30 },      // Bottom center
+  8:  { x: CENTER_X - 80, y: CHART_SIZE - PADDING - 60 }, // Bottom left
+  9:  { x: PADDING + 30, y: CENTER_Y + 80 },       // Left bottom
+  10: { x: PADDING + 30, y: CENTER_Y },            // Left center
+  11: { x: PADDING + 30, y: CENTER_Y - 80 },       // Left top
+  12: { x: CENTER_X - 80, y: PADDING + 60 }        // Top left
+};
 
-  const planetColors = {
-    'Sun': 'var(--solar-orange)',
-    'Moon': 'var(--lunar-silver)',
-    'Mars': '#FF4500',
-    'Mercury': '#32CD32',
-    'Jupiter': 'var(--vedic-gold)',
-    'Venus': 'var(--vedic-lotus)',
-    'Saturn': 'var(--cosmic-purple)',
-    'Rahu': 'var(--earth-brown)',
-    'Ketu': 'var(--wisdom-gray)',
-    'Ascendant': 'var(--vedic-saffron)'
-  };
+// Rasi number positions matching the red circles in North Indian chart
+// Houses are numbered anti-clockwise starting from top (1st house)
+// Based on the red circles in the reference image
+const RASI_NUMBER_POSITIONS = {
+  1:  { x: PADDING + 100, y: PADDING + 100 },           // Top-left corner (between houses 12 and 1)
+  2:  { x: CENTER_X - 80, y: PADDING + 60 },            // Top edge left (between houses 1 and 2)
+  3:  { x: CENTER_X + 80, y: PADDING + 60 },            // Top edge right (between houses 2 and 3)
+  4:  { x: CHART_SIZE - PADDING - 100, y: PADDING + 100 }, // Top-right corner (between houses 3 and 4)
+  5:  { x: CHART_SIZE - PADDING - 60, y: CENTER_Y - 80 },  // Right edge top (between houses 4 and 5)
+  6:  { x: CHART_SIZE - PADDING - 60, y: CENTER_Y + 80 },  // Right edge bottom (between houses 5 and 6)
+  7:  { x: CHART_SIZE - PADDING - 100, y: CHART_SIZE - PADDING - 100 }, // Bottom-right corner
+  8:  { x: CENTER_X + 80, y: CHART_SIZE - PADDING - 60 },  // Bottom edge right
+  9:  { x: CENTER_X - 80, y: CHART_SIZE - PADDING - 60 },  // Bottom edge left
+  10: { x: PADDING + 100, y: CHART_SIZE - PADDING - 100 }, // Bottom-left corner
+  11: { x: PADDING + 60, y: CENTER_Y + 80 },            // Left edge bottom
+  12: { x: PADDING + 60, y: CENTER_Y - 80 }             // Left edge top
+};
 
-  const houseSignificance = {
-    1: 'Self, Personality, Physical Appearance',
-    2: 'Wealth, Family, Speech',
-    3: 'Siblings, Courage, Communication',
-    4: 'Home, Mother, Education',
-    5: 'Children, Intelligence, Creativity',
-    6: 'Health, Enemies, Service',
-    7: 'Marriage, Partnership, Business',
-    8: 'Longevity, Transformation, Occult',
-    9: 'Fortune, Father, Spirituality',
-    10: 'Career, Fame, Status',
-    11: 'Gains, Friends, Aspirations',
-    12: 'Loss, Foreign, Spirituality'
-  };
+// Diamond frame coordinates
+const DIAMOND_FRAME = {
+  top: { x: CENTER_X, y: PADDING },
+  right: { x: CHART_SIZE - PADDING, y: CENTER_Y },
+  bottom: { x: CENTER_X, y: CHART_SIZE - PADDING },
+  left: { x: PADDING, y: CENTER_Y }
+};
 
-  // Enhanced animation effects
-  useEffect(() => {
-    if (chartDetails && !isChartVisible) {
-      const timer = setTimeout(() => {
-        setIsChartVisible(true);
-        setAnimationStage(1);
-      }, 300);
+/**
+ * Process chart data to extract planetary positions
+ * Handles direct chart data structure (rasiChart or navamsaChart)
+ */
+function processChartData(chartData) {
+  console.log('📊 Processing chart data for traditional display:', chartData);
 
-      return () => clearTimeout(timer);
-    }
-  }, [chartDetails, isChartVisible]);
+  if (!chartData) {
+    console.error('❌ No chart data provided');
+    return { planets: [], ascendant: null };
+  }
 
-  useEffect(() => {
-    if (animationStage === 1) {
-      const timer = setTimeout(() => setAnimationStage(2), 600);
-      return () => clearTimeout(timer);
-    }
-  }, [animationStage]);
+  // Handle direct chart data structure (chartData is rasiChart or navamsaChart directly)
+  const chart = chartData;
 
-  // Get planets in house using proper house calculation
-  const getPlanetsInHouse = useCallback((houseNumber) => {
-    if (!chartDetails?.rasiChart?.planets || !chartDetails?.rasiChart?.ascendant) return [];
+  if (!chart.planets || !Array.isArray(chart.planets)) {
+    console.error('❌ No valid planets array found in chart data');
+    return { planets: [], ascendant: null };
+  }
 
-    const planetsInHouse = [];
-    const ascendantLongitude = chartDetails.rasiChart.ascendant.longitude;
+  console.log('🎯 Found planetary data:', chart.planets.length, 'planets');
 
-    // Add ascendant to house 1
-    if (houseNumber === 1) {
-      planetsInHouse.push({
-        name: 'Ascendant',
-        sign: chartDetails.rasiChart.ascendant.sign,
-        degree: chartDetails.rasiChart.ascendant.degree
-      });
-    }
+  // Process planets
+  const planets = chart.planets.map(planet => {
+    const house = calculateHouseFromLongitude(planet.longitude, chart.ascendant?.longitude || 0);
+    // Use the degree field directly from API response, or calculate if not available
+    const degrees = planet.degree !== undefined ? Math.floor(planet.degree) : Math.floor(planet.longitude % 30);
+    const minutes = planet.degree !== undefined ?
+      Math.floor((planet.degree - Math.floor(planet.degree)) * 60) :
+      Math.floor(((planet.longitude % 30) - degrees) * 60);
 
-    // Check each planet and determine its house
-    chartDetails.rasiChart.planets.forEach(planet => {
-      const planetLongitude = planet.longitude;
-
-      // Calculate house number based on longitude difference
-      // Each house is 30 degrees
-      let diff = planetLongitude - ascendantLongitude;
-
-      // Normalize the difference to be between 0 and 360
-      while (diff < 0) diff += 360;
-      while (diff >= 360) diff -= 360;
-
-      // Calculate which house (1-12) the planet is in
-      const calculatedHouse = Math.floor(diff / 30) + 1;
-
-      if (calculatedHouse === houseNumber) {
-        planetsInHouse.push(planet);
-      }
-    });
-
-    return planetsInHouse;
-  }, [chartDetails]);
-
-  // Memoized planet calculations for better performance
-  const housePlanetsMap = useMemo(() => {
-    const map = {};
-    for (let i = 1; i <= 12; i++) {
-      map[i] = getPlanetsInHouse(i);
-    }
-    return map;
-  }, [getPlanetsInHouse]);
-
-  // === North Indian Kundli absolute positioning helper ===
-  const getAuthenticHousePosition = (houseNumber) => {
-    const positions = {
-      1: { top: '0%', left: '25%', width: '25%', height: '25%' },
-      2: { top: '0%', left: '50%', width: '25%', height: '25%' },
-      3: { top: '0%', left: '75%', width: '25%', height: '25%' },
-      4: { top: '25%', left: '75%', width: '25%', height: '25%' },
-      5: { top: '50%', left: '75%', width: '25%', height: '25%' },
-      6: { top: '75%', left: '75%', width: '25%', height: '25%' },
-      7: { top: '75%', left: '50%', width: '25%', height: '25%' },
-      8: { top: '75%', left: '25%', width: '25%', height: '25%' },
-      9: { top: '75%', left: '0%', width: '25%', height: '25%' },
-      10: { top: '50%', left: '0%', width: '25%', height: '25%' },
-      11: { top: '25%', left: '0%', width: '25%', height: '25%' },
-      12: { top: '0%', left: '0%', width: '25%', height: '25%' }
+    return {
+      name: planet.name,
+      code: PLANET_CODES[planet.name] || planet.name.substring(0, 2),
+      house: house,
+      degrees: degrees,
+      minutes: minutes,
+      position: HOUSE_POSITIONS[house],
+      dignity: planet.dignity || '',
+      retrograde: planet.retrograde || planet.isRetrograde || false
     };
-    return positions[houseNumber] || {};
-  };
+  });
 
-  // === Authentic North Indian chart renderer (4x4 grid) ===
-  const renderAuthenticChart = () => {
-    if (!chartDetails) return null;
+  // Process ascendant
+  let ascendant = null;
+  if (chart.ascendant) {
+    const ascHouse = 1; // Ascendant is always in 1st house in North Indian format
+    // Use the degree field directly from API response, or calculate if not available
+    const ascDegrees = chart.ascendant.degree !== undefined ?
+      Math.floor(chart.ascendant.degree) :
+      Math.floor(chart.ascendant.longitude % 30);
+    const ascMinutes = chart.ascendant.degree !== undefined ?
+      Math.floor((chart.ascendant.degree - Math.floor(chart.ascendant.degree)) * 60) :
+      Math.floor(((chart.ascendant.longitude % 30) - ascDegrees) * 60);
 
+    ascendant = {
+      name: 'Ascendant',
+      code: 'As',
+      house: ascHouse,
+      degrees: ascDegrees,
+      minutes: ascMinutes,
+      position: HOUSE_POSITIONS[ascHouse],
+      sign: chart.ascendant.sign || 'Unknown'
+    };
+  }
+
+  console.log('✅ Processed:', planets.length, 'planets and ascendant:', !!ascendant);
+  return { planets, ascendant };
+}
+
+/**
+ * Calculate house number from planetary longitude with correct ascendant offset handling
+ * Houses are calculated as 30-degree segments starting from the ascendant longitude
+ * Fixed to match API response house positions accurately
+ */
+function calculateHouseFromLongitude(planetLongitude, ascendantLongitude) {
+  // Ensure both longitudes are valid numbers
+  if (typeof planetLongitude !== 'number' || typeof ascendantLongitude !== 'number') {
+    console.warn('⚠️ Invalid longitude values:', { planetLongitude, ascendantLongitude });
+    return 1; // Default to 1st house
+  }
+
+  // Normalize longitudes to 0-360 range
+  const normalizedPlanet = ((planetLongitude % 360) + 360) % 360;
+  const normalizedAscendant = ((ascendantLongitude % 360) + 360) % 360;
+
+  // Calculate the difference from ascendant
+  let diff = normalizedPlanet - normalizedAscendant;
+
+  // Handle the wrap-around case (ensure positive difference)
+  if (diff < 0) {
+    diff += 360;
+  }
+
+  // Calculate house (each house spans 30 degrees)
+  // Add 1 because houses are 1-indexed, not 0-indexed
+  let houseNumber = Math.floor(diff / 30) + 1;
+
+  // Handle wrap-around for house 13 → house 1
+  if (houseNumber > 12) {
+    houseNumber = houseNumber - 12;
+  }
+
+  // Ensure house number is within valid range (1-12)
+  const validHouse = Math.max(1, Math.min(12, houseNumber));
+
+  console.log('🏠 House calculation (FIXED):', {
+    planet: normalizedPlanet.toFixed(2),
+    ascendant: normalizedAscendant.toFixed(2),
+    diff: diff.toFixed(2),
+    rawHouse: Math.floor(diff / 30) + 1,
+    finalHouse: validHouse
+  });
+
+  return validHouse;
+}
+
+/**
+ * Group planets by house for clean display
+ */
+function groupPlanetsByHouse(planets, ascendant) {
+  const houseGroups = {};
+
+  // Initialize all houses
+  for (let i = 1; i <= 12; i++) {
+    houseGroups[i] = [];
+  }
+
+  // Add ascendant to first house
+  if (ascendant) {
+    houseGroups[1].push(ascendant);
+  }
+
+  // Group planets by house
+  planets.forEach(planet => {
+    if (planet.house >= 1 && planet.house <= 12) {
+      houseGroups[planet.house].push(planet);
+    }
+  });
+
+  return houseGroups;
+}
+
+/**
+ * Format planet display text to match template specification EXACTLY
+ * Template format: "Ra 15" (concise, no degree symbols, no minutes)
+ */
+function formatPlanetText(planet) {
+  // EXACT template format: Planet code + space + degree number only
+  // Dignity symbols: ↑ for exalted, ↓ for debilitated (as shown in template)
+  const dignitySymbol = planet.dignity === 'exalted' ? '↑' :
+                       planet.dignity === 'debilitated' ? '↓' : '';
+
+  // Template shows format like "Ra 15", "Ju 14", "Mo 19" - NO degree symbol, NO minutes
+  return `${planet.code} ${planet.degrees}${dignitySymbol}`;
+}
+
+/**
+ * Main VedicChartDisplay Component
+ */
+export default function VedicChartDisplay({
+  chartData,
+  chartType = "rasi",
+  className = "",
+  style = {},
+  showDetails = true,
+  onError
+}) {
+  const [processedData, setProcessedData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Process chart data
+  useEffect(() => {
+    console.log('🔄 VedicChartDisplay useEffect triggered, chartData:', !!chartData);
+
+    if (!chartData) {
+      console.log('❌ No chartData provided');
+      setProcessedData(null);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      console.log('🎯 Processing traditional chart data:', chartData);
+
+      const { planets, ascendant } = processChartData(chartData);
+      const houseGroups = groupPlanetsByHouse(planets, ascendant);
+
+      console.log('📊 Chart processing results:', {
+        planetsCount: planets.length,
+        hasAscendant: !!ascendant,
+        houseGroupsKeys: Object.keys(houseGroups),
+        planetsWithHouses: planets.map(p => ({ name: p.name, house: p.house, code: p.code }))
+      });
+
+      setProcessedData({ planets, ascendant, houseGroups });
+      setError(null);
+      setLoading(false);
+
+      console.log('✅ Traditional chart processing successful');
+    } catch (err) {
+      console.error('❌ Chart processing failed:', err);
+      setError(err.message || 'Failed to process chart data');
+      setProcessedData(null);
+      setLoading(false);
+      onError?.(err);
+    }
+  }, [chartData, onError]); // Add chartData as dependency to ensure re-render on data change
+
+  // Loading state
+  if (loading) {
     return (
-      <div
-        className={`relative w-full max-w-lg mx-auto transition-all duration-500 ${
-          isChartVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
-        }`}
-        style={{ aspectRatio: '1', minHeight: '400px' }}
-      >
-        {/* Title */}
-        <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 text-center">
-          <h3 className="text-lg font-bold text-amber-800 mb-1">जन्म कुंडली</h3>
-          <h4 className="text-sm font-semibold text-amber-700">Vedic Birth Chart</h4>
-        </div>
+      <div className={`flex items-center justify-center p-8 ${className}`} style={style}>
+        <VedicLoadingSpinner text="Loading Traditional Kundli..." />
+      </div>
+    );
+  }
 
-        {/* Main Chart Container - 4x4 Grid */}
-        <div className="absolute inset-0 border-4 border-amber-800 bg-yellow-50 relative">
-          {/* Houses 1-12 positioned according to North Indian tradition */}
-          {[1,2,3,4,5,6,7,8,9,10,11,12].map(houseNum => {
-            const position = getAuthenticHousePosition(houseNum);
-            const housePlanets = housePlanetsMap[houseNum] || [];
-            const isSelected = selectedHouse === houseNum;
-            const isHovered = hoveredHouse === houseNum;
+  // Error state
+  if (error) {
+    return (
+      <div className={`bg-red-50 border-2 border-red-200 rounded-lg p-6 text-center ${className}`} style={style}>
+        <div className="text-red-600 mb-4">⚠️</div>
+        <h3 className="text-lg font-semibold text-red-800 mb-2">Chart Display Error</h3>
+        <p className="text-red-700 mb-4">{error}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors"
+        >
+          Refresh Page
+        </button>
+      </div>
+    );
+  }
+
+  // No data state
+  if (!processedData) {
+    return (
+      <div className={`bg-yellow-50 border-2 border-yellow-200 rounded-lg p-6 text-center ${className}`} style={style}>
+        <div className="text-yellow-600 mb-4">📊</div>
+        <h3 className="text-lg font-semibold text-yellow-800 mb-2">No Chart Data</h3>
+        <p className="text-yellow-700">Please generate a birth chart first.</p>
+      </div>
+    );
+  }
+
+  const { houseGroups, ascendant } = processedData;
+
+  return (
+    <div
+      className={`rounded-lg p-6 ${className}`}
+      style={{
+        ...style,
+        backgroundColor: '#FFF8E1', // Cream/beige background to match template
+        border: '2px solid #8B4513', // Brown border to match traditional kundli
+        minWidth: `${CHART_SIZE + 100}px`, // Add padding for container
+        width: 'max-content', // Ensure container doesn't shrink
+        display: 'inline-block' // Prevent flex shrinking
+      }}
+      role="article"
+      aria-label="Traditional Vedic Birth Chart (North Indian Style)"
+    >
+      {/* Chart Title with Sanskrit */}
+      <div className="text-center mb-6">
+        <h2 className="text-xl font-bold" style={{ color: '#2F1B14' }}>
+          {chartType === "navamsa" ?
+            "नवांश चक्र (Navamsa Chart) - D9" :
+            "लग्न चक्र (Lagna Chart) - D1"
+          }
+        </h2>
+        {ascendant && (
+          <p className="text-sm mt-1" style={{ color: '#5D4037' }}>
+            लग्न (Lagna): {ascendant.sign} {ascendant.degrees}°{ascendant.minutes}'
+          </p>
+        )}
+      </div>
+
+      {/* Traditional Diamond Chart */}
+      <div className="flex justify-center" style={{
+        minWidth: `${CHART_SIZE}px`,
+        minHeight: `${CHART_SIZE}px`,
+        width: `${CHART_SIZE}px`,
+        height: `${CHART_SIZE}px`
+      }}>
+        <svg
+          width={CHART_SIZE}
+          height={CHART_SIZE}
+          viewBox={`0 0 ${CHART_SIZE} ${CHART_SIZE}`}
+          style={{
+            width: `${CHART_SIZE}px`,
+            height: `${CHART_SIZE}px`,
+            minWidth: `${CHART_SIZE}px`,
+            minHeight: `${CHART_SIZE}px`,
+            display: 'block',
+            flexShrink: 0,
+            backgroundColor: '#FFF8E1' // Cream background for SVG
+          }}
+          className="border-none" // Remove default border since we're styling the container
+          role="img"
+          aria-label="Traditional North Indian Kundli Chart"
+        >
+          {/* Background fill for the entire chart */}
+          <rect width={CHART_SIZE} height={CHART_SIZE} fill="#FFF8E1" />
+
+          {/* Chart Frame - Authentic North Indian Diamond Structure */}
+          <g stroke="#000000" strokeWidth="2" fill="none">
+            {/* Outer square border */}
+            <rect
+              x={PADDING}
+              y={PADDING}
+              width={CHART_SIZE - 2*PADDING}
+              height={CHART_SIZE - 2*PADDING}
+              fill="none"
+              stroke="#000000"
+              strokeWidth="2"
+            />
+
+            {/* Corner-to-corner diagonal lines creating X pattern */}
+            <line x1={PADDING} y1={PADDING} x2={CHART_SIZE - PADDING} y2={CHART_SIZE - PADDING} />
+            <line x1={CHART_SIZE - PADDING} y1={PADDING} x2={PADDING} y2={CHART_SIZE - PADDING} />
+
+            {/* Inner diamond connecting midpoints of square sides */}
+            <line x1={CENTER_X} y1={PADDING} x2={CHART_SIZE - PADDING} y2={CENTER_Y} />
+            <line x1={CHART_SIZE - PADDING} y1={CENTER_Y} x2={CENTER_X} y2={CHART_SIZE - PADDING} />
+            <line x1={CENTER_X} y1={CHART_SIZE - PADDING} x2={PADDING} y2={CENTER_Y} />
+            <line x1={PADDING} y1={CENTER_Y} x2={CENTER_X} y2={PADDING} />
+          </g>
+
+          {/* Rasi Numbers - positioned at diamond intersections (blue circle locations) */}
+          {Object.entries(RASI_NUMBER_POSITIONS).map(([houseNum, rasiPosition]) => {
+            // Get ascendant Rasi from API data
+            const ascendantRasi = ascendant ? getRasiNumberFromSign(ascendant.sign) : 1;
+            // Calculate which Rasi occupies this house position
+            const rasiNumber = calculateRasiForHouse(parseInt(houseNum), ascendantRasi);
 
             return (
-              <div
-                key={houseNum}
-                className={`absolute border-2 border-amber-800 bg-white cursor-pointer
-                  transition-all duration-300 flex flex-col items-center justify-center
-                  ${isSelected ? 'bg-amber-100 border-amber-600 shadow-lg scale-105 z-20' : 'hover:bg-amber-50 z-10'}
-                  ${isHovered ? 'shadow-md' : ''}`}
-                style={position}
-                onClick={() => handleHouseClick(houseNum)}
-                onMouseEnter={() => handleHouseHover(houseNum)}
-                onMouseLeave={handleHouseLeave}
+              <text
+                key={`rasi-${houseNum}`}
+                x={rasiPosition.x}
+                y={rasiPosition.y}
+                textAnchor="middle"
+                fontSize="14"
+                fill="#000000"
+                fontWeight="bold"
+                fontFamily="Arial, sans-serif"
               >
-                {/* House Number */}
-                <div className="absolute top-1 left-1 text-xs font-bold text-amber-800 bg-amber-200
-                  rounded px-1 min-w-4 text-center">
-                  {houseNum}
-                </div>
-
-                {/* Planets in House */}
-                <div className="flex flex-wrap justify-center items-center p-1 gap-0.5">
-                  {housePlanets.map((planet, idx) => (
-                    <span
-                      key={idx}
-                      className="text-sm font-semibold"
-                      style={{
-                        color: planetColors[planet.name] || planetColors[planet.Name] || '#92400e',
-                        fontSize: housePlanets.length > 3 ? '10px' : '12px'
-                      }}
-                      title={`${planet.name || planet.Name} in ${planet.sign} (${planet.degree?.toFixed(1)}°)`}
-                    >
-                      {planetSymbols[planet.name] || planetSymbols[planet.Name] || (planet.name || planet.Name)?.charAt(0)}
-                    </span>
-                  ))}
-                </div>
-
-                {/* House significance tooltip on hover */}
-                {isHovered && (
-                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 z-30
-                    bg-amber-800 text-white text-xs px-2 py-1 rounded shadow-lg
-                    pointer-events-none whitespace-nowrap">
-                    <div className="font-medium">House {houseNum}</div>
-                    <div className="text-xs opacity-90">{houseSignificance[houseNum]}</div>
-                    <div className="absolute top-full left-1/2 transform -translate-x-1/2
-                      border-l-4 border-r-4 border-t-4 border-transparent border-t-amber-800"></div>
-                  </div>
-                )}
-              </div>
+                {rasiNumber}
+              </text>
             );
           })}
 
-          {/* Center Information Area - spans the middle 2x2 grid */}
-          <div className="absolute bg-gradient-to-br from-amber-100 to-yellow-100
-            border-2 border-amber-600 rounded-lg flex flex-col items-center justify-center
-            text-center shadow-inner z-10"
-            style={{
-              top: '25%',
-              left: '25%',
-              width: '50%',
-              height: '50%'
-            }}>
-            <div className="text-amber-800 font-bold text-sm mb-1">
-              {chartDetails.birthData?.name || 'Kundli'}
-            </div>
-            <div className="text-amber-700 text-xs font-medium">
-              लग्न: {chartDetails.rasiChart?.ascendant?.sign || 'Unknown'}
-            </div>
-            <div className="text-xs text-amber-600">
-              {chartDetails.rasiChart?.ascendant?.degree?.toFixed(1) || '0.0'}°
-            </div>
-            {chartDetails.rasiChart?.nakshatra?.name && (
-              <div className="text-xs text-amber-600 mt-1">
-                {chartDetails.rasiChart.nakshatra.name}
-              </div>
-            )}
-          </div>
-        </div>
 
-        {/* Decorative corner elements */}
-        <div className="absolute -top-2 -left-2 text-amber-600 text-lg">✦</div>
-        <div className="absolute -top-2 -right-2 text-amber-600 text-lg">✦</div>
-        <div className="absolute -bottom-2 -left-2 text-amber-600 text-lg">✦</div>
-        <div className="absolute -bottom-2 -right-2 text-amber-600 text-lg">✦</div>
+          {/* Planetary Positions - improved spacing to prevent overlapping */}
+          {Object.entries(houseGroups).map(([houseNum, planetsInHouse]) => {
+            if (planetsInHouse.length === 0) return null;
+
+            const housePosition = HOUSE_POSITIONS[parseInt(houseNum)];
+            const housePlanetCount = planetsInHouse.length;
+
+            return (
+              <g key={`house-planets-${houseNum}`}>
+                {planetsInHouse.map((planet, index) => {
+                  // Improved positioning logic to prevent overlapping
+                  let textX = housePosition.x;
+                  let textY = housePosition.y;
+
+                  // For multiple planets in same house, arrange them in a grid pattern
+                  if (housePlanetCount === 1) {
+                    // Single planet - center it below house number
+                    textY += 25;
+                  } else if (housePlanetCount === 2) {
+                    // Two planets - stack vertically with proper spacing
+                    textY += 20 + (index * 25);
+                  } else if (housePlanetCount === 3) {
+                    // Three planets - increased spacing to prevent overlap
+                    textY += 15 + (index * 24);
+                  } else {
+                    // Four or more planets - use 2x2 grid layout with better spacing
+                    const col = index % 2;
+                    const row = Math.floor(index / 2);
+                    textX += (col === 0 ? -35 : 35); // Increased horizontal offset
+                    textY += 20 + (row * 22); // Increased vertical spacing
+                  }
+
+                  return (
+                    <text
+                      key={`${houseNum}-${planet.name}-${index}`}
+                      x={textX}
+                      y={textY}
+                      textAnchor="middle"
+                      fontSize="12"
+                      fill="#000000"
+                      fontFamily="Arial, sans-serif"
+                      fontWeight="bold"
+                      style={{
+                        textShadow: '1px 1px 1px rgba(255,255,255,0.8)' // Add subtle shadow for clarity
+                      }}
+                    >
+                      {formatPlanetText(planet)}
+                    </text>
+                  );
+                })}
+              </g>
+            );
+          })}
+        </svg>
       </div>
-    );
-  };
 
-  // Enhanced house interaction handlers
-  const handleHouseHover = useCallback((houseNumber) => {
-    setHoveredHouse(houseNumber);
-  }, []);
-
-  const handleHouseLeave = useCallback(() => {
-    setHoveredHouse(null);
-  }, []);
-
-  const handleHouseClick = useCallback((houseNumber) => {
-    setSelectedHouse(selectedHouse === houseNumber ? null : houseNumber);
-  }, [selectedHouse]);
-
-
-
-  const renderHouseDetails = () => {
-    if (!selectedHouse || !chartDetails) return null;
-
-    const housePlanets = getPlanetsInHouse(selectedHouse);
-    const housePosition = chartDetails.rasiChart?.housePositions?.find(house => house.houseNumber === selectedHouse);
-
-    return (
-      <Card className="mt-4 p-4">
-        <h3 className="text-lg font-semibold text-amber-800 mb-2">
-          House {selectedHouse} Details
-        </h3>
-
-        <div className="space-y-2">
-          <div className="flex justify-between">
-            <span className="text-sm text-amber-700">Sign:</span>
-            <span className="text-sm font-medium text-gray-800">{housePosition?.sign || 'Unknown'}</span>
-          </div>
-
-          <div className="flex justify-between">
-            <span className="text-sm text-amber-700">Degree:</span>
-            <span className="text-sm font-medium text-gray-800">
-              {housePosition?.degree ? `${housePosition.degree.toFixed(2)}°` : 'Unknown'}
-            </span>
-          </div>
-
-          {housePlanets && housePlanets.length > 0 ? (
-            <div>
-              <div className="text-sm text-amber-700 mb-2">Planets:</div>
-              <div className="space-y-1">
-                {housePlanets.map((planet, index) => (
-                  <div key={index} className="text-sm bg-yellow-100 p-2 rounded">
-                    <div className="font-medium text-gray-800">
-                      {planetSymbols[planet.name || planet.Name]} {planet.name || planet.Name}
-                    </div>
-                    <div className="text-xs text-amber-700">
-                      {planet.sign} {planet.degree?.toFixed(2)}° - {planet.dignity || 'neutral'}
-                      {planet.isRetrograde && ' (R)'}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div className="text-sm text-amber-600">
-              No planets in this house
-            </div>
-          )}
+      {/* Legend with Sanskrit Terms */}
+      <div className="mt-6 text-xs text-center space-y-2" style={{ color: '#5D4037' }}>
+        <div>
+          <p className="font-medium mb-1">ग्रह (Graha) - Planetary Codes:</p>
+          <p>Su=सूर्य(Sun), Mo=चन्द्र(Moon), Ma=मंगल(Mars), Me=बुध(Mercury), Ju=गुरु(Jupiter)</p>
+          <p>Ve=शुक्र(Venus), Sa=शनि(Saturn), Ra=राहु(Rahu), Ke=केतु(Ketu), As=लग्न(Ascendant)</p>
         </div>
-      </Card>
-    );
-  };
-
-  if (isLoading) {
-    return (
-      <Card className={`p-6 ${className}`}>
-        <div className="text-center">
-          {/* Enhanced Vedic Loading Animation */}
-          <div className="relative mx-auto mb-6" style={{ width: '120px', height: '120px' }}>
-            {/* Outer cosmic ring */}
-            <div className="absolute inset-0 rounded-full border-4 border-vedic-gold/30 spinner-vedic"></div>
-
-            {/* Middle celestial ring */}
-            <div className="absolute inset-2 rounded-full border-3 border-cosmic-purple/50 animate-spin"
-                 style={{animationDuration: '3s', animationDirection: 'reverse'}}></div>
-
-            {/* Inner mandala core */}
-            <div className="absolute inset-6 rounded-full bg-vedic-radial
-              animate-sacred-pulse flex items-center justify-center shadow-celestial">
-              <div className="text-2xl text-white animate-float font-vedic">ॐ</div>
-            </div>
-
-            {/* Floating stars */}
-            {[...Array(8)].map((_, i) => (
-              <div
-                key={i}
-                className="absolute w-1 h-1 bg-vedic-gold rounded-full animate-float"
-                style={{
-                  top: `${20 + Math.sin(i * Math.PI / 4) * 30}%`,
-                  left: `${50 + Math.cos(i * Math.PI / 4) * 40}%`,
-                  animationDelay: `${i * 0.2}s`
-                }}
-              />
-            ))}
-          </div>
-
-          <div className="space-y-2">
-            <p className="text-vedic-gradient font-vedic text-lg font-semibold">
-              Generating your Vedic birth chart...
-            </p>
-            <p className="text-sm text-earth-brown/80">
-              Calculating planetary positions and house placements
-            </p>
-            <p className="text-xs text-cosmic-purple italic font-vedic">
-              "ग्रह गणना प्रगति में है" - Planetary calculations in progress
-            </p>
-          </div>
-
-          {/* Enhanced Progress indicator */}
-          <div className="mt-4 w-full bg-vedic-background rounded-full h-3 shadow-inner">
-            <div className="bg-vedic-radial h-3 rounded-full animate-pulse w-3/4 shadow-golden"></div>
-          </div>
+        <div>
+          <p className="font-medium mb-1">वैदिक चिह्न (Vedic Symbols):</p>
+          <p>↑=उच्च(Exalted), ↓=नीच(Debilitated), ℞=वक्री(Retrograde), ☉=अस्त(Combust)</p>
+          <p>Format: Planet Position°Minutes' with dignity symbols</p>
         </div>
-      </Card>
-    );
-  }
-
-  if (!chartData) {
-    return (
-      <Card className={`p-6 ${className}`}>
-        <div className="text-center text-gray-600">
-          <div className="text-6xl mb-4">📊</div>
-          <h3 className="text-lg font-semibold mb-2 text-amber-800">No Chart Data</h3>
-          <p className="text-sm text-gray-700">
-            Please generate a birth chart by filling out the form and clicking "Generate Chart"
-          </p>
-        </div>
-      </Card>
-    );
-  }
-
-  return (
-    <div className={`space-y-4 ${className}`}>
-      <Card className="p-4 sm:p-6">
-        <div className="text-center mb-4">
-          <h2 className="text-xl sm:text-2xl font-bold text-amber-800 mb-2">
-            Vedic Birth Chart (Kundli)
-          </h2>
-          <p className="text-xs sm:text-sm text-amber-700">
-            Click on any house to view detailed planetary information
-          </p>
-        </div>
-
-        {renderAuthenticChart()}
-
-        <div className="mt-4 text-center">
-          <div className="flex flex-wrap justify-center gap-2 sm:gap-4 text-xs text-amber-600">
-            <span>☉ Sun</span>
-            <span>☽ Moon</span>
-            <span>♂ Mars</span>
-            <span>☿ Mercury</span>
-            <span>♃ Jupiter</span>
-            <span>♀ Venus</span>
-            <span>♄ Saturn</span>
-            <span>☊ Rahu</span>
-            <span>☋ Ketu</span>
-          </div>
-        </div>
-      </Card>
-
-      {renderHouseDetails()}
-
-      {chartData.analysis && (
-        <Card className="p-4">
-          <h3 className="text-lg font-semibold text-amber-800 mb-2">
-            Chart Summary
-          </h3>
-          <div className="text-sm text-gray-700 space-y-2">
-            <div>
-              <strong className="text-amber-700">Ascendant:</strong> {chartData.rasiChart?.ascendant?.sign || chartData.analysis?.personality?.lagnaSign || 'Calculating...'}
-            </div>
-            <div>
-              <strong className="text-amber-700">Moon Sign:</strong> {chartData.analysis?.personality?.moonSign || 'Calculating...'}
-            </div>
-            <div>
-              <strong className="text-amber-700">Sun Sign:</strong> {chartData.analysis?.personality?.sunSign || 'Calculating...'}
-            </div>
-            <div>
-              <strong className="text-amber-700">Nakshatra:</strong> {chartData.rasiChart?.nakshatra?.name || 'Calculating...'}
-            </div>
-            {chartData.analysis?.personality?.keyTraits && (
-              <div>
-                <strong className="text-amber-700">Key Traits:</strong> {chartData.analysis.personality.keyTraits.join(', ')}
-              </div>
-            )}
-          </div>
-        </Card>
-      )}
+      </div>
     </div>
   );
-};
+}
 
-export default VedicChartDisplay;
+// Export helper functions for testing
+export {
+  HOUSE_POSITIONS,
+  PLANET_CODES,
+  processChartData,
+  calculateHouseFromLongitude,
+  groupPlanetsByHouse,
+  formatPlanetText
+};

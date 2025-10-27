@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const planetaryPositionSchema = new mongoose.Schema({
   planet: {
@@ -477,4 +477,4 @@ chartSchema.statics.findByDateRange = function(startDate, endDate) {
   });
 };
 
-module.exports = mongoose.model('Chart', chartSchema);
+export default mongoose.model('Chart', chartSchema);

@@ -4,7 +4,7 @@
  * Handles graha drishti (planetary aspects), special aspects, and aspect strength calculations
  */
 
-const { calculateAngularDistance } = require('../../../utils/helpers/astrologyHelpers');
+import { calculateAngularDistance } from '../../../utils/helpers/astrologyHelpers.js';
 
 class AspectAnalysisService {
   constructor(chart) {
@@ -542,4 +542,4 @@ class AspectAnalysisService {
   }
 }
 
-module.exports = AspectAnalysisService;
+export default AspectAnalysisService;

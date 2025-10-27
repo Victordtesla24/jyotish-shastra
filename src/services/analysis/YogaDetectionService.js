@@ -4,12 +4,12 @@
  * Implements comprehensive yoga detection for accurate astrological analysis
  */
 
-const RajaYogaCalculator = require('../../core/analysis/yogas/RajaYogaCalculator');
-const DhanaYogaCalculator = require('../../core/analysis/yogas/DhanaYogaCalculator');
-const GajaKesariYogaCalculator = require('../../core/analysis/yogas/GajaKesariYogaCalculator');
-const ViparitaRajaYogaCalculator = require('../../core/analysis/yogas/ViparitaRajaYogaCalculator');
-const PanchMahapurushaYogaCalculator = require('../../core/analysis/yogas/PanchMahapurushaYogaCalculator');
-const NeechaBhangaYogaCalculator = require('../../core/analysis/yogas/NeechaBhangaYogaCalculator');
+import RajaYogaCalculator from '../../core/analysis/yogas/RajaYogaCalculator.js';
+import DhanaYogaCalculator from '../../core/analysis/yogas/DhanaYogaCalculator.js';
+import GajaKesariYogaCalculator from '../../core/analysis/yogas/GajaKesariYogaCalculator.js';
+import ViparitaRajaYogaCalculator from '../../core/analysis/yogas/ViparitaRajaYogaCalculator.js';
+import PanchMahapurushaYogaCalculator from '../../core/analysis/yogas/PanchMahapurushaYogaCalculator.js';
+import NeechaBhangaYogaCalculator from '../../core/analysis/yogas/NeechaBhangaYogaCalculator.js';
 
 class YogaDetectionService {
   constructor() {
@@ -145,4 +145,4 @@ class YogaDetectionService {
   }
 }
 
-module.exports = YogaDetectionService;
+export default YogaDetectionService;

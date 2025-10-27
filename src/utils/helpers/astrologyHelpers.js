@@ -359,7 +359,7 @@ function calculateAngularDistance(long1, long2) {
   return calculateDistance(long1, long2);
 }
 
-module.exports = {
+export {
   getSign,
   getSignName,
   getSignId,

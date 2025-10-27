@@ -1,4 +1,4 @@
-const DhanaYogaCalculator = require('../../../../../src/core/analysis/yogas/DhanaYogaCalculator');
+const DhanaYogaCalculator = require('../../../../../src/core/analysis/yogas/DhanaYogaCalculator').default;
 
 describe('DhanaYogaCalculator', () => {
     let calculator;

@@ -4,11 +4,11 @@
  * Integrates all analyses into comprehensive reports following Section 8 requirements
  */
 
-const LagnaAnalysisService = require('../analysis/LagnaAnalysisService');
-const HouseAnalysisService = require('../../core/analysis/houses/HouseAnalysisService');
-const ArudhaAnalysisService = require('../analysis/ArudhaAnalysisService');
-const AspectAnalysisService = require('../../core/analysis/aspects/AspectAnalysisService');
-const BirthDataAnalysisService = require('../analysis/BirthDataAnalysisService');
+import LagnaAnalysisService from '../analysis/LagnaAnalysisService.js';
+import HouseAnalysisService from '../../core/analysis/houses/HouseAnalysisService.js';
+import ArudhaAnalysisService from '../analysis/ArudhaAnalysisService.js';
+import AspectAnalysisService from '../../core/analysis/aspects/AspectAnalysisService.js';
+import BirthDataAnalysisService from '../analysis/BirthDataAnalysisService.js';
 
 class ComprehensiveReportService {
   constructor() {
@@ -1777,4 +1777,4 @@ class ComprehensiveReportService {
   }
 }
 
-module.exports = ComprehensiveReportService;
+export default ComprehensiveReportService;

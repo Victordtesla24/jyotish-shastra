@@ -6,4 +6,4 @@ function analyzeSaptamsaChildren(saptamsaChart) {
   return { fifthHouse, jupiter };
 }
 
-module.exports = { analyzeSaptamsaChildren };
+export default SaptamsaAnalyzer;

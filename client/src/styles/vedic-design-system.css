@@ -1,6 +1,7 @@
 /*
- * Jyotish Shastra Vedic Design System
- * A comprehensive design system combining ancient Vedic aesthetics with modern web standards
+ * Jyotish Shastra Unified Design System
+ * A comprehensive design system with consistent colors, symbols, and UI elements
+ * Based on traditional Vedic aesthetics with modern web standards
  */
 
 @import 'tailwindcss/base';
@@ -8,332 +9,296 @@
 @import 'tailwindcss/utilities';
 
 /* =============================================
-   VEDIC DESIGN TOKENS & CSS CUSTOM PROPERTIES
+   VEDIC COLOR PALETTE - CORE FOUNDATION
    ============================================= */
 
 :root {
-  /* === PRIMARY VEDIC COLORS === */
-  --vedic-saffron: #FF9933;
-  --vedic-gold: #FFD700;
-  --vedic-maroon: #800000;
-  --vedic-deep-blue: #000080;
-  --vedic-lotus-pink: #FFC0CB;
+  /* === PRIMARY VEDIC COLORS (Sacred Colors) === */
+  --vedic-saffron: #FF9933;           /* Sacred saffron - primary brand color */
+  --vedic-saffron-light: #FFB366;     /* Light saffron for backgrounds */
+  --vedic-saffron-dark: #E6751A;      /* Dark saffron for emphasis */
 
-  /* === CURRENT THEME COLORS (Compatibility) === */
-  --vedic-primary: #FF6B35;
-  --vedic-secondary: #8B4513;
-  --vedic-accent: #FFD700;
+  --vedic-gold: #FFD700;              /* Sacred gold - accent color */
+  --vedic-gold-light: #FFF4B3;        /* Light gold for subtle backgrounds */
+  --vedic-gold-dark: #DAB800;         /* Dark gold for text/borders */
 
-  /* === CELESTIAL COLORS === */
-  --cosmic-purple: #6B46C1;
-  --stellar-blue: #1E40AF;
-  --lunar-silver: #C0C0C0;
-  --solar-orange: #F97316;
+  --vedic-maroon: #8B0000;            /* Deep maroon - secondary color */
+  --vedic-maroon-light: #CC6666;      /* Light maroon for backgrounds */
+  --vedic-maroon-dark: #660000;       /* Dark maroon for emphasis */
 
-  /* === SACRED NEUTRALS === */
-  --sacred-white: #FFFEF7;
-  --wisdom-gray: #6B7280;
-  --earth-brown: #92400E;
+  /* === CHAKRA COLORS (Energy Centers) === */
+  --root-chakra: #C41E3A;             /* Muladhara - Red */
+  --sacral-chakra: #FF8C00;           /* Svadhisthana - Orange */
+  --solar-chakra: #FFD700;            /* Manipura - Yellow */
+  --heart-chakra: #32CD32;            /* Anahata - Green */
+  --throat-chakra: #4169E1;           /* Vishuddha - Blue */
+  --third-eye-chakra: #4B0082;        /* Ajna - Indigo */
+  --crown-chakra: #9400D3;            /* Sahasrara - Violet */
+
+  /* === PLANETARY COLORS (Graha Colors) === */
+  --sun-color: #FFA500;               /* Surya - Orange/Gold */
+  --moon-color: #C0C0C0;              /* Chandra - Silver/White */
+  --mars-color: #CD5C5C;              /* Mangala - Red */
+  --mercury-color: #32CD32;           /* Budha - Green */
+  --jupiter-color: #FFD700;           /* Guru - Yellow/Gold */
+  --venus-color: #FFB6C1;             /* Shukra - Pink/White */
+  --saturn-color: #2F4F4F;            /* Shani - Dark Blue/Black */
+  --rahu-color: #696969;              /* Rahu - Smoky/Gray */
+  --ketu-color: #A0522D;              /* Ketu - Brown/Multicolor */
+
+  /* === RASHI COLORS (Zodiac Signs) === */
+  --aries-color: #FF4500;             /* Mesha - Fiery Red */
+  --taurus-color: #8FBC8F;            /* Vrishabha - Earth Green */
+  --gemini-color: #87CEEB;            /* Mithuna - Air Blue */
+  --cancer-color: #F0F8FF;            /* Karkata - Water White/Silver */
+  --leo-color: #FFD700;               /* Simha - Royal Gold */
+  --virgo-color: #9ACD32;             /* Kanya - Earth Green */
+  --libra-color: #FFB6C1;             /* Tula - Harmonious Pink */
+  --scorpio-color: #8B0000;           /* Vrishchika - Deep Red */
+  --sagittarius-color: #FF8C00;       /* Dhanu - Fire Orange */
+  --capricorn-color: #556B2F;         /* Makara - Earth Brown */
+  --aquarius-color: #4169E1;          /* Kumbha - Air Blue */
+  --pisces-color: #9370DB;            /* Meena - Water Purple */
+
+  /* === ELEMENT COLORS (Pancha Mahabhuta) === */
+  --fire-element: #FF4500;            /* Agni - Fire */
+  --earth-element: #8B4513;           /* Prithvi - Earth */
+  --air-element: #87CEEB;             /* Vayu - Air */
+  --water-element: #4682B4;           /* Jal - Water */
+  --space-element: #9370DB;           /* Akasha - Space/Ether */
+
+  /* === STRENGTH & STATUS COLORS === */
+  --exalted-color: #228B22;           /* Strong Green */
+  --own-sign-color: #4169E1;          /* Royal Blue */
+  --friendly-color: #32CD32;          /* Friendly Green */
+  --neutral-color: #808080;           /* Neutral Gray */
+  --enemy-color: #FF6347;             /* Enemy Orange-Red */
+  --debilitated-color: #DC143C;       /* Weak Red */
+
+  /* === DIGNITY GRADIENT COLORS === */
+  --strength-excellent: #228B22;      /* Excellent - Deep Green */
+  --strength-good: #32CD32;           /* Good - Green */
+  --strength-average: #FFD700;        /* Average - Gold */
+  --strength-weak: #FF8C00;           /* Weak - Orange */
+  --strength-poor: #DC143C;           /* Poor - Red */
+
+  /* === NEUTRAL & BACKGROUND COLORS === */
+  --sacred-white: #FFFEF7;            /* Warm white background */
+  --sacred-cream: #FFF8DC;            /* Cream background */
+  --wisdom-gray: #6B7280;             /* Text gray */
+  --earth-brown: #8B4513;             /* Earth brown */
+  --sky-blue: #87CEEB;                /* Light sky blue */
 
   /* === TEXT COLORS === */
-  --vedic-text: #333333;
-  --vedic-text-light: #555555;
-  --vedic-text-muted: #6B7280;
+  --text-primary: #1F2937;            /* Dark gray - primary text */
+  --text-secondary: #4B5563;          /* Medium gray - secondary text */
+  --text-muted: #9CA3AF;              /* Light gray - muted text */
+  --text-white: #FFFFFF;              /* Pure white text */
+  --text-gold: var(--vedic-gold-dark); /* Gold text for emphasis */
 
   /* === BACKGROUND COLORS === */
-  --vedic-background: #f8fafc;
-  --vedic-surface: #ffffff;
-  --vedic-border: #e2e8f0;
+  --bg-primary: #FFFFFF;              /* Primary white background */
+  --bg-secondary: var(--sacred-white); /* Secondary warm background */
+  --bg-subtle: var(--sacred-cream);   /* Subtle cream background */
+  --bg-overlay: rgba(255, 255, 255, 0.95); /* Semi-transparent overlay */
 
-  /* === EXTENDED PALETTE === */
-  --saffron-light: #ff8a5b;
-  --saffron-subtle: #fff0e6;
-  --gold-pure: #FFD700;
-  --gold-champagne: #f7e7ce;
-  --orange-coral: #ff7f50;
+  /* === BORDER COLORS === */
+  --border-light: #E5E7EB;            /* Light border */
+  --border-medium: #D1D5DB;           /* Medium border */
+  --border-dark: #9CA3AF;             /* Dark border */
+  --border-accent: var(--vedic-gold); /* Accent border */
 
-  /* === GRADIENT DEFINITIONS === */
-  --gradient-vedic-primary: linear-gradient(135deg, #FF6B35 0%, #8B4513 100%);
-  --gradient-vedic-secondary: linear-gradient(135deg, #8B4513 0%, #FF6B35 100%);
-  --gradient-vedic-accent: linear-gradient(90deg, #FFD700, #E6C200);
-  --gradient-vedic-text: linear-gradient(90deg, #4a4a4a, #333333);
-  --gradient-cosmic: linear-gradient(135deg, #6B46C1 0%, #1E40AF 100%);
-  --gradient-celestial: linear-gradient(135deg, #1E40AF 0%, #6B46C1 100%);
-
-  /* === SHADOWS & ELEVATIONS === */
-  --shadow-soft: 0 2px 4px rgba(0, 0, 0, 0.05);
-  --shadow-medium: 0 4px 8px rgba(0, 0, 0, 0.1);
-  --shadow-strong: 0 10px 20px rgba(0, 0, 0, 0.15);
-  --shadow-cosmic: 0 0 20px rgba(255, 107, 53, 0.4), 0 0 40px rgba(255, 240, 230, 0.3);
-  --shadow-celestial: 0 8px 25px rgba(0, 0, 0, 0.2), 0 0 20px rgba(107, 70, 193, 0.3);
-  --shadow-mandala: 0 12px 24px rgba(139, 69, 19, 0.2), 0 0 20px rgba(255, 107, 53, 0.4);
-
-  /* === FOCUS STATES === */
-  --vedic-focus-ring: #FFD700;
-  --focus-ring-width: 3px;
-  --focus-ring-offset: 2px;
-
-  /* === TYPOGRAPHY SCALES === */
-  --font-size-2xs: 0.625rem;
-  --font-size-xs: 0.75rem;
-  --font-size-sm: 0.875rem;
-  --font-size-base: 1rem;
-  --font-size-lg: 1.125rem;
-  --font-size-xl: 1.25rem;
-  --font-size-2xl: 1.5rem;
-  --font-size-3xl: 1.875rem;
-  --font-size-4xl: 2.25rem;
-  --font-size-5xl: 3rem;
-  --font-size-6xl: 3.75rem;
-  --font-size-7xl: 4.5rem;
-  --font-size-8xl: 6rem;
-  --font-size-9xl: 8rem;
+  /* === SHADOW DEFINITIONS === */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-sacred: 0 0 20px rgba(255, 153, 51, 0.3), 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-cosmic: 0 0 30px rgba(255, 215, 0, 0.4), 0 8px 16px rgba(0, 0, 0, 0.15);
 
   /* === SPACING SCALE === */
-  --spacing-px: 1px;
-  --spacing-0: 0;
-  --spacing-1: 0.25rem;
-  --spacing-2: 0.5rem;
-  --spacing-3: 0.75rem;
-  --spacing-4: 1rem;
-  --spacing-5: 1.25rem;
-  --spacing-6: 1.5rem;
-  --spacing-8: 2rem;
-  --spacing-10: 2.5rem;
-  --spacing-12: 3rem;
-  --spacing-16: 4rem;
-  --spacing-20: 5rem;
-  --spacing-24: 6rem;
-  --spacing-32: 8rem;
-  --spacing-40: 10rem;
-  --spacing-48: 12rem;
-  --spacing-56: 14rem;
-  --spacing-64: 16rem;
-  --spacing-72: 18rem;
-  --spacing-80: 20rem;
-  --spacing-96: 24rem;
+  --space-1: 0.25rem;   /* 4px */
+  --space-2: 0.5rem;    /* 8px */
+  --space-3: 0.75rem;   /* 12px */
+  --space-4: 1rem;      /* 16px */
+  --space-5: 1.25rem;   /* 20px */
+  --space-6: 1.5rem;    /* 24px */
+  --space-8: 2rem;      /* 32px */
+  --space-10: 2.5rem;   /* 40px */
+  --space-12: 3rem;     /* 48px */
+  --space-16: 4rem;     /* 64px */
+  --space-20: 5rem;     /* 80px */
 
   /* === BORDER RADIUS === */
-  --radius-none: 0;
-  --radius-sm: 0.125rem;
-  --radius-base: 0.25rem;
-  --radius-md: 0.375rem;
-  --radius-lg: 0.5rem;
-  --radius-xl: 0.75rem;
-  --radius-2xl: 1rem;
-  --radius-3xl: 1.5rem;
-  --radius-4xl: 2rem;
-  --radius-5xl: 2.5rem;
-  --radius-full: 9999px;
+  --radius-sm: 0.25rem;   /* 4px */
+  --radius-md: 0.5rem;    /* 8px */
+  --radius-lg: 0.75rem;   /* 12px */
+  --radius-xl: 1rem;      /* 16px */
+  --radius-2xl: 1.5rem;   /* 24px */
+  --radius-full: 9999px;  /* Fully rounded */
+
+  /* === TYPOGRAPHY SCALE === */
+  --text-xs: 0.75rem;     /* 12px */
+  --text-sm: 0.875rem;    /* 14px */
+  --text-base: 1rem;      /* 16px */
+  --text-lg: 1.125rem;    /* 18px */
+  --text-xl: 1.25rem;     /* 20px */
+  --text-2xl: 1.5rem;     /* 24px */
+  --text-3xl: 1.875rem;   /* 30px */
+  --text-4xl: 2.25rem;    /* 36px */
+  --text-5xl: 3rem;       /* 48px */
 
   /* === ANIMATION TIMING === */
-  --duration-75: 75ms;
-  --duration-100: 100ms;
-  --duration-150: 150ms;
-  --duration-200: 200ms;
-  --duration-300: 300ms;
-  --duration-400: 400ms;
-  --duration-500: 500ms;
-  --duration-600: 600ms;
-  --duration-700: 700ms;
-  --duration-1000: 1000ms;
+  --duration-fast: 150ms;
+  --duration-normal: 200ms;
+  --duration-slow: 300ms;
+  --duration-slower: 500ms;
 
-  /* === CUBIC BEZIER EASINGS === */
-  --ease-linear: linear;
-  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  /* === EASING FUNCTIONS === */
   --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
   --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
-  --ease-vedic: cubic-bezier(0.4, 0, 0.2, 1);
-  --ease-celestial: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 /* =============================================
-   DARK THEME SUPPORT
+   VEDIC SYMBOLS & ICONS
    ============================================= */
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --vedic-text: #f1f5f9;
-    --vedic-text-light: #cbd5e1;
-    --vedic-text-muted: #94a3b8;
-    --vedic-background: #0f172a;
-    --vedic-surface: #1e293b;
-    --vedic-border: #334155;
+.vedic-symbol {
+  font-family: 'Noto Sans Devanagari', serif;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--duration-normal) var(--ease-out);
+}
 
-    /* Adjusted shadows for dark mode */
-    --shadow-soft: 0 2px 4px rgba(0, 0, 0, 0.3);
-    --shadow-medium: 0 4px 8px rgba(0, 0, 0, 0.4);
-    --shadow-strong: 0 10px 20px rgba(0, 0, 0, 0.5);
-  }
+.symbol-om::before { content: "ॐ"; color: var(--vedic-gold); }
+.symbol-sun::before { content: "☀"; color: var(--sun-color); }
+.symbol-moon::before { content: "☽"; color: var(--moon-color); }
+.symbol-mars::before { content: "♂"; color: var(--mars-color); }
+.symbol-mercury::before { content: "☿"; color: var(--mercury-color); }
+.symbol-jupiter::before { content: "♃"; color: var(--jupiter-color); }
+.symbol-venus::before { content: "♀"; color: var(--venus-color); }
+.symbol-saturn::before { content: "♄"; color: var(--saturn-color); }
+.symbol-rahu::before { content: "☊"; color: var(--rahu-color); }
+.symbol-ketu::before { content: "☋"; color: var(--ketu-color); }
+
+.symbol-fire::before { content: "🔥"; color: var(--fire-element); }
+.symbol-earth::before { content: "🌍"; color: var(--earth-element); }
+.symbol-air::before { content: "💨"; color: var(--air-element); }
+.symbol-water::before { content: "💧"; color: var(--water-element); }
+.symbol-space::before { content: "🌌"; color: var(--space-element); }
+
+.symbol-lotus::before { content: "🪷"; color: var(--vedic-gold); }
+.symbol-mandala::before { content: "🕉"; color: var(--vedic-saffron); }
+.symbol-chakra::before { content: "⚛"; color: var(--third-eye-chakra); }
+
+/* Hover effects for symbols */
+.vedic-symbol:hover {
+  transform: scale(1.1);
+  filter: brightness(1.2);
 }
 
 /* =============================================
-   BASE LAYER STYLES
+   BUTTON SYSTEM - CONSISTENT ACROSS APP
    ============================================= */
 
-@layer base {
-  /* Enhanced HTML & Body Reset */
-  html {
-    font-size: 16px;
-    scroll-behavior: smooth;
-    -webkit-text-size-adjust: 100%;
-    -moz-text-size-adjust: 100%;
-    text-size-adjust: 100%;
-  }
-
-  body {
-    @apply font-inter antialiased;
-    color: var(--vedic-text);
-    background-color: var(--vedic-background);
-    line-height: 1.6;
-    margin: 0;
-    padding: 0;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* Enhanced Typography */
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-cinzel font-semibold;
-    color: var(--vedic-text);
-    line-height: 1.3;
-    margin-bottom: 0.5em;
-    letter-spacing: -0.02em;
-  }
-
-  h1 { @apply text-4xl md:text-5xl lg:text-6xl; }
-  h2 { @apply text-3xl md:text-4xl lg:text-5xl; }
-  h3 { @apply text-2xl md:text-3xl lg:text-4xl; }
-  h4 { @apply text-xl md:text-2xl lg:text-3xl; }
-  h5 { @apply text-lg md:text-xl lg:text-2xl; }
-  h6 { @apply text-base md:text-lg lg:text-xl; }
-
-  p {
-    @apply mb-4 text-base leading-relaxed;
-    color: var(--vedic-text-light);
-  }
-
-  /* Enhanced Link Styles */
-  a {
-    color: var(--vedic-primary);
+.btn-vedic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--radius-lg);
+  font-weight: 500;
+  font-size: var(--text-base);
+  line-height: 1;
     text-decoration: none;
-    transition: all var(--duration-200) var(--ease-out);
-    position: relative;
-  }
-
-  a:hover {
-    color: var(--vedic-secondary);
-    transform: translateY(-1px);
-  }
-
-  a:focus-visible {
-    outline: var(--focus-ring-width) solid var(--vedic-focus-ring);
-    outline-offset: var(--focus-ring-offset);
-    border-radius: var(--radius-base);
-  }
-
-  /* Enhanced Form Elements */
-  input, textarea, select {
-    @apply font-inter;
-    transition: all var(--duration-300) var(--ease-out);
-    background-color: var(--vedic-surface);
-    border: 1px solid var(--vedic-border);
-    color: var(--vedic-text);
-  }
-
-  input:focus, textarea:focus, select:focus {
-    border-color: var(--vedic-primary);
-    box-shadow: 0 0 0 var(--focus-ring-width) rgba(255, 107, 53, 0.2);
-    outline: none;
-  }
-
-  /* Enhanced Button Base */
-  button {
-    @apply font-serif font-medium;
+  border: 1px solid transparent;
     cursor: pointer;
-    border: none;
-    outline: none;
-    transition: all var(--duration-300) var(--ease-vedic);
+  transition: all var(--duration-normal) var(--ease-out);
     position: relative;
     overflow: hidden;
   }
 
-  button:disabled {
-    cursor: not-allowed;
-    opacity: 0.6;
-  }
-
-  button:focus-visible {
-    outline: var(--focus-ring-width) solid var(--vedic-focus-ring);
-    outline-offset: var(--focus-ring-offset);
-  }
+.btn-vedic:focus {
+  outline: 2px solid var(--vedic-gold);
+  outline-offset: 2px;
 }
 
+.btn-vedic:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Primary Button - Saffron */
+.btn-primary {
+  background: linear-gradient(135deg, var(--vedic-saffron) 0%, var(--vedic-saffron-dark) 100%);
+  color: var(--text-white);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--vedic-saffron-dark) 0%, var(--vedic-maroon) 100%);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Secondary Button - Gold */
+.btn-secondary {
+  background: linear-gradient(135deg, var(--vedic-gold) 0%, var(--vedic-gold-dark) 100%);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--vedic-gold-dark) 0%, var(--vedic-saffron) 100%);
+  color: var(--text-white);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Outline Button */
+.btn-outline {
+  background: transparent;
+  color: var(--vedic-saffron);
+  border-color: var(--vedic-saffron);
+}
+
+.btn-outline:hover:not(:disabled) {
+  background: var(--vedic-saffron);
+  color: var(--text-white);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Ghost Button */
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border: none;
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: var(--bg-subtle);
+  color: var(--vedic-saffron);
+}
+
+/* Button Sizes */
+.btn-sm { padding: var(--space-2) var(--space-4); font-size: var(--text-sm); }
+.btn-lg { padding: var(--space-4) var(--space-8); font-size: var(--text-lg); }
+.btn-xl { padding: var(--space-5) var(--space-10); font-size: var(--text-xl); }
+
 /* =============================================
-   COMPONENT LAYER - VEDIC UI COMPONENTS
+   CARD SYSTEM - CONSISTENT STYLING
    ============================================= */
 
-@layer components {
-  /* === VEDIC CONTAINER SYSTEM === */
-  .vedic-container {
-    @apply w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
-  }
-
-  .vedic-container-sm {
-    @apply w-full max-w-3xl mx-auto px-4 sm:px-6;
-  }
-
-  .vedic-container-lg {
-    @apply w-full max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8;
-  }
-
-  /* === VEDIC BUTTON SYSTEM === */
-  .btn-vedic {
-    @apply inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-xl;
-    @apply transition-all duration-300 ease-vedic;
-    @apply focus:outline-none focus:ring-3 focus:ring-offset-2;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .btn-vedic::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-    transition: left 0.6s ease;
-  }
-
-  .btn-vedic:hover::before {
-    left: 100%;
-  }
-
-  .btn-primary {
-    @apply btn-vedic bg-gradient-to-r from-vedic-primary to-vedic-secondary text-white;
-    @apply hover:shadow-cosmic hover:-translate-y-1;
-    @apply focus:ring-vedic-accent;
-  }
-
-  .btn-secondary {
-    @apply btn-vedic bg-transparent border-2 border-white text-white;
-    @apply hover:bg-white hover:text-vedic-primary hover:-translate-y-1;
-    @apply focus:ring-white;
-  }
-
-  .btn-accent {
-    @apply btn-vedic bg-gradient-to-r from-vedic-accent to-gold-pure text-vedic-text;
-    @apply hover:shadow-celestial hover:-translate-y-1;
-    @apply focus:ring-vedic-primary;
-  }
-
-  /* === VEDIC CARD SYSTEM === */
   .card-vedic {
-    @apply bg-vedic-surface rounded-2xl shadow-medium border border-vedic-border;
-    @apply transition-all duration-300 ease-vedic;
-    @apply hover:shadow-mandala hover:-translate-y-2;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-md);
+  transition: all var(--duration-normal) var(--ease-out);
     position: relative;
     overflow: hidden;
   }
@@ -344,672 +309,479 @@
     top: 0;
     left: 0;
     right: 0;
-    height: 4px;
-    background: var(--gradient-vedic-primary);
-  }
+  height: 3px;
+  background: linear-gradient(90deg, var(--vedic-saffron) 0%, var(--vedic-gold) 100%);
+}
 
-  .card-cosmic {
-    @apply card-vedic;
-    @apply hover:shadow-cosmic;
-  }
+.card-vedic:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--border-accent);
+}
 
-  .card-cosmic::before {
-    background: var(--gradient-cosmic);
-  }
+/* Card Variants */
+.card-sacred {
+  background: linear-gradient(135deg, var(--sacred-white) 0%, var(--sacred-cream) 100%);
+  box-shadow: var(--shadow-sacred);
+}
 
-  .card-celestial {
-    @apply card-vedic;
-    @apply hover:shadow-celestial;
-  }
+.card-sacred::before {
+  background: linear-gradient(90deg, var(--vedic-gold) 0%, var(--vedic-saffron) 100%);
+}
 
-  .card-celestial::before {
-    background: var(--gradient-celestial);
-  }
+.card-cosmic {
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--sky-blue) 5%);
+  box-shadow: var(--shadow-cosmic);
+}
 
-  /* === VEDIC GRADIENTS === */
-  .bg-gradient-vedic-primary {
-    background: var(--gradient-vedic-primary);
-  }
+.card-cosmic::before {
+  background: linear-gradient(90deg, var(--third-eye-chakra) 0%, var(--crown-chakra) 100%);
+}
 
-  .bg-gradient-vedic-secondary {
-    background: var(--gradient-vedic-secondary);
-  }
+/* =============================================
+   INPUT SYSTEM - FORM ELEMENTS
+   ============================================= */
 
-  .bg-gradient-vedic-accent {
-    background: var(--gradient-vedic-accent);
-  }
+.input-vedic {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: var(--text-base);
+  transition: all var(--duration-normal) var(--ease-out);
+}
 
-  .bg-gradient-cosmic {
-    background: var(--gradient-cosmic);
-  }
+.input-vedic:focus {
+  outline: none;
+  border-color: var(--vedic-saffron);
+  box-shadow: 0 0 0 3px rgba(255, 153, 51, 0.1);
+}
 
-  .bg-gradient-celestial {
-    background: var(--gradient-celestial);
-  }
+.input-vedic:invalid {
+  border-color: var(--debilitated-color);
+}
 
-  /* === VEDIC TEXT GRADIENTS === */
-  .text-gradient-vedic {
-    background: var(--gradient-vedic-primary);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.3));
-  }
+.input-vedic:disabled {
+  background: var(--bg-subtle);
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
 
-  .text-gradient-accent {
-    background: var(--gradient-vedic-accent);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.3));
-  }
+/* Label styling */
+.label-vedic {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-2);
+}
 
-  .text-gradient-cosmic {
-    background: var(--gradient-cosmic);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.3));
-  }
+/* =============================================
+   BADGE & TAG SYSTEM
+   ============================================= */
 
-  /* === VEDIC FORM COMPONENTS === */
-  .form-vedic {
-    @apply space-y-6;
-  }
+.badge-vedic {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
 
-  .form-group-vedic {
-    @apply flex flex-col space-y-2;
-  }
+/* Dignity Badges */
+.badge-exalted {
+  background: var(--exalted-color);
+  color: var(--text-white);
+}
 
-  .form-label-vedic {
-    @apply text-sm font-medium text-vedic-text font-devanagari;
-  }
+.badge-own-sign {
+  background: var(--own-sign-color);
+  color: var(--text-white);
+}
 
-  .form-input-vedic {
-    @apply w-full px-4 py-3 rounded-xl border border-vedic-border;
-    @apply bg-vedic-surface text-vedic-text;
-    @apply transition-all duration-300 ease-vedic;
-    @apply focus:border-vedic-primary focus:ring-3 focus:ring-vedic-primary focus:ring-opacity-20;
-    @apply hover:border-vedic-accent;
-  }
+.badge-friendly {
+  background: var(--friendly-color);
+  color: var(--text-white);
+}
 
-  .form-select-vedic {
-    @apply form-input-vedic;
-    @apply cursor-pointer;
-  }
+.badge-neutral {
+  background: var(--neutral-color);
+  color: var(--text-white);
+}
 
-  .form-textarea-vedic {
-    @apply form-input-vedic;
-    @apply min-h-[120px] resize-y;
-  }
+.badge-enemy {
+  background: var(--enemy-color);
+  color: var(--text-white);
+}
 
-  /* === VEDIC LOADING COMPONENTS === */
-  .loading-vedic {
-    @apply flex flex-col items-center justify-center min-h-[200px] space-y-4;
-  }
+.badge-debilitated {
+  background: var(--debilitated-color);
+  color: var(--text-white);
+}
 
-  .spinner-vedic {
-    @apply w-8 h-8 border-3 border-vedic-border rounded-full;
-    @apply border-t-vedic-primary animate-spin;
-  }
+/* Status Badges */
+.badge-complete {
+  background: var(--exalted-color);
+  color: var(--text-white);
+}
 
-  .spinner-mandala {
-    @apply w-12 h-12 border-4 border-gold-champagne rounded-full;
-    @apply border-t-vedic-gold animate-spin-slow;
-    box-shadow: var(--shadow-cosmic);
-  }
+.badge-pending {
+  background: var(--vedic-gold);
+  color: var(--text-primary);
+}
 
-  .loading-om {
-    @apply flex items-center justify-center;
-    font-size: 2rem;
-    color: var(--vedic-gold);
-    animation: om-rotation 4s ease-in-out infinite;
-  }
+.badge-error {
+  background: var(--debilitated-color);
+  color: var(--text-white);
+}
 
-  .loading-lotus {
-    @apply w-16 h-16 flex items-center justify-center;
-    font-size: 2rem;
-    animation: lotus-bloom 3s ease-in-out infinite;
-  }
+/* =============================================
+   PROGRESS & STRENGTH INDICATORS
+   ============================================= */
 
-  .loading-cosmic {
-    @apply relative w-16 h-16;
-  }
+.progress-vedic {
+  width: 100%;
+  height: var(--space-2);
+  background: var(--border-light);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
 
-  .loading-cosmic::before {
-    content: '✦';
-    @apply absolute inset-0 flex items-center justify-center text-2xl;
-    color: var(--cosmic-purple);
-    animation: cosmic-drift 4s ease-in-out infinite;
-  }
+.progress-bar-vedic {
+  height: 100%;
+  background: linear-gradient(90deg, var(--vedic-saffron) 0%, var(--vedic-gold) 100%);
+  border-radius: var(--radius-full);
+  transition: width var(--duration-slow) var(--ease-out);
+  position: relative;
+}
 
-  .loading-cosmic::after {
-    content: '✧';
-    @apply absolute inset-0 flex items-center justify-center text-lg;
-    color: var(--vedic-gold);
-    animation: cosmic-drift 4s ease-in-out infinite reverse;
-  }
+.progress-bar-vedic::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
+  animation: shimmer 2s infinite;
+}
 
-  .loading-text-vedic {
-    @apply text-center space-y-2 animate-sacred-pulse;
-  }
+/* Strength Meters */
+.strength-meter {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
 
-  .loading-text-vedic .loading-title {
-    @apply text-lg font-serif font-semibold text-vedic-gradient;
-  }
+.strength-dots {
+  display: flex;
+  gap: var(--space-1);
+}
 
-  .loading-text-vedic .loading-subtitle {
-    @apply text-sm text-wisdom-gray font-medium;
-  }
+.strength-dot {
+  width: var(--space-2);
+  height: var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--border-light);
+  transition: all var(--duration-normal) var(--ease-out);
+}
 
-  /* === VEDIC CULTURAL ELEMENTS === */
-  .cultural-symbol {
-    @apply inline-flex items-center justify-center;
-    font-family: 'Noto Sans Devanagari', serif;
-    transition: all var(--duration-300) var(--ease-vedic);
-  }
+.strength-dot.active {
+  background: var(--vedic-saffron);
+  box-shadow: 0 0 6px var(--vedic-saffron);
+}
 
-  .symbol-om {
-    @apply cultural-symbol text-vedic-gold;
-    font-size: 1.5em;
-  }
+/* =============================================
+   NAVIGATION SYSTEM
+   ============================================= */
 
-  .symbol-om:hover {
-    animation: om-rotation 2s ease-in-out;
-  }
+.nav-vedic {
+  display: flex;
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border-light);
+  padding: 0 var(--space-6);
+}
 
-  .symbol-lotus {
-    @apply cultural-symbol text-vedic-lotus;
-  }
+.nav-item {
+  padding: var(--space-4) var(--space-6);
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-weight: 500;
+  border-bottom: 2px solid transparent;
+  transition: all var(--duration-normal) var(--ease-out);
+  position: relative;
+}
 
-  .symbol-lotus:hover {
-    animation: lotus-bloom 2s ease-in-out;
-  }
+.nav-item:hover {
+  color: var(--vedic-saffron);
+  background: var(--bg-subtle);
+}
 
-  .symbol-star {
-    @apply cultural-symbol text-cosmic-purple;
-  }
+.nav-item.active {
+  color: var(--vedic-saffron);
+  border-bottom-color: var(--vedic-saffron);
+}
 
-  .symbol-star:hover {
-    animation: cosmic-drift 3s ease-in-out;
-  }
+.nav-item.active::after {
+  content: '';
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  width: var(--space-2);
+  height: var(--space-2);
+  background: var(--vedic-gold);
+  border-radius: var(--radius-full);
+}
 
-  /* === VEDIC PATTERN BACKGROUNDS === */
-  .pattern-mandala {
-    background-image: radial-gradient(circle at center,
-      var(--vedic-gold) 1px, transparent 1px),
-      radial-gradient(circle at 20% 20%,
-      var(--vedic-saffron) 1px, transparent 1px),
-      radial-gradient(circle at 80% 80%,
-      var(--cosmic-purple) 1px, transparent 1px);
-    background-size: 20px 20px, 40px 40px, 60px 60px;
-    background-position: 0 0, 10px 10px, 30px 30px;
-    opacity: 0.1;
-  }
+/* Tab Navigation */
+.tabs-vedic {
+  display: flex;
+  border-bottom: 1px solid var(--border-light);
+  background: var(--bg-secondary);
+}
 
-  .pattern-geometric {
-    background-image:
-      linear-gradient(45deg, var(--vedic-saffron) 25%, transparent 25%),
-      linear-gradient(-45deg, var(--vedic-saffron) 25%, transparent 25%),
-      linear-gradient(45deg, transparent 75%, var(--vedic-gold) 75%),
-      linear-gradient(-45deg, transparent 75%, var(--vedic-gold) 75%);
-    background-size: 20px 20px;
-    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
-    opacity: 0.05;
-  }
+.tab-vedic {
+  padding: var(--space-3) var(--space-6);
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all var(--duration-normal) var(--ease-out);
+  position: relative;
+}
 
-  .pattern-subtle-dots {
-    background-image: radial-gradient(circle, var(--vedic-gold) 1px, transparent 1px);
-    background-size: 15px 15px;
-    opacity: 0.1;
-  }
+.tab-vedic:hover {
+  color: var(--vedic-saffron);
+  background: var(--bg-subtle);
+}
 
-  /* === VEDIC STATUS COMPONENTS === */
-  .alert-vedic {
-    @apply p-4 rounded-xl border-l-4;
-    @apply transition-all duration-300 ease-vedic;
-  }
+.tab-vedic.active {
+  color: var(--vedic-saffron);
+  background: var(--bg-primary);
+  border-bottom-color: var(--vedic-saffron);
+}
 
-  .alert-success {
-    @apply alert-vedic bg-green-50 border-green-500 text-green-800;
-  }
+/* =============================================
+   LOADING & ANIMATION SYSTEM
+   ============================================= */
 
-  .alert-warning {
-    @apply alert-vedic bg-yellow-50 border-yellow-500 text-yellow-800;
-  }
+.loading-vedic {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-8);
+}
 
-  .alert-error {
-    @apply alert-vedic bg-red-50 border-red-500 text-red-800;
-  }
+.spinner-vedic {
+  width: var(--space-8);
+  height: var(--space-8);
+  border: 2px solid var(--border-light);
+  border-top: 2px solid var(--vedic-saffron);
+  border-radius: var(--radius-full);
+  animation: spin 1s linear infinite;
+}
 
-  .alert-info {
-    @apply alert-vedic bg-blue-50 border-blue-500 text-blue-800;
-  }
-
-  /* === VEDIC NAVIGATION === */
-  .nav-vedic {
-    @apply flex items-center space-x-8;
-  }
-
-  .nav-link-vedic {
-    @apply font-medium text-white transition-all duration-200 ease-vedic;
-    @apply hover:text-vedic-accent hover:-translate-y-0.5;
-    @apply focus:outline-none focus:ring-2 focus:ring-vedic-accent focus:ring-offset-2;
-    @apply relative;
-  }
-
-  .nav-link-vedic::after {
-    content: '';
-    position: absolute;
-    bottom: -4px;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background: var(--vedic-accent);
-    transition: width var(--duration-300) var(--ease-out);
-  }
-
-  .nav-link-vedic:hover::after {
-    width: 100%;
-  }
-
-  /* === VEDIC SECTION HEADERS === */
-  .section-header-vedic {
-    @apply text-center mb-16;
-  }
-
-  .section-title-vedic {
-    @apply text-4xl md:text-5xl font-cinzel font-bold mb-4;
-    @apply text-gradient-vedic;
+.spinner-mandala {
+  width: var(--space-12);
+  height: var(--space-12);
+  border: 3px solid var(--border-light);
+  border-top: 3px solid var(--vedic-gold);
+  border-radius: var(--radius-full);
+  animation: spin 2s linear infinite;
     position: relative;
-    padding-bottom: 1rem;
   }
 
-  .section-title-vedic::after {
-    content: '';
+.spinner-mandala::before {
+  content: "ॐ";
     position: absolute;
-    bottom: 0;
+  top: 50%;
     left: 50%;
-    transform: translateX(-50%);
-    width: 80px;
-    height: 4px;
-    background: var(--gradient-vedic-accent);
-    border-radius: 2px;
-  }
-
-  .section-subtitle-vedic {
-    @apply text-lg md:text-xl text-vedic-text-light max-w-2xl mx-auto;
-    @apply font-devanagari font-medium;
-  }
+  transform: translate(-50%, -50%);
+  font-size: var(--text-lg);
+  color: var(--vedic-saffron);
+  animation: pulse 2s ease-in-out infinite;
 }
 
 /* =============================================
-   UTILITY LAYER - VEDIC UTILITIES
+   ALERT & MESSAGE SYSTEM
    ============================================= */
 
-@layer utilities {
-  /* === VEDIC SPACING === */
-  .space-vedic { @apply space-y-6; }
-  .space-vedic-sm { @apply space-y-4; }
-  .space-vedic-lg { @apply space-y-8; }
-  .space-vedic-xl { @apply space-y-12; }
+.alert-vedic {
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  border-left: 4px solid;
+  margin-bottom: var(--space-4);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
 
-  /* === VEDIC TRANSITIONS === */
-  .transition-vedic {
-    transition: all var(--duration-300) var(--ease-vedic);
-  }
+.alert-success {
+  background: rgba(34, 139, 34, 0.1);
+  border-color: var(--exalted-color);
+  color: var(--exalted-color);
+}
 
-  .transition-celestial {
-    transition: all var(--duration-400) var(--ease-celestial);
-  }
+.alert-warning {
+  background: rgba(255, 215, 0, 0.1);
+  border-color: var(--vedic-gold);
+  color: var(--vedic-gold-dark);
+}
 
-  /* === VEDIC HOVER EFFECTS === */
-  .hover-lift {
-    @apply transition-transform duration-300 ease-vedic;
-    @apply hover:-translate-y-2;
-  }
+.alert-error {
+  background: rgba(220, 20, 60, 0.1);
+  border-color: var(--debilitated-color);
+  color: var(--debilitated-color);
+}
 
-  .hover-glow {
-    @apply transition-all duration-300 ease-vedic;
-    @apply hover:shadow-cosmic;
-  }
-
-  .hover-celestial {
-    @apply transition-all duration-300 ease-vedic;
-    @apply hover:shadow-celestial hover:-translate-y-1;
-  }
-
-  /* === VEDIC ANIMATIONS === */
-  .animate-float {
-    animation: float 20s ease-in-out infinite;
-  }
-
-  .animate-celestial-glow {
-    animation: celestial-glow 4s ease-in-out infinite alternate;
-  }
-
-  .animate-mandala-rotate {
-    animation: spin 30s linear infinite;
-  }
-
-  .animate-sacred-pulse {
-    animation: sacred-pulse 3s ease-in-out infinite;
-  }
-
-  .animate-vedic-shimmer {
-    animation: vedic-shimmer 2s linear infinite;
-  }
-
-  .animate-om-rotation {
-    animation: om-rotation 8s ease-in-out infinite;
-  }
-
-  .animate-lotus-bloom {
-    animation: lotus-bloom 6s ease-in-out infinite;
-  }
-
-  .animate-cosmic-drift {
-    animation: cosmic-drift 15s ease-in-out infinite;
-  }
-
-  .animate-divine-light {
-    animation: divine-light 4s ease-in-out infinite;
-  }
-
-  .animate-glow {
-    animation: celestial-glow 2s ease-in-out infinite alternate;
-  }
-
-  /* === VEDIC FOCUS STYLES === */
-  .focus-vedic {
-    @apply focus:outline-none focus:ring-3 focus:ring-vedic-accent focus:ring-offset-2;
-  }
-
-  /* === BACKDROP FILTERS === */
-  .backdrop-vedic {
-    @apply backdrop-blur-lg bg-white bg-opacity-10;
-    @apply border border-white border-opacity-20;
-  }
-
-  /* === VEDIC ASPECT RATIOS === */
-  .aspect-mandala {
-    aspect-ratio: 1 / 1;
-  }
-
-  .aspect-golden {
-    aspect-ratio: 1.618 / 1;
-  }
-
-  /* === VEDIC GRID PATTERNS === */
-  .grid-mandala {
-    @apply grid grid-cols-3 grid-rows-3 gap-4;
-  }
-
-  .grid-cosmic {
-    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
-  }
-
-  .grid-celestial {
-    @apply grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6;
-  }
+.alert-info {
+  background: rgba(65, 105, 225, 0.1);
+  border-color: var(--own-sign-color);
+  color: var(--own-sign-color);
 }
 
 /* =============================================
-   VEDIC KEYFRAME ANIMATIONS
+   UTILITY CLASSES
    ============================================= */
+
+/* Text Colors */
+.text-saffron { color: var(--vedic-saffron); }
+.text-gold { color: var(--vedic-gold); }
+.text-maroon { color: var(--vedic-maroon); }
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-muted { color: var(--text-muted); }
+
+/* Background Colors */
+.bg-saffron { background-color: var(--vedic-saffron); }
+.bg-gold { background-color: var(--vedic-gold); }
+.bg-sacred { background-color: var(--sacred-white); }
+.bg-subtle { background-color: var(--bg-subtle); }
+
+/* Planetary Colors */
+.text-sun { color: var(--sun-color); }
+.text-moon { color: var(--moon-color); }
+.text-mars { color: var(--mars-color); }
+.text-mercury { color: var(--mercury-color); }
+.text-jupiter { color: var(--jupiter-color); }
+.text-venus { color: var(--venus-color); }
+.text-saturn { color: var(--saturn-color); }
+.text-rahu { color: var(--rahu-color); }
+.text-ketu { color: var(--ketu-color); }
+
+/* Dignity Colors */
+.text-exalted { color: var(--exalted-color); }
+.text-debilitated { color: var(--debilitated-color); }
+.text-friendly { color: var(--friendly-color); }
+.text-neutral { color: var(--neutral-color); }
+.text-enemy { color: var(--enemy-color); }
+
+/* Spacing Utilities */
+.space-vedic > * + * { margin-top: var(--space-4); }
+.gap-vedic { gap: var(--space-4); }
+
+/* =============================================
+   ANIMATIONS & KEYFRAMES
+   ============================================= */
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.05); }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
 
 @keyframes float {
-  0%, 100% {
-    transform: translateY(0px) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-20px) rotate(5deg);
-  }
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
 }
 
-@keyframes celestial-glow {
-  0% {
-    box-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
-  }
-  100% {
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 30px rgba(255, 215, 0, 0.6);
-  }
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 5px var(--vedic-gold); }
+  50% { box-shadow: 0 0 20px var(--vedic-gold), 0 0 30px var(--vedic-saffron); }
 }
 
-@keyframes mandala-pulse {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.05);
-    opacity: 0.8;
-  }
-}
-
-@keyframes sacred-pulse {
-  0%, 100% {
-    transform: scale(1);
-    box-shadow: 0 0 10px rgba(255, 153, 51, 0.3);
-  }
-  50% {
-    transform: scale(1.02);
-    box-shadow: 0 0 20px rgba(255, 153, 51, 0.6), 0 0 30px rgba(255, 215, 0, 0.4);
-  }
-}
-
-@keyframes vedic-shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
-}
-
-@keyframes om-rotation {
-  0% {
-    transform: rotate(0deg) scale(1);
-  }
-  25% {
-    transform: rotate(90deg) scale(1.1);
-  }
-  50% {
-    transform: rotate(180deg) scale(1);
-  }
-  75% {
-    transform: rotate(270deg) scale(1.1);
-  }
-  100% {
-    transform: rotate(360deg) scale(1);
-  }
-}
-
-@keyframes lotus-bloom {
-  0% {
-    transform: scale(0.8) rotate(-5deg);
-    opacity: 0.7;
-  }
-  50% {
-    transform: scale(1.1) rotate(0deg);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1) rotate(5deg);
-    opacity: 0.9;
-  }
-}
-
-@keyframes cosmic-drift {
-  0%, 100% {
-    transform: translateX(0) translateY(0) rotate(0deg);
-  }
-  25% {
-    transform: translateX(10px) translateY(-5px) rotate(2deg);
-  }
-  50% {
-    transform: translateX(-5px) translateY(-10px) rotate(-1deg);
-  }
-  75% {
-    transform: translateX(-10px) translateY(5px) rotate(1deg);
-  }
-}
-
-@keyframes divine-light {
-  0% {
-    background: radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
-    transform: scale(1);
-  }
-  50% {
-    background: radial-gradient(circle, rgba(255, 215, 0, 0.3) 0%, rgba(255, 153, 51, 0.1) 50%, transparent 70%);
-    transform: scale(1.2);
-  }
-  100% {
-    background: radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
-    transform: scale(1);
-  }
-}
+/* Animation Classes */
+.animate-spin { animation: spin 1s linear infinite; }
+.animate-pulse { animation: pulse 2s ease-in-out infinite; }
+.animate-float { animation: float 3s ease-in-out infinite; }
+.animate-glow { animation: glow 2s ease-in-out infinite; }
 
 /* =============================================
-   RESPONSIVE DESIGN BREAKPOINTS
+   RESPONSIVE DESIGN
    ============================================= */
 
-/* === MOBILE FIRST APPROACH === */
 @media (max-width: 640px) {
-  .section-title-vedic {
-    @apply text-3xl;
-  }
-
-  .section-subtitle-vedic {
-    @apply text-base;
-  }
-
-  .btn-vedic {
-    @apply px-4 py-2 text-sm;
-  }
-
-  .nav-vedic {
-    @apply flex-col space-y-4 space-x-0;
-  }
+  .btn-vedic { padding: var(--space-2) var(--space-4); font-size: var(--text-sm); }
+  .card-vedic { padding: var(--space-4); }
+  .tabs-vedic { overflow-x: auto; }
+  .nav-vedic { padding: 0 var(--space-4); }
 }
 
-/* === TABLET BREAKPOINT === */
-@media (min-width: 641px) and (max-width: 1024px) {
-  .vedic-container {
-    @apply px-6;
+@media (max-width: 768px) {
+  .tabs-vedic {
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
-}
-
-/* === DESKTOP BREAKPOINT === */
-@media (min-width: 1025px) {
-  .vedic-container {
-    @apply px-8;
-  }
-
-  .section-title-vedic {
-    @apply text-6xl;
-  }
-
-  .hover-lift:hover {
-    @apply -translate-y-3;
-  }
+  .tabs-vedic::-webkit-scrollbar { display: none; }
 }
 
 /* =============================================
-   HIGH DPI & RETINA DISPLAY OPTIMIZATIONS
-   ============================================= */
-
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-  .text-gradient-vedic,
-  .text-gradient-accent,
-  .text-gradient-cosmic {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-}
-
-/* =============================================
-   REDUCED MOTION ACCESSIBILITY
+   ACCESSIBILITY
    ============================================= */
 
 @media (prefers-reduced-motion: reduce) {
+  .animate-spin,
+  .animate-pulse,
   .animate-float,
-  .animate-celestial-glow,
-  .animate-mandala-rotate {
+  .animate-glow {
     animation: none;
   }
 
-  .transition-vedic,
-  .transition-celestial {
-    transition: none;
+  * {
+    transition: none !important;
   }
+}
 
-  .hover-lift:hover,
-  .hover-celestial:hover {
-    transform: none;
-  }
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .card-vedic { border-width: 2px; }
+  .btn-vedic { border-width: 2px; }
+  .badge-vedic { border: 1px solid currentColor; }
 }
 
 /* =============================================
-   PRINT STYLES
+   DARK MODE SUPPORT
    ============================================= */
 
-@media print {
-  .btn-vedic,
-  .nav-vedic,
-  .animate-float,
-  .animate-celestial-glow {
-    display: none !important;
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary: #1F2937;
+    --bg-secondary: #111827;
+    --bg-subtle: #374151;
+    --text-primary: #F9FAFB;
+    --text-secondary: #D1D5DB;
+    --text-muted: #9CA3AF;
+    --border-light: #374151;
+    --border-medium: #4B5563;
+    --border-dark: #6B7280;
   }
-
-  .card-vedic {
-    @apply shadow-none border border-gray-300;
-  }
-
-  .text-gradient-vedic,
-  .text-gradient-accent,
-  .text-gradient-cosmic {
-    -webkit-text-fill-color: initial;
-    background: none;
-    color: var(--vedic-text);
-  }
-}
-
-/* =============================================
-   VEDIC KUNDLI CHART (North Indian Layout)
-   ============================================= */
-.kundli-house {
-  border: 2px solid var(--earth-brown);
-  background: var(--sacred-white);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  position: absolute; /* positioned absolutely within grid container */
-  transition: all 0.3s ease;
-}
-
-.kundli-house:hover {
-  background: var(--vedic-saffron-light);
-  transform: scale(1.02);
-}
-
-.kundli-house.selected {
-  background: var(--vedic-gold-light);
-  border-color: var(--vedic-saffron);
-  box-shadow: 0 0 15px var(--vedic-saffron);
-}
-
-.kundli-center {
-  grid-column: 2 / 4;
-  grid-row: 2 / 4;
-  background: var(--gradient-vedic-secondary);
-  border: 3px solid var(--vedic-saffron);
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 0.5rem;
 }

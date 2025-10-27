@@ -1322,4 +1322,4 @@ class DetailedHouseAnalyzer {
     }
 }
 
-module.exports = DetailedHouseAnalyzer;
+export default router;

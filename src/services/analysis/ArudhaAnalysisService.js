@@ -1503,4 +1503,4 @@ class ArudhaAnalysisService {
   }
 }
 
-module.exports = ArudhaAnalysisService;
+export default ArudhaAnalysisService;

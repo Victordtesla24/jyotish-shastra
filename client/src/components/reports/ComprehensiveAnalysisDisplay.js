@@ -1,590 +1,910 @@
-import React, { useState } from 'react';
-import VedicChartDisplay from '../charts/VedicChartDisplay';
-import { Card, CardHeader, CardTitle, CardContent } from '../ui';
-import LagnaLuminariesSection from './sections/LagnaLuminariesSection';
-import HouseAnalysisSection from './sections/HouseAnalysisSection';
-import PlanetaryAspectsSection from './sections/PlanetaryAspectsSection';
-import ArudhaLagnaSection from './sections/ArudhaLagnaSection';
-import NavamsaAnalysisSection from './sections/NavamsaAnalysisSection';
-import SynthesisSection from './sections/SynthesisSection';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useAnalysis } from '../../contexts/AnalysisContext';
+import ResponseDataToUIDisplayAnalyser from '../analysis/ResponseDataToUIDisplayAnalyser';
 
-const ComprehensiveAnalysisDisplay = ({ data }) => {
-  // Always call hooks unconditionally
-  const [activeTab, setActiveTab] = useState('overview');
+/**
+ * Comprehensive Analysis Display Component
+ * Transforms raw astrological data into user-friendly, interactive UI components
+ * Uses consistent Vedic design system across the entire application
+ */
+const ComprehensiveAnalysisDisplay = ({ analysisData }) => {
+  const [activeSection, setActiveSection] = useState('section1');
+  const [expandedItems, setExpandedItems] = useState(new Set());
+  const {
+    setSectionData,
+    isSectionVisited,
+    setContextActiveSection
+  } = useAnalysis();
 
-  // DEFENSIVE: Handle completely undefined/null data at the root level
-  if (!data) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-sacred-white to-gray-50 p-6">
-        <Card className="max-w-2xl mx-auto text-center py-12">
-          <CardContent>
-            <div className="text-6xl mb-4">🔮</div>
-            <h1 className="text-2xl font-bold text-earth-brown mb-4">No Analysis Data Available</h1>
-            <p className="text-wisdom-gray">Please generate an analysis first to view comprehensive insights.</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  // Process and validate incoming analysis data
+  const { sectionsData, sectionOrder, sectionNames } = useMemo(() => {
+    console.log('🔍 [ComprehensiveAnalysisDisplay] Processing analysis data...');
+    console.log('📊 [ComprehensiveAnalysisDisplay] Received analysisData:', analysisData);
+    console.log('📊 [ComprehensiveAnalysisDisplay] AnalysisData type:', typeof analysisData);
+    console.log('📊 [ComprehensiveAnalysisDisplay] AnalysisData keys:', analysisData ? Object.keys(analysisData) : 'null');
 
-  // Parse the ACTUAL API response structure from the backend
-  console.log('🔍 Raw API Response:', data);
+    if (!analysisData) {
+      console.log('❌ [ComprehensiveAnalysisDisplay] No analysisData provided');
+      return { sectionsData: {}, sectionOrder: [], sectionNames: {} };
+    }
 
-  // Handle actual API response structure: { success: true, analysis: {...} }
-  const apiResponse = data || {};
-  const analysisData = apiResponse.analysis || {};
-  const sections = analysisData.sections || {};
+    // Extract sections from various possible data structures
+    let sections = {};
+    if (analysisData.sections) {
+      console.log('✅ [ComprehensiveAnalysisDisplay] Found sections in analysisData.sections');
+      sections = analysisData.sections;
+    } else if (analysisData.analysis?.sections) {
+      console.log('✅ [ComprehensiveAnalysisDisplay] Found sections in analysisData.analysis.sections');
+      sections = analysisData.analysis.sections;
+    } else if (analysisData.analysis) {
+      console.log('✅ [ComprehensiveAnalysisDisplay] Using analysisData.analysis as sections');
+      sections = analysisData.analysis;
+    } else {
+      console.log('❌ [ComprehensiveAnalysisDisplay] No sections found in any expected location');
+    }
 
-  console.log('📊 Analysis sections:', Object.keys(sections));
+    console.log('📊 [ComprehensiveAnalysisDisplay] Extracted sections:', {
+      sectionsType: typeof sections,
+      sectionsKeys: Object.keys(sections),
+      sectionsCount: Object.keys(sections).length
+    });
 
-  // Extract birth data from section1 (Birth Data Collection and Chart Casting)
-  const section1 = sections.section1 || {};
-  const questions = section1.questions || [];
+    const order = analysisData.sectionOrder ||
+                  ['section1', 'section2', 'section3', 'section4', 'section5', 'section6', 'section7', 'section8'];
 
-  // Question 0: Birth data gathering - DEFENSIVE NULL CHECKS
-  const birthDataQuestion = questions[0] || {};
-  const birthDataDetails = birthDataQuestion.details || birthDataQuestion || {};
+    const names = ResponseDataToUIDisplayAnalyser.getSectionNames();
 
-  // Question 1: Chart casting (Rasi and Navamsa)
-  const chartQuestion = questions[1] || {};
-  const chartDetails = chartQuestion.details || {};
+    console.log('✅ [ComprehensiveAnalysisDisplay] Final processed data:', {
+      sectionsCount: Object.keys(sections).length,
+      sectionOrder: order,
+      availableSections: Object.keys(sections),
+      sampleSectionContent: sections.section1 ? 'Section1 has content' : 'Section1 empty'
+    });
 
-  // Question 2: Ascendant information
-  const ascendantQuestion = questions[2] || {};
-  const ascendantDetails = ascendantQuestion.details || {};
+    return {
+      sectionsData: sections,
+      sectionOrder: order,
+      sectionNames: names
+    };
+  }, [analysisData]);
 
-  // Question 3: Planetary positions
-  const planetaryQuestion = questions[3] || {};
-  const planetaryPositions = planetaryQuestion.planetaryPositions || {};
+  // Progress calculation with section visit tracking
+  const progress = useMemo(() => {
+    const totalSections = sectionOrder.length;
+    const completedSections = sectionOrder.filter(sectionId => {
+      const section = sectionsData[sectionId];
+      return section && (
+        (section.questions && section.questions.length > 0) ||
+        (section.analyses && Object.keys(section.analyses).length > 0) ||
+        (section.houses && Object.keys(section.houses).length > 0) ||
+        (section.aspects && Object.keys(section.aspects).length > 0) ||
+        (section.arudhaAnalysis) ||
+        (section.navamsaAnalysis) ||
+        (section.dashaAnalysis)
+      );
+    }).length;
 
-  // Question 4: Dasha information
-  const dashaQuestion = questions[4] || {};
-  const dashaDetails = dashaQuestion.details || {};
+    return {
+      completed: completedSections,
+      total: totalSections,
+      percentage: totalSections > 0 ? (completedSections / totalSections) * 100 : 0
+    };
+  }, [sectionsData, sectionOrder]);
 
-  // Extract birth data using actual API structure - MAXIMUM DEFENSIVE PROGRAMMING
-  const safeBirthData = {
-    name: (() => {
-      try {
-        return birthDataDetails?.place?.placeOfBirth?.name ||
-               birthDataDetails?.name ||
-               birthDataDetails?.place?.name ||
-               'Test User';
-      } catch (e) {
-        console.error('Error accessing name:', e);
-        return 'Test User';
+  // Mark sections as visited when they contain meaningful data
+  useEffect(() => {
+    sectionOrder.forEach(sectionId => {
+      const section = sectionsData[sectionId];
+      if (section && setSectionData) {
+        const hasData = Object.keys(section).length > 1 ||
+                       (Object.keys(section).length === 1 && !section.name);
+        if (hasData) {
+          setSectionData(sectionId, section);
+        }
       }
-    })(),
-    dateOfBirth: (() => {
-      try {
-        return birthDataDetails?.dateOfBirth?.value ?
-               new Date(birthDataDetails.dateOfBirth.value).toLocaleDateString() :
-               'Not provided';
-      } catch (e) {
-        return 'Not provided';
-      }
-    })(),
-    timeOfBirth: birthDataDetails?.timeOfBirth?.value || 'Not provided',
-    placeOfBirth: birthDataDetails?.place?.placeOfBirth?.name || birthDataDetails?.place?.name || 'Not provided',
-    latitude: birthDataDetails?.place?.placeOfBirth?.latitude || birthDataDetails?.place?.latitude || null,
-    longitude: birthDataDetails?.place?.placeOfBirth?.longitude || birthDataDetails?.place?.longitude || null,
-    timezone: birthDataDetails?.place?.placeOfBirth?.timezone || birthDataDetails?.place?.timezone || null
-  };
+    });
+  }, [sectionsData, sectionOrder, setSectionData]);
 
-  // Extract chart data using actual API structure - this is the key fix
-  const rasiChartData = chartDetails.rasiChart || {};
-  const safeRasiChart = {
-    ascendant: {
-      sign: rasiChartData.ascendant?.sign || ascendantDetails.ascendant?.sign || 'Unknown',
-      degree: rasiChartData.ascendant?.degree || ascendantDetails.lagnaDegree || 0,
-      longitude: rasiChartData.ascendant?.longitude || ascendantDetails.ascendant?.longitude || 0
-    },
-    nakshatra: {
-      name: dashaDetails.nakshatra || 'Unknown',
-      pada: 1
-    },
-    planetaryPositions: planetaryPositions,
-    planets: Object.entries(planetaryPositions).map(([name, data]) => ({
-      name: name.charAt(0).toUpperCase() + name.slice(1),
-      sign: data?.sign || 'Unknown',
-      degree: data?.degree || 0,
-      longitude: data?.longitude || 0,
-      house: data?.house || 'Unknown',
-      dignity: data?.dignity || 'Unknown',
-      isRetrograde: data?.isRetrograde || false,
-      isCombust: data?.isCombust || false
-    }))
-  };
-
-  // Extract dasha info using actual API structure
-  const safeDashaInfo = {
-    currentDasha: {
-      dasha: dashaDetails.currentDasha?.planet || 'Unknown',
-      remainingYears: dashaDetails.currentDasha?.remainingYears || 0,
-      startAge: dashaDetails.currentDasha?.startAge || 0,
-      endAge: dashaDetails.currentDasha?.endAge || 0
-    },
-    upcomingDashas: dashaDetails.upcomingDashas || [],
-    dashaSequence: dashaDetails.dashaSequence || []
-  };
-
-  // Generate analysis using actual planetary data from the API
-  const moonData = planetaryPositions.moon || {};
-  const sunData = planetaryPositions.sun || {};
-
-  const safeAnalysis = {
-    personality: {
-      lagnaSign: safeRasiChart.ascendant.sign,
-      moonSign: moonData.sign || 'Unknown',
-      sunSign: sunData.sign || 'Unknown',
-      keyTraits: [
-        `${safeRasiChart.ascendant.sign} Ascendant traits`,
-        `${moonData.sign || 'Unknown'} Moon emotional patterns`,
-        `${sunData.sign || 'Unknown'} Sun personality`
-      ]
-    },
-    career: {
-      timing: `Current period: ${safeDashaInfo.currentDasha.dasha} dasha (${safeDashaInfo.currentDasha.remainingYears.toFixed(1)} years remaining)`,
-      suitableProfessions: ['Technology', 'Business', 'Communication', 'Leadership roles'],
-      careerStrengths: ['Innovation', 'Strategic thinking', 'Problem solving']
-    },
-    health: {
-      generalHealth: `Health influenced by ${safeRasiChart.ascendant.sign} Ascendant and planetary positions`,
-      recommendations: ['Regular exercise', 'Balanced diet', 'Stress management', 'Meditation']
-    },
-    finances: {
-      wealthIndicators: `Financial prospects influenced by planetary positions in houses`,
-      financialTiming: `Current period: ${safeDashaInfo.currentDasha.dasha} dasha`,
-      incomeSources: ['Primary career', 'Investments', 'Business ventures']
-    },
-    relationships: {
-      marriageIndications: 'Marriage prospects based on 7th house and Venus position analysis',
-      partnerCharacteristics: 'Partner traits determined by Venus and 7th house lord',
-      timing: `Relationship timing linked to ${safeDashaInfo.currentDasha.dasha} period`
+  // Handle section navigation
+  const handleSectionChange = (sectionId) => {
+    setActiveSection(sectionId);
+    if (setContextActiveSection) {
+      setContextActiveSection(sectionId);
     }
   };
 
-  console.log('✅ Processed chart data:', safeRasiChart);
-  console.log('✅ Processed dasha info:', safeDashaInfo);
-  console.log('✅ Planetary positions found:', Object.keys(planetaryPositions));
+  // Toggle item expansion for progressive disclosure
+  const toggleExpansion = (itemId) => {
+    setExpandedItems(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(itemId)) {
+        newSet.delete(itemId);
+      } else {
+        newSet.add(itemId);
+      }
+      return newSet;
+    });
+  };
 
-  const analysisSteps = [
-    { id: 'overview', title: 'Overview', icon: '📊', description: 'Birth data & chart fundamentals' },
-    { id: 'lagna-luminaries', title: 'Lagna & Luminaries', icon: '🌟', description: 'Ascendant, Sun & Moon analysis' },
-    { id: 'houses', title: 'House Analysis', icon: '🏠', description: '12 Houses examination' },
-    { id: 'aspects', title: 'Planetary Aspects', icon: '🔗', description: 'Planetary relationships' },
-    { id: 'arudha', title: 'Arudha Lagna', icon: '👁️', description: 'Public image & perception' },
-    { id: 'navamsa', title: 'Navamsa Chart', icon: '💍', description: 'D9 chart & marriage' },
-    { id: 'dasha', title: 'Dasha Analysis', icon: '⏰', description: 'Life timeline & periods' },
-    { id: 'synthesis', title: 'Synthesis', icon: '🎯', description: 'Summary & recommendations' }
-  ];
+  // === ENHANCED HELPER FUNCTIONS ===
 
-  const currentStepIndex = analysisSteps.findIndex(step => step.id === activeTab);
-  const progressPercentage = ((currentStepIndex + 1) / analysisSteps.length) * 100;
+  /**
+   * Smart Value Formatter - Uses consistent Vedic design system
+   */
+  const formatSmartValue = (value, key = '') => {
+    if (value === null || value === undefined) {
+      return <span className="text-muted italic">Not available</span>;
+    }
 
+    if (typeof value === 'boolean') {
+      return (
+        <span className={`badge-vedic ${value ? 'badge-complete' : 'badge-error'}`}>
+          <span className="vedic-symbol">{value ? '✓' : '✗'}</span>
+          {value ? 'Yes' : 'No'}
+        </span>
+      );
+    }
+
+    if (typeof value === 'number') {
+      // Format numeric values with appropriate precision
+      if (key.toLowerCase().includes('longitude') || key.toLowerCase().includes('latitude')) {
+        return <span className="text-jupiter font-mono">{value.toFixed(6)}°</span>;
+      }
+      if (key.toLowerCase().includes('degree')) {
+        return <span className="text-venus font-mono">{value.toFixed(2)}°</span>;
+      }
+      if (value % 1 === 0) {
+        return <span className="text-primary font-mono">{value}</span>;
+      }
+      return <span className="text-primary font-mono">{value.toFixed(2)}</span>;
+    }
+
+    if (typeof value === 'string') {
+      // Handle special string formatting
+      if (value.includes('T') && value.includes('Z')) {
+        // ISO date format
+        try {
+          const date = new Date(value);
+          return <span className="text-jupiter">{date.toLocaleString()}</span>;
+        } catch {
+          return <span className="text-secondary">{value}</span>;
+        }
+      }
+      return <span className="text-secondary">{value}</span>;
+    }
+
+    if (Array.isArray(value)) {
+      if (value.length === 0) {
+        return <span className="text-muted italic">No items</span>;
+      }
+      return (
+        <div className="space-y-1">
+          {value.map((item, index) => (
+            <div key={index} className="flex items-center gap-vedic">
+              <span className="w-1.5 h-1.5 bg-saffron rounded-full flex-shrink-0"></span>
+              <span className="text-sm text-secondary">{formatSmartValue(item, key)}</span>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    if (typeof value === 'object') {
+      return <ObjectDisplay data={value} compact={true} />;
+    }
+
+    return <span className="text-secondary">{String(value)}</span>;
+  };
+
+  /**
+   * Enhanced Object Display Component - Uses Vedic design system
+   */
+  const ObjectDisplay = ({ data, compact = false, title = null }) => {
+    if (!data || typeof data !== 'object') return null;
+
+    const entries = Object.entries(data);
+    if (entries.length === 0) {
+      return <span className="text-muted italic">No data available</span>;
+    }
+
+    return (
+      <div className={`space-vedic ${compact ? 'text-sm' : ''}`}>
+        {title && (
+          <h4 className="text-lg font-semibold text-saffron border-b border-gold/20 pb-2 mb-3 flex items-center gap-2">
+            <span className="vedic-symbol symbol-mandala"></span>
+            {title}
+          </h4>
+        )}
+        {entries.map(([key, value]) => (
+          <div key={key} className="flex flex-col gap-1">
+            <div className="flex items-start justify-between">
+              <span className="text-xs font-medium text-gold uppercase tracking-wide">
+                {key.replace(/([A-Z])/g, ' $1').trim()}:
+              </span>
+            </div>
+            <div className="ml-2 pl-3 border-l-2 border-gold/30">
+              {formatSmartValue(value, key)}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  /**
+   * Enhanced Details Accordion - Consistent with Vedic design
+   */
+  const DetailsAccordion = ({ details, title = "Details", defaultExpanded = false, icon = "📋" }) => {
+    const [isExpanded, setIsExpanded] = useState(defaultExpanded);
+
+    if (!details || typeof details !== 'object') return null;
+
+    return (
+      <div className="card-vedic">
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="w-full p-0 bg-transparent border-none flex items-center justify-between text-left"
+          aria-expanded={isExpanded}
+        >
+          <span className="text-lg font-semibold text-saffron flex items-center gap-3">
+            <span className="vedic-symbol">{icon}</span>
+            {title}
+          </span>
+          <span className={`text-gold transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}>
+            ▼
+          </span>
+        </button>
+        {isExpanded && (
+          <div className="mt-4 pt-4 border-t border-gold/20">
+            <ObjectDisplay data={details} />
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // === SPECIALIZED DISPLAY COMPONENTS ===
+
+  /**
+   * Enhanced Questions Display Component - Uses Vedic design system
+   */
+  const QuestionsDisplay = ({ questions }) => {
+    if (!questions || !Array.isArray(questions)) return null;
+
+    return (
+      <div className="space-vedic">
+        <h3 className="text-2xl font-bold text-saffron mb-6 flex items-center gap-3">
+          <span className="w-10 h-10 bg-gold/20 text-gold rounded-full flex items-center justify-center font-bold">Q</span>
+          Analysis Questions
+          <span className="ml-auto text-base font-normal text-muted">
+            {questions.length} question{questions.length !== 1 ? 's' : ''}
+          </span>
+        </h3>
+
+        {questions.map((q, index) => {
+          const itemId = `question-${index}`;
+          const isExpanded = expandedItems.has(itemId);
+
+          return (
+            <div key={index} className="card-sacred hover:shadow-lg transition-all duration-300">
+              <div
+                className="cursor-pointer"
+                onClick={() => toggleExpansion(itemId)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    toggleExpansion(itemId);
+                  }
+                }}
+                aria-expanded={isExpanded}
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center mb-3">
+                      <span className="badge-vedic bg-gold text-primary font-bold mr-3">
+                        Q{index + 1}
+                      </span>
+                      <h4 className="text-lg font-semibold text-primary leading-tight">
+                        {q.question}
+                      </h4>
+                    </div>
+
+                    {/* Enhanced Answer Preview */}
+                    <p className="text-secondary leading-relaxed">
+                      {isExpanded ? q.answer : `${q.answer?.substring(0, 120)}${q.answer?.length > 120 ? '...' : ''}`}
+                    </p>
+
+                    {/* Enhanced Completeness Badge */}
+                    {q.completeness && (
+                      <div className="mt-3">
+                        <span className={`badge-vedic ${
+                          q.completeness === 'Complete' ? 'badge-complete' : 'badge-pending'
+                        }`}>
+                          <span className="vedic-symbol">{q.completeness === 'Complete' ? '✓' : '⏳'}</span>
+                          {q.completeness}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  <button className="ml-4 text-saffron hover:text-gold transition-colors p-2 rounded-lg hover:bg-gold/10">
+                    <span className={`transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}>
+                      ▼
+                    </span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Enhanced Expandable Details Section */}
+              {isExpanded && q.details && (
+                <div className="mt-4 pt-4 border-t border-gold/20">
+                  <DetailsAccordion details={q.details} title="Question Details" defaultExpanded={true} icon="🔍" />
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  /**
+   * Enhanced Planetary Analyses Display Component - Uses Vedic design system
+   */
+  const AnalysesDisplay = ({ analyses }) => {
+    if (!analyses || typeof analyses !== 'object') return null;
+
+    const planetEntries = Object.entries(analyses);
+
+    return (
+      <div className="space-vedic">
+        <h3 className="text-2xl font-bold text-saffron mb-6 flex items-center gap-3">
+          <span className="w-10 h-10 bg-jupiter/20 text-jupiter rounded-full flex items-center justify-center vedic-symbol">☿</span>
+          Planetary Analysis
+          <span className="ml-auto text-base font-normal text-muted">
+            {planetEntries.length} planet{planetEntries.length !== 1 ? 's' : ''}
+          </span>
+        </h3>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {planetEntries.map(([planetKey, planetData]) => {
+            if (!planetData || typeof planetData !== 'object') return null;
+
+            const planetName = planetKey.replace('Analysis', '').replace(/([A-Z])/g, ' $1').trim();
+            const strength = planetData.strength?.overallStrength || 0;
+            const dignity = planetData.dignity?.dignity || 'Unknown';
+
+            return (
+              <div key={planetKey} className="card-cosmic hover:shadow-xl transition-all duration-300">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="text-xl font-bold text-primary capitalize flex items-center gap-2">
+                    <span className="vedic-symbol text-jupiter">☿</span>
+                    {planetName}
+                  </h4>
+                  <span className={`badge-vedic ${getDignityBadgeClass(dignity)}`}>
+                    {dignity}
+                  </span>
+                </div>
+
+                {/* Enhanced Strength Meter */}
+                {strength > 0 && (
+                  <div className="mb-4">
+                    <div className="flex justify-between text-sm text-secondary mb-2">
+                      <span className="font-medium">Planetary Strength</span>
+                      <span className="font-mono text-saffron font-bold">{strength.toFixed(1)}/10</span>
+                    </div>
+                    <div className="progress-vedic">
+                      <div
+                        className="progress-bar-vedic"
+                        style={{ width: `${Math.min(strength * 10, 100)}%` }}
+                      ></div>
+                    </div>
+                    <div className="strength-meter mt-2">
+                      <div className="strength-dots">
+                        {[...Array(10)].map((_, i) => (
+                          <div
+                            key={i}
+                            className={`strength-dot ${i < Math.floor(strength) ? 'active' : ''}`}
+                          ></div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Enhanced Planet Details */}
+                <div className="space-vedic">
+                  {planetData.signCharacteristics && (
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-sm font-medium text-secondary">Element:</span>
+                        <span className="badge-vedic bg-earth-element/20 text-earth-element">
+                          <span className="vedic-symbol symbol-earth"></span>
+                          {planetData.signCharacteristics.element}
+                        </span>
+                      </div>
+                      {planetData.signCharacteristics.traits && (
+                        <div>
+                          <span className="text-sm font-medium text-secondary block mb-2">Traits:</span>
+                          <div className="flex flex-wrap gap-2">
+                            {planetData.signCharacteristics.traits.slice(0, 3).map((trait, i) => (
+                              <span key={i} className="badge-vedic bg-subtle text-secondary">
+                                {trait}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {planetData.strength?.interpretation && (
+                    <div className="card-vedic bg-sacred/50 p-4">
+                      <p className="text-sm text-secondary italic leading-relaxed">
+                        {planetData.strength.interpretation}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Additional Planet Data with Progressive Disclosure */}
+                  {Object.keys(planetData).length > 3 && (
+                    <DetailsAccordion
+                      details={planetData}
+                      title={`${planetName} Additional Details`}
+                      defaultExpanded={false}
+                      icon="🪐"
+                    />
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
+  /**
+   * Enhanced Houses Display Component - Uses Vedic design system
+   */
+  const HousesDisplay = ({ houses }) => {
+    if (!houses || typeof houses !== 'object') return null;
+
+    const houseEntries = Object.values(houses);
+
+    return (
+      <div className="space-vedic">
+        <h3 className="text-2xl font-bold text-saffron mb-6 flex items-center gap-3">
+          <span className="w-10 h-10 bg-maroon/20 text-maroon rounded-full flex items-center justify-center vedic-symbol">🏠</span>
+          House Analysis
+          <span className="ml-auto text-base font-normal text-muted">
+            {houseEntries.length} house{houseEntries.length !== 1 ? 's' : ''}
+          </span>
+        </h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {houseEntries.map((house, index) => {
+            if (!house || typeof house !== 'object') return null;
+
+            const houseNumber = house.house || index + 1;
+            const sign = house.sign || 'Unknown';
+            const lord = house.lord?.planet || 'Unknown';
+
+            return (
+              <div key={index} className="card-vedic group hover:shadow-xl transition-all duration-300">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="text-xl font-bold text-maroon group-hover:text-saffron transition-colors flex items-center gap-2">
+                    <span className="vedic-symbol">🏠</span>
+                    House {houseNumber}
+                  </h4>
+                  <span className="badge-vedic bg-maroon/20 text-maroon">
+                    {sign}
+                  </span>
+                </div>
+
+                <div className="space-vedic">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-secondary">Lord:</span>
+                    <span className="badge-vedic bg-gold/20 text-gold font-semibold">{lord}</span>
+                  </div>
+
+                  {house.interpretation && (
+                    <div className="card-vedic bg-sacred/50 p-4">
+                      <p className="text-sm text-secondary leading-relaxed">
+                        {house.interpretation}
+                      </p>
+                    </div>
+                  )}
+
+                  {house.houseData?.significations && (
+                    <div>
+                      <span className="text-xs font-semibold text-muted uppercase tracking-wide block mb-2">Significations:</span>
+                      <div className="flex flex-wrap gap-2">
+                        {house.houseData.significations.slice(0, 4).map((sig, i) => (
+                          <span key={i} className="badge-vedic bg-subtle text-secondary">
+                            {sig}
+                          </span>
+                        ))}
+                        {house.houseData.significations.length > 4 && (
+                          <span className="text-xs text-muted px-2 py-1">
+                            +{house.houseData.significations.length - 4} more
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* House Details with Progressive Disclosure */}
+                  {Object.keys(house).length > 4 && (
+                    <DetailsAccordion
+                      details={house}
+                      title={`House ${houseNumber} Details`}
+                      defaultExpanded={false}
+                      icon="🏛️"
+                    />
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
+  /**
+   * Enhanced Aspects Display Component - Uses Vedic design system
+   */
+  const AspectsDisplay = ({ aspects }) => {
+    if (!aspects || typeof aspects !== 'object') return null;
+
+    const allAspects = aspects.allAspects || [];
+    const patterns = aspects.patterns || {};
+
+    return (
+      <div className="space-vedic">
+        <h3 className="text-2xl font-bold text-saffron mb-6 flex items-center gap-3">
+          <span className="w-10 h-10 bg-friendly/20 text-friendly rounded-full flex items-center justify-center vedic-symbol">◯</span>
+          Planetary Aspects
+          <span className="ml-auto text-base font-normal text-muted">
+            {allAspects.length} aspect{allAspects.length !== 1 ? 's' : ''}
+          </span>
+        </h3>
+
+        {/* Enhanced Aspect Patterns Summary */}
+        {Object.keys(patterns).length > 0 && (
+          <div className="card-cosmic mb-6">
+            <h4 className="text-lg font-semibold text-primary mb-4 flex items-center gap-2">
+              <span className="vedic-symbol">✨</span>
+              Special Patterns
+            </h4>
+            <div className="flex flex-wrap gap-3">
+              {Object.entries(patterns).map(([pattern, exists]) => (
+                exists && (
+                  <span key={pattern} className="badge-vedic bg-friendly/20 text-friendly flex items-center gap-2">
+                    <span className="w-2 h-2 bg-friendly rounded-full"></span>
+                    {pattern.replace(/([A-Z])/g, ' $1').trim()}
+                  </span>
+                )
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Enhanced Individual Aspects */}
+        <div className="space-vedic">
+          {allAspects.map((aspect, index) => {
+            if (!aspect || typeof aspect !== 'object') return null;
+
+            const isPositive = aspect.nature === 'benefic';
+            const strength = aspect.strength || 0;
+
+            return (
+              <div key={index} className={`card-vedic transition-all duration-300 hover:shadow-lg ${
+                isPositive
+                  ? 'bg-friendly/5 border-friendly/20 hover:bg-friendly/10'
+                  : 'bg-enemy/5 border-enemy/20 hover:bg-enemy/10'
+              }`}>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-4">
+                    <span className="font-semibold text-primary flex items-center gap-2">
+                      <span className="vedic-symbol text-jupiter">☿</span>
+                      {aspect.source}
+                    </span>
+                    <span className="text-muted">→</span>
+                    <span className={`badge-vedic ${
+                      isPositive ? 'badge-friendly' : 'badge-enemy'
+                    }`}>
+                      {aspect.type}
+                    </span>
+                    <span className="text-muted">→</span>
+                    <span className="font-semibold text-primary flex items-center gap-2">
+                      <span className="vedic-symbol text-venus">♀</span>
+                      {aspect.target?.planet || aspect.target}
+                    </span>
+                  </div>
+
+                  {/* Enhanced Strength Indicator */}
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-muted">Strength:</span>
+                    <div className="strength-meter">
+                      <div className="strength-dots">
+                        {[...Array(5)].map((_, i) => (
+                          <div key={i} className={`strength-dot ${
+                            i < Math.floor(strength / 2) ? 'active' : ''
+                          }`}></div>
+                        ))}
+                      </div>
+                    </div>
+                    <span className="text-xs font-mono text-saffron font-bold">
+                      {strength}/10
+                    </span>
+                  </div>
+                </div>
+
+                {aspect.description && (
+                  <div className="card-vedic bg-sacred/50 p-4">
+                    <p className="text-sm text-secondary italic leading-relaxed">
+                      {aspect.description}
+                    </p>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
+  /**
+   * Enhanced Generic Content Display - Uses Vedic design system
+   */
+  const GenericAnalysisDisplay = ({ data, title, icon = "📊" }) => {
+    if (!data || typeof data !== 'object') return null;
+
+    const entries = Object.entries(data);
+
+    return (
+      <div className="space-vedic">
+        <h3 className="text-2xl font-bold text-saffron mb-6 flex items-center gap-3">
+          <span className="w-10 h-10 bg-muted/20 text-muted rounded-full flex items-center justify-center">{icon}</span>
+          {title}
+          <span className="ml-auto text-base font-normal text-muted">
+            {entries.length} item{entries.length !== 1 ? 's' : ''}
+          </span>
+        </h3>
+
+        <div className="card-vedic">
+          <ObjectDisplay data={data} title={null} />
+        </div>
+      </div>
+    );
+  };
+
+  // Helper function to get dignity badge class using consistent design system
+  const getDignityBadgeClass = (dignity) => {
+    switch (dignity.toLowerCase()) {
+      case 'exalted':
+        return 'badge-exalted';
+      case 'debilitated':
+        return 'badge-debilitated';
+      case 'own sign':
+        return 'badge-own-sign';
+      case 'strong':
+        return 'badge-friendly';
+      case 'friendly':
+        return 'badge-friendly';
+      case 'neutral':
+        return 'badge-neutral';
+      case 'enemy':
+        return 'badge-enemy';
+      default:
+        return 'badge-neutral';
+    }
+  };
+
+  // Main section content renderer
+  const renderSectionContent = (sectionId) => {
+    const section = sectionsData[sectionId];
+
+    if (!section) {
+      return (
+        <div className="loading-vedic">
+          <div className="text-muted text-6xl mb-4">📊</div>
+          <h3 className="text-xl font-semibold text-secondary mb-2">No Data Available</h3>
+          <p className="text-muted">This section is currently empty or still loading.</p>
+        </div>
+      );
+    }
+
+    // Determine section data for rendering
+    let sectionData = section;
+    if (section.analysis) {
+      sectionData = section.analysis;
+    }
+    if (section.culturalAnalysisData) {
+      sectionData = section.culturalAnalysisData;
+    }
+
+    return (
+      <div className="p-8 space-vedic">
+        {/* Enhanced Section Title */}
+        <div className="border-b border-gold/20 pb-6 mb-8">
+          <h2 className="text-3xl font-bold text-primary flex items-center gap-3">
+            <span className="vedic-symbol symbol-om"></span>
+            {sectionNames[sectionId]}
+          </h2>
+          <div className="flex items-center mt-3 gap-6">
+            {isSectionVisited(sectionId) && (
+              <span className="badge-vedic badge-complete flex items-center gap-2">
+                <span className="w-2 h-2 bg-exalted rounded-full"></span>
+                Completed
+              </span>
+            )}
+            <span className="text-sm text-muted">
+              Section {sectionId.replace('section', '')} of {sectionOrder.length}
+            </span>
+          </div>
+        </div>
+
+        {/* Render section-specific content with enhanced components */}
+        {sectionData.questions && (
+          <QuestionsDisplay questions={sectionData.questions} />
+        )}
+
+        {sectionData.analyses && (
+          <AnalysesDisplay analyses={sectionData.analyses} />
+        )}
+
+        {sectionData.houses && (
+          <HousesDisplay houses={sectionData.houses} />
+        )}
+
+        {sectionData.aspects && (
+          <AspectsDisplay aspects={sectionData.aspects} />
+        )}
+
+        {sectionData.arudhaAnalysis && (
+          <GenericAnalysisDisplay
+            data={sectionData.arudhaAnalysis}
+            title="Arudha Analysis"
+            icon="🏛️"
+          />
+        )}
+
+        {sectionData.navamsaAnalysis && (
+          <GenericAnalysisDisplay
+            data={sectionData.navamsaAnalysis}
+            title="Navamsa Analysis"
+            icon="💒"
+          />
+        )}
+
+        {sectionData.dashaAnalysis && (
+          <GenericAnalysisDisplay
+            data={sectionData.dashaAnalysis}
+            title="Dasha Analysis"
+            icon="⏳"
+          />
+        )}
+
+        {/* Enhanced Fallback for unhandled content */}
+        {!sectionData.questions &&
+         !sectionData.analyses &&
+         !sectionData.houses &&
+         !sectionData.aspects &&
+         !sectionData.arudhaAnalysis &&
+         !sectionData.navamsaAnalysis &&
+         !sectionData.dashaAnalysis && (
+          <GenericAnalysisDisplay
+            data={sectionData}
+            title="Analysis Data"
+            icon="📋"
+          />
+        )}
+      </div>
+    );
+  };
+
+  // Return main component JSX with consistent Vedic design
   return (
-    <div className="comprehensive-analysis-display min-h-screen bg-gradient-to-br from-sacred-white via-vedic-background to-gray-50">
-      {/* Enhanced Header with Navigation */}
-      <Card variant="cosmic" className="mb-8 shadow-cosmic">
-        <CardContent className="p-6 bg-gradient-to-r from-cosmic-purple via-stellar-blue to-cosmic-purple">
-          {/* Decorative Sanskrit header */}
-          <div className="text-center mb-4">
-            <div className="text-vedic-gold font-serif text-lg mb-1">॥ ज्योतिष फलादेश ॥</div>
-            <div className="text-white/60 text-sm">Comprehensive Astrological Analysis</div>
+    <div className="comprehensive-analysis-display max-w-6xl mx-auto">
+      {/* CRITICAL: Show fallback when no sections available */}
+      {Object.keys(sectionsData).length === 0 ? (
+        <div className="card-cosmic text-center py-12">
+          <div className="text-6xl mb-4">📊</div>
+          <h3 className="text-2xl font-bold text-primary mb-4">
+            No Analysis Data Available
+          </h3>
+          <div className="text-secondary mb-6 space-y-2">
+            <p>The comprehensive analysis data is not yet available.</p>
+            <p>Please ensure:</p>
+            <ul className="text-left inline-block mt-4 space-y-1">
+              <li>• Birth data has been entered correctly</li>
+              <li>• Chart has been generated successfully</li>
+              <li>• API analysis has completed</li>
+            </ul>
           </div>
 
-          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between mb-6">
-            <div className="backdrop-vedic rounded-lg p-4 mb-4 lg:mb-0">
-              <h1 className="font-serif text-2xl lg:text-3xl font-bold text-vedic-gradient mb-2">
-                Comprehensive Vedic Analysis
-              </h1>
-              <p className="text-sacred-white/90 text-sm lg:text-base font-medium">
-                {safeBirthData.name} • {safeBirthData.dateOfBirth} • {safeBirthData.timeOfBirth}
-              </p>
+          <div className="mt-6 space-y-2">
+            <button
+              onClick={() => window.location.reload()}
+              className="btn-vedic btn-primary"
+            >
+              🔄 Reload Page
+            </button>
+            <button
+              onClick={() => {
+                // Try to fetch fresh data
+                const birthData = localStorage.getItem('birthData');
+                if (birthData) {
+                  console.log('🔄 Attempting to reload comprehensive analysis...');
+                  window.location.href = '/comprehensive-analysis';
+                } else {
+                  window.location.href = '/';
+                }
+              }}
+              className="btn-vedic btn-secondary"
+            >
+              🏠 Start Over
+            </button>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Enhanced Progress Section */}
+          <div className="mb-8 card-cosmic">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold text-primary flex items-center gap-3">
+                <span className="vedic-symbol symbol-mandala"></span>
+                Analysis Progress
+              </h3>
+              <span className="text-sm font-semibold text-saffron">
+                {progress.completed}/{progress.total} sections complete
+              </span>
             </div>
-            <div className="flex items-center space-x-3 backdrop-vedic rounded-lg p-3">
-              <div className="text-sacred-white/80 text-sm font-serif">
-                Section {currentStepIndex + 1} of {analysisSteps.length}
-              </div>
-              <div className="w-32 h-3 bg-sacred-white/20 rounded-full overflow-hidden shadow-inner">
-                <div
-                  className="h-full bg-vedic-radial transition-all duration-500 shadow-golden"
-                  style={{ width: `${progressPercentage}%` }}
-                ></div>
-              </div>
+            <div className="progress-vedic mb-3">
+              <div
+                className="progress-bar-vedic"
+                style={{ width: `${progress.percentage}%` }}
+              ></div>
+            </div>
+            <div className="text-sm text-secondary">
+              {progress.percentage.toFixed(0)}% complete
             </div>
           </div>
 
           {/* Enhanced Section Navigation */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2">
-            {analysisSteps.map((step, index) => (
-              <button
-                key={step.id}
-                onClick={() => setActiveTab(step.id)}
-                className={`p-3 rounded-lg text-center transition-all duration-300 transform hover:scale-105 ${
-                  activeTab === step.id
-                    ? 'bg-vedic-radial text-white shadow-cosmic border-2 border-vedic-gold scale-105'
-                    : 'bg-sacred-white/10 text-white/80 hover:bg-sacred-white/20 hover:text-white shadow-vedic-soft border border-white/20'
-                }`}
-              >
-                <div className="text-lg mb-1 animate-glow">{step.icon}</div>
-                <div className="text-xs font-serif font-medium">{step.title}</div>
-              </button>
-            ))}
+          <div className="border-b border-gold/20 mb-8">
+            <nav className="tabs-vedic" role="tablist">
+              {sectionOrder.map((sectionId) => (
+                <button
+                  key={sectionId}
+                  onClick={() => handleSectionChange(sectionId)}
+                  role="tab"
+                  aria-selected={activeSection === sectionId}
+                  className={`tab-vedic relative ${
+                    activeSection === sectionId ? 'active' : ''
+                  }`}
+                >
+                  <span className="font-medium">{sectionNames[sectionId]}</span>
+                  {isSectionVisited(sectionId) && (
+                    <span className="absolute top-2 right-2 w-2 h-2 bg-exalted rounded-full"></span>
+                  )}
+                </button>
+              ))}
+            </nav>
           </div>
 
-          {/* Enhanced Decorative elements with new animations */}
-          <div className="absolute top-4 left-4 text-vedic-gold/30 text-2xl animate-cosmic-drift">✦</div>
-          <div className="absolute top-4 right-4 text-lunar-silver/30 text-2xl animate-lotus-bloom" style={{animationDelay: '1s'}}>🪷</div>
-          <div className="absolute bottom-4 left-4 symbol-om text-vedic-lotus/30 text-2xl" style={{animationDelay: '2s'}}>ॐ</div>
-          <div className="absolute bottom-4 right-4 text-vedic-gold/30 text-2xl animate-divine-light" style={{animationDelay: '3s'}}>✦</div>
-        </CardContent>
-      </Card>
-
-      {/* Enhanced Quick Jump Navigation */}
-      <Card variant="elevated" className="mb-6 shadow-vedic-medium border border-vedic-saffron/20">
-        <CardContent className="p-4 bg-gradient-to-r from-sacred-white to-vedic-background">
-          <div className="flex flex-col sm:flex-row items-center justify-between">
-            <div className="flex items-center space-x-4 mb-4 sm:mb-0">
-              <div className="w-12 h-12 bg-vedic-radial rounded-full flex items-center justify-center shadow-cosmic animate-sacred-pulse">
-                <span className="text-white text-lg animate-glow">
-                  {analysisSteps.find(step => step.id === activeTab)?.icon}
-                </span>
-              </div>
-              <div>
-                <h3 className="font-serif font-bold text-vedic-gradient text-lg">
-                  {analysisSteps.find(step => step.id === activeTab)?.title}
-                </h3>
-                <p className="text-sm text-wisdom-gray font-medium">
-                  {analysisSteps.find(step => step.id === activeTab)?.description}
-                </p>
-              </div>
-            </div>
-            <div className="flex space-x-3">
-              <button
-                onClick={() => {
-                  const prevIndex = Math.max(0, currentStepIndex - 1);
-                  setActiveTab(analysisSteps[prevIndex].id);
-                }}
-                disabled={currentStepIndex === 0}
-                className="px-4 py-2 text-sm border-2 border-cosmic-purple text-cosmic-purple rounded-lg
-                  hover:bg-cosmic-purple hover:text-white disabled:opacity-50 disabled:cursor-not-allowed
-                  transition-all duration-300 font-serif font-medium shadow-vedic-soft"
-              >
-                ← Previous
-              </button>
-              <button
-                onClick={() => {
-                  const nextIndex = Math.min(analysisSteps.length - 1, currentStepIndex + 1);
-                  setActiveTab(analysisSteps[nextIndex].id);
-                }}
-                disabled={currentStepIndex === analysisSteps.length - 1}
-                className="px-4 py-2 text-sm bg-vedic-radial text-white rounded-lg
-                  hover:shadow-cosmic disabled:opacity-50 disabled:cursor-not-allowed
-                  transition-all duration-300 font-serif font-medium shadow-golden"
-              >
-                Next →
-              </button>
-            </div>
+          {/* Enhanced Section Content */}
+          <div className="card-vedic">
+            {renderSectionContent(activeSection)}
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Enhanced Birth Information */}
-      <Card className="mb-6 shadow-vedic-medium border border-vedic-gold/20">
-        <CardHeader className="bg-gradient-to-r from-vedic-saffron/10 to-vedic-gold/10">
-          <CardTitle className="font-serif text-vedic-gradient flex items-center gap-2">
-            <span className="text-xl">🌟</span>
-            Birth Details (जन्म विवरण)
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-6 bg-gradient-to-br from-sacred-white to-vedic-background/30">
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <span className="text-vedic-saffron font-serif font-semibold">Name:</span>
-                <span className="text-earth-brown font-medium">{safeBirthData.name}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-vedic-saffron font-serif font-semibold">Date:</span>
-                <span className="text-earth-brown font-medium">{safeBirthData.dateOfBirth}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-vedic-saffron font-serif font-semibold">Time:</span>
-                <span className="text-earth-brown font-medium">{safeBirthData.timeOfBirth}</span>
-              </div>
-            </div>
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <span className="text-vedic-saffron font-serif font-semibold">Place:</span>
-                <span className="text-earth-brown font-medium">{safeBirthData.geocodingInfo?.formattedAddress || safeBirthData.placeOfBirth}</span>
-              </div>
-              {safeBirthData.geocodingInfo && (
-                <div className="flex items-center gap-2">
-                  <span className="text-vedic-saffron font-serif font-semibold">Coordinates:</span>
-                  <span className="text-earth-brown font-medium text-sm">
-                    {safeBirthData.latitude}, {safeBirthData.longitude} (via {safeBirthData.geocodingInfo.service})
-                  </span>
-                </div>
-              )}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Vedic Chart Visualization */}
-      <div className="chart-visualization">
-        <VedicChartDisplay
-          chartData={{
-            rasiChart: safeRasiChart,
-            birthData: safeBirthData,
-            analysis: safeAnalysis
-          }}
-          isLoading={false}
-          className="mb-6"
-        />
-      </div>
-
-      {/* Enhanced Chart Details */}
-      <Card className="mb-6 shadow-vedic-medium border border-cosmic-purple/20">
-        <CardHeader className="bg-gradient-to-r from-cosmic-purple/10 to-stellar-blue/10">
-          <CardTitle className="font-serif text-vedic-gradient flex items-center gap-2">
-            <span className="text-xl">📊</span>
-            Chart Details (कुंडली विवरण)
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-6 bg-gradient-to-br from-sacred-white to-cosmic-purple/5">
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="text-center p-4 bg-gradient-to-br from-vedic-saffron/10 to-vedic-gold/10 rounded-lg border border-vedic-saffron/20">
-              <div className="text-vedic-saffron font-serif font-semibold mb-1">Ascendant (लग्न)</div>
-              <div className="text-earth-brown font-bold text-lg">{safeRasiChart.ascendant.sign}</div>
-              <div className="text-wisdom-gray text-sm">({safeRasiChart.ascendant.degree.toFixed(2)}°)</div>
-            </div>
-            <div className="text-center p-4 bg-gradient-to-br from-cosmic-purple/10 to-stellar-blue/10 rounded-lg border border-cosmic-purple/20">
-              <div className="text-cosmic-purple font-serif font-semibold mb-1">Nakshatra (नक्षत्र)</div>
-              <div className="text-earth-brown font-bold text-lg">{safeRasiChart.nakshatra.name}</div>
-              <div className="text-wisdom-gray text-sm">(Pada {safeRasiChart.nakshatra.pada})</div>
-            </div>
-            <div className="text-center p-4 bg-gradient-to-br from-lunar-silver/10 to-vedic-lotus/10 rounded-lg border border-lunar-silver/20">
-              <div className="text-cosmic-purple font-serif font-semibold mb-1">Current Dasha (दशा)</div>
-              <div className="text-earth-brown font-bold text-lg">{safeDashaInfo.currentDasha.dasha}</div>
-              <div className="text-wisdom-gray text-sm">({safeDashaInfo.currentDasha.remainingYears.toFixed(1)} years remaining)</div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Enhanced Planetary Positions */}
-      <Card className="mb-6 shadow-vedic-medium border border-vedic-lotus/20">
-        <CardHeader className="bg-gradient-to-r from-vedic-lotus/10 to-lunar-silver/10">
-          <CardTitle className="font-serif text-vedic-gradient flex items-center gap-2">
-            <span className="text-xl">🌍</span>
-            Planetary Positions (ग्रह स्थिति)
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-6 bg-gradient-to-br from-sacred-white to-vedic-lotus/5">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Object.entries(safeRasiChart.planetaryPositions).map(([planet, position]) => (
-              <div key={planet} className="planet-card bg-gradient-to-br from-sacred-white to-vedic-background
-                border border-vedic-saffron/20 rounded-lg p-4 shadow-vedic-soft hover:shadow-vedic-medium
-                transition-all duration-300 transform hover:scale-105">
-
-                <div className="flex items-center gap-3 mb-3">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold shadow-cosmic
-                    ${planet === 'sun' ? 'bg-gradient-to-br from-solar-orange to-vedic-saffron' :
-                      planet === 'moon' ? 'bg-gradient-to-br from-lunar-silver to-gray-400' :
-                      planet === 'mars' ? 'bg-gradient-to-br from-red-500 to-red-600' :
-                      planet === 'mercury' ? 'bg-gradient-to-br from-green-500 to-green-600' :
-                      planet === 'jupiter' ? 'bg-gradient-to-br from-vedic-gold to-yellow-500' :
-                      planet === 'venus' ? 'bg-gradient-to-br from-vedic-lotus to-pink-400' :
-                      planet === 'saturn' ? 'bg-gradient-to-br from-cosmic-purple to-purple-700' :
-                      planet === 'rahu' ? 'bg-gradient-to-br from-earth-brown to-amber-800' :
-                      'bg-gradient-to-br from-wisdom-gray to-gray-600'
-                    }`}>
-                    {planet === 'sun' ? '☉' :
-                     planet === 'moon' ? '☽' :
-                     planet === 'mars' ? '♂' :
-                     planet === 'mercury' ? '☿' :
-                     planet === 'jupiter' ? '♃' :
-                     planet === 'venus' ? '♀' :
-                     planet === 'saturn' ? '♄' :
-                     planet === 'rahu' ? '☊' :
-                     planet === 'ketu' ? '☋' :
-                     planet.charAt(0).toUpperCase()}
-                  </div>
-                  <div>
-                    <h4 className="font-serif font-bold text-earth-brown text-lg">
-                      {planet.charAt(0).toUpperCase() + planet.slice(1)}
-                    </h4>
-                    <div className="text-xs text-wisdom-gray">
-                      {planet === 'sun' ? 'सूर्य' :
-                       planet === 'moon' ? 'चन्द्र' :
-                       planet === 'mars' ? 'मंगल' :
-                       planet === 'mercury' ? 'बुध' :
-                       planet === 'jupiter' ? 'गुरु' :
-                       planet === 'venus' ? 'शुक्र' :
-                       planet === 'saturn' ? 'शनि' :
-                       planet === 'rahu' ? 'राहु' :
-                       planet === 'ketu' ? 'केतु' : ''}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-vedic-saffron font-serif font-semibold">Sign:</span>
-                    <span className="text-sm text-earth-brown font-medium">{position.sign || 'Unknown'}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-vedic-saffron font-serif font-semibold">Degree:</span>
-                    <span className="text-sm text-earth-brown font-medium">{(position.degree || 0).toFixed(2)}°</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-vedic-saffron font-serif font-semibold">Dignity:</span>
-                    <span className={`text-sm font-medium px-2 py-1 rounded-full text-xs
-                      ${position.dignity === 'exalted' ? 'bg-green-100 text-green-800' :
-                        position.dignity === 'debilitated' ? 'bg-red-100 text-red-800' :
-                        position.dignity === 'own' ? 'bg-blue-100 text-blue-800' :
-                        'bg-gray-100 text-gray-800'}`}>
-                      {position.dignity || 'Unknown'}
-                    </span>
-                  </div>
-
-                  {/* Special conditions */}
-                  <div className="flex flex-wrap gap-1 mt-2">
-                    {position.isRetrograde && (
-                      <span className="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded-full font-medium">
-                        Retrograde (वक्री)
-                      </span>
-                    )}
-                    {position.isCombust && (
-                      <span className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded-full font-medium">
-                        Combust (अस्त)
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Comprehensive Analysis - All 8 Sections */}
-      <div className="comprehensive-analysis">
-        {/* Section 1: Overview (Birth Data & Basic Chart Info) */}
-        {activeTab === 'overview' && (
-          <div className="analysis-section">
-            <h3>Birth Data & Chart Overview</h3>
-            <Card className="mb-6">
-              <CardHeader>
-                <CardTitle>Chart Fundamentals</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <h4 className="font-semibold text-amber-700 mb-2">Birth Information</h4>
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <p><strong>Name:</strong> {safeBirthData.name}</p>
-                        <p><strong>Date:</strong> {safeBirthData.dateOfBirth}</p>
-                        <p><strong>Time:</strong> {safeBirthData.timeOfBirth}</p>
-                        <p><strong>Place:</strong> {safeBirthData.placeOfBirth}</p>
-                      </div>
-                      <div>
-                        <p><strong>Ascendant:</strong> {safeRasiChart.ascendant.sign} ({safeRasiChart.ascendant.degree.toFixed(2)}°)</p>
-                        <p><strong>Moon Sign:</strong> {moonData.sign || 'Unknown'}</p>
-                        <p><strong>Sun Sign:</strong> {sunData.sign || 'Unknown'}</p>
-                        <p><strong>Current Dasha:</strong> {safeDashaInfo.currentDasha.dasha}</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-amber-700 mb-2">Planetary Positions Summary</h4>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
-                      {Object.entries(safeRasiChart.planetaryPositions).map(([planet, position]) => (
-                        <div key={planet} className="bg-amber-50 p-2 rounded">
-                          <div className="font-medium">{planet.charAt(0).toUpperCase() + planet.slice(1)}</div>
-                          <div>{position.sign || 'Unknown'}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
-
-        {/* Section 2: Lagna & Luminaries Analysis */}
-        {activeTab === 'lagna-luminaries' && (
-          <LagnaLuminariesSection data={sections.section2} />
-        )}
-
-        {/* Section 3: House-by-House Analysis */}
-        {activeTab === 'houses' && (
-          <HouseAnalysisSection data={sections.section3} />
-        )}
-
-        {/* Section 4: Planetary Aspects & Interrelationships */}
-        {activeTab === 'aspects' && (
-          <PlanetaryAspectsSection data={sections.section4} />
-        )}
-
-        {/* Section 5: Arudha Lagna Analysis */}
-        {activeTab === 'arudha' && (
-          <ArudhaLagnaSection data={sections.section5} />
-        )}
-
-        {/* Section 6: Navamsa Chart Analysis */}
-        {activeTab === 'navamsa' && (
-          <NavamsaAnalysisSection data={sections.section6} />
-        )}
-
-        {/* Section 7: Dasha Analysis */}
-        {activeTab === 'dasha' && (
-          <div className="analysis-section">
-            <h3>Dasha Analysis</h3>
-            <Card className="mb-6">
-              <CardHeader>
-                <CardTitle>Current Dasha Period</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <h4 className="font-semibold text-amber-700 mb-2">Active Dasha</h4>
-                    <div className="bg-amber-50 p-4 rounded">
-                      <p><strong>Planet:</strong> {safeDashaInfo.currentDasha.dasha}</p>
-                      <p><strong>Remaining:</strong> {safeDashaInfo.currentDasha.remainingYears.toFixed(1)} years</p>
-                      <p><strong>Age Range:</strong> {safeDashaInfo.currentDasha.startAge} - {safeDashaInfo.currentDasha.endAge} years</p>
-                    </div>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-amber-700 mb-2">Dasha Sequence</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                      {['Sun', 'Moon', 'Mars', 'Rahu', 'Jupiter', 'Saturn', 'Mercury', 'Ketu', 'Venus'].map((planet, index) => {
-                        const periods = [6, 10, 7, 18, 16, 19, 17, 7, 20];
-                        return (
-                          <div key={planet} className={`p-2 rounded text-center ${
-                            planet === safeDashaInfo.currentDasha.dasha ? 'bg-amber-200' : 'bg-gray-100'
-                          }`}>
-                            <div className="font-medium">{planet}</div>
-                            <div className="text-sm">{periods[index]} years</div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
-
-        {/* Section 8: Synthesis & Recommendations */}
-        {activeTab === 'synthesis' && (
-          <SynthesisSection data={sections.section8} />
-        )}
-      </div>
+        </>
+      )}
     </div>
   );
 };
