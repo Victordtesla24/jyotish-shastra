@@ -650,6 +650,7 @@ class LagnaLordAnalyzer {
         aspects.push({
           planet: planet.planet,
           type: '7th Aspect',
+          orb: 0,
           strength: this.calculateAspectStrength({ type: '7th Aspect', orb: 0 }),
           nature: this.getAspectNature(planet.planet, 'Target', '7th Aspect')
         });
@@ -663,6 +664,7 @@ class LagnaLordAnalyzer {
           aspects.push({
             planet: planet.planet,
             type: fourthAspect === targetHouse ? '4th Aspect' : '8th Aspect',
+            orb: 0,
             strength: 70,
             nature: { malefic: true }
           });
@@ -676,6 +678,7 @@ class LagnaLordAnalyzer {
           aspects.push({
             planet: planet.planet,
             type: fifthAspect === targetHouse ? '5th Aspect' : '9th Aspect',
+            orb: 0,
             strength: 80,
             nature: { benefic: true }
           });
@@ -689,6 +692,7 @@ class LagnaLordAnalyzer {
           aspects.push({
             planet: planet.planet,
             type: thirdAspect === targetHouse ? '3rd Aspect' : '10th Aspect',
+            orb: 0,
             strength: 75,
             nature: { malefic: true }
           });

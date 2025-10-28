@@ -229,20 +229,46 @@ class TestChartFactory {
    * @param {number} house - House where planet is placed
    * @returns {Object} Updated chart
    */
-  static addPlanet(chart, planetName, sign, house) {
+  static addPlanet(chart, planetName, sign, degreeOrHouse) {
     // Ensure arrays exist
     if (!chart.rasiChart) chart.rasiChart = { planets: [] };
     if (!chart.rasiChart.planets) chart.rasiChart.planets = [];
     if (!chart.planetaryPositions) chart.planetaryPositions = [];
     
     const signIndex = this.getSignIndex(sign);
+    
+    // PRODUCTION-GRADE: Intelligent parameter detection using precision mode flag
+    const isPrecisionMode = chart._precisionMode === true;
+    
+    let degree, house, longitude;
+    const ascLongitude = chart.ascendant?.longitude || (chart.rasiChart?.ascendant?.longitude || 0);
+    
+    // Detection logic based on explicit mode flag:
+    // 1. If chart is tagged as _precisionMode: treat 1-30 as degrees
+    // 2. If value > 12: always treat as degree
+    // 3. Default: treat 1-12 as house numbers (standard usage)
+    if (isPrecisionMode || (degreeOrHouse > 12 && degreeOrHouse <= 30)) {
+      // Parameter is degree within the sign (precision mode for Navamsa, etc.)
+      degree = degreeOrHouse;
+      longitude = signIndex * 30 + degree;
+      // Calculate house from longitude
+      let houseLongitude = longitude - ascLongitude;
+      if (houseLongitude < 0) houseLongitude += 360;
+      house = Math.floor(houseLongitude / 30) + 1;
+    } else {
+      // Parameter is house number (standard mode)
+      house = degreeOrHouse;
+      degree = 15;
+      longitude = signIndex * 30 + degree;
+    }
+    
     const planetData = {
       planet: planetName,
       name: planetName,
       sign: sign,
       signIndex: signIndex,
-      degree: 15,
-      longitude: signIndex * 30 + 15,
+      degree: degree,
+      longitude: longitude,
       house: house,
       isRetrograde: false,
       dignity: 'neutral'
@@ -271,10 +297,37 @@ class TestChartFactory {
    * @param {Object} config - Chart configuration
    * @returns {Object} Custom chart
    */
-  static createChart(config) {
+  static createChart(config, ascendantDegree = null) {
     if (typeof config === 'string') {
       // If config is a string, treat it as ascendant sign
       const ascendantSign = config;
+      const degree = ascendantDegree !== null ? ascendantDegree : 15;
+      
+      // If ascendantDegree is provided, this is a precision test (don't add default planets)
+      const isPrecisionMode = ascendantDegree !== null;
+      
+      if (isPrecisionMode) {
+        // Precision mode: minimal chart for specific calculations (Navamsa, etc.)
+        return {
+          _precisionMode: true, // Tag for detection in addPlanet
+          rasiChart: {
+            ascendant: { sign: ascendantSign, degree: degree, longitude: this.getSignIndex(ascendantSign) * 30 + degree },
+            planets: []
+          },
+          ascendant: { sign: ascendantSign, longitude: this.getSignIndex(ascendantSign) * 30 + degree },
+          planetaryPositions: [],
+          birthData: {
+            name: 'Precision Test',
+            dateOfBirth: '1990-01-01',
+            timeOfBirth: '12:00',
+            latitude: 19.076,
+            longitude: 72.8777,
+            timezone: 'Asia/Kolkata'
+          }
+        };
+      }
+      
+      // Standard mode: full chart with default planets
       const planets = this.generatePlanets();
       
       return {
@@ -423,28 +476,6 @@ class TestChartFactory {
    * @param {string} sign - Sign name
    * @param {number} house - House number
    */
-  static addPlanet(chart, planetName, sign, house) {
-    // Ensure both structures exist
-    if (!chart.planetaryPositions) chart.planetaryPositions = [];
-    if (!chart.rasiChart) chart.rasiChart = { planets: [] };
-    if (!chart.rasiChart.planets) chart.rasiChart.planets = [];
-    
-    const signIndex = this.getSignIndex(sign);
-    const planetData = {
-      name: planetName,
-      planet: planetName,
-      sign: sign,
-      signIndex: signIndex,
-      house: house,
-      degree: 15,
-      longitude: signIndex * 30 + 15,
-      isRetrograde: false,
-      dignity: 'neutral'
-    };
-    
-    chart.planetaryPositions.push(planetData);
-    chart.rasiChart.planets.push(planetData);
-  }
 
   /**
    * Get sign index from sign name

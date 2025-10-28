@@ -93,12 +93,12 @@ curl -X POST http://localhost:3001/api/v1/chart/generate \
   -d '{
       "name": "Farhan",
       "dateOfBirth": "1997-12-18",
-      "timeOfBirth": "02:30",
+      "timeOfBirth": "00:00",
       "latitude": 32.4935378,
       "longitude": 74.5411575,
       "timezone": "Asia/Karachi",
       "gender": "male"
-  }' | jq .
+  }' | jq . > farhan-birth-chart.json
 ```
 
 ### 7. Generate Comprehensive Chart
@@ -114,7 +114,7 @@ curl -X POST http://localhost:3001/api/v1/chart/generate/comprehensive \
       "timezone": "Asia/Karachi",
       "gender": "male",
       "placeOfBirth": "Sialkot, Pakistan"
-  }' | jq .
+  }' | jq . > farhan-comprehensive-chart.json
 ```
 
 ### 8. Birth Data Analysis
@@ -129,7 +129,7 @@ curl -X POST http://localhost:3001/api/v1/chart/analysis/birth-data \
       "longitude": 74.5411575,
       "timezone": "Asia/Karachi",
       "gender": "male"
-  }' | jq .
+  }' | jq . > farhan-birth-data.json
 ```
 
 ### 9. Get Chart by ID
@@ -172,7 +172,7 @@ curl -X POST http://localhost:3001/api/v1/chart/analysis/house/1 \
       "longitude": 74.5411575,
       "timezone": "Asia/Karachi",
       "gender": "male"
-  }' | jq .
+  }' | jq . > farhan-house-1.json
 
 # House 7 Analysis (Marriage House)
 curl -X POST http://localhost:3001/api/v1/chart/analysis/house/7 \
@@ -185,7 +185,7 @@ curl -X POST http://localhost:3001/api/v1/chart/analysis/house/7 \
       "longitude": 74.5411575,
       "timezone": "Asia/Karachi",
       "gender": "male"
-  }' | jq .
+  }' | jq . > farhan-house-7.json
 
 # House 10 Analysis (Career House)
 curl -X POST http://localhost:3001/api/v1/chart/analysis/house/10 \
@@ -198,7 +198,7 @@ curl -X POST http://localhost:3001/api/v1/chart/analysis/house/10 \
       "longitude": 74.5411575,
       "timezone": "Asia/Karachi",
       "gender": "male"
-  }' | jq .
+  }' | jq . > farhan-house-10.json
 ```
 
 ### 13. Chart Comprehensive Analysis
@@ -213,7 +213,7 @@ curl -X POST http://localhost:3001/api/v1/chart/analysis/comprehensive \
       "longitude": 74.5411575,
       "timezone": "Asia/Karachi",
       "gender": "male"
-  }' | jq .
+  }' | jq . > farhan-comprehensive-analysis.json
 ```
 
 ---
@@ -232,7 +232,7 @@ curl -X POST http://localhost:3001/api/v1/analysis/comprehensive \
       "longitude": 74.5411575,
       "timezone": "Asia/Karachi",
       "gender": "male"
-  }' | jq .
+  }' | jq . > farhan-comprehensive-analysis.json
 ```
 
 ### 15. Birth Data Validation
@@ -247,7 +247,7 @@ curl -X POST http://localhost:3001/api/v1/analysis/birth-data \
       "longitude": 74.5411575,
       "timezone": "Asia/Karachi",
       "gender": "male"
-  }' | jq .
+  }' | jq . > farhan-birth-data.json
 ```
 
 ### 16. Preliminary Analysis
@@ -262,7 +262,7 @@ curl -X POST http://localhost:3001/api/v1/analysis/preliminary \
       "longitude": 74.5411575,
       "timezone": "Asia/Karachi",
       "gender": "male"
-  }' | jq .
+  }' | jq . > farhan-preliminary-analysis.json
 ```
 
 ### 17. Houses Analysis
@@ -277,7 +277,7 @@ curl -X POST http://localhost:3001/api/v1/analysis/houses \
       "longitude": 74.5411575,
       "timezone": "Asia/Karachi",
       "gender": "male"
-  }' | jq .
+  }' | jq . > farhan-houses-analysis.json
 ```
 
 ### 18. Aspects Analysis
@@ -292,7 +292,7 @@ curl -X POST http://localhost:3001/api/v1/analysis/aspects \
       "longitude": 74.5411575,
       "timezone": "Asia/Karachi",
       "gender": "male"
-  }' | jq .
+  }' | jq . > farhan-aspects-analysis.json
 ```
 
 ### 19. Arudha Analysis
@@ -307,7 +307,7 @@ curl -X POST http://localhost:3001/api/v1/analysis/arudha \
       "longitude": 74.5411575,
       "timezone": "Asia/Karachi",
       "gender": "male"
-  }' | jq .
+  }' | jq . > farhan-arudha-analysis.json
 ```
 
 ### 20. Navamsa Analysis
@@ -322,7 +322,7 @@ curl -X POST http://localhost:3001/api/v1/analysis/navamsa \
       "longitude": 74.5411575,
       "timezone": "Asia/Karachi",
       "gender": "male"
-  }' | jq .
+  }' | jq . > farhan-navamsa-analysis.json
 ```
 
 ### 21. Dasha Analysis
@@ -337,33 +337,33 @@ curl -X POST http://localhost:3001/api/v1/analysis/dasha \
       "longitude": 74.5411575,
       "timezone": "Asia/Karachi",
       "gender": "male"
-  }' | jq .
+  }' | jq . > farhan-dasha-analysis.json
 ```
 
 ### 22. Get Analysis by ID
 ```bash
 # Replace {analysisId} with actual analysis ID from analysis response
-curl -X GET http://localhost:3001/api/v1/analysis/{analysisId} | jq .
+curl -X GET http://localhost:3001/api/v1/analysis/{analysisId} | jq . > farhan-analysis.json
 ```
 
 ### 23. Get User Analysis History (Requires Authentication)
 ```bash
 # Replace {userId} with actual user ID and {authToken} with valid JWT token
 curl -X GET http://localhost:3001/api/v1/analysis/user/{userId} \
-  -H "Authorization: Bearer {authToken}" | jq .
+  -H "Authorization: Bearer {authToken}" | jq . > farhan-user-analysis-history.json
 ```
 
 ### 24. Delete Analysis (Requires Authentication)
 ```bash
 # Replace {analysisId} with actual analysis ID and {authToken} with valid JWT token
 curl -X DELETE http://localhost:3001/api/v1/analysis/{analysisId} \
-  -H "Authorization: Bearer {authToken}" | jq .
+  -H "Authorization: Bearer {authToken}" | jq . > farhan-analysis-deleted.json
 ```
 
 ### 25. Get Analysis Progress
 ```bash
 # Replace {analysisId} with actual analysis ID from analysis response
-curl -X GET http://localhost:3001/api/v1/analysis/progress/{analysisId} | jq .
+curl -X GET http://localhost:3001/api/v1/analysis/progress/{analysisId} | jq . > farhan-analysis-progress.json
 ```
 
 ---

@@ -137,7 +137,9 @@ class HouseAnalysisService {
    */
   calculateHouseData(chart) {
     const houseData = {};
-    const ascendantLongitude = chart.ascendant.longitude;
+    // Handle both direct chart and nested rasiChart format
+    const actualChart = chart.rasiChart || chart;
+    const ascendantLongitude = actualChart.ascendant?.longitude || 0;
 
     for (let house = 1; house <= 12; house++) {
       const houseStartLongitude = (ascendantLongitude + (house - 1) * 30) % 360;
@@ -157,22 +159,32 @@ class HouseAnalysisService {
     }
 
     // Add planets to their respective houses
-    // Handle both chart.planets and chart.planetaryPositions formats
+    // Handle multiple chart structure formats - check all possible locations
     let planets = [];
 
-    if (chart.planets && Array.isArray(chart.planets)) {
-      planets = chart.planets;
-    } else if (chart.planetaryPositions) {
-      if (Array.isArray(chart.planetaryPositions)) {
-        planets = chart.planetaryPositions;
-      } else if (typeof chart.planetaryPositions === 'object') {
-        // Convert object format to array
-        planets = Object.entries(chart.planetaryPositions).map(([name, data]) => ({
-          name: name,
-          planet: name,
-          ...data
-        }));
-      }
+    // Priority 1: Direct planets array
+    if (actualChart.planets && Array.isArray(actualChart.planets)) {
+      planets = actualChart.planets;
+    } 
+    // Priority 2: PlanetaryPositions array
+    else if (actualChart.planetaryPositions && Array.isArray(actualChart.planetaryPositions)) {
+      planets = actualChart.planetaryPositions;
+    }
+    // Priority 3: PlanetaryPositions object (convert to array)
+    else if (actualChart.planetaryPositions && typeof actualChart.planetaryPositions === 'object') {
+      planets = Object.entries(actualChart.planetaryPositions).map(([name, data]) => ({
+        name: name,
+        planet: name,
+        ...data
+      }));
+    }
+    // Priority 4: Original chart rasiChart.planets (if actualChart is different)
+    else if (chart !== actualChart && chart.rasiChart?.planets && Array.isArray(chart.rasiChart.planets)) {
+      planets = chart.rasiChart.planets;
+    }
+    // Priority 5: Original chart planetaryPositions
+    else if (chart !== actualChart && chart.planetaryPositions && Array.isArray(chart.planetaryPositions)) {
+      planets = chart.planetaryPositions;
     }
 
     planets.forEach(planet => {
@@ -182,18 +194,30 @@ class HouseAnalysisService {
 
       const planetName = planet.name || planet.planet;
       const planetLongitude = planet.longitude;
+      const planetHouse = planet.house;
 
-      if (!planetName || planetLongitude === undefined || planetLongitude === null) {
-        return; // Skip if essential data is missing
+      if (!planetName) {
+        return; // Skip if no name
       }
 
-      // CRITICAL FIX: Use pre-calculated house number from TestChartFactory if available
-      const houseNumber = planet.house || getHouseFromLongitude(planetLongitude, ascendantLongitude);
+      // Determine house number - prefer explicit house property, fallback to longitude calculation
+      let houseNumber;
+      if (planetHouse && planetHouse >= 1 && planetHouse <= 12) {
+        // Use explicit house number if provided
+        houseNumber = planetHouse;
+      } else if (planetLongitude !== undefined && planetLongitude !== null) {
+        // Calculate from longitude
+        houseNumber = getHouseFromLongitude(planetLongitude, ascendantLongitude);
+      } else {
+        // Cannot determine house
+        return;
+      }
+
       if (houseData[houseNumber] && houseNumber >= 1 && houseNumber <= 12) {
         houseData[houseNumber].occupyingPlanets.push({
           name: planetName,
-          longitude: planetLongitude,
-          sign: planet.sign || this.getSignFromLongitude(planetLongitude)
+          longitude: planetLongitude || 0,
+          sign: planet.sign || this.getSignFromLongitude(planetLongitude || 0)
         });
       }
     });
@@ -592,6 +616,8 @@ class HouseAnalysisService {
    * @returns {Object} Single house analysis
    */
   analyzeHouse(houseNumber, chart = null) {
+    // CRITICAL: Use provided chart (for tests that update chart after construction)
+    // This ensures we analyze the CURRENT chart state, not the one from construction time
     const chartToUse = chart || this.chart;
 
     if (!chartToUse) {
