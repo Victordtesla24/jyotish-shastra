@@ -12,7 +12,7 @@ const path = require('path');
 describe('AnalysisPage UI-API Integration Tests', () => {
   let browser;
   let page;
-  const baseUrl = 'http://localhost:3002';
+  const baseUrl = 'http://localhost:3000';
   const testLogsDir = path.join(__dirname, 'test-logs');
 
   // Test data as specified in requirements

@@ -21,7 +21,7 @@ async function comprehensiveTabTest() {
 
   try {
     // Step 1: Navigate to homepage and add real session data
-    await page.goto('http://localhost:3002', { waitUntil: 'networkidle0' });
+    await page.goto('http://localhost:3000', { waitUntil: 'networkidle0' });
 
     await page.evaluate(() => {
       // Add birth data
@@ -73,7 +73,7 @@ async function comprehensiveTabTest() {
     console.log(`📊 Available sections: ${Object.keys(apiResponse.analysis.sections)}`);
 
     // Step 3: Navigate to Analysis Page
-    await page.goto('http://localhost:3002/analysis', { waitUntil: 'networkidle0' });
+    await page.goto('http://localhost:3000/analysis', { waitUntil: 'networkidle0' });
     await new Promise(resolve => setTimeout(resolve, 2000));
 
     // Step 4: Define tabs to test

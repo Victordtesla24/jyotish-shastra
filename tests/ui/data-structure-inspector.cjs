@@ -19,7 +19,7 @@ async function dataStructureInspector() {
 
   try {
     // Navigate and inject comprehensive data
-    await page.goto('http://localhost:3002', { waitUntil: 'networkidle0' });
+    await page.goto('http://localhost:3000', { waitUntil: 'networkidle0' });
 
     await page.evaluate(() => {
       const mockBirthData = {
@@ -142,7 +142,7 @@ async function dataStructureInspector() {
     });
 
     // Navigate to Analysis Page
-    await page.goto('http://localhost:3002/analysis', { waitUntil: 'networkidle0' });
+    await page.goto('http://localhost:3000/analysis', { waitUntil: 'networkidle0' });
     await new Promise(resolve => setTimeout(resolve, 3000));
 
     // Inject console logs into the components to debug data structure

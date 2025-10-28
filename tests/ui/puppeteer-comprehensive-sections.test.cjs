@@ -40,7 +40,7 @@ describe('Comprehensive Analysis Session Storage & Data Flow Test', () => {
       console.log('🚀 Starting comprehensive session storage and data flow test...\n');
 
       // Step 1: Navigate to application and verify initial state
-      await page.goto('http://localhost:3002', { waitUntil: 'networkidle0' });
+      await page.goto('http://localhost:3000', { waitUntil: 'networkidle0' });
       console.log('✅ Application loaded');
 
       // Check initial session storage state

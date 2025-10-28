@@ -1,10 +1,14 @@
+/**
+ * @jest-environment node
+ */
+
 const puppeteer = require('puppeteer');
 const path = require('path');
 const fs = require('fs').promises;
 
 // Test configuration
 const TEST_CONFIG = {
-  baseUrl: 'http://localhost:3002',
+  baseUrl: 'http://localhost:3000',
   apiUrl: 'http://localhost:3001',
   timeout: 30000,
   headless: true,

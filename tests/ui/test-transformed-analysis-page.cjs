@@ -80,7 +80,7 @@ async function testTransformedAnalysisPage() {
     console.log('📍 Phase 1: Setting up session data...');
     results.phases.phase1 = { status: 'running', startTime: new Date().toISOString() };
 
-    await page.goto('http://localhost:3002', { waitUntil: 'networkidle0' });
+    await page.goto('http://localhost:3000', { waitUntil: 'networkidle0' });
 
     // Inject birth data and analysis data into session storage
     await page.evaluate((birthData, analysisData) => {
@@ -104,7 +104,7 @@ async function testTransformedAnalysisPage() {
     console.log('📍 Phase 2: Navigating to AnalysisPage...');
     results.phases.phase2 = { status: 'running', startTime: new Date().toISOString() };
 
-    await page.goto('http://localhost:3002/analysis', { waitUntil: 'networkidle0' });
+    await page.goto('http://localhost:3000/analysis', { waitUntil: 'networkidle0' });
 
     // Wait for page to load
     await new Promise(resolve => setTimeout(resolve, 3000));

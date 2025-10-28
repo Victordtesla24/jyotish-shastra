@@ -24,7 +24,7 @@ async function tabSwitchingTest() {
 
   try {
     // Navigate to homepage first
-    await page.goto('http://localhost:3002', { waitUntil: 'networkidle0' });
+    await page.goto('http://localhost:3000', { waitUntil: 'networkidle0' });
 
     // Add mock comprehensive analysis data
     await page.evaluate(() => {
@@ -80,7 +80,7 @@ async function tabSwitchingTest() {
     });
 
     // Navigate to Analysis Page
-    await page.goto('http://localhost:3002/analysis', { waitUntil: 'networkidle0' });
+    await page.goto('http://localhost:3000/analysis', { waitUntil: 'networkidle0' });
     await new Promise(resolve => setTimeout(resolve, 2000));
 
     console.log('\n🎯 TESTING TAB SWITCHING FUNCTIONALITY:');

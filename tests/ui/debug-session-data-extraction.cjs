@@ -15,7 +15,7 @@ async function extractSessionData() {
     const page = await browser.newPage();
 
     // Navigate to the frontend
-    await page.goto('http://localhost:3002');
+    await page.goto('http://localhost:3000');
 
     // Wait for page to load
     await new Promise(resolve => setTimeout(resolve, 2000));

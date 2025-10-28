@@ -36,7 +36,7 @@ async function runSessionStorageValidationTest() {
 
     // Step 1: Load application and verify UIDataSaver initialization
     console.log('📋 Step 1: Loading application and verifying UIDataSaver...');
-    await page.goto('http://localhost:3002', { waitUntil: 'networkidle0' });
+    await page.goto('http://localhost:3000', { waitUntil: 'networkidle0' });
 
     // Check initial session storage state
     const initialState = await page.evaluate(() => {

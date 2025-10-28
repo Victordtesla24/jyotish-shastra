@@ -9,7 +9,7 @@ const fs = require('fs');
     console.log('📊 Testing UIDataSaver data retrieval...');
     const testData = JSON.parse(fs.readFileSync('../test-data/analysis-comprehensive-response.json', 'utf8'));
 
-    await page.goto('http://localhost:3002');
+    await page.goto('http://localhost:3000');
 
     // Inject data in UIDataSaver expected format
     const result = await page.evaluate((data) => {
@@ -89,7 +89,7 @@ const fs = require('fs');
       console.log('✅ UIDataSaver can retrieve sections - testing ComprehensiveAnalysisPage');
 
       // Navigate to comprehensive analysis page to see if it works
-      await page.goto('http://localhost:3002/comprehensive');
+      await page.goto('http://localhost:3000/comprehensive');
       await new Promise(resolve => setTimeout(resolve, 3000));
 
       const pageResult = await page.evaluate(() => {

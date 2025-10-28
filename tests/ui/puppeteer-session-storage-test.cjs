@@ -32,7 +32,7 @@ async function runSessionStorageTest() {
     page.on('pageerror', error => console.error('Page error:', error));
 
     // Step 1: Navigate to application and verify initial state
-    await page.goto('http://localhost:3002', { waitUntil: 'networkidle0' });
+    await page.goto('http://localhost:3000', { waitUntil: 'networkidle0' });
     console.log('✅ Application loaded');
 
     // Check initial session storage state
@@ -153,7 +153,7 @@ async function runSessionStorageTest() {
     if (!comprehensiveButton) {
       // Manual navigation as fallback
       console.log('⚠️ Button not found, navigating directly to comprehensive analysis URL');
-      await page.goto('http://localhost:3002/comprehensive', { waitUntil: 'networkidle0' });
+      await page.goto('http://localhost:3000/comprehensive', { waitUntil: 'networkidle0' });
     } else {
       await comprehensiveButton.click();
     }

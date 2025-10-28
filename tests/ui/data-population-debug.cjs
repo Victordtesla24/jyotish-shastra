@@ -20,7 +20,7 @@ async function dataPopulationDebug() {
   });
 
   try {
-    await page.goto('http://localhost:3002', { waitUntil: 'networkidle0' });
+    await page.goto('http://localhost:3000', { waitUntil: 'networkidle0' });
 
     // Add comprehensive mock data
     await page.evaluate(() => {
@@ -66,7 +66,7 @@ async function dataPopulationDebug() {
       }
     });
 
-    await page.goto('http://localhost:3002/analysis', { waitUntil: 'networkidle0' });
+    await page.goto('http://localhost:3000/analysis', { waitUntil: 'networkidle0' });
     await new Promise(resolve => setTimeout(resolve, 5000)); // Wait longer for data loading
 
     // Check analysisData state after page load

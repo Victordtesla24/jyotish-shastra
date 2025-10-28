@@ -108,7 +108,7 @@ class EnhancedComprehensiveDebugger {
 
     // Navigate to homepage
     console.log('📍 Navigating to homepage...');
-    await this.page.goto('http://localhost:3002', { waitUntil: 'networkidle2' });
+    await this.page.goto('http://localhost:3000', { waitUntil: 'networkidle2' });
 
     // Take initial screenshot
     await this.takeScreenshot('01-homepage-initial', 'Initial homepage load');
@@ -313,7 +313,7 @@ class EnhancedComprehensiveDebugger {
     console.log('\n📊 Testing Analysis Page (/analysis)...');
 
     try {
-      await this.page.goto('http://localhost:3002/analysis', {
+      await this.page.goto('http://localhost:3000/analysis', {
         waitUntil: 'networkidle2',
         timeout: 15000
       });
@@ -391,7 +391,7 @@ class EnhancedComprehensiveDebugger {
     console.log('\n📋 Testing Comprehensive Analysis Page (/comprehensive-analysis)...');
 
     try {
-      await this.page.goto('http://localhost:3002/comprehensive-analysis', {
+      await this.page.goto('http://localhost:3000/comprehensive-analysis', {
         waitUntil: 'networkidle2',
         timeout: 15000
       });
@@ -485,7 +485,7 @@ class EnhancedComprehensiveDebugger {
     console.log('📸 Capturing detailed Analysis page screenshots...');
 
     try {
-      await this.page.goto('http://localhost:3002/analysis', { waitUntil: 'networkidle2' });
+      await this.page.goto('http://localhost:3000/analysis', { waitUntil: 'networkidle2' });
       await new Promise(resolve => setTimeout(resolve, 3000));
 
       // Full page screenshot
@@ -516,7 +516,7 @@ class EnhancedComprehensiveDebugger {
     console.log('📸 Capturing detailed Comprehensive Analysis page screenshots...');
 
     try {
-      await this.page.goto('http://localhost:3002/comprehensive-analysis', { waitUntil: 'networkidle2' });
+      await this.page.goto('http://localhost:3000/comprehensive-analysis', { waitUntil: 'networkidle2' });
       await new Promise(resolve => setTimeout(resolve, 5000));
 
       // Full page screenshot

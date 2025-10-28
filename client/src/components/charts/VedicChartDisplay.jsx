@@ -135,15 +135,22 @@ function processChartData(chartData) {
   // Handle direct chart data structure (chartData is rasiChart or navamsaChart directly)
   const chart = chartData;
 
-  if (!chart.planets || !Array.isArray(chart.planets)) {
-    console.error('❌ No valid planets array found in chart data');
+  // Use planetaryPositions if available (from API), otherwise fall back to planets array
+  let planetsData = [];
+  if (chart.planetaryPositions && typeof chart.planetaryPositions === 'object') {
+    // Convert planetaryPositions object to array
+    planetsData = Object.values(chart.planetaryPositions);
+    console.log('🎯 Found planetaryPositions data:', planetsData.length, 'planets');
+  } else if (chart.planets && Array.isArray(chart.planets)) {
+    planetsData = chart.planets;
+    console.log('🎯 Found planets array data:', planetsData.length, 'planets');
+  } else {
+    console.error('❌ No valid planets data found in chart data');
     return { planets: [], ascendant: null };
   }
 
-  console.log('🎯 Found planetary data:', chart.planets.length, 'planets');
-
   // Process planets
-  const planets = chart.planets.map(planet => {
+  const planets = planetsData.map(planet => {
     const house = calculateHouseFromLongitude(planet.longitude, chart.ascendant?.longitude || 0);
     // Use the degree field directly from API response, or calculate if not available
     const degrees = planet.degree !== undefined ? Math.floor(planet.degree) : Math.floor(planet.longitude % 30);
@@ -182,7 +189,7 @@ function processChartData(chartData) {
       degrees: ascDegrees,
       minutes: ascMinutes,
       position: HOUSE_POSITIONS[ascHouse],
-      sign: chart.ascendant.sign || 'Unknown'
+      sign: chart.ascendant.signName || chart.ascendant.sign || 'Unknown'
     };
   }
 

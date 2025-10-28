@@ -12,7 +12,7 @@ async function tabIndexDebug() {
   const page = await browser.newPage();
 
   try {
-    await page.goto('http://localhost:3002', { waitUntil: 'networkidle0' });
+    await page.goto('http://localhost:3000', { waitUntil: 'networkidle0' });
 
     // Add minimal mock data
     await page.evaluate(() => {
@@ -38,7 +38,7 @@ async function tabIndexDebug() {
       }
     });
 
-    await page.goto('http://localhost:3002/analysis', { waitUntil: 'networkidle0' });
+    await page.goto('http://localhost:3000/analysis', { waitUntil: 'networkidle0' });
     await new Promise(resolve => setTimeout(resolve, 3000));
 
     // Analyze all tab buttons and their attributes

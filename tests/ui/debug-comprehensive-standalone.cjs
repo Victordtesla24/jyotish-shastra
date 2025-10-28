@@ -49,7 +49,7 @@ async function debugComprehensiveAnalysis() {
 
     // Step 1: Navigate to homepage
     console.log('📍 Step 1: Navigate to homepage');
-    await page.goto('http://localhost:3002', { waitUntil: 'networkidle2' });
+    await page.goto('http://localhost:3000', { waitUntil: 'networkidle2' });
 
     // Step 2: Check if UIDataSaver is available
     console.log('📍 Step 2: Check UIDataSaver availability');
@@ -157,7 +157,7 @@ async function debugComprehensiveAnalysis() {
     console.log('📍 Step 6: Navigate to comprehensive analysis page');
 
     try {
-      await page.goto('http://localhost:3002/comprehensive-analysis', {
+      await page.goto('http://localhost:3000/comprehensive-analysis', {
         waitUntil: 'networkidle2',
         timeout: 15000
       });

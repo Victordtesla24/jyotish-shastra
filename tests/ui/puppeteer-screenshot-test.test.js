@@ -1,9 +1,13 @@
+/**
+ * @jest-environment node
+ */
+
 const puppeteer = require('puppeteer');
 const path = require('path');
 const fs = require('fs');
 
 // Test configuration
-const FRONTEND_URL = 'http://localhost:3002';
+const FRONTEND_URL = 'http://localhost:3000';
 const BACKEND_URL = 'http://localhost:3001';
 const SCREENSHOT_DIR = path.join(__dirname, 'test-logs');
 

@@ -21,7 +21,7 @@ async function comprehensiveTabsValidation() {
 
   try {
     // Navigate to homepage first and inject comprehensive data
-    await page.goto('http://localhost:3002', { waitUntil: 'networkidle0' });
+    await page.goto('http://localhost:3000', { waitUntil: 'networkidle0' });
 
     // Add mock birth data and comprehensive analysis
     await page.evaluate(() => {
@@ -178,7 +178,7 @@ async function comprehensiveTabsValidation() {
     });
 
     // Navigate to Analysis Page
-    await page.goto('http://localhost:3002/analysis', { waitUntil: 'networkidle0' });
+    await page.goto('http://localhost:3000/analysis', { waitUntil: 'networkidle0' });
     await new Promise(resolve => setTimeout(resolve, 2000));
 
     const tabs = [

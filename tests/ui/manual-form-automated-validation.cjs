@@ -46,7 +46,7 @@ async function manualFormAutomatedValidation() {
 
   try {
     // Navigate to homepage
-    await page.goto('http://localhost:3002', { waitUntil: 'networkidle0' });
+    await page.goto('http://localhost:3000', { waitUntil: 'networkidle0' });
     console.log('📍 Navigated to homepage');
 
     // Take initial screenshot
@@ -162,7 +162,7 @@ async function manualFormAutomatedValidation() {
 
     // Navigate to analysis page to test data loading
     console.log('🔄 Navigating to comprehensive analysis page...');
-    await page.goto('http://localhost:3002/comprehensive-analysis', { waitUntil: 'networkidle0' });
+    await page.goto('http://localhost:3000/comprehensive-analysis', { waitUntil: 'networkidle0' });
 
     // Wait for page to load
     await new Promise(resolve => setTimeout(resolve, 3000));
