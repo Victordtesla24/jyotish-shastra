@@ -1,5 +1,5 @@
-const DetailedDashaAnalysisService = require('../../../../../src/services/analysis/DetailedDashaAnalysisService');
-const sampleBirthData = require('../../../../test-data/sample-birth-data.json');
+import DetailedDashaAnalysisService from '../../../../../src/services/analysis/DetailedDashaAnalysisService.js';
+import { sampleBirthData, testCases } from '../../../../test-data/sample-chart-data.js';
 
 describe('DetailedDashaAnalysisService', () => {
     let service;
@@ -120,7 +120,7 @@ describe('DetailedDashaAnalysisService', () => {
   // New test case for a different birth chart to ensure broader coverage
   describe('Dasha Calculations for a Different Lagna', () => {
     const anotherBirthData = {
-      ...sampleBirthData.testCases[1].birthData, // Use test case 2 (Delhi birth July 22, 1985)
+      ...testCases[1].birthData, // Use test case 2 (Delhi birth July 22, 1985)
       nakshatra: 'Punarvasu', // Explicitly set the nakshatra as per test comment
       nakshatraLongitude: 6.67
     };

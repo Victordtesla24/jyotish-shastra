@@ -2,11 +2,11 @@ import swisseph from 'swisseph';
 import { getSign, getSignName, getSignId } from '../../../utils/helpers/astrologyHelpers.js';
 import path from 'path';
 import fs from 'fs';
-import { fileURLToPath } from 'url';
 
-// ES Module equivalent of __dirname
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// Cross-environment directory resolution
+// In Jest (CommonJS): Uses current working directory + relative path
+// In Node.js (ES modules): Falls back to CWD resolution
+const __dirname = path.resolve(process.cwd(), 'src/core/calculations/chart-casting');
 
 /**
  * Swiss Ephemeris House Calculator with proper initialization
@@ -405,3 +405,9 @@ class AscendantCalculator {
 }
 
 export default AscendantCalculator;
+
+// CommonJS compatibility for Jest
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = AscendantCalculator;
+  module.exports.default = AscendantCalculator;
+}

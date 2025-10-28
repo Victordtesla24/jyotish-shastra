@@ -1,4 +1,5 @@
-const DhanaYogaCalculator = require('../../../../../src/core/analysis/yogas/DhanaYogaCalculator').default;
+import DhanaYogaCalculator from '../../../../../src/core/analysis/yogas/DhanaYogaCalculator.js';
+import TestChartFactory from '../../../../utils/TestChartFactory.js';
 
 describe('DhanaYogaCalculator', () => {
     let calculator;

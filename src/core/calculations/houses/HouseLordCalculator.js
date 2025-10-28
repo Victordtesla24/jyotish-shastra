@@ -4,10 +4,10 @@
  * Section 3: House-by-House Examination - House lord analysis
  */
 
-const {
+import {
   PLANETS,
-  ZODIAC_SIGNS
-} = require('../../../utils/constants/astronomicalConstants');
+  SIGNS
+} from '../../../utils/constants/astronomicalConstants.js';
 
 class HouseLordCalculator {
   /**
@@ -202,18 +202,18 @@ class HouseLordCalculator {
    */
   static getSignRuler(sign) {
     const rulers = {
-      [ZODIAC_SIGNS.ARIES]: PLANETS.MARS,
-      [ZODIAC_SIGNS.TAURUS]: PLANETS.VENUS,
-      [ZODIAC_SIGNS.GEMINI]: PLANETS.MERCURY,
-      [ZODIAC_SIGNS.CANCER]: PLANETS.MOON,
-      [ZODIAC_SIGNS.LEO]: PLANETS.SUN,
-      [ZODIAC_SIGNS.VIRGO]: PLANETS.MERCURY,
-      [ZODIAC_SIGNS.LIBRA]: PLANETS.VENUS,
-      [ZODIAC_SIGNS.SCORPIO]: PLANETS.MARS,
-      [ZODIAC_SIGNS.SAGITTARIUS]: PLANETS.JUPITER,
-      [ZODIAC_SIGNS.CAPRICORN]: PLANETS.SATURN,
-      [ZODIAC_SIGNS.AQUARIUS]: PLANETS.SATURN,
-      [ZODIAC_SIGNS.PISCES]: PLANETS.JUPITER
+      'Aries': PLANETS.MARS,
+      'Taurus': PLANETS.VENUS,
+      'Gemini': PLANETS.MERCURY,
+      'Cancer': PLANETS.MOON,
+      'Leo': PLANETS.SUN,
+      'Virgo': PLANETS.MERCURY,
+      'Libra': PLANETS.VENUS,
+      'Scorpio': PLANETS.MARS,
+      'Sagittarius': PLANETS.JUPITER,
+      'Capricorn': PLANETS.SATURN,
+      'Aquarius': PLANETS.SATURN,
+      'Pisces': PLANETS.JUPITER
     };
 
     return rulers[sign];
@@ -1513,4 +1513,4 @@ class HouseLordCalculator {
   }
 }
 
-module.exports = HouseLordCalculator;
+export default HouseLordCalculator;

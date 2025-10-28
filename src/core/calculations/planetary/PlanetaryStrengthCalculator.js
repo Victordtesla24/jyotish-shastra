@@ -9,8 +9,8 @@ const { getSignIndex } = require('../../../utils/helpers/astrologyHelpers');
 class PlanetaryStrengthCalculator {
   constructor(chart) {
     this.chart = chart;
-    this.planets = chart.planets;
-    this.ascendant = chart.ascendant;
+    this.planets = chart.rasiChart?.planets || chart.planets;
+    this.ascendant = chart.rasiChart?.ascendant || chart.ascendant;
   }
 
   /**

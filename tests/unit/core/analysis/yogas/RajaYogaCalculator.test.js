@@ -1,4 +1,5 @@
-const RajaYogaCalculator = require('../../../../../src/core/analysis/yogas/RajaYogaCalculator').default;
+import RajaYogaCalculator from '../../../../../src/core/analysis/yogas/RajaYogaCalculator.js';
+import TestChartFactory from '../../../../utils/TestChartFactory.js';
 
 describe('RajaYogaCalculator', () => {
   let calculator;

@@ -1,5 +1,5 @@
-const DashaAnalysisService = require('../../../../src/services/analysis/DetailedDashaAnalysisService');
-const { sampleBirthData } = require('../../../test-data/sample-birth-data.json');
+import DashaAnalysisService from '../../../../src/services/analysis/DetailedDashaAnalysisService.js';
+import { sampleBirthData } from '../../../test-data/sample-chart-data.js';
 
 describe('DashaAnalysisService', () => {
   let service;

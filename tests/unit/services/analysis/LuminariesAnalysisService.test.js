@@ -1,5 +1,5 @@
-const LuminariesAnalysisService = require('../../../../src/services/analysis/LuminariesAnalysisService');
-const TestChartFactory = require('../../../utils/TestChartFactory');
+import LuminariesAnalysisService from '../../../../src/services/analysis/LuminariesAnalysisService.js';
+import TestChartFactory from '../../../utils/TestChartFactory.js';
 
 describe('LuminariesAnalysisService', () => {
     let service;

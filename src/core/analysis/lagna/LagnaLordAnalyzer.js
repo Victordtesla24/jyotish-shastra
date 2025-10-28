@@ -56,13 +56,20 @@ class LagnaLordAnalyzer {
     // Handle different chart structures
     const actualChart = chart.rasiChart || chart;
 
-    if (!actualChart.ascendant || !actualChart.planetaryPositions) {
-      throw new Error('Invalid chart structure: missing ascendant or planetaryPositions');
+    if (!actualChart.ascendant) {
+      throw new Error('Invalid chart structure: missing ascendant');
+    }
+
+    // Handle both planetaryPositions (array) and planets (array) structures
+    const planetaryData = actualChart.planetaryPositions || actualChart.planets;
+    
+    if (!planetaryData || planetaryData.length === 0) {
+      throw new Error('Invalid chart structure: missing planetary data');
     }
 
     const lagnaSign = actualChart.ascendant.sign.charAt(0).toUpperCase() + actualChart.ascendant.sign.slice(1).toLowerCase();
     const lagnaLord = this.getLagnaLord(lagnaSign);
-    const lordPosition = this.findPlanetPosition(actualChart.planetaryPositions, lagnaLord);
+    const lordPosition = this.findPlanetPosition(planetaryData, lagnaLord);
 
     if (!lordPosition) {
       throw new Error(`Lagna lord ${lagnaLord} position not found in chart`);
@@ -70,8 +77,11 @@ class LagnaLordAnalyzer {
 
     const dignity = this.analyzeDignity(lordPosition, actualChart);
     const houseEffects = this.analyzeHouseEffects(lordPosition.house, lagnaSign);
-    const conjunctionEffects = this.analyzeConjunctions(lordPosition, actualChart.planetaryPositions);
-    const aspectEffects = this.analyzeAspects(lordPosition, actualChart);
+    const conjunctionEffects = this.analyzeConjunctions(lordPosition, planetaryData);
+    
+    // Create chart with planetaryData for aspect analysis
+    const chartForAspects = { ...actualChart, planetaryPositions: planetaryData };
+    const aspectEffects = this.analyzeAspects(lordPosition, chartForAspects);
     const lifeEffects = this.analyzeLifeEffects(lordPosition, lagnaSign);
     const dashaEffects = this.analyzeDashaEffects(lordPosition, lagnaSign);
     const remedialMeasures = this.generateRemedialMeasures(lordPosition, { overallStrength: { score: dignity.strength } });

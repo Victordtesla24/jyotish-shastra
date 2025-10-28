@@ -36,6 +36,7 @@
     "swisseph": "^0.5.17"
   },
   "devDependencies": {
+    "@babel/plugin-syntax-import-meta": "^7.10.4",
     "@babel/preset-env": "^7.28.0",
     "@babel/preset-react": "^7.27.1",
     "@babel/preset-typescript": "^7.27.1",
@@ -46,6 +47,7 @@
     "cypress": "^13.6.0",
     "eslint": "^8.55.0",
     "husky": "^8.0.3",
+    "identity-obj-proxy": "^3.0.0",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "jest-transform-css": "^6.0.3",

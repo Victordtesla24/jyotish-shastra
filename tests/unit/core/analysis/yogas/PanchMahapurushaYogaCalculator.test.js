@@ -1,5 +1,5 @@
-const PanchMahapurushaYogaCalculator = require('../../../../../src/core/analysis/yogas/PanchMahapurushaYogaCalculator');
-const TestChartFactory = require('../../../../utils/TestChartFactory');
+import PanchMahapurushaYogaCalculator from '../../../../../src/core/analysis/yogas/PanchMahapurushaYogaCalculator.js';
+import TestChartFactory from '../../../../utils/TestChartFactory.js';
 
 describe('PanchMahapurushaYogaCalculator', () => {
   let calculator;

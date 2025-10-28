@@ -1,5 +1,5 @@
-const NeechaBhangaYogaCalculator = require('../../../../../src/core/analysis/yogas/NeechaBhangaYogaCalculator');
-const TestChartFactory = require('../../../../utils/TestChartFactory');
+import NeechaBhangaYogaCalculator from '../../../../../src/core/analysis/yogas/NeechaBhangaYogaCalculator.js';
+import TestChartFactory from '../../../../utils/TestChartFactory.js';
 
 describe('NeechaBhangaYogaCalculator', () => {
   let calculator;

@@ -1,5 +1,5 @@
-const VargottamaDetector = require('../../../../../src/core/analysis/divisional/VargottamaDetector');
-const TestChartFactory = require('../../../../utils/TestChartFactory');
+import VargottamaDetector from '../../../../../src/core/analysis/divisional/VargottamaDetector.js';
+import TestChartFactory from '../../../../utils/TestChartFactory.js';
 
 describe('VargottamaDetector', () => {
     let detector;

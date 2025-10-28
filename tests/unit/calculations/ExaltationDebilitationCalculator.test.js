@@ -1,5 +1,5 @@
-const ExaltationDebilitationCalculator = require('../../../src/core/calculations/planetary/ExaltationDebilitationCalculator.js');
-const TestChartFactory = require('../../utils/TestChartFactory.js');
+import ExaltationDebilitationCalculator from '../../../src/core/calculations/planetary/ExaltationDebilitationCalculator.js';
+import TestChartFactory from '../../utils/TestChartFactory.js';
 
 describe('ExaltationDebilitationCalculator', () => {
   let calculator;

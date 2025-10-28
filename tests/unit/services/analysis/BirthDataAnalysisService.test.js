@@ -1,5 +1,5 @@
-const BirthDataAnalysisService = require('../../../../src/services/analysis/BirthDataAnalysisService');
-const sampleBirthData = require('../../../test-data/sample-birth-data.json');
+import BirthDataAnalysisService from '../../../../src/services/analysis/BirthDataAnalysisService.js';
+import { sampleBirthData } from '../../../test-data/sample-chart-data.js';
 
 describe('BirthDataAnalysisService', () => {
     let service;

@@ -3,14 +3,15 @@
  * Tests Lagna lord placement analysis based on Vedic principles
  */
 
-const LagnaLordAnalyzer = require('../../src/core/analysis/lagna/LagnaLordAnalyzer');
-const TestChartFactory = require('../utils/TestChartFactory');
+import LagnaLordAnalyzer from '../../src/core/analysis/lagna/LagnaLordAnalyzer.js';
+import TestChartFactory from '../utils/TestChartFactory.js';
 
 describe('LagnaLordAnalyzer', () => {
   let chart;
 
   beforeEach(() => {
     chart = TestChartFactory.createChartWithLagnaLord('Cancer', 'Sagittarius', 6);
+    TestChartFactory.addPlanet(chart, 'Moon', 'Sagittarius', 6); // Moon is the Lagna lord for Cancer
     TestChartFactory.addPlanet(chart, 'Sun', 'Pisces', 9);
     TestChartFactory.addPlanet(chart, 'Mars', 'Aries', 10);
     TestChartFactory.addPlanet(chart, 'Mercury', 'Pisces', 9);
@@ -87,7 +88,8 @@ describe('LagnaLordAnalyzer', () => {
     test('should handle error cases gracefully', () => {
       const incompleteChart = TestChartFactory.createChart('Cancer');
       // Remove Moon (Cancer's lagna lord) to make chart incomplete
-      incompleteChart.planetaryPositions = incompleteChart.planetaryPositions.filter(p => p.planet !== 'Moon');
+      incompleteChart.planetaryPositions = incompleteChart.planetaryPositions.filter(p => p.planet !== 'Moon' && p.name !== 'Moon');
+      incompleteChart.rasiChart.planets = incompleteChart.rasiChart.planets.filter(p => p.planet !== 'Moon' && p.name !== 'Moon');
 
       expect(() => {
         LagnaLordAnalyzer.analyzeLagnaLord(incompleteChart);
@@ -494,8 +496,8 @@ describe('LagnaLordAnalyzer', () => {
 
     test('should handle edge cases gracefully', () => {
       const edgeCaseChart = TestChartFactory.createChartWithLagnaLord('Cancer', 'Cancer', 1);
-      TestChartFactory.addPlanet(edgeCaseChart, 'Sun', 'Libra', 4, 0);
-
+      TestChartFactory.addPlanet(edgeCaseChart, 'Moon', 'Cancer', 1); // Add Moon explicitly
+      TestChartFactory.addPlanet(edgeCaseChart, 'Sun', 'Libra', 4);
 
       expect(() => {
         LagnaLordAnalyzer.analyzeLagnaLord(edgeCaseChart);
@@ -504,17 +506,21 @@ describe('LagnaLordAnalyzer', () => {
   });
 
   it('should correctly analyze the Lagna Lord for an Aries ascendant', () => {
-    const chart = TestChartFactory.createChart('Aries');
-    TestChartFactory.addPlanet(chart, 'Mars', 'Cancer', 4); // Mars in Cancer at 4 degrees (3rd house)
+    // Create chart with Mars (Aries lagna lord) in Cancer at 4th house
+    const chart = {
+      ascendant: { sign: 'Aries', degree: 15, longitude: 15 },
+      planetaryPositions: [
+        { planet: 'Mars', name: 'Mars', sign: 'Cancer', degree: 15, house: 4, isRetrograde: false, dignity: 'debilitated' }
+      ]
+    };
 
-    // The static method expects a specific chart structure
-    const analysis = LagnaLordAnalyzer.analyzeLagnaLord({ rasiChart: chart });
+    const analysis = LagnaLordAnalyzer.analyzeLagnaLord(chart);
 
     expect(analysis).toBeDefined();
     expect(analysis.lagnaLord).toBe('Mars');
-    expect(analysis.lordPosition.house).toBe(3);
+    expect(analysis.lordPosition.house).toBe(4);
     expect(analysis.analysis.dignity.type).toBe('debilitated');
-    expect(analysis.analysis.houseEffects.description).toContain('Lagna lord in 3th house');
+    expect(analysis.analysis.houseEffects.description).toContain('Lagna lord in 4th house');
   });
 
   it('should throw an error if the Lagna Lord is not found', () => {

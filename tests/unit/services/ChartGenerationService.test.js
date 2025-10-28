@@ -1,5 +1,5 @@
-const ChartGenerationService = require('../../../src/services/chart/ChartGenerationService');
-const { sampleBirthData } = require('../../test-data/sample-chart-data');
+import ChartGenerationService from '../../../src/services/chart/ChartGenerationService.js';
+import { sampleBirthData } from '../../test-data/sample-chart-data.js';
 
 describe('ChartGenerationService', () => {
   let chartGenerationService;

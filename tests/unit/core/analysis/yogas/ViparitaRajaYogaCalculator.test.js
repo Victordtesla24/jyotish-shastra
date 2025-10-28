@@ -1,5 +1,5 @@
-const ViparitaRajaYogaCalculator = require('../../../../../src/core/analysis/yogas/ViparitaRajaYogaCalculator');
-const TestChartFactory = require('../../../../utils/TestChartFactory');
+import ViparitaRajaYogaCalculator from '../../../../../src/core/analysis/yogas/ViparitaRajaYogaCalculator.js';
+import TestChartFactory from '../../../../utils/TestChartFactory.js';
 
 describe('ViparitaRajaYogaCalculator', () => {
   let calculator;

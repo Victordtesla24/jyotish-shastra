@@ -1,5 +1,5 @@
-const HouseAnalysisService = require('../../../../../src/core/analysis/houses/HouseAnalysisService');
-const TestChartFactory = require('../../../../utils/TestChartFactory');
+import HouseAnalysisService from '../../../../../src/core/analysis/houses/HouseAnalysisService.js';
+import TestChartFactory from '../../../../utils/TestChartFactory.js';
 
 describe('HouseAnalysisService', () => {
   let service;

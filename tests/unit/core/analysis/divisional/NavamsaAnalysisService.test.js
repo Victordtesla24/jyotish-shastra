@@ -1,6 +1,6 @@
-const NavamsaAnalysisService = require('../../../../../src/core/analysis/divisional/NavamsaAnalysisService');
-const TestChartFactory = require('../../../../utils/TestChartFactory');
-const sampleBirthData = require('../../../../test-data/sample-birth-data.json');
+import NavamsaAnalysisService from '../../../../../src/core/analysis/divisional/NavamsaAnalysisService.js';
+import TestChartFactory from '../../../../utils/TestChartFactory.js';
+import { sampleBirthData } from '../../../../test-data/sample-chart-data.js';
 
 describe('NavamsaAnalysisService', () => {
   let service;

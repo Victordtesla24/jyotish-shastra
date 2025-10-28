@@ -10,7 +10,7 @@ import {
   mapApiDataToChart,
   generateSVGPath,
   validateChartData
-} from '../../../src/utils/template-matching';
+} from '../../src/utils/template-matching.js';
 
 describe('Template Matching Unit Tests', () => {
   describe('House Position Calculations', () => {
@@ -387,7 +387,7 @@ if (typeof calculateHousePosition === 'undefined') {
     const signDegree = normalizedDegree % 30;
     const degrees = Math.floor(signDegree);
     const minutes = Math.floor((signDegree - degrees) * 60);
-    return \`\${degrees}°\${minutes.toString().padStart(2, '0')}'\`;
+    return `${degrees}\u00B0${minutes.toString().padStart(2, '0')}'`;
   };
 
   global.calculateRashiNumber = (houseNumber, ascendantSignIndex) => {
@@ -458,8 +458,8 @@ if (typeof calculateHousePosition === 'undefined') {
     if (type === 'diamond') {
       const center = size / 2;
       return [
-        \`M \${center} 0 L \${size} \${center} L \${center} \${size} L 0 \${center} Z\`,
-        \`M 0 0 L \${size} \${size} M \${size} 0 L 0 \${size}\`
+        `M ${center} 0 L ${size} ${center} L ${center} ${size} L 0 ${center} Z`,
+        `M 0 0 L ${size} ${size} M ${size} 0 L 0 ${size}`
       ];
     }
     return [];

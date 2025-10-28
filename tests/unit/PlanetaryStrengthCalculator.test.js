@@ -1,5 +1,5 @@
-const PlanetaryStrengthCalculator = require('../../src/core/calculations/planetary/PlanetaryStrengthCalculator');
-const TestChartFactory = require('../utils/TestChartFactory');
+import PlanetaryStrengthCalculator from '../../src/core/calculations/planetary/PlanetaryStrengthCalculator.js';
+import TestChartFactory from '../utils/TestChartFactory.js';
 
 describe('PlanetaryStrengthCalculator', () => {
   let calculator;

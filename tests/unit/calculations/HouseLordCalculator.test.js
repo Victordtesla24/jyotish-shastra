@@ -1,5 +1,5 @@
-const HouseLordCalculator = require('../../../src/core/calculations/houses/HouseLordCalculator.js');
-const { getSign, getSignName } = require('../../../src/utils/helpers/astrologyHelpers.js');
+import HouseLordCalculator from '../../../src/core/calculations/houses/HouseLordCalculator.js';
+import { getSign, getSignName } from '../../../src/utils/helpers/astrologyHelpers.js';
 
 describe('HouseLordCalculator', () => {
   let calculator;

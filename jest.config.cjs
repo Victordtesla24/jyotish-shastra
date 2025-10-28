@@ -22,7 +22,7 @@ module.exports = {
     '^.+\\.(js|jsx)$': 'babel-jest'
   },
   transformIgnorePatterns: [
-    'node_modules/(?!(swisseph)/)'
+    'node_modules/(?!(swisseph|uuid)/)'
   ],
   testTimeout: 10000,
   verbose: true
