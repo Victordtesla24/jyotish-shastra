@@ -19,7 +19,7 @@ async function dataStructureInspector() {
 
   try {
     // Navigate and inject comprehensive data
-    await page.goto('http://localhost:3000', { waitUntil: 'networkidle0' });
+    await page.goto('http://localhost:3002', { waitUntil: 'networkidle0' });
 
     await page.evaluate(() => {
       const mockBirthData = {

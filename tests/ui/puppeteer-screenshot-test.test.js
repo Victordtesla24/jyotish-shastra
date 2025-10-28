@@ -7,7 +7,7 @@ const path = require('path');
 const fs = require('fs');
 
 // Test configuration
-const FRONTEND_URL = 'http://localhost:3000';
+const FRONTEND_URL = 'http://localhost:3002';
 const BACKEND_URL = 'http://localhost:3001';
 const SCREENSHOT_DIR = path.join(__dirname, 'test-logs');
 
@@ -258,7 +258,7 @@ describe('Puppeteer UI-API Integration Tests', () => {
       const firstTab = await page.$('[role="tab"], .tab, button');
       if (firstTab) {
         await firstTab.click();
-        await page.waitForTimeout(1000);
+        await new Promise(resolve => setTimeout(resolve, 1000));
         await takeScreenshot(page, 'analysis-page-tab-content');
       }
     }
@@ -317,7 +317,7 @@ describe('Puppeteer UI-API Integration Tests', () => {
     const navButtons = await page.$$('button[class*="nav"], [class*="navigation"] button');
     if (navButtons.length > 0) {
       await navButtons[0].click();
-      await page.waitForTimeout(1000);
+      await new Promise(resolve => setTimeout(resolve, 1000));
       await takeScreenshot(page, 'comprehensive-analysis-navigation');
     }
   }, 30000);
@@ -389,7 +389,7 @@ describe('Puppeteer UI-API Integration Tests', () => {
 
     // Try to submit empty form
     await page.click('button[type="submit"]');
-    await page.waitForTimeout(1000);
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
     // Check for validation errors
     const validationErrors = await page.evaluate(() => {
@@ -407,7 +407,7 @@ describe('Puppeteer UI-API Integration Tests', () => {
     await page.type('input[name="timeOfBirth"]', '25:00'); // Invalid time
 
     await page.click('button[type="submit"]');
-    await page.waitForTimeout(1000);
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
     const invalidDataErrors = await page.evaluate(() => {
       const errors = Array.from(document.querySelectorAll('.error-message, .field-error, [class*="error"]'));
@@ -425,7 +425,7 @@ describe('Puppeteer UI-API Integration Tests', () => {
 
     // Navigate to a page without data
     await page.goto(`${FRONTEND_URL}/analysis`, { waitUntil: 'networkidle2' });
-    await page.waitForTimeout(2000);
+    await new Promise(resolve => setTimeout(resolve, 2000));
 
     console.log('🔴 JavaScript errors:', jsErrors);
     await takeScreenshot(page, 'no-data-page');

@@ -7,9 +7,9 @@ const fs = require('fs');
 
   try {
     console.log('📊 Testing UIDataSaver data retrieval...');
-    const testData = JSON.parse(fs.readFileSync('../test-data/analysis-comprehensive-response.json', 'utf8'));
+    const testData = JSON.parse(fs.readFileSync('../../logs/ui/ui-test-data/analysis-comprehensive-response.json', 'utf8'));
 
-    await page.goto('http://localhost:3000');
+    await page.goto('http://localhost:3002');
 
     // Inject data in UIDataSaver expected format
     const result = await page.evaluate((data) => {

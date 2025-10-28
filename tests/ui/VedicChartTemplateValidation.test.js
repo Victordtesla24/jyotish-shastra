@@ -20,7 +20,7 @@ const path = require('path');
 describe('Vedic Chart Template Validation Tests', () => {
   let browser;
   let page;
-  const baseUrl = 'http://localhost:3000';
+  const baseUrl = 'http://localhost:3002';
   const screenshotDir = path.join(__dirname, '../../logs/ui/ui-test-screenshots');
   const testLogsDir = path.join(__dirname, '../../logs/ui/ui-test-logs');
 

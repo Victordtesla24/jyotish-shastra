@@ -8,7 +8,7 @@ const fs = require('fs').promises;
 
 // Test configuration
 const TEST_CONFIG = {
-  appUrl: 'http://localhost:3000',
+  appUrl: 'http://localhost:3002',
   apiUrl: 'http://localhost:3001',
   timeout: 30000,
   headless: true,

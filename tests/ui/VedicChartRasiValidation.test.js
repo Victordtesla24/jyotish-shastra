@@ -37,7 +37,7 @@ describe('VedicChart Rasi Position Visual Validation', () => {
     page = await browser.newPage();
 
     // Navigate to the Chart page
-    await page.goto('http://localhost:3000', {
+    await page.goto('http://localhost:3002', {
       waitUntil: 'networkidle2',
       timeout: 30000
     });

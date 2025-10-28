@@ -24,7 +24,7 @@ describe('Rasi Calculation Validation', () => {
     page = await browser.newPage();
 
     // Navigate to the chart page
-    await page.goto('http://localhost:3000');
+    await page.goto('http://localhost:3002');
     console.log('🌐 Navigated to frontend');
   });
 

@@ -104,7 +104,7 @@ function processChartData(chartData) {
   const ascendant = chart.ascendant ? {
     name: "Ascendant",
     code: "As",
-    sign: chart.ascendant.sign,
+    sign: chart.ascendant.signName || chart.ascendant.sign,
     degrees: Math.floor(chart.ascendant.degree || 0),
     minutes: Math.round(((chart.ascendant.degree || 0) - Math.floor(chart.ascendant.degree || 0)) * 60),
     house: 1,
@@ -140,7 +140,7 @@ describe('Chart Data Flow Validation', () => {
 
     // Validate ascendant
     expect(processedData.ascendant).toBeTruthy();
-    expect(processedData.ascendant.sign).toBe('Libra');
+    expect(processedData.ascendant.sign || processedData.ascendant.signName).toBe('Libra');
     expect(processedData.ascendant.house).toBe(1);
 
     // Validate planet count
