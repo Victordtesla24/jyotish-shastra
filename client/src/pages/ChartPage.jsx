@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Card, VedicLoadingSpinner, ErrorMessage } from '../components/ui';
 import VedicChartDisplay from '../components/charts/VedicChartDisplay';
+import BirthDataForm from '../components/forms/BirthDataForm';
 import { useChart } from '../contexts/ChartContext';
 import UIDataSaver from '../components/forms/UIDataSaver';
 
@@ -90,8 +91,52 @@ class ChartPageErrorBoundary extends React.Component {
 
 const ChartPage = () => {
   const navigate = useNavigate();
-  const { currentChart, isLoading, error } = useChart();
+  const { currentChart, isLoading, error, setLoading, setError, setCurrentChart, setProgress } = useChart();
   const [chartData, setChartData] = useState(null);
+
+  const handleFormSubmit = async (formData) => {
+    try {
+      setLoading(true);
+      setProgress?.(10);
+
+      // Save birth data for compatibility with other pages
+      sessionStorage.setItem('birthData', JSON.stringify(formData));
+
+      // Generate chart
+      const response = await fetch('http://localhost:3001/api/v1/chart/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const chartResponse = await response.json();
+      setProgress?.(50);
+
+      // Save chart response
+      UIDataSaver.saveApiResponse({
+        chart: chartResponse.data?.rasiChart || chartResponse.rasiChart,
+        navamsa: chartResponse.data?.navamsaChart || chartResponse.navamsaChart,
+        analysis: chartResponse.data?.analysis || chartResponse.analysis,
+        metadata: chartResponse.metadata,
+        success: chartResponse.success,
+        originalResponse: chartResponse
+      });
+
+      // Update state
+      setCurrentChart?.({ id: `chart_${Date.now()}`, birthData: formData, chartData: chartResponse, generatedAt: new Date().toISOString(), chartType: 'birth_chart' });
+      setChartData(chartResponse.data || chartResponse);
+      setProgress?.(100);
+    } catch (e) {
+      setError?.({ message: e.message, code: 'CHART_GENERATION_ERROR', timestamp: new Date().toISOString() });
+      throw e;
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (!currentChart) {
@@ -265,6 +310,13 @@ const ChartPage = () => {
               <div className="w-16 h-px bg-gradient-to-r from-vedic-gold to-transparent"></div>
             </div>
           </div>
+
+          {/* Birth Data Form (for direct /chart access and tests) */}
+          {!chartData && (
+            <div className="card-cosmic backdrop-vedic border-2 border-white/20 shadow-mandala p-8 rounded-3xl mb-8">
+              <BirthDataForm onSubmit={handleFormSubmit} onError={(err) => setError?.(err)} />
+            </div>
+          )}
 
           {/* Premium Chart Display Grid */}
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-12">

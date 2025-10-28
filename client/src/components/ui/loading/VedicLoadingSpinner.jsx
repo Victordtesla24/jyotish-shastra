@@ -411,7 +411,7 @@ const VedicLoadingSpinner = ({
 
   if (fullscreen) {
     return (
-      <div className="fixed inset-0 bg-gradient-to-br from-cosmic-purple via-vedic-primary to-vedic-secondary z-50 flex items-center justify-center">
+      <div className="fixed inset-0 bg-gradient-to-br from-cosmic-purple via-vedic-primary to-vedic-secondary z-50 flex items-center justify-center loading-spinner">
         <LoadingContent />
       </div>
     );
@@ -423,7 +423,8 @@ const VedicLoadingSpinner = ({
       "bg-gradient-to-br from-cosmic-purple/90 via-vedic-primary/90 to-vedic-secondary/90",
       "rounded-2xl backdrop-blur-md",
       fullscreen ? "fixed inset-0 z-50" : "p-8",
-      className
+      className,
+      "loading-spinner"
     )}>
       <LoadingContent />
     </div>

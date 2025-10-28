@@ -223,7 +223,7 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
               <span>Name</span>
               <span className="text-xs text-white/60 font-normal">(Optional)</span>
             </label>
-            <div className="relative">
+          <div className="relative">
               <input
                 type="text"
                 id="name"
@@ -234,6 +234,7 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
                 className={`form-input-vedic transition-all duration-300 pl-12 ${
                   errors.name ? 'border-red-400 bg-red-50/10' : 'focus:shadow-cosmic'
                 }`}
+              data-testid="name-input"
               />
               <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-vedic-gold text-lg">
                 🕉️
@@ -262,6 +263,7 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
                 className={`form-select-vedic transition-all duration-300 pl-12 ${
                   errors.gender ? 'border-red-400 bg-red-50/10' : 'focus:shadow-cosmic'
                 }`}
+                data-testid="gender-select"
               >
                 <option value="prefer_not_to_say">Prefer not to say</option>
                 <option value="male">Male</option>
@@ -299,6 +301,7 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
                 className={`form-input-vedic transition-all duration-300 pl-12 ${
                   errors.dateOfBirth ? 'border-red-400 bg-red-50/10' : 'focus:shadow-cosmic'
                 }`}
+                data-testid="dob-input"
               />
               <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-vedic-gold text-lg">
                 🌅
@@ -329,6 +332,7 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
                 className={`form-input-vedic transition-all duration-300 pl-12 ${
                   errors.timeOfBirth ? 'border-red-400 bg-red-50/10' : 'focus:shadow-cosmic'
                 }`}
+                data-testid="time-input"
               />
               <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-vedic-gold text-lg">
                 🕐
@@ -364,6 +368,7 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
               className={`form-input-vedic transition-all duration-300 pl-12 ${
                 errors.placeOfBirth ? 'border-red-400 bg-red-50/10' : 'focus:shadow-cosmic'
               }`}
+              data-testid="place-input"
             />
             <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-vedic-gold text-lg">
               📍
@@ -454,6 +459,7 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
             type="submit"
             disabled={loading || geocoding}
                 className="btn-vedic btn-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+            data-testid="generate-chart-button"
           >
             <span className="flex items-center justify-center space-x-2">
               {loading ? (
