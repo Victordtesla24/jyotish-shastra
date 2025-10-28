@@ -426,7 +426,7 @@ export default function VedicChartDisplay({
             flexShrink: 0,
             backgroundColor: '#FFF8E1' // Cream background for SVG
           }}
-          className="border-none" // Remove default border since we're styling the container
+          className="border-none vedic-chart" // Mark for UI tests
           role="img"
           aria-label="Traditional North Indian Kundli Chart"
         >
@@ -474,6 +474,7 @@ export default function VedicChartDisplay({
                 fill="#000000"
                 fontWeight="bold"
                 fontFamily="Arial, sans-serif"
+                data-testid={`rashi-${houseNum}`}
               >
                 {rasiNumber}
               </text>
@@ -489,7 +490,7 @@ export default function VedicChartDisplay({
             const housePlanetCount = planetsInHouse.length;
 
             return (
-              <g key={`house-planets-${houseNum}`}>
+              <g key={`house-planets-${houseNum}`} data-house={houseNum}>
                 {planetsInHouse.map((planet, index) => {
                   // Improved positioning logic to prevent overlapping
                   let textX = housePosition.x;
@@ -526,6 +527,7 @@ export default function VedicChartDisplay({
                       style={{
                         textShadow: '1px 1px 1px rgba(255,255,255,0.8)' // Add subtle shadow for clarity
                       }}
+                      data-planet={planet.name}
                     >
                       {formatPlanetText(planet)}
                     </text>

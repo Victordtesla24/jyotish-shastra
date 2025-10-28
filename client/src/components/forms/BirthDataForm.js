@@ -231,6 +231,7 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
                 value={formData.name}
                 onChange={handleChange}
                 placeholder="Enter your sacred name"
+              data-testid="name-input"
                 className={`form-input-vedic transition-all duration-300 pl-12 ${
                   errors.name ? 'border-red-400 bg-red-50/10' : 'focus:shadow-cosmic'
                 }`}
@@ -240,7 +241,7 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
               </div>
             </div>
             {errors.name && (
-              <div className="alert-error text-sm mt-1 animate-fade-in" role="alert">
+              <div className="alert-error error-message text-sm mt-1 animate-fade-in" role="alert">
                 {errors.name}
               </div>
             )}
@@ -259,6 +260,7 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
                 name="gender"
                 value={formData.gender}
                 onChange={handleChange}
+                data-testid="gender-select"
                 className={`form-select-vedic transition-all duration-300 pl-12 ${
                   errors.gender ? 'border-red-400 bg-red-50/10' : 'focus:shadow-cosmic'
                 }`}
@@ -273,7 +275,7 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
               </div>
             </div>
             {errors.gender && (
-              <div className="alert-error text-sm mt-1 animate-fade-in">
+              <div className="alert-error error-message text-sm mt-1 animate-fade-in">
                 {errors.gender}
               </div>
             )}
@@ -296,6 +298,7 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
                 required
                 min="1900-01-01"
                 max={new Date().toISOString().split('T')[0]}
+                data-testid="dob-input"
                 className={`form-input-vedic transition-all duration-300 pl-12 ${
                   errors.dateOfBirth ? 'border-red-400 bg-red-50/10' : 'focus:shadow-cosmic'
                 }`}
@@ -305,7 +308,7 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
               </div>
             </div>
             {errors.dateOfBirth && (
-              <div className="alert-error text-sm mt-1 animate-fade-in" role="alert">
+              <div className="alert-error error-message text-sm mt-1 animate-fade-in" role="alert">
                 {errors.dateOfBirth}
               </div>
             )}
@@ -326,6 +329,7 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
                 value={formData.timeOfBirth}
                 onChange={handleChange}
                 required
+                data-testid="time-input"
                 className={`form-input-vedic transition-all duration-300 pl-12 ${
                   errors.timeOfBirth ? 'border-red-400 bg-red-50/10' : 'focus:shadow-cosmic'
                 }`}
@@ -338,7 +342,7 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
               Use 24-hour format (HH:MM) for precise calculations
             </small>
             {errors.timeOfBirth && (
-              <div className="alert-error text-sm mt-1 animate-fade-in" role="alert">
+              <div className="alert-error error-message text-sm mt-1 animate-fade-in" role="alert">
                 {errors.timeOfBirth}
               </div>
             )}
@@ -361,6 +365,7 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
               onChange={handleChange}
               placeholder="City, State, Country (e.g., Mumbai, Maharashtra, India)"
               required
+                data-testid="place-input"
               className={`form-input-vedic transition-all duration-300 pl-12 ${
                 errors.placeOfBirth ? 'border-red-400 bg-red-50/10' : 'focus:shadow-cosmic'
               }`}
@@ -399,7 +404,7 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
 
           {/* Location Error */}
           {errors.placeOfBirth && (
-            <div className="alert-error text-sm mt-1 animate-fade-in" role="alert">
+            <div className="alert-error error-message text-sm mt-1 animate-fade-in" role="alert">
               {errors.placeOfBirth}
             </div>
           )}
@@ -428,7 +433,7 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
 
         {/* Global Form Error */}
         {errors.submit && (
-          <div className="alert-error p-4 rounded-xl border border-red-400/20 animate-fade-in">
+          <div className="alert-error error-message p-4 rounded-xl border border-red-400/20 animate-fade-in">
             <div className="flex items-center space-x-2">
               <span className="text-red-400 text-lg">⚠️</span>
               <span className="text-red-300">{errors.submit}</span>
@@ -453,6 +458,7 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
           <button
             type="submit"
             disabled={loading || geocoding}
+            data-testid="generate-chart-button"
                 className="btn-vedic btn-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
           >
             <span className="flex items-center justify-center space-x-2">
