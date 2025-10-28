@@ -211,7 +211,7 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
   return (
     <div className="relative">
       {/* Premium Form Container */}
-      <form onSubmit={handleSubmit} className="form-vedic space-vedic" role="form">
+      <form onSubmit={handleSubmit} method="post" className="form-vedic space-vedic" role="form">
 
         {/* Enhanced Form Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -231,6 +231,7 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
                 value={formData.name}
                 onChange={handleChange}
                 placeholder="Enter your sacred name"
+                data-testid="name-input"
                 className={`form-input-vedic transition-all duration-300 pl-12 ${
                   errors.name ? 'border-red-400 bg-red-50/10' : 'focus:shadow-cosmic'
                 }`}
@@ -259,6 +260,7 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
                 name="gender"
                 value={formData.gender}
                 onChange={handleChange}
+                data-testid="gender-select"
                 className={`form-select-vedic transition-all duration-300 pl-12 ${
                   errors.gender ? 'border-red-400 bg-red-50/10' : 'focus:shadow-cosmic'
                 }`}
@@ -296,6 +298,7 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
                 required
                 min="1900-01-01"
                 max={new Date().toISOString().split('T')[0]}
+                data-testid="dob-input"
                 className={`form-input-vedic transition-all duration-300 pl-12 ${
                   errors.dateOfBirth ? 'border-red-400 bg-red-50/10' : 'focus:shadow-cosmic'
                 }`}
@@ -326,6 +329,7 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
                 value={formData.timeOfBirth}
                 onChange={handleChange}
                 required
+                data-testid="time-input"
                 className={`form-input-vedic transition-all duration-300 pl-12 ${
                   errors.timeOfBirth ? 'border-red-400 bg-red-50/10' : 'focus:shadow-cosmic'
                 }`}
@@ -361,6 +365,7 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
               onChange={handleChange}
               placeholder="City, State, Country (e.g., Mumbai, Maharashtra, India)"
               required
+              data-testid="place-input"
               className={`form-input-vedic transition-all duration-300 pl-12 ${
                 errors.placeOfBirth ? 'border-red-400 bg-red-50/10' : 'focus:shadow-cosmic'
               }`}
@@ -453,7 +458,8 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
           <button
             type="submit"
             disabled={loading || geocoding}
-                className="btn-vedic btn-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+            data-testid="generate-chart-button"
+            className="btn-vedic btn-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
           >
             <span className="flex items-center justify-center space-x-2">
               {loading ? (

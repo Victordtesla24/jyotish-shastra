@@ -1,13 +1,13 @@
 /**
- * Geocoding Service for OpenCage API
- * Converts location text to latitude/longitude coordinates
+ * Geocoding Service for Backend API
+ * Converts location text to latitude/longitude coordinates using backend service
  */
 
-const OPENCAGE_API_URL = 'https://api.opencagedata.com/geocode/v1/json';
+const BACKEND_GEOCODING_URL = 'http://localhost:3001/api/v1/geocoding/location';
 
 class GeocodingService {
   /**
-   * Geocode a location string to coordinates
+   * Geocode a location string to coordinates using backend API
    * @param {string} location - Location string (e.g., "Pune, Maharashtra, India")
    * @returns {Promise<Object>} - Geocoding result with coordinates
    */
@@ -16,20 +16,16 @@ class GeocodingService {
       throw new Error('Location is required for geocoding');
     }
 
-    const OPENCAGE_API_KEY = process.env.REACT_APP_GEOCODING_API_KEY;
-    if (!OPENCAGE_API_KEY) {
-      throw new Error('Geocoding API key is not configured');
-    }
-
     try {
-      const params = new URLSearchParams({
-        q: location,
-        key: OPENCAGE_API_KEY,
-        limit: 1,
-        no_annotations: 1
+      const response = await fetch(BACKEND_GEOCODING_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          placeOfBirth: location
+        })
       });
-
-      const response = await fetch(`${OPENCAGE_API_URL}?${params}`);
 
       if (!response.ok) {
         throw new Error(`Geocoding API error: ${response.status}`);
@@ -37,16 +33,14 @@ class GeocodingService {
 
       const data = await response.json();
 
-      if (data.results && data.results.length > 0) {
-        const result = data.results[0];
+      if (data.success && data.data) {
         return {
           success: true,
-          formatted: result.formatted,
-          latitude: result.geometry.lat,
-          longitude: result.geometry.lng,
-          components: result.components,
-          timezone: result.annotations?.timezone?.name || 'UTC',
-          confidence: result.confidence
+          formatted: data.data.formatted_address || location,
+          latitude: data.data.latitude,
+          longitude: data.data.longitude,
+          timezone: data.data.timezone || 'UTC',
+          confidence: data.data.accuracy || 'high'
         };
       } else {
         return {

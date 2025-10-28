@@ -138,8 +138,11 @@ function processChartData(chartData) {
   // Use planetaryPositions if available (from API), otherwise fall back to planets array
   let planetsData = [];
   if (chart.planetaryPositions && typeof chart.planetaryPositions === 'object') {
-    // Convert planetaryPositions object to array
-    planetsData = Object.values(chart.planetaryPositions);
+    // Convert planetaryPositions object to array with planet names
+    planetsData = Object.entries(chart.planetaryPositions).map(([planetKey, planetData]) => ({
+      ...planetData,
+      name: planetKey.charAt(0).toUpperCase() + planetKey.slice(1) // Convert 'sun' to 'Sun'
+    }));
     console.log('🎯 Found planetaryPositions data:', planetsData.length, 'planets');
   } else if (chart.planets && Array.isArray(chart.planets)) {
     planetsData = chart.planets;

@@ -5,8 +5,11 @@ import { useNavigate } from 'react-router-dom';
 import '../styles/vedic-design-system.css';
 
 // Import UI components with Vedic design
-import { VedicLoadingSpinner, ErrorMessage, Skeleton } from '../components/ui';
+import { VedicLoadingSpinner, ErrorMessage } from '../components/ui';
 // Note: Progressive loading with skeleton states implemented for better UX
+
+// Import chart visualization components
+import VedicChartDisplay from '../components/charts/VedicChartDisplay';
 
 // Import contexts
 import { useChart } from '../contexts/ChartContext';
@@ -20,88 +23,170 @@ import ResponseDataToUIDisplayAnalyser from '../components/analysis/ResponseData
 
 const LagnaDisplay = ({ data }) => {
   if (!data) return (
-    <div className="card-vedic text-center">
-      <div className="text-muted">🌅</div>
-      <p className="text-muted">No Lagna analysis data available</p>
+    <div className="card-cosmic text-center animate-pulse">
+      <div className="text-6xl mb-4 animate-float">🌅</div>
+      <p className="text-muted text-lg">No Lagna analysis data available</p>
     </div>
   );
 
   const lagna = data.analysis || data.lagna || data;
 
   return (
-    <div className="card-vedic">
-      <div className="section-header-vedic">
-        <h3 className="section-title-vedic">🌅 Lagna Analysis (Ascendant)</h3>
-        <p className="section-subtitle-vedic">The foundation of your personality and life path</p>
+    <div className="space-y-8">
+      {/* Enhanced Header Section */}
+      <div className="card-sacred group hover:shadow-xl transition-all duration-500">
+        <div className="flex items-center gap-4 mb-6">
+          <div className="w-16 h-16 bg-gradient-to-br from-saffron to-gold rounded-full flex items-center justify-center text-3xl animate-glow">
+            🌅
+          </div>
+          <div>
+            <h3 className="text-3xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
+              Lagna Analysis (Ascendant)
+            </h3>
+            <p className="text-secondary text-lg">The foundation of your personality and life path</p>
+          </div>
+        </div>
       </div>
 
-      <div className="space-vedic">
+      {/* Enhanced Insight Cards Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {lagna.sign && (
-          <div className="insight-card">
-            <div className="insight-label">Ascendant Sign</div>
-            <div className="insight-value">{lagna.sign}</div>
-            {lagna.signLord && (
-              <div className="insight-detail">Ruled by {lagna.signLord}</div>
-            )}
-            {lagna.element && (
-              <div className="insight-detail">Element: {lagna.element}</div>
-            )}
+          <div className="insight-card-enhanced group">
+            <div className="card-vedic h-full hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-jupiter/20 rounded-full flex items-center justify-center">
+                  <span className="vedic-symbol text-jupiter">♃</span>
+                </div>
+                <h4 className="text-lg font-semibold text-primary">Ascendant Sign</h4>
+              </div>
+              <div className="space-y-3">
+                <div className="text-2xl font-bold text-saffron">{lagna.sign}</div>
+                {lagna.signLord && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-secondary">Ruled by:</span>
+                    <span className="badge-vedic bg-gold/20 text-gold">{lagna.signLord}</span>
+                  </div>
+                )}
+                {lagna.element && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-secondary">Element:</span>
+                    <span className="badge-vedic bg-earth-element/20 text-earth-element">{lagna.element}</span>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         )}
 
         {lagna.degree && (
-          <div className="insight-card">
-            <div className="insight-label">Exact Degree</div>
-            <div className="insight-value">{lagna.degree}</div>
-            <div className="insight-detail">Precise ascendant position</div>
+          <div className="insight-card-enhanced group">
+            <div className="card-vedic h-full hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-venus/20 rounded-full flex items-center justify-center">
+                  <span className="vedic-symbol text-venus">♀</span>
+                </div>
+                <h4 className="text-lg font-semibold text-primary">Exact Degree</h4>
+              </div>
+              <div className="space-y-3">
+                <div className="text-2xl font-bold text-saffron font-mono">{lagna.degree}</div>
+                <div className="text-sm text-secondary">Precise ascendant position</div>
+              </div>
+            </div>
           </div>
         )}
 
         {lagna.nakshatra && (
-          <div className="insight-card">
-            <div className="insight-label">Nakshatra</div>
-            <div className="insight-value">{lagna.nakshatra}</div>
-            {lagna.nakshatraPada && (
-              <div className="insight-detail">Pada: {lagna.nakshatraPada}</div>
-            )}
-          </div>
-        )}
-
-        {lagna.description && (
-          <div className="interpretation-vedic">
-            <h4 className="interpretation-title">Lagna Interpretation</h4>
-            <p className="interpretation-text">{lagna.description}</p>
-          </div>
-        )}
-
-        {lagna.characteristics && Array.isArray(lagna.characteristics) && (
-          <div className="characteristics-vedic">
-            <h4 className="characteristics-title">Key Characteristics</h4>
-            <div className="characteristics-grid">
-              {lagna.characteristics.map((char, index) => (
-                <div key={index} className="characteristic-item">
-                  <span className="characteristic-icon">✨</span>
-                  <span className="characteristic-text">{char}</span>
+          <div className="insight-card-enhanced group">
+            <div className="card-vedic h-full hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-moon/20 rounded-full flex items-center justify-center">
+                  <span className="vedic-symbol text-moon">☽</span>
                 </div>
-              ))}
+                <h4 className="text-lg font-semibold text-primary">Nakshatra</h4>
+              </div>
+              <div className="space-y-3">
+                <div className="text-2xl font-bold text-saffron">{lagna.nakshatra}</div>
+                {lagna.nakshatraPada && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-secondary">Pada:</span>
+                    <span className="badge-vedic bg-moon/20 text-moon">{lagna.nakshatraPada}</span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
+      </div>
 
-        {lagna.strengths && Array.isArray(lagna.strengths) && (
-          <div className="strengths-vedic">
-            <h4 className="strengths-title">Strengths</h4>
-            <div className="strength-list">
-              {lagna.strengths.map((strength, index) => (
-                <div key={index} className="strength-item">
-                  <span className="strength-icon">💪</span>
-                  <span>{typeof strength === 'object' ? JSON.stringify(strength) : strength}</span>
-                </div>
-              ))}
+      {/* Enhanced Interpretation Section */}
+      {lagna.description && (
+        <div className="card-cosmic group hover:shadow-xl transition-all duration-500">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-12 h-12 bg-gradient-to-br from-third-eye-chakra to-crown-chakra rounded-full flex items-center justify-center text-white text-xl">
+              🧠
             </div>
+            <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
+              Lagna Interpretation
+            </h4>
           </div>
-        )}
+          <div className="prose prose-lg max-w-none">
+            <p className="text-secondary leading-relaxed text-lg">{lagna.description}</p>
+          </div>
+        </div>
+      )}
 
+      {/* Enhanced Characteristics Grid */}
+      {lagna.characteristics && Array.isArray(lagna.characteristics) && (
+        <div className="card-sacred group hover:shadow-xl transition-all duration-500">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-12 h-12 bg-gradient-to-br from-friendly to-exalted rounded-full flex items-center justify-center text-white text-xl">
+              ✨
+            </div>
+            <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
+              Key Characteristics
+            </h4>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {lagna.characteristics.map((char, index) => (
+              <div key={index} className="characteristic-item-enhanced group">
+                <div className="flex items-center gap-3 p-4 bg-sacred/50 rounded-lg hover:bg-sacred transition-all duration-300 hover:transform hover:scale-105">
+                  <span className="text-saffron group-hover:animate-pulse">✨</span>
+                  <span className="text-secondary group-hover:text-primary transition-colors duration-300">{char}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Enhanced Strengths Section */}
+      {lagna.strengths && Array.isArray(lagna.strengths) && (
+        <div className="card-vedic group hover:shadow-xl transition-all duration-500">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-12 h-12 bg-gradient-to-br from-exalted to-friendly rounded-full flex items-center justify-center text-white text-xl">
+              💪
+            </div>
+            <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
+              Strengths
+            </h4>
+          </div>
+          <div className="space-y-4">
+            {lagna.strengths.map((strength, index) => (
+              <div key={index} className="strength-item-enhanced group">
+                <div className="flex items-center gap-4 p-4 bg-exalted/10 rounded-lg hover:bg-exalted/20 transition-all duration-300 hover:transform hover:scale-105">
+                  <span className="text-exalted group-hover:animate-pulse">💪</span>
+                  <span className="text-secondary group-hover:text-primary transition-colors duration-300">
+                    {typeof strength === 'object' ? JSON.stringify(strength) : strength}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Additional Analysis Sections */}
+      <div className="space-y-6">
         {lagna.challenges && Array.isArray(lagna.challenges) && (
           <div className="challenges-vedic">
             <h4 className="challenges-title">Areas for Growth</h4>
@@ -365,9 +450,9 @@ const AspectsDisplay = ({ data }) => {
   if (!data) {
     console.log('🔗 AspectsDisplay: No data provided');
     return (
-      <div className="card-vedic text-center">
-        <div className="text-muted">🔗</div>
-        <p className="text-muted">No planetary aspects data available</p>
+      <div className="card-cosmic text-center animate-pulse">
+        <div className="text-6xl mb-4 animate-float">🔗</div>
+        <p className="text-muted text-lg">No planetary aspects data available</p>
       </div>
     );
   }
@@ -396,149 +481,187 @@ const AspectsDisplay = ({ data }) => {
   const majorAspects = allAspects.slice(0, 10); // Show first 10 as major aspects
 
   return (
-    <div className="card-vedic">
-      <div className="section-header-vedic">
-        <h3 className="section-title-vedic">🔗 Planetary Aspects</h3>
-        <p className="section-subtitle-vedic">Cosmic relationships influencing your life</p>
+    <div className="space-y-8">
+      {/* Enhanced Header Section */}
+      <div className="card-sacred group hover:shadow-xl transition-all duration-500">
+        <div className="flex items-center gap-4 mb-6">
+          <div className="w-16 h-16 bg-gradient-to-br from-friendly to-exalted rounded-full flex items-center justify-center text-3xl animate-glow">
+            🔗
+          </div>
+          <div>
+            <h3 className="text-3xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
+              Planetary Aspects
+            </h3>
+            <p className="text-secondary text-lg">Cosmic relationships influencing your life</p>
+          </div>
+        </div>
       </div>
 
-      <div className="space-vedic">
-        {/* All Aspects Overview */}
-        {allAspects.length > 0 && (
-          <div className="aspects-section">
-            <h4 className="aspects-title">Planetary Aspects Overview</h4>
-            <div className="aspects-stats">
-              <div className="stat-item">
-                <span className="stat-number">{allAspects.length}</span>
-                <span className="stat-label">Total Aspects</span>
-              </div>
-              <div className="stat-item">
-                <span className="stat-number">{beneficAspects.length}</span>
-                <span className="stat-label">Benefic Aspects</span>
-              </div>
-              <div className="stat-item">
-                <span className="stat-number">{maleficAspects.length}</span>
-                <span className="stat-label">Challenging Aspects</span>
-              </div>
+      {/* Enhanced Overview Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="card-vedic group hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 bg-jupiter/20 rounded-full flex items-center justify-center">
+              <span className="vedic-symbol text-jupiter">♃</span>
             </div>
+            <h4 className="text-lg font-semibold text-primary">Total Aspects</h4>
           </div>
-        )}
+          <div className="text-3xl font-bold text-saffron">{allAspects.length}</div>
+          <div className="text-sm text-secondary">Planetary relationships</div>
+        </div>
 
-        {/* Major Aspects */}
-        {majorAspects.length > 0 && (
-          <div className="aspects-section">
-            <h4 className="aspects-title">Major Aspects</h4>
-            <div className="aspects-grid">
-              {majorAspects.map((aspect, index) => (
-                <div key={index} className="aspect-card">
-                  <div className="aspect-header">
-                    <span className="aspect-planets">
-                      {aspect.source} → {aspect.target?.planet || aspect.to}
-                    </span>
-                    <span className={`aspect-type ${aspect.nature?.toLowerCase()}`}>
-                      {aspect.type}
-                    </span>
-                  </div>
-                  <div className="aspect-details">
-                    <div className="aspect-strength">Strength: {aspect.strength}/10</div>
-                    {aspect.houseDistance && (
-                      <div className="aspect-distance">House Distance: {aspect.houseDistance}</div>
+        <div className="card-vedic group hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 bg-exalted/20 rounded-full flex items-center justify-center">
+              <span className="vedic-symbol text-exalted">✓</span>
+            </div>
+            <h4 className="text-lg font-semibold text-primary">Benefic Aspects</h4>
+          </div>
+          <div className="text-3xl font-bold text-exalted">{beneficAspects.length}</div>
+          <div className="text-sm text-secondary">Positive influences</div>
+        </div>
+
+        <div className="card-vedic group hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 bg-enemy/20 rounded-full flex items-center justify-center">
+              <span className="vedic-symbol text-enemy">⚠</span>
+            </div>
+            <h4 className="text-lg font-semibold text-primary">Challenging Aspects</h4>
+          </div>
+          <div className="text-3xl font-bold text-enemy">{maleficAspects.length}</div>
+          <div className="text-sm text-secondary">Growth opportunities</div>
+        </div>
+      </div>
+
+      {/* Enhanced Major Aspects List */}
+      {majorAspects.length > 0 && (
+        <div className="card-cosmic group hover:shadow-xl transition-all duration-500">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-12 h-12 bg-gradient-to-br from-third-eye-chakra to-crown-chakra rounded-full flex items-center justify-center text-white text-xl">
+              ⭐
+            </div>
+            <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
+              Major Aspects
+            </h4>
+          </div>
+          <div className="space-y-4">
+            {majorAspects.map((aspect, index) => {
+              const isPositive = aspect.nature === 'benefic';
+              const strength = aspect.strength || 0;
+              
+              return (
+                <div key={index} className={`aspect-item-enhanced group ${
+                  isPositive ? 'bg-exalted/5 border-exalted/20' : 'bg-enemy/5 border-enemy/20'
+                }`}>
+                  <div className="card-vedic hover:transform hover:scale-105 transition-all duration-300 hover:shadow-lg">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-4">
+                        <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                          isPositive ? 'bg-exalted/20' : 'bg-enemy/20'
+                        }`}>
+                          <span className={`vedic-symbol ${isPositive ? 'text-exalted' : 'text-enemy'}`}>
+                            {isPositive ? '✓' : '⚠'}
+                          </span>
+                        </div>
+                        <div>
+                          <div className="text-lg font-semibold text-primary">
+                            {aspect.source} → {aspect.target?.planet || aspect.target}
+                          </div>
+                          <div className="text-sm text-secondary">{aspect.type} aspect</div>
+                        </div>
+                      </div>
+                      
+                      {/* Enhanced Strength Indicator */}
+                      <div className="flex items-center gap-3">
+                        <div className="strength-meter">
+                          <div className="strength-dots">
+                            {[...Array(5)].map((_, i) => (
+                              <div key={i} className={`strength-dot ${
+                                i < Math.floor(strength / 2) ? 'active' : ''
+                              }`}></div>
+                            ))}
+                          </div>
+                        </div>
+                        <span className="text-sm font-mono text-saffron font-bold">
+                          {strength}/10
+                        </span>
+                      </div>
+                    </div>
+
+                    {aspect.description && (
+                      <div className="bg-sacred/50 p-4 rounded-lg">
+                        <p className="text-secondary leading-relaxed">{aspect.description}</p>
+                      </div>
                     )}
                   </div>
-                  {aspect.description && (
-                    <div className="aspect-description">{aspect.description}</div>
-                  )}
                 </div>
-              ))}
-            </div>
+              );
+            })}
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Benefic Aspects */}
-        {beneficAspects.length > 0 && (
-          <div className="aspects-section">
-            <h4 className="aspects-title positive">✨ Beneficial Aspects</h4>
-            <div className="aspects-list positive">
-              {beneficAspects.map((aspect, index) => (
-                <div key={index} className="aspect-item positive">
-                  <span className="aspect-icon">🌟</span>
-                  <span className="aspect-detail">
-                    {aspect.source} {aspect.type} aspect to {aspect.target?.planet || aspect.to}
+      {/* Enhanced Patterns Section */}
+      {patterns.length > 0 && (
+        <div className="card-sacred group hover:shadow-xl transition-all duration-500">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-12 h-12 bg-gradient-to-br from-friendly to-exalted rounded-full flex items-center justify-center text-white text-xl">
+              ✨
+            </div>
+            <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
+              Special Patterns
+            </h4>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {patterns.map((pattern, index) => (
+              <div key={index} className="pattern-item-enhanced group">
+                <div className="flex items-center gap-3 p-4 bg-sacred/50 rounded-lg hover:bg-sacred transition-all duration-300 hover:transform hover:scale-105">
+                  <span className="text-saffron group-hover:animate-pulse">✨</span>
+                  <span className="text-secondary group-hover:text-primary transition-colors duration-300">
+                    {pattern}
                   </span>
-                  <span className="aspect-strength">Strength: {aspect.strength}/10</span>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Challenging Aspects */}
-        {maleficAspects.length > 0 && (
-          <div className="aspects-section">
-            <h4 className="aspects-title challenging">⚡ Challenging Aspects</h4>
-            <div className="aspects-list challenging">
-              {maleficAspects.map((aspect, index) => (
-                <div key={index} className="aspect-item challenging">
-                  <span className="aspect-icon">⚠️</span>
-                  <span className="aspect-detail">
-                    {aspect.source} {aspect.type} aspect to {aspect.target?.planet || aspect.to}
+      {/* Enhanced Yogas Section */}
+      {yogas.length > 0 && (
+        <div className="card-vedic group hover:shadow-xl transition-all duration-500">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-12 h-12 bg-gradient-to-br from-exalted to-friendly rounded-full flex items-center justify-center text-white text-xl">
+              🕉️
+            </div>
+            <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
+              Special Yogas
+            </h4>
+          </div>
+          <div className="space-y-4">
+            {yogas.map((yoga, index) => (
+              <div key={index} className="yoga-item-enhanced group">
+                <div className="flex items-center gap-4 p-4 bg-exalted/10 rounded-lg hover:bg-exalted/20 transition-all duration-300 hover:transform hover:scale-105">
+                  <span className="text-exalted group-hover:animate-pulse">🕉️</span>
+                  <span className="text-secondary group-hover:text-primary transition-colors duration-300">
+                    {yoga}
                   </span>
-                  <span className="aspect-strength">Strength: {aspect.strength}/10</span>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Patterns */}
-        {patterns.length > 0 && (
-          <div className="patterns-section">
-            <h4 className="patterns-title">🔄 Aspect Patterns</h4>
-            <div className="patterns-grid">
-              {patterns.map((pattern, index) => (
-                <div key={index} className="pattern-card">
-                  <div className="pattern-name">{pattern.name || pattern.type}</div>
-                  <div className="pattern-description">{pattern.description}</div>
-                  {pattern.planets && (
-                    <div className="pattern-planets">Planets: {pattern.planets.join(', ')}</div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Yogas */}
-        {yogas.length > 0 && (
-          <div className="yogas-vedic">
-            <h4 className="yogas-title">🕉️ Planetary Yogas</h4>
-            <div className="yogas-grid">
-              {yogas.map((yoga, index) => (
-                <div key={index} className="yoga-card">
-                  <div className="yoga-name">{yoga.name}</div>
-                  {yoga.planets && (
-                    <div className="yoga-planets">{yoga.planets.join(', ')}</div>
-                  )}
-                  <div className="yoga-effect">{yoga.effect || yoga.description}</div>
-                  {yoga.strength && (
-                    <div className="yoga-strength">Strength: {yoga.strength}</div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Fallback if no data found */}
-        {allAspects.length === 0 && patterns.length === 0 && yogas.length === 0 && (
-          <div className="text-center text-muted">
-            <p>Planetary aspects analysis will be available once comprehensive data is loaded.</p>
-            <pre className="text-xs mt-2 bg-gray-100 p-2 rounded">
-              Data structure: {JSON.stringify(Object.keys(aspects), null, 2)}
-            </pre>
-          </div>
-        )}
-      </div>
+      {/* Fallback if no data found */}
+      {allAspects.length === 0 && patterns.length === 0 && yogas.length === 0 && (
+        <div className="text-center text-muted">
+          <p className="text-lg">Planetary aspects analysis will be available once comprehensive data is loaded.</p>
+          <pre className="text-xs mt-2 bg-gray-100 p-2 rounded">
+            Data structure: {JSON.stringify(Object.keys(aspects), null, 2)}
+          </pre>
+        </div>
+      )}
     </div>
   );
 };
@@ -759,17 +882,47 @@ const NavamsaDisplay = ({ data }) => {
   const marriageIndications = navamsa.marriageIndications || {};
   const spiritualIndications = navamsa.spiritualIndications || {};
   const planetaryStrengths = navamsa.planetaryStrengths || {};
-  const planetaryAnalysis = navamsa.planetaryAnalysis || {};
   const vargottamaPlanets = navamsa.vargottamaPlanets || [];
   const yogaFormations = navamsa.yogaFormations || [];
   const overallAnalysis = navamsa.overallAnalysis || {};
+  
+  // Extract navamsa chart data for visualization
+  const navamsaChartData = navamsa.chart || navamsa.navamsaChart || null;
 
   return (
-    <div className="card-vedic">
-      <div className="section-header-vedic">
-        <h3 className="section-title-vedic">🔄 Navamsa Chart (D9) Analysis</h3>
-        <p className="section-subtitle-vedic">Marriage, spirituality, inner strength, and soul purpose</p>
+    <div className="space-y-8">
+      {/* Enhanced Header Section */}
+      <div className="card-sacred group hover:shadow-xl transition-all duration-500">
+        <div className="flex items-center gap-4 mb-6">
+          <div className="w-16 h-16 bg-gradient-to-br from-third-eye-chakra to-crown-chakra rounded-full flex items-center justify-center text-3xl animate-glow">
+            🔄
+          </div>
+          <div>
+            <h3 className="text-3xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
+              Navamsa Chart (D9) Analysis
+            </h3>
+            <p className="text-secondary text-lg">Marriage, spirituality, inner strength, and soul purpose</p>
+          </div>
+        </div>
       </div>
+
+      {/* Navamsa Chart Visualization */}
+      {navamsaChartData && (
+        <div className="card-cosmic group hover:shadow-xl transition-all duration-500">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-12 h-12 bg-gradient-to-br from-saffron to-gold rounded-full flex items-center justify-center text-white text-xl">
+              📊
+            </div>
+            <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
+              Navamsa Chart Visualization
+            </h4>
+          </div>
+          <VedicChartDisplay 
+            chartData={navamsaChartData} 
+            chartType="Navamsa (D9)"
+          />
+        </div>
+      )}
 
       <div className="space-vedic">
         {/* Chart Info */}
@@ -1535,17 +1688,14 @@ const ComprehensiveDisplay = ({ data }) => {
 
 const AnalysisPage = () => {
   const navigate = useNavigate();
-  const { currentChart } = useChart();
+  useChart(); // Using context for future enhancements
   const {
-    currentAnalysis,
-    setCurrentAnalysis,
     isLoading,
     error,
     setLoading,
     setError,
     activeSection,
-    setActiveSection,
-    setSectionData
+    setActiveSection
   } = useAnalysis();
 
   const [analysisData, setAnalysisData] = useState({});
@@ -1599,7 +1749,8 @@ const AnalysisPage = () => {
     };
 
     initializeDataLoading();
-  }, []); // Empty dependency array for mount-only execution
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty dependency array for mount-only execution - dependencies handled internally
 
   // Define all analysis endpoints
   const analysisEndpoints = useMemo(() => ({
@@ -1642,6 +1793,8 @@ const AnalysisPage = () => {
   );
 
   // Individual analysis data fetching following ComprehensiveAnalysisPage pattern
+  // Note: This function is kept for reference but logic now handled by ResponseDataToUIDisplayAnalyser
+  // eslint-disable-next-line no-unused-vars
   const fetchIndividualAnalysis = useCallback(async (analysisType) => {
     try {
       setLoading(true);
@@ -1710,9 +1863,11 @@ const AnalysisPage = () => {
     } finally {
       setLoading(false);
     }
-  }, [navigate, analysisEndpoints]);
+  }, [navigate, analysisEndpoints, setError, setLoading]);
 
   // Load comprehensive analysis and extract individual sections
+  // Note: This function is kept for reference but logic now handled by ResponseDataToUIDisplayAnalyser
+  // eslint-disable-next-line no-unused-vars
   const loadFromComprehensiveAnalysis = useCallback(async () => {
     try {
       setLoading(true);
@@ -1963,7 +2118,7 @@ const AnalysisPage = () => {
       setError(err.message);
       setLoading(false);
     }
-  }, [navigate]);
+  }, [navigate, setError, setLoading]);
 
   // Fetch all analysis data with loading stages tracking (FIXED: Using data layer)
   const fetchAllAnalysisData = useCallback(async () => {
@@ -2021,7 +2176,7 @@ const AnalysisPage = () => {
     } finally {
       setLoading(false);
     }
-  }, [analysisEndpoints]);
+  }, [analysisEndpoints, setError, setLoading]);
 
     // Handle tab switching - use already loaded comprehensive data
   const handleTabChange = (tabKey) => {
@@ -2241,72 +2396,117 @@ const AnalysisPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-vedic-bg">
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto">
-          {/* Header with Vedic styling */}
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-primary mb-2">
-              📊 Comprehensive Vedic Analysis
-            </h1>
-            <p className="text-muted">
-              Complete astrological analysis with all perspectives
-            </p>
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-sacred-white via-white to-sacred-cream">
+      {/* Enhanced Background Pattern */}
+      <div className="fixed inset-0 opacity-5 pointer-events-none">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23FF9933' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+        }}></div>
+      </div>
 
-          {/* Main Tab Navigation with Vedic design */}
-          <div className="mb-6">
-            <div className="tabs-vedic">
-              <div className="tab-list">
-                {mainTabs.map((tab) => (
-                  <button
-                    key={tab.key}
-                    onClick={(event) => {
-                      event.preventDefault();
-                      event.stopPropagation();
-                      handleTabChange(tab.key);
-                    }}
-                    className={`tab-vedic ${activeSection === tab.key ? 'active' : ''}`}
-                    data-tab={tab.key}
-                    data-analysis-type={tab.key}
-                  >
-                    <span>{tab.icon}</span>
-                    <span>{tab.label}</span>
-                    {/* Assuming loadingStages is defined elsewhere or will be added */}
-                    {/* {loadingStages[tab.key] && (
-                      <span className={`badge-vedic ${
-                        loadingStages[tab.key] === 'completed' ? 'badge-success' :
-                        loadingStages[tab.key] === 'loading' ? 'badge-warning' :
-                        loadingStages[tab.key] === 'error' ? 'badge-error' : 'badge-neutral'
-                      }`}>
-                        {loadingStages[tab.key]}
-                      </span>
-                    )} */}
-                  </button>
-                ))}
+      <div className="relative z-10">
+        <div className="container mx-auto px-6 py-12">
+          <div className="max-w-7xl mx-auto">
+            {/* Enhanced Header Section */}
+            <div className="text-center mb-12">
+              <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-vedic-saffron to-vedic-gold rounded-full mb-6 shadow-lg">
+                <span className="text-3xl vedic-symbol symbol-mandala"></span>
+              </div>
+              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-vedic-saffron via-vedic-gold to-vedic-maroon bg-clip-text text-transparent mb-4">
+                Comprehensive Vedic Analysis
+              </h1>
+              <p className="text-lg text-secondary max-w-2xl mx-auto leading-relaxed">
+                Complete astrological analysis with all perspectives - Discover the cosmic influences shaping your destiny
+              </p>
+              
+              {/* Progress Indicator */}
+              <div className="mt-8 max-w-md mx-auto">
+                <div className="flex justify-between text-sm text-secondary mb-2">
+                  <span>Analysis Progress</span>
+                  <span>{Object.keys(analysisData).length} sections loaded</span>
+                </div>
+                <div className="progress-vedic">
+                  <div 
+                    className="progress-bar-vedic" 
+                    style={{ width: `${(Object.keys(analysisData).length / Object.keys(analysisEndpoints).length) * 100}%` }}
+                  ></div>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Tab Content */}
-          <div className="space-y-6">
-            {renderTabContent()}
-          </div>
+            {/* Enhanced Main Tab Navigation */}
+            <div className="mb-8">
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gold/20 overflow-hidden">
+                <div className="tabs-vedic-enhanced">
+                  <div className="tab-list-enhanced">
+                    {mainTabs.map((tab) => (
+                      <button
+                        key={tab.key}
+                        onClick={(event) => {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          handleTabChange(tab.key);
+                        }}
+                        className={`tab-vedic-enhanced group ${activeSection === tab.key ? 'active' : ''}`}
+                        data-tab={tab.key}
+                        data-analysis-type={tab.key}
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="text-xl transition-transform group-hover:scale-110">{tab.icon}</span>
+                          <span className="font-medium">{tab.label}</span>
+                          {loadingStages[tab.key] && (
+                            <span className={`badge-vedic-sm ${
+                              loadingStages[tab.key] === 'completed' ? 'badge-complete' :
+                              loadingStages[tab.key] === 'loading' ? 'badge-pending' :
+                              loadingStages[tab.key] === 'error' ? 'badge-error' : 'badge-neutral'
+                            }`}>
+                              {loadingStages[tab.key] === 'loading' ? '⏳' : 
+                               loadingStages[tab.key] === 'completed' ? '✓' : 
+                               loadingStages[tab.key] === 'error' ? '✗' : '○'}
+                            </span>
+                          )}
+                        </div>
+                        {activeSection === tab.key && (
+                          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-vedic-saffron to-vedic-gold"></div>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
 
-          {/* Action Buttons with Vedic styling */}
-          <div className="mt-8 flex justify-center space-x-4">
-            <button
-              onClick={() => navigate('/chart')}
-              className="btn-vedic btn-secondary"
-            >
-              View Chart
-            </button>
-            <button
-              onClick={() => navigate('/comprehensive-analysis')}
-              className="btn-vedic btn-primary"
-            >
-              8-Section Analysis
-            </button>
+            {/* Enhanced Tab Content Container */}
+            <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl border border-gold/20 overflow-hidden">
+              <div className="p-8 md:p-12">
+                {renderTabContent()}
+              </div>
+            </div>
+
+            {/* Enhanced Action Buttons */}
+            <div className="mt-12 flex flex-col sm:flex-row justify-center gap-6">
+              <button
+                onClick={() => navigate('/chart')}
+                className="btn-vedic btn-secondary btn-lg group"
+              >
+                <span className="vedic-symbol symbol-mandala mr-2 group-hover:rotate-12 transition-transform"></span>
+                View Birth Chart
+              </button>
+              <button
+                onClick={() => navigate('/comprehensive-analysis')}
+                className="btn-vedic btn-primary btn-lg group"
+              >
+                <span className="vedic-symbol symbol-chakra mr-2 group-hover:scale-110 transition-transform"></span>
+                Deep Analysis Report
+              </button>
+              <button
+                onClick={() => fetchAllAnalysisData()}
+                className="btn-vedic btn-outline btn-lg group"
+              >
+                <span className="vedic-symbol mr-2 group-hover:rotate-180 transition-transform">🔄</span>
+                Refresh Analysis
+              </button>
+            </div>
           </div>
         </div>
       </div>

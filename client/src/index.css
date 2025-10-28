@@ -24,10 +24,18 @@
     --wisdom-gray: #6B7280;
     --earth-brown: #92400E;
 
-    /* Animation Durations */
-    --animation-fast: 150ms;
-    --animation-normal: 300ms;
-    --animation-slow: 500ms;
+  /* Animation Durations */
+  --animation-fast: 150ms;
+  --animation-normal: 300ms;
+  --animation-slow: 500ms;
+  --animation-slower: 700ms;
+  
+  /* Shadow Elevations */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
 
     /* Spacing */
     --space-vedic: 1.618rem;
@@ -687,6 +695,124 @@
     background: white !important;
     color: black !important;
   }
+}
+
+/* Enhanced Animations */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(255, 153, 51, 0);
+  }
+  50% {
+    box-shadow: 0 0 20px 10px rgba(255, 153, 51, 0.2);
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Enhanced Card Styles */
+.card-enhanced {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-md);
+  transition: all var(--animation-normal) cubic-bezier(0.4, 0, 0.2, 1);
+  animation: scale-in var(--animation-slow) ease-out;
+}
+
+.card-enhanced:hover {
+  box-shadow: var(--shadow-xl);
+  transform: translateY(-4px);
+}
+
+.card-enhanced-bordered {
+  background: linear-gradient(white, white) padding-box,
+              linear-gradient(135deg, var(--vedic-saffron), var(--vedic-gold)) border-box;
+  border: 2px solid transparent;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  transition: all var(--animation-normal) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-enhanced-bordered:hover {
+  box-shadow: 0 0 30px rgba(255, 153, 51, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Loading Shimmer Effect */
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    #f3f4f6 0px,
+    #e5e7eb 40px,
+    #f3f4f6 80px
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite linear;
+}
+
+/* Stagger Animation for Lists */
+.stagger-animation > * {
+  animation: slide-up var(--animation-slow) ease-out;
+}
+
+.stagger-animation > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-animation > *:nth-child(2) { animation-delay: 100ms; }
+.stagger-animation > *:nth-child(3) { animation-delay: 200ms; }
+.stagger-animation > *:nth-child(4) { animation-delay: 300ms; }
+.stagger-animation > *:nth-child(5) { animation-delay: 400ms; }
+.stagger-animation > *:nth-child(6) { animation-delay: 500ms; }
+
+/* Hover Lift Effect */
+.hover-lift {
+  transition: all var(--animation-normal) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-xl);
+}
+
+/* Glow Effect */
+.glow-effect {
+  animation: pulse-glow 3s ease-in-out infinite;
 }
 
 /* Reduced Motion Support */

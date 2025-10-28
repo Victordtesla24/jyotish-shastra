@@ -5,6 +5,8 @@
     "dev": "node src/index.js",
     "start": "node src/index.js",
     "test": "jest --verbose",
+    "test:ui": "jest --config jest.config.ui.cjs --verbose",
+    "test:ui:watch": "jest --config jest.config.ui.cjs --watch",
     "test:transformers": "jest --testNamePattern=\"dataTransformers\" --verbose",
     "test:chart": "jest src/components/__tests__/VedicChartDisplay.test.js --verbose",
     "test:chart-watch": "jest src/components/__tests__/VedicChartDisplay.test.js --watch",

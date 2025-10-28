@@ -538,34 +538,121 @@
   border-radius: var(--radius-full);
 }
 
-/* Tab Navigation */
-.tabs-vedic {
+/* Enhanced Tab Navigation */
+.tabs-vedic-enhanced {
   display: flex;
-  border-bottom: 1px solid var(--border-light);
-  background: var(--bg-secondary);
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--sacred-white) 100%);
+  border-radius: var(--radius-xl);
+  padding: var(--space-2);
+  box-shadow: var(--shadow-lg);
 }
 
-.tab-vedic {
-  padding: var(--space-3) var(--space-6);
+.tab-list-enhanced {
+  display: flex;
+  width: 100%;
+  gap: var(--space-1);
+}
+
+.tab-vedic-enhanced {
+  flex: 1;
+  padding: var(--space-4) var(--space-6);
   background: transparent;
   border: none;
   color: var(--text-secondary);
   font-weight: 500;
   cursor: pointer;
-  border-bottom: 2px solid transparent;
+  border-radius: var(--radius-lg);
   transition: all var(--duration-normal) var(--ease-out);
+  position: relative;
+  overflow: hidden;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tab-vedic-enhanced::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, var(--vedic-saffron) 0%, var(--vedic-gold) 100%);
+  opacity: 0;
+  transition: opacity var(--duration-normal) var(--ease-out);
+  border-radius: var(--radius-lg);
+}
+
+.tab-vedic-enhanced:hover {
+  color: var(--vedic-saffron);
+  background: var(--bg-subtle);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.tab-vedic-enhanced:hover::before {
+  opacity: 0.1;
+}
+
+.tab-vedic-enhanced.active {
+  color: var(--text-white);
+  background: linear-gradient(135deg, var(--vedic-saffron) 0%, var(--vedic-gold) 100%);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.tab-vedic-enhanced.active::before {
+  opacity: 1;
+}
+
+.tab-vedic-enhanced.active > div {
+  position: relative;
+  z-index: 1;
+}
+
+/* Enhanced Badge Styles */
+.badge-vedic-sm {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  min-width: 20px;
+  height: 20px;
+  justify-content: center;
+}
+
+/* Enhanced Progress Bar */
+.progress-vedic {
+  width: 100%;
+  height: var(--space-3);
+  background: var(--border-light);
+  border-radius: var(--radius-full);
+  overflow: hidden;
   position: relative;
 }
 
-.tab-vedic:hover {
-  color: var(--vedic-saffron);
-  background: var(--bg-subtle);
+.progress-bar-vedic {
+  height: 100%;
+  background: linear-gradient(90deg, var(--vedic-saffron) 0%, var(--vedic-gold) 100%);
+  border-radius: var(--radius-full);
+  transition: width var(--duration-slow) var(--ease-out);
+  position: relative;
 }
 
-.tab-vedic.active {
-  color: var(--vedic-saffron);
-  background: var(--bg-primary);
-  border-bottom-color: var(--vedic-saffron);
+.progress-bar-vedic::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
+  animation: shimmer 2s infinite;
 }
 
 /* =============================================
@@ -718,11 +805,152 @@
   50% { box-shadow: 0 0 20px var(--vedic-gold), 0 0 30px var(--vedic-saffron); }
 }
 
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes bounce {
+  0%, 20%, 53%, 80%, 100% { transform: translate3d(0,0,0); }
+  40%, 43% { transform: translate3d(0, -8px, 0); }
+  70% { transform: translate3d(0, -4px, 0); }
+  90% { transform: translate3d(0, -2px, 0); }
+}
+
 /* Animation Classes */
 .animate-spin { animation: spin 1s linear infinite; }
 .animate-pulse { animation: pulse 2s ease-in-out infinite; }
 .animate-float { animation: float 3s ease-in-out infinite; }
 .animate-glow { animation: glow 2s ease-in-out infinite; }
+.animate-fadeIn { animation: fadeIn 0.5s ease-in-out; }
+.animate-slideIn { animation: slideIn 0.6s ease-out; }
+.animate-bounce { animation: bounce 1s ease-in-out infinite; }
+
+/* Enhanced Card Animations */
+.insight-card-enhanced {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.insight-card-enhanced:hover {
+  transform: translateY(-4px) scale(1.02);
+}
+
+.question-card-enhanced {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.question-card-enhanced:hover {
+  transform: translateY(-6px) scale(1.03);
+}
+
+.planet-card-enhanced {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.planet-card-enhanced:hover {
+  transform: translateY(-8px) scale(1.05);
+}
+
+.house-card-enhanced {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.house-card-enhanced:hover {
+  transform: translateY(-6px) scale(1.03);
+}
+
+.aspect-item-enhanced {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.aspect-item-enhanced:hover {
+  transform: translateX(4px);
+}
+
+.pattern-item-enhanced {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pattern-item-enhanced:hover {
+  transform: scale(1.05);
+}
+
+.yoga-item-enhanced {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.yoga-item-enhanced:hover {
+  transform: scale(1.05);
+}
+
+.characteristic-item-enhanced {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.characteristic-item-enhanced:hover {
+  transform: translateX(8px);
+}
+
+.strength-item-enhanced {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.strength-item-enhanced:hover {
+  transform: translateX(8px);
+}
+
+/* Enhanced Hover Effects */
+.group:hover .group-hover\:animate-pulse {
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.group:hover .group-hover\:animate-bounce {
+  animation: bounce 0.6s ease-in-out infinite;
+}
+
+.group:hover .group-hover\:animate-float {
+  animation: float 2s ease-in-out infinite;
+}
+
+/* Staggered Animation Delays */
+.animate-delay-100 { animation-delay: 0.1s; }
+.animate-delay-200 { animation-delay: 0.2s; }
+.animate-delay-300 { animation-delay: 0.3s; }
+.animate-delay-400 { animation-delay: 0.4s; }
+.animate-delay-500 { animation-delay: 0.5s; }
+
+/* Enhanced Card Shadows */
+.card-vedic {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-vedic:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.card-sacred {
+  box-shadow: 0 0 20px rgba(255, 153, 51, 0.3), 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-sacred:hover {
+  box-shadow: 0 0 30px rgba(255, 153, 51, 0.4), 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.card-cosmic {
+  box-shadow: 0 0 30px rgba(255, 215, 0, 0.4), 0 8px 16px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-cosmic:hover {
+  box-shadow: 0 0 40px rgba(255, 215, 0, 0.5), 0 12px 20px rgba(0, 0, 0, 0.2);
+}
 
 /* =============================================
    RESPONSIVE DESIGN

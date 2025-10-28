@@ -84,8 +84,11 @@ class UIToAPIDataInterpreter {
       validatedData.placeOfBirth = data.placeOfBirth.trim();
     }
 
-    // Coordinates validation
-    if (data.latitude !== undefined && data.longitude !== undefined) {
+    // Coordinates validation - REQUIRED for API
+    if (data.latitude === undefined || data.longitude === undefined || 
+        data.latitude === null || data.longitude === null) {
+      errors.push('Failed to geocode location');
+    } else {
       validatedData.latitude = parseFloat(data.latitude);
       validatedData.longitude = parseFloat(data.longitude);
       validatedData.timezone = data.timezone || 'Asia/Kolkata';
@@ -122,12 +125,7 @@ class UIToAPIDataInterpreter {
       }
     });
 
-    return {
-      apiRequest: {
-        ...apiData,
-        formatted: true
-      }
-    };
+    return apiData;
   }
 
   createRequestBody(apiData) {

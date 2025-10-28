@@ -266,92 +266,119 @@ const ComprehensiveAnalysisDisplay = ({ analysisData }) => {
   // === SPECIALIZED DISPLAY COMPONENTS ===
 
   /**
-   * Enhanced Questions Display Component - Uses Vedic design system
+   * Enhanced Questions Display Component - Uses Vedic design system with sophisticated animations
    */
   const QuestionsDisplay = ({ questions }) => {
     if (!questions || !Array.isArray(questions)) return null;
 
     return (
-      <div className="space-vedic">
-        <h3 className="text-2xl font-bold text-saffron mb-6 flex items-center gap-3">
-          <span className="w-10 h-10 bg-gold/20 text-gold rounded-full flex items-center justify-center font-bold">Q</span>
-          Analysis Questions
-          <span className="ml-auto text-base font-normal text-muted">
-            {questions.length} question{questions.length !== 1 ? 's' : ''}
-          </span>
-        </h3>
+      <div className="space-y-8">
+        {/* Enhanced Header Section */}
+        <div className="card-sacred group hover:shadow-xl transition-all duration-500">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-16 h-16 bg-gradient-to-br from-gold to-saffron rounded-full flex items-center justify-center text-3xl animate-glow">
+              Q
+            </div>
+            <div>
+              <h3 className="text-3xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
+                Analysis Questions
+              </h3>
+              <p className="text-secondary text-lg">
+                {questions.length} question{questions.length !== 1 ? 's' : ''} answered
+              </p>
+            </div>
+          </div>
+        </div>
 
-        {questions.map((q, index) => {
-          const itemId = `question-${index}`;
-          const isExpanded = expandedItems.has(itemId);
+        {/* Enhanced Questions Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {questions.map((q, index) => {
+            const itemId = `question-${index}`;
+            const isExpanded = expandedItems.has(itemId);
 
-          return (
-            <div key={index} className="card-sacred hover:shadow-lg transition-all duration-300">
-              <div
-                className="cursor-pointer"
-                onClick={() => toggleExpansion(itemId)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    toggleExpansion(itemId);
-                  }
-                }}
-                aria-expanded={isExpanded}
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center mb-3">
-                      <span className="badge-vedic bg-gold text-primary font-bold mr-3">
-                        Q{index + 1}
-                      </span>
-                      <h4 className="text-lg font-semibold text-primary leading-tight">
-                        {q.question}
-                      </h4>
+            return (
+              <div key={index} className="question-card-enhanced group">
+                <div className="card-cosmic h-full hover:transform hover:scale-105 transition-all duration-500 hover:shadow-xl">
+                  <div
+                    className="cursor-pointer"
+                    onClick={() => toggleExpansion(itemId)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        toggleExpansion(itemId);
+                      }
+                    }}
+                    aria-expanded={isExpanded}
+                  >
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 bg-gradient-to-br from-saffron to-gold rounded-full flex items-center justify-center text-white font-bold text-lg">
+                          {index + 1}
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="text-lg font-semibold text-primary leading-tight group-hover:text-saffron transition-colors duration-300">
+                            {q.question}
+                          </h4>
+                        </div>
+                      </div>
+
+                      <button className="text-saffron hover:text-gold transition-colors p-2 rounded-lg hover:bg-gold/10 group-hover:animate-pulse">
+                        <span className={`transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}>
+                          ▼
+                        </span>
+                      </button>
                     </div>
 
                     {/* Enhanced Answer Preview */}
-                    <p className="text-secondary leading-relaxed">
-                      {isExpanded ? q.answer : `${q.answer?.substring(0, 120)}${q.answer?.length > 120 ? '...' : ''}`}
-                    </p>
+                    <div className="bg-sacred/30 p-4 rounded-lg mb-4">
+                      <p className="text-secondary leading-relaxed">
+                        {isExpanded ? q.answer : `${q.answer?.substring(0, 120)}${q.answer?.length > 120 ? '...' : ''}`}
+                      </p>
+                    </div>
 
                     {/* Enhanced Completeness Badge */}
                     {q.completeness && (
-                      <div className="mt-3">
+                      <div className="flex items-center justify-between">
                         <span className={`badge-vedic ${
                           q.completeness === 'Complete' ? 'badge-complete' : 'badge-pending'
                         }`}>
                           <span className="vedic-symbol">{q.completeness === 'Complete' ? '✓' : '⏳'}</span>
                           {q.completeness}
                         </span>
+                        <span className="text-xs text-muted">
+                          {isExpanded ? 'Click to collapse' : 'Click to expand'}
+                        </span>
                       </div>
                     )}
                   </div>
 
-                  <button className="ml-4 text-saffron hover:text-gold transition-colors p-2 rounded-lg hover:bg-gold/10">
-                    <span className={`transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}>
-                      ▼
-                    </span>
-                  </button>
+                  {/* Enhanced Expandable Details Section */}
+                  {isExpanded && q.details && (
+                    <div className="mt-6 pt-6 border-t border-gold/20 animate-fadeIn">
+                      <div className="card-vedic bg-sacred/50">
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="w-8 h-8 bg-third-eye-chakra/20 rounded-full flex items-center justify-center">
+                            <span className="vedic-symbol text-third-eye-chakra">🔍</span>
+                          </div>
+                          <h5 className="text-lg font-semibold text-primary">Question Details</h5>
+                        </div>
+                        <ObjectDisplay data={q.details} />
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
-
-              {/* Enhanced Expandable Details Section */}
-              {isExpanded && q.details && (
-                <div className="mt-4 pt-4 border-t border-gold/20">
-                  <DetailsAccordion details={q.details} title="Question Details" defaultExpanded={true} icon="🔍" />
-                </div>
-              )}
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     );
   };
 
   /**
-   * Enhanced Planetary Analyses Display Component - Uses Vedic design system
+   * Enhanced Planetary Analyses Display Component - Uses Vedic design system with sophisticated animations
    */
   const AnalysesDisplay = ({ analyses }) => {
     if (!analyses || typeof analyses !== 'object') return null;
@@ -359,16 +386,26 @@ const ComprehensiveAnalysisDisplay = ({ analysisData }) => {
     const planetEntries = Object.entries(analyses);
 
     return (
-      <div className="space-vedic">
-        <h3 className="text-2xl font-bold text-saffron mb-6 flex items-center gap-3">
-          <span className="w-10 h-10 bg-jupiter/20 text-jupiter rounded-full flex items-center justify-center vedic-symbol">☿</span>
-          Planetary Analysis
-          <span className="ml-auto text-base font-normal text-muted">
-            {planetEntries.length} planet{planetEntries.length !== 1 ? 's' : ''}
-          </span>
-        </h3>
+      <div className="space-y-8">
+        {/* Enhanced Header Section */}
+        <div className="card-sacred group hover:shadow-xl transition-all duration-500">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-16 h-16 bg-gradient-to-br from-jupiter to-mercury rounded-full flex items-center justify-center text-3xl animate-glow">
+              ☿
+            </div>
+            <div>
+              <h3 className="text-3xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
+                Planetary Analysis
+              </h3>
+              <p className="text-secondary text-lg">
+                {planetEntries.length} planet{planetEntries.length !== 1 ? 's' : ''} analyzed
+              </p>
+            </div>
+          </div>
+        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Enhanced Planetary Cards Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {planetEntries.map(([planetKey, planetData]) => {
             if (!planetData || typeof planetData !== 'object') return null;
 
@@ -377,86 +414,115 @@ const ComprehensiveAnalysisDisplay = ({ analysisData }) => {
             const dignity = planetData.dignity?.dignity || 'Unknown';
 
             return (
-              <div key={planetKey} className="card-cosmic hover:shadow-xl transition-all duration-300">
-                <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-xl font-bold text-primary capitalize flex items-center gap-2">
-                    <span className="vedic-symbol text-jupiter">☿</span>
-                    {planetName}
-                  </h4>
-                  <span className={`badge-vedic ${getDignityBadgeClass(dignity)}`}>
-                    {dignity}
-                  </span>
-                </div>
-
-                {/* Enhanced Strength Meter */}
-                {strength > 0 && (
-                  <div className="mb-4">
-                    <div className="flex justify-between text-sm text-secondary mb-2">
-                      <span className="font-medium">Planetary Strength</span>
-                      <span className="font-mono text-saffron font-bold">{strength.toFixed(1)}/10</span>
-                    </div>
-                    <div className="progress-vedic">
-                      <div
-                        className="progress-bar-vedic"
-                        style={{ width: `${Math.min(strength * 10, 100)}%` }}
-                      ></div>
-                    </div>
-                    <div className="strength-meter mt-2">
-                      <div className="strength-dots">
-                        {[...Array(10)].map((_, i) => (
-                          <div
-                            key={i}
-                            className={`strength-dot ${i < Math.floor(strength) ? 'active' : ''}`}
-                          ></div>
-                        ))}
+              <div key={planetKey} className="planet-card-enhanced group">
+                <div className="card-cosmic h-full hover:transform hover:scale-105 transition-all duration-500 hover:shadow-xl">
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-16 h-16 bg-gradient-to-br from-jupiter/20 to-mercury/20 rounded-full flex items-center justify-center text-2xl">
+                        <span className="vedic-symbol text-jupiter">☿</span>
+                      </div>
+                      <div>
+                        <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300 capitalize">
+                          {planetName}
+                        </h4>
+                        <p className="text-sm text-secondary">Planetary Analysis</p>
                       </div>
                     </div>
+                    <span className={`badge-vedic ${getDignityBadgeClass(dignity)}`}>
+                      {dignity}
+                    </span>
                   </div>
-                )}
 
-                {/* Enhanced Planet Details */}
-                <div className="space-vedic">
-                  {planetData.signCharacteristics && (
-                    <div>
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-sm font-medium text-secondary">Element:</span>
-                        <span className="badge-vedic bg-earth-element/20 text-earth-element">
-                          <span className="vedic-symbol symbol-earth"></span>
-                          {planetData.signCharacteristics.element}
-                        </span>
+                  {/* Enhanced Strength Meter */}
+                  {strength > 0 && (
+                    <div className="mb-6">
+                      <div className="flex justify-between text-sm text-secondary mb-3">
+                        <span className="font-medium">Planetary Strength</span>
+                        <span className="font-mono text-saffron font-bold">{strength.toFixed(1)}/10</span>
                       </div>
-                      {planetData.signCharacteristics.traits && (
-                        <div>
-                          <span className="text-sm font-medium text-secondary block mb-2">Traits:</span>
-                          <div className="flex flex-wrap gap-2">
-                            {planetData.signCharacteristics.traits.slice(0, 3).map((trait, i) => (
-                              <span key={i} className="badge-vedic bg-subtle text-secondary">
-                                {trait}
-                              </span>
-                            ))}
-                          </div>
+                      <div className="progress-vedic mb-3">
+                        <div
+                          className="progress-bar-vedic"
+                          style={{ width: `${Math.min(strength * 10, 100)}%` }}
+                        ></div>
+                      </div>
+                      <div className="strength-meter">
+                        <div className="strength-dots">
+                          {[...Array(10)].map((_, i) => (
+                            <div
+                              key={i}
+                              className={`strength-dot ${i < Math.floor(strength) ? 'active' : ''}`}
+                            ></div>
+                          ))}
                         </div>
-                      )}
+                      </div>
                     </div>
                   )}
 
-                  {planetData.strength?.interpretation && (
-                    <div className="card-vedic bg-sacred/50 p-4">
-                      <p className="text-sm text-secondary italic leading-relaxed">
-                        {planetData.strength.interpretation}
-                      </p>
-                    </div>
-                  )}
+                  {/* Enhanced Planet Details */}
+                  <div className="space-y-4">
+                    {planetData.signCharacteristics && (
+                      <div className="card-vedic bg-sacred/30 p-4">
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className="vedic-symbol text-earth-element">🌍</span>
+                          <span className="text-sm font-medium text-secondary">Element:</span>
+                          <span className="badge-vedic bg-earth-element/20 text-earth-element">
+                            {planetData.signCharacteristics.element}
+                          </span>
+                        </div>
+                        {planetData.signCharacteristics.traits && (
+                          <div>
+                            <span className="text-sm font-medium text-secondary block mb-2">Traits:</span>
+                            <div className="flex flex-wrap gap-2">
+                              {planetData.signCharacteristics.traits.slice(0, 3).map((trait, i) => (
+                                <span key={i} className="badge-vedic bg-subtle text-secondary">
+                                  {trait}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
 
-                  {/* Additional Planet Data with Progressive Disclosure */}
-                  {Object.keys(planetData).length > 3 && (
-                    <DetailsAccordion
-                      details={planetData}
-                      title={`${planetName} Additional Details`}
-                      defaultExpanded={false}
-                      icon="🪐"
-                    />
-                  )}
+                    {planetData.strength?.interpretation && (
+                      <div className="card-vedic bg-exalted/10 p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="vedic-symbol text-exalted">💡</span>
+                          <span className="text-sm font-medium text-secondary">Interpretation</span>
+                        </div>
+                        <p className="text-sm text-secondary italic leading-relaxed">
+                          {planetData.strength.interpretation}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Additional Planet Data with Progressive Disclosure */}
+                    {Object.keys(planetData).length > 3 && (
+                      <div className="mt-4">
+                        <button
+                          onClick={() => toggleExpansion(`planet-${planetKey}`)}
+                          className="w-full flex items-center justify-between p-3 bg-sacred/50 rounded-lg hover:bg-sacred transition-all duration-300"
+                        >
+                          <span className="text-sm font-medium text-secondary">
+                            Additional {planetName} Details
+                          </span>
+                          <span className={`vedic-symbol text-saffron transition-transform duration-300 ${
+                            expandedItems.has(`planet-${planetKey}`) ? 'rotate-180' : ''
+                          }`}>
+                            ▼
+                          </span>
+                        </button>
+                        {expandedItems.has(`planet-${planetKey}`) && (
+                          <div className="mt-4 animate-fadeIn">
+                            <div className="card-vedic bg-sacred/30">
+                              <ObjectDisplay data={planetData} />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             );
