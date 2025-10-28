@@ -1,5 +1,10 @@
 // Test setup file
 import '@testing-library/jest-dom';
+import { TextEncoder, TextDecoder } from 'util';
+
+// Polyfill TextEncoder/TextDecoder for Node.js environment (required for supertest)
+global.TextEncoder = TextEncoder;
+global.TextDecoder = TextDecoder;
 
 // Global test setup
 global.console = {

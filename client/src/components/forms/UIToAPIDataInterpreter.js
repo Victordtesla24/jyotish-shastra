@@ -103,7 +103,7 @@ class UIToAPIDataInterpreter {
     };
   }
 
-  formatForAPI(data) {
+  formatForAPI(data, endpoint = 'analysis') {
     // Format to match exact curl command structure - NO placeOfBirth field
     const apiData = {
       name: data.name,
@@ -122,7 +122,12 @@ class UIToAPIDataInterpreter {
       }
     });
 
-    return apiData;
+    return {
+      apiRequest: {
+        ...apiData,
+        formatted: true
+      }
+    };
   }
 
   createRequestBody(apiData) {

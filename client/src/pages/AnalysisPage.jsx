@@ -5,7 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import '../styles/vedic-design-system.css';
 
 // Import UI components with Vedic design
-import { VedicLoadingSpinner, ErrorMessage } from '../components/ui';
+import { VedicLoadingSpinner, ErrorMessage, Skeleton } from '../components/ui';
+// Note: Progressive loading with skeleton states implemented for better UX
 
 // Import contexts
 import { useChart } from '../contexts/ChartContext';

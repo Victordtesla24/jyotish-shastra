@@ -1,6 +1,6 @@
-const ChartGenerationService = require('../../src/services/chart/ChartGenerationService.js');
-const MasterAnalysisOrchestrator = require('../../src/services/analysis/MasterAnalysisOrchestrator');
-const sampleBirthData = require('../test-data/sample-birth-data.json');
+import ChartGenerationService from '../../src/services/chart/ChartGenerationService.js';
+import MasterAnalysisOrchestrator from '../../src/services/analysis/MasterAnalysisOrchestrator.js';
+import sampleBirthData from '../test-data/sample-birth-data.json';
 
 describe('System Test: Chart and Analysis Pipeline', () => {
 
@@ -9,10 +9,11 @@ describe('System Test: Chart and Analysis Pipeline', () => {
     return {
       dateOfBirth: testBirthData.dateOfBirth,
       timeOfBirth: testBirthData.timeOfBirth,
-      latitude: testBirthData.placeOfBirth.latitude,
-      longitude: testBirthData.placeOfBirth.longitude,
-      timeZone: testBirthData.placeOfBirth.timezone,
-      placeOfBirth: testBirthData.placeOfBirth.name
+      latitude: testBirthData.latitude,
+      longitude: testBirthData.longitude,
+      timeZone: testBirthData.timezone || testBirthData.timeZone,
+      placeOfBirth: testBirthData.placeOfBirth,
+      gender: testBirthData.gender
     };
   }
 
@@ -21,7 +22,7 @@ describe('System Test: Chart and Analysis Pipeline', () => {
     // In a real test, we would not mock this, but for a pure system-level flow test,
     // we can use the actual service.
     const chartService = new ChartGenerationService();
-    const transformedBirthData = transformBirthData(sampleBirthData.testCases[0].birthData);
+    const transformedBirthData = transformBirthData(sampleBirthData);
     const chart = await chartService.generateRasiChart(transformedBirthData);
     const d9Chart = await chartService.generateNavamsaChart(transformedBirthData);
     const fullChartData = { ...chart, d9: d9Chart, birthData: transformedBirthData };
@@ -57,7 +58,7 @@ describe('System Test: Chart and Analysis Pipeline', () => {
     const chartService = new ChartGenerationService();
 
     // The system should not crash but should throw a specific, handled error.
-    const invalidData = transformBirthData({ ...sampleBirthData.testCases[0].birthData, dateOfBirth: null });
+    const invalidData = transformBirthData({ ...sampleBirthData, dateOfBirth: null });
 
     // We expect the ChartGenerationService to throw an error, which prevents the pipeline from proceeding.
     await expect(async () => {

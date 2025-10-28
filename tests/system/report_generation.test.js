@@ -1,4 +1,4 @@
-const ReportGenerationService = require('../../src/services/report/ComprehensiveReportService.js');
+import ComprehensiveReportService from '../../src/services/report/ComprehensiveReportService.js';
 
 // Mock sample analysis results for testing
 const sampleAnalysisResults = {
@@ -62,7 +62,7 @@ describe('System Test: Report Generation Pipeline', () => {
 
     // Phase 2: Report Generation
     // The report service takes chart data and generates comprehensive analysis
-    const reportService = new ReportGenerationService();
+    const reportService = new ComprehensiveReportService();
     const report = await reportService.generateComprehensiveReport(mockChart);
 
     // Phase 3: Validation
@@ -108,7 +108,7 @@ describe('System Test: Report Generation Pipeline', () => {
       // Missing navamsaChart
     };
 
-    const reportService = new ReportGenerationService();
+    const reportService = new ComprehensiveReportService();
 
     // The service should handle incomplete data gracefully
     await expect(reportService.generateComprehensiveReport(incompleteChart)).resolves.toBeDefined();

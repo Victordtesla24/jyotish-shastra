@@ -3,7 +3,8 @@ module.exports = {
   moduleNameMapper: {
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
     '^react$': '<rootDir>/node_modules/react',
-    '^react-dom$': '<rootDir>/node_modules/react-dom'
+    '^react-dom$': '<rootDir>/node_modules/react-dom',
+    '^mongoose$': '<rootDir>/tests/__mocks__/mongoose.js'
   },
   setupFilesAfterEnv: ['<rootDir>/tests/setup.js'],
   testMatch: [
@@ -22,7 +23,7 @@ module.exports = {
     '^.+\\.(js|jsx)$': 'babel-jest'
   },
   transformIgnorePatterns: [
-    'node_modules/(?!(swisseph|uuid)/)'
+    'node_modules/(?!(swisseph|uuid|bson|mongodb)/)'
   ],
   testTimeout: 10000,
   verbose: true

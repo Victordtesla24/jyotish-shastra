@@ -4,12 +4,12 @@
  * Validates user-friendly error messages and standardized schemas
  */
 
-const request = require('supertest');
-const express = require('express');
+import request from 'supertest';
+import express from 'express';
 
 // Import route handlers
-const comprehensiveAnalysisRoutes = require('../../../src/api/routes/comprehensiveAnalysis');
-const chartRoutes = require('../../../src/api/routes/chart');
+import comprehensiveAnalysisRoutes from '../../../src/api/routes/comprehensiveAnalysis.js';
+import chartRoutes from '../../../src/api/routes/chart.js';
 
 // Test data fixtures
 const validBirthData = {

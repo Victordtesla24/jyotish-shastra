@@ -1,6 +1,23 @@
 {
   "success": true,
   "message": "Comprehensive analysis completed successfully",
+  "analysis": {
+    "sections": {
+      "section1": {"name": "Birth Data Collection", "questions": []},
+      "section2": {"name": "Lagna Analysis", "questions": [], "analyses": {"lagna": {}, "luminaries": {}}},
+      "section3": {"name": "House Analysis", "questions": [], "houses": {}},
+      "section4": {"name": "Planetary Analysis", "questions": [], "aspects": {}},
+      "section5": {"name": "Aspects Analysis", "questions": []},
+      "section6": {"name": "Yogas Analysis", "questions": []},
+      "section7": {"name": "Dasha Analysis", "questions": []},
+      "section8": {"name": "Navamsa Analysis", "questions": []}
+    }
+  },
+  "metadata": {
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "completionPercentage": 100,
+    "status": "completed"
+  },
   "data": {
     "chart": {
       "rasi": {

@@ -19,6 +19,7 @@ describe('UI to API Data Flow Integration', () => {
       timeOfBirth: '12:00',
       latitude: 19.054999,
       longitude: 72.8692035,
+      placeOfBirth: 'Mumbai, India',
       timezone: 'Asia/Kolkata',
       gender: 'male'
     };

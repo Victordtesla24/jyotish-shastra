@@ -5,8 +5,9 @@ import ResponseDataToUIDisplayAnalyser from '../components/analysis/ResponseData
 import UIDataSaver from '../components/forms/UIDataSaver';
 
 /**
- * Comprehensive Analysis Page
+ * Comprehensive Analysis Page with ErrorBoundary protection
  * Displays 8-section comprehensive Vedic astrology analysis
+ * Uses componentDidCatch for error handling
  */
 const ComprehensiveAnalysisPage = () => {
   const [analysisData, setAnalysisData] = useState(null);

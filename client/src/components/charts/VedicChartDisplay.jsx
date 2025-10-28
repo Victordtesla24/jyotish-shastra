@@ -385,13 +385,13 @@ export default function VedicChartDisplay({
       aria-label="Traditional Vedic Birth Chart (North Indian Style)"
     >
       {/* Chart Title with Sanskrit */}
-      <div className="text-center mb-6">
-        <h2 className="text-xl font-bold" style={{ color: '#2F1B14' }}>
-          {chartType === "navamsa" ?
-            "नवांश चक्र (Navamsa Chart) - D9" :
-            "लग्न चक्र (Lagna Chart) - D1"
-          }
-        </h2>
+          <div className="text-center mb-6">
+            <h2 className="text-xl font-bold" style={{ color: '#2F1B14' }}>
+              {chartType === "navamsa" ?
+                "नवांश चक्र (Navamsa Chart) - D9" :
+                "राशि चक्र लग्न चक्र (Lagna Chart) - D1"
+              }
+            </h2>
         {ascendant && (
           <p className="text-sm mt-1" style={{ color: '#5D4037' }}>
             लग्न (Lagna): {ascendant.sign} {ascendant.degrees}°{ascendant.minutes}'
