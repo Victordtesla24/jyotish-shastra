@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Card, VedicLoadingSpinner, ErrorMessage } from '../components/ui';
+import { VedicLoadingSpinner } from '../components/ui';
 import VedicChartDisplay from '../components/charts/VedicChartDisplay';
 import { useChart } from '../contexts/ChartContext';
 import UIDataSaver from '../components/forms/UIDataSaver';

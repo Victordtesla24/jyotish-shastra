@@ -3,7 +3,7 @@
  * Production-ready component with comprehensive validation and error handling
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import geocodingService from '../../services/geocodingService';
 import UIDataSaver from './UIDataSaver';
 import UIToAPIDataInterpreter from './UIToAPIDataInterpreter';
@@ -33,34 +33,8 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
   const [geocoding, setGeocoding] = useState(false);
   const [locationSuggestions, setLocationSuggestions] = useState([]);
 
-  // Load saved session data on mount
-  useEffect(() => {
-    try {
-      const savedSession = dataSaver.loadSession();
-      if (savedSession && savedSession.birthData) {
-        setFormData(prev => ({ ...prev, ...savedSession.birthData }));
-        if (savedSession.coordinates) {
-          setCoordinates(savedSession.coordinates);
-        }
-      }
-    } catch (error) {
-      console.error('Failed to load session data:', error);
-      // Continue without saved data if loading fails
-    }
-  }, []);
-
-  // Debounced geocoding
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (formData.placeOfBirth && formData.placeOfBirth.length > 3) {
-        geocodeLocation(formData.placeOfBirth);
-      }
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, [formData.placeOfBirth]);
-
-  const geocodeLocation = async (location) => {
+  // Geocode location function wrapped in useCallback
+  const geocodeLocation = useCallback(async (location) => {
     setGeocoding(true);
     setLocationSuggestions([]);
 
@@ -100,7 +74,34 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
     } finally {
       setGeocoding(false);
     }
-  };
+  }, [formData, dataSaver]);
+
+  // Load saved session data on mount
+  useEffect(() => {
+    try {
+      const savedSession = dataSaver.loadSession();
+      if (savedSession && savedSession.birthData) {
+        setFormData(prev => ({ ...prev, ...savedSession.birthData }));
+        if (savedSession.coordinates) {
+          setCoordinates(savedSession.coordinates);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load session data:', error);
+      // Continue without saved data if loading fails
+    }
+  }, [dataSaver]);
+
+  // Debounced geocoding
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (formData.placeOfBirth && formData.placeOfBirth.length > 3) {
+        geocodeLocation(formData.placeOfBirth);
+      }
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [formData.placeOfBirth, geocodeLocation]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -211,7 +212,7 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
   return (
     <div className="relative">
       {/* Premium Form Container */}
-      <form onSubmit={handleSubmit} method="post" className="form-vedic space-vedic" role="form">
+      <form onSubmit={handleSubmit} method="post" className="form-vedic space-vedic">
 
         {/* Enhanced Form Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

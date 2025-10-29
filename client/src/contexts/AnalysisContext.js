@@ -96,7 +96,6 @@ function analysisReducer(state, action) {
 
     case AnalysisActionTypes.SET_ACTIVE_SECTION:
       const newVisitedSections = [...new Set([...state.navigationState.visitedSections, action.payload])];
-      const sectionIndex = ANALYSIS_SECTIONS.indexOf(action.payload);
       const progress = Math.round((newVisitedSections.length / ANALYSIS_SECTIONS.length) * 100);
 
       return {

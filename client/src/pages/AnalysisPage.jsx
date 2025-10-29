@@ -1507,10 +1507,25 @@ const PreliminaryDisplay = ({ data }) => {
       </div>
 
       <div className="space-vedic">
+        {/* Handle summary as either string or object */}
         {preliminary.summary && (
           <div className="summary-vedic">
             <h4 className="summary-title">Chart Overview</h4>
-            <p className="summary-text">{preliminary.summary}</p>
+            {typeof preliminary.summary === 'object' ? (
+              <div className="status-grid-premium">
+                {Object.entries(preliminary.summary).map(([key, value]) => (
+                  <div key={key} className="status-item-premium">
+                    <div className="status-label">{key.replace(/([A-Z])/g, ' $1').trim()}</div>
+                    <div className="status-value">
+                      {typeof value === 'boolean' ? (value ? '✅' : '❌') :
+                       typeof value === 'object' ? JSON.stringify(value) : String(value)}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="summary-text">{String(preliminary.summary)}</p>
+            )}
           </div>
         )}
 
@@ -1575,13 +1590,33 @@ const PreliminaryDisplay = ({ data }) => {
         {preliminary.status && typeof preliminary.status === 'object' && (
           <div className="status-section-vedic">
             <h4 className="status-title">📊 Analysis Status</h4>
-            <div className="status-grid">
+            <div className="status-grid-premium">
               {Object.entries(preliminary.status).map(([key, value]) => (
-                <div key={key} className="status-item">
+                <div key={key} className="status-item-premium">
                   <div className="status-label">{key}</div>
                   <div className="status-value">
                     {typeof value === 'boolean' ? (value ? '✅' : '❌') :
-                     typeof value === 'object' ? JSON.stringify(value) : value}
+                     typeof value === 'object' ? JSON.stringify(value) : String(value)}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Fallback: If preliminary is the status object itself, handle it */}
+        {!preliminary.summary && !preliminary.keyPlacements && !preliminary.strengths && 
+         !preliminary.challenges && !preliminary.recommendations && !preliminary.status &&
+         typeof preliminary === 'object' && Object.keys(preliminary).length > 0 && (
+          <div className="status-section-vedic">
+            <h4 className="status-title">📊 Chart Status</h4>
+            <div className="status-grid-premium">
+              {Object.entries(preliminary).map(([key, value]) => (
+                <div key={key} className="status-item-premium">
+                  <div className="status-label">{key.replace(/([A-Z])/g, ' $1').trim()}</div>
+                  <div className="status-value">
+                    {typeof value === 'boolean' ? (value ? '✅' : '❌') :
+                     typeof value === 'object' ? JSON.stringify(value) : String(value)}
                   </div>
                 </div>
               ))}
@@ -2118,7 +2153,7 @@ const AnalysisPage = () => {
       setError(err.message);
       setLoading(false);
     }
-  }, [navigate, setError, setLoading]);
+  }, [setError, setLoading]);
 
   // Fetch all analysis data with loading stages tracking (FIXED: Using data layer)
   const fetchAllAnalysisData = useCallback(async () => {
@@ -2396,7 +2431,7 @@ const AnalysisPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sacred-white via-white to-sacred-cream">
+    <div className="min-h-screen bg-gradient-to-br from-sacred-white via-white to-sacred-cream bg-cosmic-pattern">
       {/* Enhanced Background Pattern */}
       <div className="fixed inset-0 opacity-5 pointer-events-none">
         <div className="absolute inset-0" style={{
@@ -2408,26 +2443,26 @@ const AnalysisPage = () => {
         <div className="container mx-auto px-6 py-12">
           <div className="max-w-7xl mx-auto">
             {/* Enhanced Header Section */}
-            <div className="text-center mb-12">
-              <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-vedic-saffron to-vedic-gold rounded-full mb-6 shadow-lg">
-                <span className="text-3xl vedic-symbol symbol-mandala"></span>
+            <div className="text-center mb-12 float-cosmic">
+              <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-vedic-saffron to-vedic-gold rounded-full mb-6 shadow-lg animate-pulse">
+                <span className="text-3xl vedic-symbol symbol-mandala text-cosmic-glow"></span>
               </div>
-              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-vedic-saffron via-vedic-gold to-vedic-maroon bg-clip-text text-transparent mb-4">
+              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-vedic-saffron via-vedic-gold to-vedic-maroon bg-clip-text text-transparent mb-4 text-cosmic-glow">
                 Comprehensive Vedic Analysis
               </h1>
               <p className="text-lg text-secondary max-w-2xl mx-auto leading-relaxed">
                 Complete astrological analysis with all perspectives - Discover the cosmic influences shaping your destiny
               </p>
               
-              {/* Progress Indicator */}
+              {/* Enhanced Progress Indicator */}
               <div className="mt-8 max-w-md mx-auto">
                 <div className="flex justify-between text-sm text-secondary mb-2">
                   <span>Analysis Progress</span>
                   <span>{Object.keys(analysisData).length} sections loaded</span>
                 </div>
-                <div className="progress-vedic">
+                <div className="progress-vedic-premium">
                   <div 
-                    className="progress-bar-vedic" 
+                    className="progress-bar-vedic-premium" 
                     style={{ width: `${(Object.keys(analysisData).length / Object.keys(analysisEndpoints).length) * 100}%` }}
                   ></div>
                 </div>
@@ -2447,7 +2482,7 @@ const AnalysisPage = () => {
                           event.stopPropagation();
                           handleTabChange(tab.key);
                         }}
-                        className={`tab-vedic-enhanced group ${activeSection === tab.key ? 'active' : ''}`}
+                        className={`tab-vedic-premium group ${activeSection === tab.key ? 'active' : ''}`}
                         data-tab={tab.key}
                         data-analysis-type={tab.key}
                       >
@@ -2466,9 +2501,6 @@ const AnalysisPage = () => {
                             </span>
                           )}
                         </div>
-                        {activeSection === tab.key && (
-                          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-vedic-saffron to-vedic-gold"></div>
-                        )}
                       </button>
                     ))}
                   </div>
@@ -2477,7 +2509,7 @@ const AnalysisPage = () => {
             </div>
 
             {/* Enhanced Tab Content Container */}
-            <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl border border-gold/20 overflow-hidden">
+            <div className="card-cosmic-enhanced">
               <div className="p-8 md:p-12">
                 {renderTabContent()}
               </div>
@@ -2487,23 +2519,23 @@ const AnalysisPage = () => {
             <div className="mt-12 flex flex-col sm:flex-row justify-center gap-6">
               <button
                 onClick={() => navigate('/chart')}
-                className="btn-vedic btn-secondary btn-lg group"
+                className="btn-vedic-premium group"
               >
-                <span className="vedic-symbol symbol-mandala mr-2 group-hover:rotate-12 transition-transform"></span>
+                <span className="vedic-symbol symbol-mandala mr-2 transition-transform"></span>
                 View Birth Chart
               </button>
               <button
                 onClick={() => navigate('/comprehensive-analysis')}
-                className="btn-vedic btn-primary btn-lg group"
+                className="btn-vedic-premium group"
               >
                 <span className="vedic-symbol symbol-chakra mr-2 group-hover:scale-110 transition-transform"></span>
                 Deep Analysis Report
               </button>
               <button
                 onClick={() => fetchAllAnalysisData()}
-                className="btn-vedic btn-outline btn-lg group"
+                className="btn-vedic-premium group"
               >
-                <span className="vedic-symbol mr-2 group-hover:rotate-180 transition-transform">🔄</span>
+                <span className="vedic-symbol mr-2 transition-transform">🔄</span>
                 Refresh Analysis
               </button>
             </div>

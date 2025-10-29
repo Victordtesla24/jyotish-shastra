@@ -997,6 +997,354 @@
 }
 
 /* =============================================
+   ENHANCED ANIMATIONS & TRANSITIONS
+   ============================================= */
+
+/* Cosmic Pulse Animation */
+@keyframes cosmic-pulse {
+  0%, 100% { 
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 153, 51, 0.4);
+  }
+  50% { 
+    transform: scale(1.05);
+    box-shadow: 0 0 0 20px rgba(255, 153, 51, 0);
+  }
+}
+
+/* Stellar Rotation */
+@keyframes stellar-rotation {
+  from { transform: scale(1); }
+  to { transform: scale(1); }
+}
+
+/* Nebula Glow */
+@keyframes nebula-glow {
+  0%, 100% { 
+    filter: brightness(1) drop-shadow(0 0 10px rgba(255, 153, 51, 0.3));
+  }
+  50% { 
+    filter: brightness(1.2) drop-shadow(0 0 20px rgba(255, 153, 51, 0.6));
+  }
+}
+
+/* Constellation Fade */
+@keyframes constellation-fade {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Galaxy Spiral */
+@keyframes galaxy-spiral {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* Enhanced Card Animations */
+.card-cosmic-enhanced {
+  @apply relative overflow-hidden;
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.1) 0%, 
+    rgba(255, 153, 51, 0.05) 50%, 
+    rgba(255, 255, 255, 0.1) 100%);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 153, 51, 0.2);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-cosmic-enhanced:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(255, 153, 51, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  animation: nebula-glow 2s ease-in-out infinite;
+}
+
+.card-cosmic-enhanced::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.2), 
+    transparent);
+  transition: left 0.6s ease;
+}
+
+.card-cosmic-enhanced:hover::before {
+  left: 100%;
+}
+
+/* Enhanced Tab System */
+.tab-vedic-premium {
+  @apply relative px-6 py-4 text-sm font-medium transition-all duration-300;
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.05) 0%, 
+    rgba(255, 153, 51, 0.02) 100%);
+  border: 1px solid rgba(255, 153, 51, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.tab-vedic-premium::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, 
+    rgba(255, 153, 51, 0.1) 0%, 
+    rgba(255, 215, 0, 0.05) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.tab-vedic-premium:hover::before {
+  opacity: 1;
+}
+
+.tab-vedic-premium.active {
+  background: linear-gradient(135deg, 
+    rgba(255, 153, 51, 0.15) 0%, 
+    rgba(255, 215, 0, 0.1) 100%);
+  border-color: rgba(255, 153, 51, 0.3);
+  box-shadow: 
+    0 4px 12px rgba(255, 153, 51, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.tab-vedic-premium.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, 
+    var(--vedic-saffron) 0%, 
+    var(--vedic-gold) 100%);
+  animation: cosmic-pulse 2s ease-in-out infinite;
+}
+
+/* Enhanced Progress Bar */
+.progress-vedic-premium {
+  @apply relative w-full h-3 bg-gray-200 rounded-full overflow-hidden;
+  background: linear-gradient(90deg, 
+    rgba(255, 255, 255, 0.1) 0%, 
+    rgba(255, 153, 51, 0.05) 100%);
+  border: 1px solid rgba(255, 153, 51, 0.2);
+}
+
+.progress-bar-vedic-premium {
+  @apply h-full rounded-full transition-all duration-1000 ease-out;
+  background: linear-gradient(90deg, 
+    var(--vedic-saffron) 0%, 
+    var(--vedic-gold) 50%, 
+    var(--vedic-saffron) 100%);
+  background-size: 200% 100%;
+  animation: galaxy-spiral 3s ease-in-out infinite;
+  box-shadow: 
+    0 0 10px rgba(255, 153, 51, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Enhanced Status Grid */
+.status-grid-premium {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4;
+}
+
+.status-item-premium {
+  @apply p-4 rounded-lg transition-all duration-300;
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.05) 0%, 
+    rgba(255, 153, 51, 0.02) 100%);
+  border: 1px solid rgba(255, 153, 51, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.status-item-premium:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 8px 16px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(255, 153, 51, 0.2);
+  animation: constellation-fade 0.6s ease-out;
+}
+
+.status-item-premium::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, 
+    var(--vedic-saffron) 0%, 
+    var(--vedic-gold) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.status-item-premium:hover::before {
+  opacity: 1;
+}
+
+/* Enhanced Insight Cards */
+.insight-card-premium {
+  @apply relative overflow-hidden;
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.08) 0%, 
+    rgba(255, 153, 51, 0.03) 50%, 
+    rgba(255, 255, 255, 0.08) 100%);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 153, 51, 0.15);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.insight-card-premium:hover {
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: 
+    0 16px 32px rgba(0, 0, 0, 0.12),
+    0 0 0 1px rgba(255, 153, 51, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.insight-card-premium .insight-icon {
+  @apply w-12 h-12 rounded-full flex items-center justify-center text-xl;
+  background: linear-gradient(135deg, 
+    var(--vedic-saffron) 0%, 
+    var(--vedic-gold) 100%);
+  animation: stellar-rotation 8s linear infinite;
+}
+
+/* Enhanced Loading States */
+.loading-cosmic {
+  @apply relative;
+}
+
+.loading-cosmic::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 40px;
+  height: 40px;
+  margin: -20px 0 0 -20px;
+  border: 3px solid rgba(255, 153, 51, 0.2);
+  border-top: 3px solid var(--vedic-saffron);
+  border-radius: 50%;
+  animation: stellar-rotation 1s linear infinite;
+}
+
+/* Enhanced Button Styles */
+.btn-vedic-premium {
+  @apply relative px-8 py-4 text-sm font-semibold rounded-lg transition-all duration-300;
+  background: linear-gradient(135deg, 
+    var(--vedic-saffron) 0%, 
+    var(--vedic-gold) 100%);
+  border: 1px solid rgba(255, 153, 51, 0.3);
+  box-shadow: 
+    0 4px 12px rgba(255, 153, 51, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-vedic-premium:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 8px 20px rgba(255, 153, 51, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  animation: cosmic-pulse 1.5s ease-in-out infinite;
+}
+
+.btn-vedic-premium::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.3), 
+    transparent);
+  transition: left 0.6s ease;
+}
+
+.btn-vedic-premium:hover::before {
+  left: 100%;
+}
+
+/* Enhanced Section Headers */
+.section-header-premium {
+  @apply relative mb-8;
+}
+
+.section-header-premium::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, 
+    var(--vedic-saffron) 0%, 
+    var(--vedic-gold) 100%);
+  border-radius: 2px;
+  animation: cosmic-pulse 2s ease-in-out infinite;
+}
+
+/* Enhanced Floating Elements */
+.float-cosmic {
+  animation: constellation-fade 0.8s ease-out;
+}
+
+.float-cosmic:hover {
+  animation: cosmic-pulse 2s ease-in-out infinite;
+}
+
+/* Enhanced Background Patterns */
+.bg-cosmic-pattern {
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(255, 153, 51, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(255, 153, 51, 0.05) 0%, transparent 50%);
+  background-size: 300px 300px, 200px 200px, 400px 400px;
+  animation: galaxy-spiral 20s linear infinite;
+}
+
+/* Enhanced Text Effects */
+.text-cosmic-glow {
+  text-shadow: 
+    0 0 10px rgba(255, 153, 51, 0.3),
+    0 0 20px rgba(255, 153, 51, 0.2),
+    0 0 30px rgba(255, 153, 51, 0.1);
+  animation: nebula-glow 3s ease-in-out infinite;
+}
+
+/* Enhanced Responsive Design */
+@media (max-width: 768px) {
+  .card-cosmic-enhanced:hover {
+    transform: translateY(-4px) scale(1.01);
+  }
+  
+  .tab-vedic-premium {
+    @apply px-4 py-3 text-xs;
+  }
+  
+  .status-grid-premium {
+    @apply grid-cols-1 gap-3;
+  }
+}
+
+/* =============================================
    DARK MODE SUPPORT
    ============================================= */
 

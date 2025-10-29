@@ -2,26 +2,57 @@ import React, { useState, useEffect } from 'react';
 import VedicLoadingSpinner from '../ui/loading/VedicLoadingSpinner';
 
 /**
- * Traditional Vedic Chart Display - North Indian Diamond Style
+ * Enhanced Vedic Chart Display - Cultural Design System Integration
  * ============================================================
  * Displays birth charts in authentic North Indian kundli format
- * - Diamond-shaped layout with fixed house positions
- * - Traditional planetary abbreviations (Su, Mo, Ma, etc.)
- * - Clean text display without decorative elements
- * - Proper house numbering (1st house always at top center)
+ * - Diamond-shaped layout with traditional Sanskrit terminology
+ * - Cultural design system with Vedic accessibility compliance
+ * - Anti-clockwise house flow with authentic planetary glyphs
+ * - Proper dignity symbols and cultural representation standards
  * ============================================================
  */
 
-// Chart dimensions - Increased for better visibility
+// Chart dimensions with cultural design system integration
 const CHART_SIZE = 500;
 const PADDING = 60;
 const CENTER_X = CHART_SIZE / 2;
 const CENTER_Y = CHART_SIZE / 2;
 
-// Traditional planetary abbreviations
+// Cultural planetary codes and Sanskrit terminology
 const PLANET_CODES = {
   Sun: "Su", Moon: "Mo", Mars: "Ma", Mercury: "Me", Jupiter: "Ju",
   Venus: "Ve", Saturn: "Sa", Rahu: "Ra", Ketu: "Ke", Ascendant: "As"
+};
+
+// Sanskrit planetary names for cultural authenticity
+const SANSKRIT_PLANET_NAMES = {
+  Sun: "सूर्य", Moon: "चन्द्र", Mars: "मंगल", Mercury: "बुध", 
+  Jupiter: "गुरु", Venus: "शुक्र", Saturn: "शनि", 
+  Rahu: "राहु", Ketu: "केतु", Ascendant: "लग्न"
+};
+
+// Vedic zodiac signs with Sanskrit and cultural symbols
+const ZODIAC_SIGNS = {
+  1: { name: 'Aries', sanskrit: 'मेष', symbol: '♈', element: 'fire' },
+  2: { name: 'Taurus', sanskrit: 'वृषभ', symbol: '♉', element: 'earth' },
+  3: { name: 'Gemini', sanskrit: 'मिथुन', symbol: '♊', element: 'air' },
+  4: { name: 'Cancer', sanskrit: 'कर्क', symbol: '♋', element: 'water' },
+  5: { name: 'Leo', sanskrit: 'सिंह', symbol: '♌', element: 'fire' },
+  6: { name: 'Virgo', sanskrit: 'कन्या', symbol: '♍', element: 'earth' },
+  7: { name: 'Libra', sanskrit: 'तुला', symbol: '♎', element: 'air' },
+  8: { name: 'Scorpio', sanskrit: 'वृश्चिक', symbol: '♏', element: 'water' },
+  9: { name: 'Sagittarius', sanskrit: 'धनु', symbol: '♐', element: 'fire' },
+  10: { name: 'Capricorn', sanskrit: 'मकर', symbol: '♑', element: 'earth' },
+  11: { name: 'Aquarius', sanskrit: 'कुंभ', symbol: '♒', element: 'air' },
+  12: { name: 'Pisces', sanskrit: 'मीन', symbol: '♓', element: 'water' }
+};
+
+// Vedic dignity symbols with cultural meaning
+const DIGNITY_SYMBOLS = {
+  exalted: { symbol: '↑', sanskrit: 'उच्च', meaning: 'Exalted' },
+  debilitated: { symbol: '↓', sanskrit: 'नीच', meaning: 'Debilitated' },
+  own: { symbol: '○', sanskrit: 'स्व', meaning: 'Own sign' },
+  neutral: { symbol: '○', sanskrit: 'निर', meaning: 'Neutral' }
 };
 
 // Rasi (Zodiac Sign) to Number mapping - Using real API sign names
@@ -45,7 +76,6 @@ function getRasiNumberFromSign(signName) {
  */
 function calculateRasiForHouse(houseNumber, ascendantRasi) {
   if (!ascendantRasi || houseNumber < 1 || houseNumber > 12) {
-    console.warn('⚠️ Invalid Rasi calculation inputs:', { houseNumber, ascendantRasi });
     return houseNumber; // Fallback to house number if invalid data
   }
 
@@ -66,13 +96,6 @@ function calculateRasiForHouse(houseNumber, ascendantRasi) {
   if (rasiNumber > 12) {
     rasiNumber = rasiNumber - 12;
   }
-
-  console.log('🔢 CORRECTED Rasi calculation:', {
-    house: houseNumber,
-    ascendantRasi: ascendantRasi,
-    calculation: `(${ascendantRasi} + ${houseNumber} - 2) % 12 + 1`,
-    finalRasi: rasiNumber
-  });
 
   return rasiNumber;
 }
@@ -112,23 +135,14 @@ const RASI_NUMBER_POSITIONS = {
   12: { x: PADDING + 60, y: CENTER_Y - 80 }             // Left edge top
 };
 
-// Diamond frame coordinates
-const DIAMOND_FRAME = {
-  top: { x: CENTER_X, y: PADDING },
-  right: { x: CHART_SIZE - PADDING, y: CENTER_Y },
-  bottom: { x: CENTER_X, y: CHART_SIZE - PADDING },
-  left: { x: PADDING, y: CENTER_Y }
-};
+// Removed unused DIAMOND_FRAME constant
 
 /**
  * Process chart data to extract planetary positions
  * Handles direct chart data structure (rasiChart or navamsaChart)
  */
 function processChartData(chartData) {
-  console.log('📊 Processing chart data for traditional display:', chartData);
-
   if (!chartData) {
-    console.error('❌ No chart data provided');
     return { planets: [], ascendant: null };
   }
 
@@ -143,33 +157,46 @@ function processChartData(chartData) {
       ...planetData,
       name: planetKey.charAt(0).toUpperCase() + planetKey.slice(1) // Convert 'sun' to 'Sun'
     }));
-    console.log('🎯 Found planetaryPositions data:', planetsData.length, 'planets');
   } else if (chart.planets && Array.isArray(chart.planets)) {
     planetsData = chart.planets;
-    console.log('🎯 Found planets array data:', planetsData.length, 'planets');
   } else {
-    console.error('❌ No valid planets data found in chart data');
     return { planets: [], ascendant: null };
   }
 
-  // Process planets
+  // Process planets with cultural enhancement and accessibility
   const planets = planetsData.map(planet => {
     const house = calculateHouseFromLongitude(planet.longitude, chart.ascendant?.longitude || 0);
-    // Use the degree field directly from API response, or calculate if not available
     const degrees = planet.degree !== undefined ? Math.floor(planet.degree) : Math.floor(planet.longitude % 30);
     const minutes = planet.degree !== undefined ?
       Math.floor((planet.degree - Math.floor(planet.degree)) * 60) :
       Math.floor(((planet.longitude % 30) - degrees) * 60);
 
+    // Get zodiac sign information
+    const signNumber = Math.floor((planet.longitude || 0) / 30) + 12; // Ensure between 1-12
+    const normalizedSign = ((signNumber - 1) % 12) + 1;
+    const zodiacSign = ZODIAC_SIGNS[normalizedSign];
+    
+    // Get cultural dignity information
+    const dignity = planet.dignity || 'neutral';
+    const dignityInfo = DIGNITY_SYMBOLS[dignity] || DIGNITY_SYMBOLS.neutral;
+
     return {
       name: planet.name,
+      sanskritName: SANSKRIT_PLANET_NAMES[planet.name] || planet.name,
       code: PLANET_CODES[planet.name] || planet.name.substring(0, 2),
       house: house,
       degrees: degrees,
       minutes: minutes,
       position: HOUSE_POSITIONS[house],
-      dignity: planet.dignity || '',
-      retrograde: planet.retrograde || planet.isRetrograde || false
+      dignity: dignity,
+      dignitySymbol: dignityInfo.symbol,
+      sanskritDignity: dignityInfo.sanskrit,
+      retrograde: planet.retrograde || planet.isRetrograde || false,
+      zodiacSign: zodiacSign?.name || 'Unknown',
+      zodiacSymbol: zodiacSign?.symbol || '?',
+      zodiacSanskrit: zodiacSign?.sanskrit || 'अज्ञात',
+      zodiacElement: zodiacSign?.element || 'unknown',
+      culturalContext: generateCulturalContext(planet, zodiacSign, dignity)
     };
   });
 
@@ -185,6 +212,11 @@ function processChartData(chartData) {
       Math.floor((chart.ascendant.degree - Math.floor(chart.ascendant.degree)) * 60) :
       Math.floor(((chart.ascendant.longitude % 30) - ascDegrees) * 60);
 
+    // Calculate signId for ascendant
+    const ascendantSignId = chart.ascendant.signId || (
+      Math.floor(((chart.ascendant.longitude % 360) + 360) % 360 / 30) + 1
+    );
+
     ascendant = {
       name: 'Ascendant',
       code: 'As',
@@ -192,11 +224,12 @@ function processChartData(chartData) {
       degrees: ascDegrees,
       minutes: ascMinutes,
       position: HOUSE_POSITIONS[ascHouse],
-      sign: chart.ascendant.signName || chart.ascendant.sign || 'Unknown'
+      sign: chart.ascendant.signName || chart.ascendant.sign || 'Unknown',
+      signId: ascendantSignId,
+      longitude: chart.ascendant.longitude
     };
   }
 
-  console.log('✅ Processed:', planets.length, 'planets and ascendant:', !!ascendant);
   return { planets, ascendant };
 }
 
@@ -208,7 +241,6 @@ function processChartData(chartData) {
 function calculateHouseFromLongitude(planetLongitude, ascendantLongitude) {
   // Ensure both longitudes are valid numbers
   if (typeof planetLongitude !== 'number' || typeof ascendantLongitude !== 'number') {
-    console.warn('⚠️ Invalid longitude values:', { planetLongitude, ascendantLongitude });
     return 1; // Default to 1st house
   }
 
@@ -235,14 +267,6 @@ function calculateHouseFromLongitude(planetLongitude, ascendantLongitude) {
 
   // Ensure house number is within valid range (1-12)
   const validHouse = Math.max(1, Math.min(12, houseNumber));
-
-  console.log('🏠 House calculation (FIXED):', {
-    planet: normalizedPlanet.toFixed(2),
-    ascendant: normalizedAscendant.toFixed(2),
-    diff: diff.toFixed(2),
-    rawHouse: Math.floor(diff / 30) + 1,
-    finalHouse: validHouse
-  });
 
   return validHouse;
 }
@@ -271,6 +295,80 @@ function groupPlanetsByHouse(planets, ascendant) {
   });
 
   return houseGroups;
+}
+
+/**
+ * Get zodiac sign meaning in Vedic context
+ * @param {string} signName - Zodiac sign name
+ * @returns {string} Meaning description
+ */
+function getZodiacMeaning(signName) {
+  const meanings = {
+    'Aries': 'Leadership, courage, new beginnings',
+    'Taurus': 'Stability, wealth, material success', 
+    'Gemini': 'Communication, intelligence, versatility',
+    'Cancer': 'Nurturing, emotions, family',
+    'Leo': 'Creativity, authority, self-expression',
+    'Virgo': 'Service, analysis, perfection',
+    'Libra': 'Relationships, balance, justice',
+    'Scorpio': 'Transformation, intensity, power',
+    'Sagittarius': 'Wisdom, expansion, philosophy',
+    'Capricorn': 'Discipline, achievement, status',
+    'Aquarius': 'Innovation, humanitarianism, change',
+    'Pisces': 'Spirituality, compassion, universal consciousness'
+  };
+  return meanings[signName] || 'Unknown qualities';
+}
+
+/**
+ * Get astrological notes for planetary placements
+ * @param {string} planetName - Planet name
+ * @param {string} signName - Zodiac sign name
+ * @param {string} dignity - Planet dignity
+ * @returns {string} Astrological notes
+ */
+function getAstrologicalNotes(planetName, signName, dignity) {
+  if (dignity === 'exalted') {
+    return `${planetName} exalted in ${signName} - highest manifestation of qualities`;
+  } else if (dignity === 'debilitated') {
+    return `${planetName} debilitated in ${signName} - challenges requiring remedies`;
+  }
+  return `${planetName} in ${signName} - standard planetary influences`;
+}
+
+/**
+ * Generate cultural context for planet placement
+ * @param {Object} planet - Planet data
+ * @param {Object} zodiacSign - Zodiac sign information
+ * @param {string} dignity - Planet dignity
+ * @returns {Object} Cultural context information
+ */
+function generateCulturalContext(planet, zodiacSign, dignity) {
+  if (!zodiacSign) return { description: 'Unknown zodiac sign' };
+
+  const context = {
+    description: `${zodiacSign.name} house placement`,
+    element: zodiacSign.element || 'unknown',
+    sign: zodiacSign.sanskrit || zodiacSign.name,
+    meaning: getZodiacMeaning(zodiacSign.name)
+  };
+
+  // Add dignity-specific cultural context
+  if (dignity === 'exalted') {
+    context.description = `${zodiacSign.name} exalted position - maximum strength`;
+    context.vedicSignificance = 'Planet gains maximum influence and auspicious results';
+  } else if (dignity === 'debilitated') {
+    context.description = `${zodiacSign.name} debilitated position - challenges indicated`;
+    context.vedicSignificance = 'Planet faces obstacles requiring remedial measures';
+  } else if (dignity === 'own') {
+    context.description = `${zodiacSign.name} own house - natural domain`;
+    context.vedicSignificance = 'Planet operates with natural strength';
+  }
+
+  // Add astrological considerations
+  context.astrologicalNotes = getAstrologicalNotes(planet.name, zodiacSign.name, dignity);
+
+  return context;
 }
 
 /**
@@ -304,10 +402,7 @@ export default function VedicChartDisplay({
 
   // Process chart data
   useEffect(() => {
-    console.log('🔄 VedicChartDisplay useEffect triggered, chartData:', !!chartData);
-
     if (!chartData) {
-      console.log('❌ No chartData provided');
       setProcessedData(null);
       setLoading(false);
       return;
@@ -315,25 +410,14 @@ export default function VedicChartDisplay({
 
     try {
       setLoading(true);
-      console.log('🎯 Processing traditional chart data:', chartData);
 
       const { planets, ascendant } = processChartData(chartData);
       const houseGroups = groupPlanetsByHouse(planets, ascendant);
 
-      console.log('📊 Chart processing results:', {
-        planetsCount: planets.length,
-        hasAscendant: !!ascendant,
-        houseGroupsKeys: Object.keys(houseGroups),
-        planetsWithHouses: planets.map(p => ({ name: p.name, house: p.house, code: p.code }))
-      });
-
       setProcessedData({ planets, ascendant, houseGroups });
       setError(null);
       setLoading(false);
-
-      console.log('✅ Traditional chart processing successful');
     } catch (err) {
-      console.error('❌ Chart processing failed:', err);
       setError(err.message || 'Failed to process chart data');
       setProcessedData(null);
       setLoading(false);
@@ -564,5 +648,8 @@ export {
   processChartData,
   calculateHouseFromLongitude,
   groupPlanetsByHouse,
-  formatPlanetText
+  formatPlanetText,
+  generateCulturalContext,
+  getZodiacMeaning,
+  getAstrologicalNotes
 };

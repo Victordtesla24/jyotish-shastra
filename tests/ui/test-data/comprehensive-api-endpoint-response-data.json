@@ -1,0 +1,663 @@
+{
+  "success": true,
+  "data": {
+    "chartId": "174bcf70-7e15-47aa-a529-254fcc0c3d34",
+    "rasiChart": {
+      "ascendant": {
+        "longitude": 178.35442812724557,
+        "sign": 6,
+        "signName": "Virgo",
+        "degree": 28.35442812724557,
+        "house": 1,
+        "ayanamsa": 23.828614515703464
+      },
+      "planets": [
+        {
+          "name": "Sun",
+          "longitude": 242.1368647292095,
+          "sign": 9,
+          "signName": "Sagittarius",
+          "degree": 2.136864729209492,
+          "house": 9,
+          "nakshatra": {
+            "number": 19,
+            "name": "Mula",
+            "pada": 1,
+            "degree": 2.136870729209498
+          },
+          "speed": -0.0002138174769602819,
+          "retrograde": true
+        },
+        {
+          "name": "Moon",
+          "longitude": 107.77652854016628,
+          "sign": 4,
+          "signName": "Cancer",
+          "degree": 17.776528540166282,
+          "house": 4,
+          "nakshatra": {
+            "number": 9,
+            "name": "Ashlesha",
+            "pada": 1,
+            "degree": 1.109864540166285
+          },
+          "speed": -2.6852218268970445,
+          "retrograde": true
+        },
+        {
+          "name": "Mars",
+          "longitude": 275.8584460269758,
+          "sign": 10,
+          "signName": "Capricorn",
+          "degree": 5.858446026975798,
+          "house": 10,
+          "nakshatra": {
+            "number": 21,
+            "name": "Uttara Ashadha",
+            "pada": 3,
+            "degree": 9.191786026975805
+          },
+          "speed": -1.2230355548666891,
+          "retrograde": true
+        },
+        {
+          "name": "Mercury",
+          "longitude": 240.824913941977,
+          "sign": 9,
+          "signName": "Sagittarius",
+          "degree": 0.8249139419770017,
+          "house": 9,
+          "nakshatra": {
+            "number": 19,
+            "name": "Mula",
+            "pada": 1,
+            "degree": 0.8249199419770079
+          },
+          "speed": 2.0786470503664676,
+          "retrograde": false
+        },
+        {
+          "name": "Jupiter",
+          "longitude": 295.62074346739564,
+          "sign": 10,
+          "signName": "Capricorn",
+          "degree": 25.62074346739564,
+          "house": 10,
+          "nakshatra": {
+            "number": 23,
+            "name": "Dhanishtha",
+            "pada": 1,
+            "degree": 2.287417467395649
+          },
+          "speed": -0.8791668853681874,
+          "retrograde": true
+        },
+        {
+          "name": "Venus",
+          "longitude": 278.55391617612963,
+          "sign": 10,
+          "signName": "Capricorn",
+          "degree": 8.553916176129633,
+          "house": 10,
+          "nakshatra": {
+            "number": 21,
+            "name": "Uttara Ashadha",
+            "pada": 4,
+            "degree": 11.88725617612964
+          },
+          "speed": -0.968128556783794,
+          "retrograde": true
+        },
+        {
+          "name": "Saturn",
+          "longitude": 349.70752812516895,
+          "sign": 12,
+          "signName": "Pisces",
+          "degree": 19.70752812516895,
+          "house": 12,
+          "nakshatra": {
+            "number": 27,
+            "name": "Revati",
+            "pada": 1,
+            "degree": 3.040870125168958
+          },
+          "speed": -2.5729947775147735,
+          "retrograde": true
+        },
+        {
+          "name": "Rahu",
+          "longitude": 140.64529040388658,
+          "sign": 5,
+          "signName": "Leo",
+          "degree": 20.645290403886577,
+          "house": 5,
+          "nakshatra": {
+            "number": 11,
+            "name": "Purva Phalguni",
+            "pada": 3,
+            "degree": 7.31196040388658
+          },
+          "speed": 0,
+          "retrograde": false
+        },
+        {
+          "name": "Ketu",
+          "longitude": 320.6452904038865,
+          "sign": 11,
+          "signName": "Aquarius",
+          "degree": 20.64529040388652,
+          "house": 11,
+          "nakshatra": {
+            "number": 25,
+            "name": "Purva Bhadrapada",
+            "pada": 1,
+            "degree": 0.6452984038865281
+          },
+          "speed": 0,
+          "retrograde": false
+        }
+      ],
+      "houses": [
+        {
+          "house": 1,
+          "sign": 6,
+          "signName": "Virgo",
+          "cuspLongitude": 178.35442812724557,
+          "degree": 28.35442812724557,
+          "ayanamsa": 23.828614515703464
+        },
+        {
+          "house": 2,
+          "sign": 7,
+          "signName": "Libra",
+          "cuspLongitude": 206.7591421133293,
+          "degree": 26.75914211332929,
+          "ayanamsa": 23.828614515703464
+        },
+        {
+          "house": 3,
+          "sign": 8,
+          "signName": "Scorpio",
+          "cuspLongitude": 237.71065499549923,
+          "degree": 27.710654995499226,
+          "ayanamsa": 23.828614515703464
+        },
+        {
+          "house": 4,
+          "sign": 10,
+          "signName": "Capricorn",
+          "cuspLongitude": 270.3391486499909,
+          "degree": 0.33914864999087513,
+          "ayanamsa": 23.828614515703464
+        },
+        {
+          "house": 5,
+          "sign": 11,
+          "signName": "Aquarius",
+          "cuspLongitude": 302.7472341719115,
+          "degree": 2.7472341719114866,
+          "ayanamsa": 23.828614515703464
+        },
+        {
+          "house": 6,
+          "sign": 12,
+          "signName": "Pisces",
+          "cuspLongitude": 332.54781713433647,
+          "degree": 2.5478171343364693,
+          "ayanamsa": 23.828614515703464
+        },
+        {
+          "house": 7,
+          "sign": 12,
+          "signName": "Pisces",
+          "cuspLongitude": 358.35442812724557,
+          "degree": 28.35442812724557,
+          "ayanamsa": 23.828614515703464
+        },
+        {
+          "house": 8,
+          "sign": 1,
+          "signName": "Aries",
+          "cuspLongitude": 26.759142113329347,
+          "degree": 26.759142113329347,
+          "ayanamsa": 23.828614515703464
+        },
+        {
+          "house": 9,
+          "sign": 2,
+          "signName": "Taurus",
+          "cuspLongitude": 57.71065499549917,
+          "degree": 27.71065499549917,
+          "ayanamsa": 23.828614515703464
+        },
+        {
+          "house": 10,
+          "sign": 4,
+          "signName": "Cancer",
+          "cuspLongitude": 90.33914864999082,
+          "degree": 0.3391486499908183,
+          "ayanamsa": 23.828614515703464
+        },
+        {
+          "house": 11,
+          "sign": 5,
+          "signName": "Leo",
+          "cuspLongitude": 122.74723417191149,
+          "degree": 2.7472341719114866,
+          "ayanamsa": 23.828614515703464
+        },
+        {
+          "house": 12,
+          "sign": 6,
+          "signName": "Virgo",
+          "cuspLongitude": 152.54781713433647,
+          "degree": 2.5478171343364693,
+          "ayanamsa": 23.828614515703464
+        }
+      ],
+      "aspects": {
+        "sun-mercury": {
+          "type": "conjunction",
+          "degree": 1.3119507872324903
+        },
+        "sun-jupiter": {
+          "type": "sextile",
+          "degree": 53.48387873818615
+        },
+        "moon-jupiter": {
+          "type": "opposition",
+          "degree": 172.15578507277064
+        },
+        "moon-saturn": {
+          "type": "trine",
+          "degree": 118.06900041499733
+        },
+        "mars-venus": {
+          "type": "conjunction",
+          "degree": 2.6954701491538344
+        },
+        "mercury-jupiter": {
+          "type": "sextile",
+          "degree": 54.79582952541864
+        },
+        "jupiter-saturn": {
+          "type": "sextile",
+          "degree": 54.08678465777331
+        },
+        "rahu-ketu": {
+          "type": "opposition",
+          "degree": 179.99999999999994
+        }
+      }
+    },
+    "navamsaChart": {
+      "ascendant": {
+        "longitude": 0,
+        "sign": 1,
+        "signName": "Aries",
+        "degree": 0,
+        "house": 1
+      },
+      "planets": [
+        {
+          "name": "Sun",
+          "longitude": 19.2317825628852,
+          "sign": 1,
+          "signName": "Aries",
+          "degree": 19.2317825628852,
+          "house": 9,
+          "nakshatra": {
+            "number": 19,
+            "name": "Mula",
+            "pada": 1,
+            "degree": 2.136870729209498
+          },
+          "speed": -0.0002138174769602819,
+          "retrograde": true,
+          "isVargottama": false
+        },
+        {
+          "name": "Moon",
+          "longitude": 249.98875686149654,
+          "sign": 9,
+          "signName": "Sagittarius",
+          "degree": 9.98875686149654,
+          "house": 4,
+          "nakshatra": {
+            "number": 9,
+            "name": "Ashlesha",
+            "pada": 1,
+            "degree": 1.109864540166285
+          },
+          "speed": -2.6852218268970445,
+          "retrograde": true,
+          "isVargottama": false
+        },
+        {
+          "name": "Mars",
+          "longitude": 322.7260142427822,
+          "sign": 11,
+          "signName": "Aquarius",
+          "degree": 22.726014242782185,
+          "house": 10,
+          "nakshatra": {
+            "number": 21,
+            "name": "Uttara Ashadha",
+            "pada": 3,
+            "degree": 9.191786026975805
+          },
+          "speed": -1.2230355548666891,
+          "retrograde": true,
+          "isVargottama": false
+        },
+        {
+          "name": "Mercury",
+          "longitude": 7.424225477792788,
+          "sign": 1,
+          "signName": "Aries",
+          "degree": 7.424225477792788,
+          "house": 9,
+          "nakshatra": {
+            "number": 19,
+            "name": "Mula",
+            "pada": 1,
+            "degree": 0.8249199419770079
+          },
+          "speed": 2.0786470503664676,
+          "retrograde": false,
+          "isVargottama": false
+        },
+        {
+          "name": "Jupiter",
+          "longitude": 140.58669120656077,
+          "sign": 5,
+          "signName": "Leo",
+          "degree": 20.586691206560772,
+          "house": 10,
+          "nakshatra": {
+            "number": 23,
+            "name": "Dhanishtha",
+            "pada": 1,
+            "degree": 2.287417467395649
+          },
+          "speed": -0.8791668853681874,
+          "retrograde": true,
+          "isVargottama": false
+        },
+        {
+          "name": "Venus",
+          "longitude": 346.9852455851669,
+          "sign": 12,
+          "signName": "Pisces",
+          "degree": 16.985245585166922,
+          "house": 10,
+          "nakshatra": {
+            "number": 21,
+            "name": "Uttara Ashadha",
+            "pada": 4,
+            "degree": 11.88725617612964
+          },
+          "speed": -0.968128556783794,
+          "retrograde": true,
+          "isVargottama": false
+        },
+        {
+          "name": "Saturn",
+          "longitude": 267.3677531265207,
+          "sign": 9,
+          "signName": "Sagittarius",
+          "degree": 27.36775312652071,
+          "house": 12,
+          "nakshatra": {
+            "number": 27,
+            "name": "Revati",
+            "pada": 1,
+            "degree": 3.040870125168958
+          },
+          "speed": -2.5729947775147735,
+          "retrograde": true,
+          "isVargottama": false
+        },
+        {
+          "name": "Rahu",
+          "longitude": 185.80761363497913,
+          "sign": 7,
+          "signName": "Libra",
+          "degree": 5.807613634979134,
+          "house": 5,
+          "nakshatra": {
+            "number": 11,
+            "name": "Purva Phalguni",
+            "pada": 3,
+            "degree": 7.31196040388658
+          },
+          "speed": 0,
+          "retrograde": false,
+          "isVargottama": false
+        },
+        {
+          "name": "Ketu",
+          "longitude": 5.807613634978679,
+          "sign": 1,
+          "signName": "Aries",
+          "degree": 5.807613634978679,
+          "house": 11,
+          "nakshatra": {
+            "number": 25,
+            "name": "Purva Bhadrapada",
+            "pada": 1,
+            "degree": 0.6452984038865281
+          },
+          "speed": 0,
+          "retrograde": false,
+          "isVargottama": false
+        }
+      ],
+      "type": "Navamsa (D9)"
+    },
+    "analysis": {
+      "personality": {
+        "summary": "Personality analysis based on ascendant and planetary positions",
+        "traits": [
+          "Analytical",
+          "Intuitive",
+          "Practical"
+        ],
+        "strengths": [
+          "Strong willpower",
+          "Good communication"
+        ],
+        "challenges": [
+          "Tendency to worry",
+          "Need for security"
+        ]
+      },
+      "health": {
+        "summary": "Health analysis based on 6th house and health-related planets",
+        "generalHealth": "Good overall health with attention to specific areas",
+        "areas": [
+          "Digestive system",
+          "Respiratory health"
+        ],
+        "recommendations": [
+          "Regular exercise",
+          "Balanced diet"
+        ]
+      },
+      "career": {
+        "summary": "Career analysis based on 10th house and career-related planets",
+        "suitableFields": [
+          "Technology",
+          "Education",
+          "Healthcare"
+        ],
+        "strengths": [
+          "Leadership qualities",
+          "Analytical skills"
+        ],
+        "recommendations": [
+          "Focus on skill development",
+          "Network building"
+        ]
+      },
+      "relationships": {
+        "summary": "Relationship analysis based on 7th house and Venus",
+        "compatibility": "Good compatibility with earth and water signs",
+        "traits": [
+          "Loyal",
+          "Caring",
+          "Supportive"
+        ],
+        "recommendations": [
+          "Open communication",
+          "Mutual respect"
+        ]
+      },
+      "finances": {
+        "summary": "Financial analysis based on 2nd and 11th houses",
+        "earningPotential": "Good earning potential through hard work",
+        "investment": [
+          "Real estate",
+          "Stocks",
+          "Business"
+        ],
+        "recommendations": [
+          "Save regularly",
+          "Diversify investments"
+        ]
+      },
+      "spirituality": {
+        "summary": "Spiritual analysis based on 9th and 12th houses",
+        "spiritualPath": "Practical spirituality with service orientation",
+        "practices": [
+          "Meditation",
+          "Service to others",
+          "Study of scriptures"
+        ],
+        "recommendations": [
+          "Regular spiritual practice",
+          "Community service"
+        ]
+      }
+    },
+    "dashaInfo": {
+      "currentDasha": "Venus",
+      "currentAntardasha": "Sun",
+      "nakshatra": {
+        "number": 9,
+        "name": "Ashlesha",
+        "pada": 1,
+        "degree": 1.109864540166285
+      },
+      "nakshatraLord": "Mercury",
+      "ageInYears": 27.85970291567001,
+      "dashaSequence": [
+        {
+          "planet": "Mercury",
+          "startAge": 0,
+          "endAge": 17,
+          "period": 17,
+          "isCurrent": false,
+          "remainingYears": null
+        },
+        {
+          "planet": "Ketu",
+          "startAge": 17,
+          "endAge": 24,
+          "period": 7,
+          "isCurrent": false,
+          "remainingYears": null
+        },
+        {
+          "planet": "Venus",
+          "startAge": 24,
+          "endAge": 44,
+          "period": 20,
+          "isCurrent": true,
+          "remainingYears": 16.14029708432999
+        },
+        {
+          "planet": "Sun",
+          "startAge": 44,
+          "endAge": 50,
+          "period": 6,
+          "isCurrent": false,
+          "remainingYears": null
+        },
+        {
+          "planet": "Moon",
+          "startAge": 50,
+          "endAge": 60,
+          "period": 10,
+          "isCurrent": false,
+          "remainingYears": null
+        },
+        {
+          "planet": "Mars",
+          "startAge": 60,
+          "endAge": 67,
+          "period": 7,
+          "isCurrent": false,
+          "remainingYears": null
+        },
+        {
+          "planet": "Rahu",
+          "startAge": 67,
+          "endAge": 85,
+          "period": 18,
+          "isCurrent": false,
+          "remainingYears": null
+        },
+        {
+          "planet": "Jupiter",
+          "startAge": 85,
+          "endAge": 101,
+          "period": 16,
+          "isCurrent": false,
+          "remainingYears": null
+        },
+        {
+          "planet": "Saturn",
+          "startAge": 101,
+          "endAge": 120,
+          "period": 19,
+          "isCurrent": false,
+          "remainingYears": null
+        }
+      ],
+      "dashaPeriods": {
+        "Sun": 6,
+        "Moon": 10,
+        "Mars": 7,
+        "Rahu": 18,
+        "Jupiter": 16,
+        "Saturn": 19,
+        "Mercury": 17,
+        "Ketu": 7,
+        "Venus": 20
+      }
+    },
+    "metadata": {
+      "generatedAt": "2025-10-27T08:49:59.490Z",
+      "birthData": {
+        "name": "Farhan",
+        "dateOfBirth": "1997-12-18",
+        "timeOfBirth": "02:30",
+        "placeOfBirth": {
+          "name": "Sialkot, Pakistan",
+          "latitude": 32.4935378,
+          "longitude": 74.5411575,
+          "timezone": "Asia/Kolkata",
+          "city": "سیالکوٹ",
+          "country": "پاکستان"
+        },
+        "latitude": 32.4935378,
+        "longitude": 74.5411575,
+        "timezone": "Asia/Kolkata"
+      },
+      "calculationMethod": "Swiss Ephemeris",
+      "ayanamsa": "Lahiri",
+      "houseSystem": "Placidus"
+    }
+  }
+}

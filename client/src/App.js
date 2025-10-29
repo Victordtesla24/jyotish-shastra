@@ -7,7 +7,7 @@ import { AnalysisProvider } from './contexts/AnalysisContext';
 import usePWA from './hooks/usePWA';
 import Header from './components/Header';
 import Footer from './components/Footer';
-import { VedicLoadingSpinner, Button } from './components/ui';
+import { Button } from './components/ui';
 import { initializeErrorHandling } from './utils/apiErrorHandler';
 import './styles/vedic-design-system.css';
 
@@ -116,20 +116,7 @@ const OfflineBanner = () => {
   );
 };
 
-// Enhanced Loading Component
-const AppLoadingFallback = () => (
-  <div className="min-h-screen bg-gradient-to-br from-sacred-white to-gray-50 dark:from-dark-bg-primary dark:to-dark-bg-secondary flex items-center justify-center">
-    <div className="text-center">
-      <VedicLoadingSpinner size="large" className="mx-auto mb-4" />
-      <h2 className="font-accent text-xl text-earth-brown dark:text-dark-text-primary mb-2">
-        Loading Cosmic Wisdom...
-      </h2>
-      <p className="text-wisdom-gray dark:text-dark-text-secondary">
-        Preparing your Vedic astrology experience
-      </p>
-    </div>
-  </div>
-);
+// Removed unused AppLoadingFallback component
 
 // Error Boundary Component
 class ErrorBoundary extends React.Component {

@@ -1,7 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import ThemeToggle from './ui/ThemeToggle';
-import { Button } from './ui';
 
 const Header = () => {
   const navigate = useNavigate();

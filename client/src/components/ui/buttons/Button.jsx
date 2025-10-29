@@ -12,7 +12,6 @@ const Button = ({ children, onClick, disabled = false, loading = false, type = '
       onClick={onClick}
       disabled={isDisabled}
       className={`bg-saffron text-white px-6 py-3 rounded hover:bg-saffron/90 disabled:opacity-50 ${className}`}
-      role="button"
       tabIndex={isDisabled ? -1 : 0}
       aria-disabled={isDisabled}
       aria-busy={loading}

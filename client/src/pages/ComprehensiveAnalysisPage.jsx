@@ -104,10 +104,17 @@ const ComprehensiveAnalysisPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-sacred-white via-white to-sacred-cream bg-cosmic-pattern flex items-center justify-center p-4">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading comprehensive analysis...</p>
+          <div className="spinner-mandala mb-6"></div>
+          <h2 className="text-2xl font-bold text-primary mb-3 animate-pulse">
+            Unveiling Cosmic Insights
+          </h2>
+          <p className="text-secondary text-lg">Loading comprehensive analysis...</p>
+          <div className="mt-6 flex items-center justify-center gap-2">
+            <span className="vedic-symbol text-saffron animate-float">🕉️</span>
+            <span className="text-muted">Calculating celestial positions</span>
+          </div>
         </div>
       </div>
     );
@@ -115,42 +122,65 @@ const ComprehensiveAnalysisPage = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto p-6">
-          <div className="text-red-600 text-6xl mb-4">⚠️</div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Analysis Error</h2>
-          <p className="text-gray-600 mb-4">{error}</p>
-          <button
-            onClick={() => fetchComprehensiveAnalysis()}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mr-2"
-          >
-            Try Again
-          </button>
-          <button
-            onClick={() => navigate('/')}
-            className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700"
-          >
-            Back to Home
-          </button>
+      <div className="min-h-screen bg-gradient-to-br from-sacred-white via-white to-sacred-cream bg-cosmic-pattern flex items-center justify-center p-4">
+        <div className="card-cosmic-enhanced max-w-md w-full text-center p-8">
+          <div className="text-6xl mb-6 animate-bounce">⚠️</div>
+          <h2 className="text-2xl font-bold text-primary mb-4">Cosmic Disturbance</h2>
+          <p className="text-secondary mb-6 leading-relaxed">{error}</p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button
+              onClick={() => fetchComprehensiveAnalysis()}
+              className="btn-vedic btn-primary"
+            >
+              <span className="flex items-center justify-center gap-2">
+                <span>🔄</span>
+                <span>Try Again</span>
+              </span>
+            </button>
+            <button
+              onClick={() => navigate('/')}
+              className="btn-vedic btn-secondary"
+            >
+              <span className="flex items-center justify-center gap-2">
+                <span>🏠</span>
+                <span>Back to Home</span>
+              </span>
+            </button>
           </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto py-6">
-        <div className="bg-white rounded-lg shadow-lg">
-          <div className="p-6 border-b">
-            <h1 className="text-3xl font-bold text-gray-900">
-              Comprehensive Vedic Analysis
-            </h1>
-            <p className="text-gray-600 mt-2">
-              Complete 8-section astrology analysis with detailed insights
-            </p>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-sacred-white via-white to-sacred-cream bg-cosmic-pattern">
+      <div className="fixed inset-0 opacity-5 pointer-events-none">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23FF9933' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+        }}></div>
+      </div>
 
-          <ComprehensiveAnalysisDisplay analysisData={analysisData} />
+      <div className="relative z-10">
+        <div className="container mx-auto px-6 py-12">
+          <div className="max-w-7xl mx-auto">
+            {/* Enhanced Header Section */}
+            <div className="text-center mb-12 float-cosmic">
+              <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-vedic-saffron to-vedic-gold rounded-full mb-6 shadow-lg animate-pulse">
+                <span className="text-3xl vedic-symbol symbol-mandala text-cosmic-glow"></span>
+              </div>
+              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-vedic-saffron via-vedic-gold to-vedic-maroon bg-clip-text text-transparent mb-4 text-cosmic-glow">
+                Comprehensive Vedic Analysis
+              </h1>
+              <p className="text-lg text-secondary max-w-2xl mx-auto leading-relaxed">
+                Complete 8-section astrology analysis with detailed insights
+              </p>
+            </div>
+
+            {/* Enhanced Content Container */}
+            <div className="card-cosmic-enhanced">
+              <ComprehensiveAnalysisDisplay analysisData={analysisData} />
+            </div>
+          </div>
         </div>
       </div>
     </div>

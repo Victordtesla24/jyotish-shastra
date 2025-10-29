@@ -46,10 +46,12 @@ describe('Rasi Calculation Unit Tests', () => {
 
   test('should calculate correct rasi sequence for Libra ascendant from test data', () => {
     // Extract ascendant data from test response
-    const ascendantSign = testData.data.rasiChart.ascendant.sign; // "Libra"
-    const ascendantSignId = testData.data.rasiChart.ascendant.signId; // 7
+    const ascendantData = testData.data.rasiChart.ascendant;
+    const ascendantSign = ascendantData.signName; // "Libra"
+    const ascendantSignId = ascendantData.sign; // 7
 
     console.log('🎯 Testing with test data ascendant:', { ascendantSign, ascendantSignId });
+    console.log('🔍 Ascendant data structure:', ascendantData);
 
     // Expected anti-clockwise rasi sequence for Libra ascendant
     const expectedRasiSequence = {

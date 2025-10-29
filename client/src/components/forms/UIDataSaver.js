@@ -494,7 +494,7 @@ class UIDataSaver {
       const birthDataKeys = allKeys.filter(key =>
         key.includes('birthData') ||
         key.includes('birth_data') ||
-        key.includes('jyotish') && key.includes('form')
+        (key.includes('jyotish') && key.includes('form'))
       );
 
       for (const key of birthDataKeys) {

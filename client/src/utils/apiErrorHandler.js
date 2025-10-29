@@ -79,8 +79,10 @@ export const formatErrorMessage = (error) => {
   return error.message || 'An unexpected error occurred';
 };
 
-export default {
+const apiErrorHandler = {
   initializeErrorHandling,
   handleError,
-  formatErrorMessage,
+  formatErrorMessage
 };
+
+export default apiErrorHandler;
