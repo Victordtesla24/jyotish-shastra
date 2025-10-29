@@ -319,11 +319,23 @@ class HouseLayoutManager {
    * Parse rectangular position string
    */
   parseRectangularPosition(position) {
-    const match = position.match(/row-(\d+)-col-(\d+)/);
-    if (match) {
-      return [parseInt(match[1]), parseInt(match[2])];
+    if (!position || typeof position !== 'string') {
+      throw new Error('Invalid position format. Expected string like "row-1-col-1"');
     }
-    return [1, 1]; // Default fallback
+    
+    const match = position.match(/row-(\d+)-col-(\d+)/);
+    if (!match) {
+      throw new Error(`Invalid position format: "${position}". Expected format: "row-X-col-Y" where X and Y are numbers.`);
+    }
+    
+    const row = parseInt(match[1], 10);
+    const col = parseInt(match[2], 10);
+    
+    if (isNaN(row) || isNaN(col)) {
+      throw new Error(`Invalid position values. Row: ${match[1]}, Col: ${match[2]}. Expected numeric values.`);
+    }
+    
+    return [row, col];
   }
 
   /**

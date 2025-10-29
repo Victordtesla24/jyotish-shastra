@@ -94,49 +94,14 @@ router.post('/comprehensive', async (req, res) => {
             });
         }
 
-        // Handle chartId case
+        // PRODUCTION: chartId-based analysis requires proper database/cache implementation
+        // Temporary storage removed - provide birth data directly for analysis
         if (validationResult.data.chartId) {
-            // CRITICAL FIX: Generate analysisId for E2E workflow
-            const analysisId = crypto.randomUUID();
-
-            // Retrieve chart data from temporary storage or process with stored chartId
-            const chartData = global.tempChartStorage?.get(validationResult.data.chartId);
-
-            // Perform comprehensive analysis on the existing chart
-            let analysis;
-            if (chartData) {
-                // Use stored chart data
-                analysis = await orchestrator.performComprehensiveAnalysis(chartData.birthData, {
-                    includeNavamsa: true,
-                    includeYogas: true,
-                    includeDashas: true
-                });
-            } else {
-                // If no valid chart data, return error - never use mock data
-                return res.status(400).json({
-                    success: false,
-                    error: 'Invalid chart data',
-                    message: 'Unable to perform analysis without valid chart data'
-                });
-            }
-
-            // Store analysis for later retrieval
-            global.tempAnalysisStorage = global.tempAnalysisStorage || new Map();
-            global.tempAnalysisStorage.set(analysisId, {
-                chartId: validationResult.data.chartId,
-                analysis: analysis,
-                status: 'completed',
-                timestamp: new Date().toISOString()
-            });
-
-            return res.status(200).json({
-                success: true,
-                data: {
-                    analysisId: analysisId,
-                    chartId: validationResult.data.chartId,
-                    status: 'completed',
-                    message: 'Comprehensive analysis completed using existing chart'
-                }
+            return res.status(400).json({
+                success: false,
+                error: 'Chart ID lookup not implemented',
+                message: 'Please provide complete birth data for analysis. Chart ID-based analysis requires database integration.',
+                code: 'CHART_ID_NOT_SUPPORTED'
             });
         }
 
@@ -306,42 +271,11 @@ router.post('/houses', async (req, res) => {
         const charts = await orchestrator.generateCharts(finalBirthData);
         const analysis = await orchestrator.executeSection3Analysis(charts, {});
 
-        // Check if houses analysis is empty and provide basic analysis
-        let housesResult = analysis.sections?.section3?.houses || {};
+        // PRODUCTION: No fallback analysis - throw error if analysis fails
+        const housesResult = analysis.sections?.section3?.houses;
 
         if (!housesResult || Object.keys(housesResult).length === 0) {
-            // Provide basic houses analysis
-            housesResult = {};
-            for (let i = 1; i <= 12; i++) {
-                const houseSignificances = {
-                    1: 'self, personality, health, and overall vitality',
-                    2: 'wealth, family, speech, and values',
-                    3: 'siblings, courage, communication, and short journeys',
-                    4: 'mother, home, happiness, and property',
-                    5: 'creativity, children, education, and intelligence',
-                    6: 'enemies, diseases, debts, and service',
-                    7: 'spouse, partnerships, and business relationships',
-                    8: 'longevity, transformation, and occult sciences',
-                    9: 'fortune, father, dharma, and higher learning',
-                    10: 'career, reputation, authority, and status',
-                    11: 'gains, income, elder siblings, and social circle',
-                    12: 'expenses, losses, spirituality, and foreign lands'
-                };
-
-                housesResult[`house${i}`] = {
-                    houseNumber: i,
-                    analysis: {
-                        summary: `The ${i === 1 ? '1st' : i === 2 ? '2nd' : i === 3 ? '3rd' : `${i}th`} house represents ${houseSignificances[i]}`,
-                        significance: houseSignificances[i],
-                        recommendations: [`Focus on ${houseSignificances[i]} for best results`]
-                    },
-                    lord: {
-                        analysis: 'House lord analysis available in comprehensive report'
-                    },
-                    occupants: [],
-                    strength: 'Medium'
-                };
-            }
+            throw new Error('Houses analysis failed to generate results. Please verify birth data and try again.');
         }
 
         return res.status(200).json({
@@ -473,30 +407,11 @@ router.post('/navamsa', async (req, res) => {
 
         const analysis = await orchestrator.executeSection6Analysis(charts, analysisContext);
 
-        // Check if navamsa analysis is empty and provide basic analysis
-        let navamsaResult = analysis.sections?.section6?.navamsaAnalysis || {};
+        // PRODUCTION: No fallback analysis - throw error if analysis fails
+        const navamsaResult = analysis.sections?.section6?.navamsaAnalysis;
 
         if (!navamsaResult || Object.keys(navamsaResult).length === 0) {
-            // Provide basic navamsa analysis
-            navamsaResult = {
-                chartInfo: {
-                    name: 'Navamsa Chart (D9)',
-                    significance: 'Marriage, dharma, and spiritual analysis'
-                },
-                lagnaAnalysis: {
-                    navamsaLagna: charts.navamsaChart?.ascendant?.sign || 'Unknown',
-                    significance: 'Represents inner nature and dharmic path'
-                },
-                marriageIndications: {
-                    status: 'Basic marriage analysis based on D9 chart',
-                    recommendations: 'Detailed navamsa analysis available in comprehensive report'
-                },
-                spiritualIndications: {
-                    status: 'Basic spiritual analysis based on D9 positions',
-                    recommendations: 'Meditation and dharmic practices recommended'
-                },
-                summary: 'Basic Navamsa analysis completed. For detailed analysis including yogas and comprehensive marriage predictions, full service integration required.'
-            };
+            throw new Error('Navamsa analysis failed to generate results. Please verify birth data and try again.');
         }
 
         return res.status(200).json({
@@ -630,27 +545,13 @@ router.get('/:analysisId', async (req, res) => {
     try {
         const { analysisId } = req.params;
 
-        // CRITICAL FIX: Check temporary storage first for E2E tests
-        const storedAnalysis = global.tempAnalysisStorage?.get(analysisId);
-
-        if (storedAnalysis) {
-            return res.status(200).json({
-                success: true,
-                data: {
-                    analysisId,
-                    status: storedAnalysis.status,
-                    result: storedAnalysis.analysis,
-                    chartId: storedAnalysis.chartId,
-                    timestamp: storedAnalysis.timestamp
-                }
-            });
-        }
-
-        // If no stored analysis found, return error - never use mock data
-        return res.status(404).json({
+        // PRODUCTION: Analysis retrieval requires proper database implementation
+        // Temporary storage removed - analysis ID lookup not supported without database
+        return res.status(501).json({
             success: false,
-            error: 'Analysis not found',
-            message: 'The requested analysis was not found'
+            error: 'Analysis retrieval not implemented',
+            message: 'Analysis ID-based retrieval requires database integration. Please use the comprehensive analysis endpoint with birth data.',
+            code: 'ANALYSIS_ID_NOT_SUPPORTED'
         });
     } catch (error) {
         console.error('Analysis retrieval error:', error);

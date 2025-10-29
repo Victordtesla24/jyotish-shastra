@@ -206,10 +206,14 @@ class ChartGenerationService {
   async generateRasiChart(birthData) {
     try {
       const { dateOfBirth, timeOfBirth } = birthData;
-      // Handle both 'timezone' and 'timeZone' properties, with fallback to placeOfBirth.timezone
-      const timeZone = birthData.timezone || birthData.timeZone || birthData.placeOfBirth?.timezone;
-      const latitude = birthData.latitude || birthData.placeOfBirth?.latitude;
-      const longitude = birthData.longitude || birthData.placeOfBirth?.longitude;
+      // Production code: Use standard property names only
+      const timeZone = birthData.timezone;
+      const latitude = birthData.latitude;
+      const longitude = birthData.longitude;
+      
+      if (!timeZone) {
+        throw new Error('Timezone is required for chart generation. Please provide timezone in birth data.');
+      }
 
       if (!latitude || !longitude) {
         throw new Error('Latitude and longitude are required for Rasi chart generation.');
@@ -297,8 +301,8 @@ class ChartGenerationService {
             rasiChart.ascendant &&
             rasiChart.ascendant.longitude !== undefined &&
             rasiChart.ascendant.longitude !== null) {
-                      try {
-              houseNumber = calculateHouseNumber(navamsaPosition.longitude, rasiChart.ascendant.longitude);
+          try {
+            houseNumber = calculateHouseNumber(navamsaPosition.longitude, rasiChart.ascendant.longitude);
             // Validate house number
             if (!houseNumber || houseNumber < 1 || houseNumber > 12) {
               houseNumber = 1;
@@ -330,8 +334,14 @@ class ChartGenerationService {
       // Calculate Navamsa Ascendant
       const navamsaAscendant = this.calculateNavamsaPosition(rasiChart.ascendant);
 
-      // Calculate Navamsa house positions
-      const navamsaHouses = this.calculateHousePositions(navamsaAscendant);
+      // CRITICAL FIX: Pass all required parameters to calculateHousePositions
+      // Extract jd, latitude, longitude from rasiChart which has all the data
+      const navamsaHouses = this.calculateHousePositions(
+        navamsaAscendant,
+        rasiChart.jd,
+        rasiChart.birthData.latitude,
+        rasiChart.birthData.longitude
+      );
 
       return {
         ascendant: navamsaAscendant,
@@ -433,50 +443,36 @@ class ChartGenerationService {
    * @returns {Array} House positions
    */
   calculateHousePositions(ascendant, jd, latitude, longitude) {
+    if (!jd || !latitude || !longitude) {
+      throw new Error('Julian day, latitude, and longitude are required for house position calculation');
+    }
+
     try {
-      // For Navamsa chart (and as fallback), use whole sign houses if detailed data isn't available
-      if (!jd || !latitude || !longitude) {
-        return this.generateWholeSignHouses(ascendant);
+      const adjustedLatitude = Math.max(-89.999999, Math.min(89.999999, latitude));
+      const houses = swisseph.swe_houses(jd, adjustedLatitude, longitude, 'P');
+
+      if (!houses || !houses.house || houses.house.length < 12) {
+        throw new Error('Swiss Ephemeris returned invalid house data');
       }
 
-      // Try to use Swiss Ephemeris for more accurate house positions
-      try {
-        const adjustedLatitude = Math.max(-89.999999, Math.min(89.999999, latitude));
-        const houses = swisseph.swe_houses(jd, adjustedLatitude, longitude, 'P');
-
-        // Swiss Ephemeris houses calculated successfully
-
-        if (houses && houses.house && houses.house.length >= 12) {
-          const housePositions = [];
-          for (let i = 0; i < 12; i++) {
-            const houseDegree = houses.house[i]; // Swiss Ephemeris house array is 0-indexed
-            if (houseDegree !== undefined && !isNaN(houseDegree)) {
-              const sign = this.degreeToSign(houseDegree);
-              housePositions.push({
-                houseNumber: i + 1,
-                degree: houseDegree,
-                sign: sign.name,
-                signId: sign.id,
-                longitude: houseDegree
-              });
-            } else {
-              throw new Error(`Invalid house cusp for house ${i+1}`);
-            }
-          }
-          return housePositions;
-        } else {
-          throw new Error('Swiss Ephemeris returned invalid house data');
+      const housePositions = [];
+      for (let i = 0; i < 12; i++) {
+        const houseDegree = houses.house[i];
+        if (houseDegree === undefined || isNaN(houseDegree)) {
+          throw new Error(`Invalid house cusp for house ${i+1}`);
         }
-      } catch (swissEphError) {
-        // CRITICAL FIX: Silent fallback to eliminate console noise in production/test
-        if (process.env.NODE_ENV === 'development') {
-          console.warn('Swiss Ephemeris house calculation failed, falling back to whole sign houses:', swissEphError.message);
-        }
-        // Fall back to whole sign houses
-        return this.generateWholeSignHouses(ascendant);
+        const sign = this.degreeToSign(houseDegree);
+        housePositions.push({
+          houseNumber: i + 1,
+          degree: houseDegree,
+          sign: sign.name,
+          signId: sign.id,
+          longitude: houseDegree
+        });
       }
+      return housePositions;
     } catch (error) {
-      throw new Error(`Failed to calculate house positions: ${error.message}`);
+      throw new Error(`House position calculation failed: ${error.message}`);
     }
   }
 
@@ -936,14 +932,10 @@ class ChartGenerationService {
       try {
         dateTime = moment.tz(dateTimeString, 'YYYY-MM-DD HH:mm:ss', timeZone);
       } catch (error) {
-        // Fallback to UTC if IANA timezone fails
-        console.warn(`Warning: IANA timezone "${timeZone}" not recognized, falling back to UTC`);
-        dateTime = moment.utc(dateTimeString, 'YYYY-MM-DD HH:mm:ss');
+        throw new Error(`IANA timezone "${timeZone}" is not recognized. Please provide a valid IANA timezone identifier (e.g., "Asia/Kolkata", "America/New_York").`);
       }
-    }
-    // Fallback to UTC for any unrecognized timezone format
-    else {
-      dateTime = moment.utc(dateTimeString, 'YYYY-MM-DD HH:mm:ss');
+    } else {
+      throw new Error(`Invalid timezone format: "${timeZone}". Please provide a valid IANA timezone identifier.`);
     }
 
     if (!dateTime || !dateTime.isValid()) {

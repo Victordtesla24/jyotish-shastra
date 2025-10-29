@@ -24,11 +24,10 @@ const ComprehensiveAnalysisDisplay = ({ analysisData }) => {
     console.log('📊 [ComprehensiveAnalysisDisplay] AnalysisData keys:', analysisData ? Object.keys(analysisData) : 'null');
 
     if (!analysisData) {
-      console.log('❌ [ComprehensiveAnalysisDisplay] No analysisData provided');
-      return { sectionsData: {}, sectionOrder: [], sectionNames: {} };
+      throw new Error('Analysis data is required. Expected processed data from ResponseDataToUIDisplayAnalyser.processComprehensiveAnalysis().');
     }
 
-    // Extract sections from various possible data structures
+    // Extract sections from processed data structure
     let sections = {};
     if (analysisData.sections) {
       console.log('✅ [ComprehensiveAnalysisDisplay] Found sections in analysisData.sections');
@@ -36,11 +35,12 @@ const ComprehensiveAnalysisDisplay = ({ analysisData }) => {
     } else if (analysisData.analysis?.sections) {
       console.log('✅ [ComprehensiveAnalysisDisplay] Found sections in analysisData.analysis.sections');
       sections = analysisData.analysis.sections;
-    } else if (analysisData.analysis) {
-      console.log('✅ [ComprehensiveAnalysisDisplay] Using analysisData.analysis as sections');
-      sections = analysisData.analysis;
     } else {
-      console.log('❌ [ComprehensiveAnalysisDisplay] No sections found in any expected location');
+      throw new Error('Sections data is missing from analysis data. Expected analysisData.sections or analysisData.analysis.sections with 8 sections (section1-section8).');
+    }
+    
+    if (!sections || Object.keys(sections).length === 0) {
+      throw new Error('Sections data is empty. Expected analysisData.sections with 8 sections (section1-section8) from API.');
     }
 
     console.log('📊 [ComprehensiveAnalysisDisplay] Extracted sections:', {
@@ -857,7 +857,7 @@ const ComprehensiveAnalysisDisplay = ({ analysisData }) => {
           />
         )}
 
-        {/* Enhanced Fallback for unhandled content */}
+        {/* Display unhandled content */}
         {!sectionData.questions &&
          !sectionData.analyses &&
          !sectionData.houses &&
@@ -878,7 +878,7 @@ const ComprehensiveAnalysisDisplay = ({ analysisData }) => {
   // Return main component JSX with consistent Vedic design
   return (
     <div className="comprehensive-analysis-display max-w-6xl mx-auto">
-      {/* CRITICAL: Show fallback when no sections available */}
+      {/* Display when no sections available */}
       {Object.keys(sectionsData).length === 0 ? (
         <div className="card-cosmic text-center py-12">
           <div className="text-6xl mb-4">📊</div>

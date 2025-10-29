@@ -36,13 +36,12 @@ class PlanetaryPositionCalculator {
     const normalizedPlanet = this.normalizeLongitude(planetLongitude);
     const normalizedAscendant = this.normalizeLongitude(ascendantLongitude);
 
-    if (housePositions && housePositions.length === 12) {
-      // Use API-provided house cusps for accurate calculation
-      return this.calculateHouseWithCusps(normalizedPlanet, housePositions);
-    } else {
-      // Fallback to equal house system
-      return this.calculateEqualHouse(normalizedPlanet, normalizedAscendant);
+    if (!housePositions || housePositions.length !== 12) {
+      throw new Error('House positions are required for accurate calculation. Expected array of 12 house cusps from API.');
     }
+    
+    // Use API-provided house cusps for accurate calculation
+    return this.calculateHouseWithCusps(normalizedPlanet, housePositions);
   }
 
   /**
@@ -60,7 +59,7 @@ class PlanetaryPositionCalculator {
         return currentHouse.houseNumber;
       }
     }
-    return 1; // Fallback
+    throw new Error(`Unable to determine house for planet at longitude ${planetLongitude}. House positions may be invalid.`);
   }
 
   /**

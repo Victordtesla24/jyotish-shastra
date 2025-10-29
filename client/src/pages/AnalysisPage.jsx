@@ -240,7 +240,7 @@ const LagnaDisplay = ({ data }) => {
           </div>
         )}
 
-        {/* Fallback display for any data we receive */}
+        {/* Display data from API response */}
         {!lagna.sign && !lagna.description && !lagna.characteristics && (
           <div className="interpretation-vedic">
             <h4 className="interpretation-title">Lagna Analysis Available</h4>
@@ -653,7 +653,7 @@ const AspectsDisplay = ({ data }) => {
         </div>
       )}
 
-      {/* Fallback if no data found */}
+      {/* Display when no data found */}
       {allAspects.length === 0 && patterns.length === 0 && yogas.length === 0 && (
         <div className="text-center text-muted">
           <p className="text-lg">Planetary aspects analysis will be available once comprehensive data is loaded.</p>
@@ -668,226 +668,638 @@ const AspectsDisplay = ({ data }) => {
 
 const ArudhaDisplay = ({ data }) => {
   if (!data) return (
-    <div className="card-vedic text-center">
-      <div className="text-muted">🎯</div>
-      <p className="text-muted">No Arudha Padas data available</p>
+    <div className="card-cosmic text-center animate-pulse">
+      <div className="text-6xl mb-4 animate-float">🎯</div>
+      <p className="text-muted text-lg">No Arudha Padas data available</p>
     </div>
   );
 
   // Handle the actual API data structure
+  // The data structure can be: data.arudha.analysis or data.analysis or just data
   const arudha = data.arudha || data.analysis || data;
   const arudhaLagna = arudha.arudhaLagna || {};
-  const arudhaPadas = arudha.arudhaPadas || {};
+  
+  // Extract arudhaPadas - STRICT validation
+  let arudhaPadas = {};
+  
+  // CRITICAL FIX: Check for nested arudhaPadas.arudhaPadas structure first (actual API format)
+  // Path: section5.arudhaAnalysis.arudhaPadas.arudhaPadas
+  if (arudha.arudhaPadas?.arudhaPadas && typeof arudha.arudhaPadas.arudhaPadas === 'object' && !Array.isArray(arudha.arudhaPadas.arudhaPadas)) {
+    arudhaPadas = arudha.arudhaPadas.arudhaPadas;
+  }
+  // Check direct arudhaPadas (but validate it contains A1-A12 keys, not wrapper properties)
+  else if (arudha.arudhaPadas && typeof arudha.arudhaPadas === 'object' && !Array.isArray(arudha.arudhaPadas)) {
+    // Validate: check if this object has A1, A2, etc. as direct keys
+    const topLevelKeys = Object.keys(arudha.arudhaPadas);
+    const padaKeyPattern = /^[Aa]?([1-9]|1[0-2])$/; // Matches A1-A12, 1-12
+    const hasDirectPadaKeys = topLevelKeys.some(key => padaKeyPattern.test(key.trim()));
+    
+    if (hasDirectPadaKeys) {
+      // This IS the padas object directly
+      arudhaPadas = arudha.arudhaPadas;
+    } else {
+      // This is a wrapper, check if it has arudhaPadas nested inside
+      if (arudha.arudhaPadas.arudhaPadas && typeof arudha.arudhaPadas.arudhaPadas === 'object') {
+        arudhaPadas = arudha.arudhaPadas.arudhaPadas;
+      }
+    }
+  } 
+  // Check alternative naming conventions
+  else if (arudha.AarudhaPadas?.arudhaPadas && typeof arudha.AarudhaPadas.arudhaPadas === 'object' && !Array.isArray(arudha.AarudhaPadas.arudhaPadas)) {
+    arudhaPadas = arudha.AarudhaPadas.arudhaPadas;
+  }
+  else if (arudha.AarudhaPadas && typeof arudha.AarudhaPadas === 'object' && !Array.isArray(arudha.AarudhaPadas)) {
+    const topLevelKeys = Object.keys(arudha.AarudhaPadas);
+    const padaKeyPattern = /^[Aa]?([1-9]|1[0-2])$/;
+    const hasDirectPadaKeys = topLevelKeys.some(key => padaKeyPattern.test(key.trim()));
+    if (hasDirectPadaKeys) {
+      arudhaPadas = arudha.AarudhaPadas;
+    } else if (arudha.AarudhaPadas.arudhaPadas && typeof arudha.AarudhaPadas.arudhaPadas === 'object') {
+      arudhaPadas = arudha.AarudhaPadas.arudhaPadas;
+    }
+  }
+  
+  // CRITICAL: Filter to ONLY include valid Arudha Pada keys (A1-A12)
+  // Use strict regex pattern to match exactly A1, A2, ..., A12 or 1, 2, ..., 12
+  const padaKeyPattern = /^[Aa]?([1-9]|1[0-2])$/;
+  const validPadaKeys = Object.keys(arudhaPadas).filter(key => {
+    const trimmedKey = key.trim();
+    
+    // Must match pattern exactly (A1-A12 or 1-12)
+    if (!padaKeyPattern.test(trimmedKey)) {
+      return false;
+    }
+    
+    // Extract number to validate range
+    const normalizedKey = trimmedKey.replace(/^[Aa]/i, '').trim();
+    const num = parseInt(normalizedKey, 10);
+    
+    // Must be 1-12
+    if (isNaN(num) || num < 1 || num > 12) {
+      return false;
+    }
+    
+    // Validate the value is a proper pada object
+    const value = arudhaPadas[trimmedKey];
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+      return false;
+    }
+    
+    // Must have at least one of these properties to be a valid pada
+    const hasValidProperties = value.sign || value.arudhaHouse || value.house || 
+                               value.description || value.houseLord || 
+                               value.originalHouse !== undefined || 
+                               value.calculatedArudhaHouse !== undefined;
+    
+    return hasValidProperties;
+  });
+  
+  // Create filtered arudhaPadas object with only valid keys, preserving original key case
+  const filteredArudhaPadas = {};
+  validPadaKeys.forEach(key => {
+    const value = arudhaPadas[key];
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
+      filteredArudhaPadas[key] = value;
+    }
+  });
+  
   const imageStability = arudha.imageStability || {};
   const publicImageFactors = arudha.publicImageFactors || [];
   const recommendations = arudha.recommendations || [];
   const reputationCycles = arudha.reputationCycles || [];
 
+  // Get house meanings for Arudha Padas
+  const getHouseMeaning = (houseNum) => {
+    const meanings = {
+      '1': 'Self-image', 'A1': 'Self-image',
+      '2': 'Wealth image', 'A2': 'Wealth image',
+      '3': 'Siblings image', 'A3': 'Siblings image',
+      '4': 'Home image', 'A4': 'Home image',
+      '5': 'Creative image', 'A5': 'Creative image',
+      '6': 'Service image', 'A6': 'Service image',
+      '7': 'Partnership image', 'A7': 'Partnership image',
+      '8': 'Transformation image', 'A8': 'Transformation image',
+      '9': 'Dharma image', 'A9': 'Dharma image',
+      '10': 'Career image', 'A10': 'Career image',
+      '11': 'Gains image', 'A11': 'Gains image',
+      '12': 'Spiritual image', 'A12': 'Spiritual image'
+    };
+    return meanings[houseNum] || 'House perception';
+  };
+
   return (
-    <div className="card-vedic">
-      <div className="section-header-vedic">
-        <h3 className="section-title-vedic">🎯 Arudha Padas Analysis</h3>
-        <p className="section-subtitle-vedic">Public image, perception, and social reputation</p>
+    <div className="space-y-8">
+      {/* Enhanced Header Section */}
+      <div className="card-sacred group hover:shadow-xl transition-all duration-500">
+        <div className="flex items-center gap-4 mb-6">
+          <div className="w-16 h-16 bg-gradient-to-br from-jupiter to-saffron rounded-full flex items-center justify-center text-3xl animate-glow">
+            🎯
+          </div>
+          <div>
+            <h3 className="text-3xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
+              Arudha Padas Analysis
+            </h3>
+            <p className="text-secondary text-lg">Public image, perception, and social reputation</p>
+          </div>
+        </div>
       </div>
 
-      <div className="space-vedic">
-        {/* Arudha Lagna */}
-        {arudhaLagna.lagnaSign && (
-          <div className="arudha-lagna-section">
-            <h4 className="section-title">🌟 Arudha Lagna (Public Image)</h4>
-            <div className="insight-cards-grid">
-              <div className="insight-card primary">
-                <div className="insight-label">Arudha Lagna Sign</div>
-                <div className="insight-value">{arudhaLagna.lagnaSign}</div>
-                <div className="insight-detail">How the world perceives you</div>
+      {/* Arudha Lagna Section */}
+      {arudhaLagna.lagnaSign && (
+        <div className="card-cosmic group hover:shadow-xl transition-all duration-500">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-12 h-12 bg-gradient-to-br from-jupiter to-gold rounded-full flex items-center justify-center text-white text-xl">
+              🌟
+            </div>
+            <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
+              Arudha Lagna (Public Image)
+            </h4>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="card-vedic group hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-jupiter/20 rounded-full flex items-center justify-center">
+                  <span className="vedic-symbol text-jupiter">⭐</span>
+                </div>
+                <h5 className="text-lg font-semibold text-primary">Arudha Lagna Sign</h5>
               </div>
-
-              {arudhaLagna.lagnaLord && (
-                <div className="insight-card">
-                  <div className="insight-label">Arudha Lagna Lord</div>
-                  <div className="insight-value">{arudhaLagna.lagnaLord}</div>
-                  <div className="insight-detail">Ruler of your public image</div>
-                </div>
-              )}
-
-              {arudhaLagna.lagnaLordPosition?.sign && (
-                <div className="insight-card">
-                  <div className="insight-label">AL Lord Position</div>
-                  <div className="insight-value">
-                    {arudhaLagna.lagnaLordPosition.sign} (House {arudhaLagna.lagnaLordPosition.house})
-                  </div>
-                  <div className="insight-detail">Image stability factor</div>
-                </div>
-              )}
+              <div className="text-3xl font-bold text-saffron">{arudhaLagna.lagnaSign}</div>
+              <div className="text-sm text-secondary">How the world perceives you</div>
             </div>
-          </div>
-        )}
 
-        {/* Arudha Padas */}
-        {Object.keys(arudhaPadas).length > 0 && (
-          <div className="arudha-padas-section">
-            <h4 className="section-title">🏠 Arudha Padas (House Perceptions)</h4>
-            <div className="padas-grid">
-              {Object.entries(arudhaPadas).map(([house, pada]) => (
-                <div key={house} className="pada-item">
-                  <div className="pada-house">A{house}</div>
-                  <div className="pada-sign">
-                    {typeof pada === 'object' ? (pada.sign || JSON.stringify(pada)) : pada}
+            {arudhaLagna.lagnaLord && (
+              <div className="card-vedic group hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-saffron/20 rounded-full flex items-center justify-center">
+                    <span className="vedic-symbol text-saffron">👑</span>
                   </div>
-                  <div className="pada-meaning">
-                    {house === '1' && 'Self-image'}
-                    {house === '2' && 'Wealth image'}
-                    {house === '4' && 'Home image'}
-                    {house === '5' && 'Creative image'}
-                    {house === '7' && 'Partnership image'}
-                    {house === '10' && 'Career image'}
-                  </div>
+                  <h5 className="text-lg font-semibold text-primary">Arudha Lagna Lord</h5>
                 </div>
-              ))}
+                <div className="text-3xl font-bold text-saffron">{arudhaLagna.lagnaLord}</div>
+                <div className="text-sm text-secondary">Ruler of your public image</div>
+              </div>
+            )}
+
+            {arudhaLagna.lagnaLordPosition?.sign && (
+              <div className="card-vedic group hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-gold/20 rounded-full flex items-center justify-center">
+                    <span className="vedic-symbol text-gold">📍</span>
+                  </div>
+                  <h5 className="text-lg font-semibold text-primary">AL Lord Position</h5>
+                </div>
+                <div className="text-2xl font-bold text-saffron">
+                  {arudhaLagna.lagnaLordPosition.sign}
+                </div>
+                <div className="text-sm text-secondary">House {arudhaLagna.lagnaLordPosition.house} - Image stability factor</div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Arudha Padas Section - Enhanced UI */}
+      {Object.keys(filteredArudhaPadas).length > 0 && (
+        <div className="card-cosmic group hover:shadow-xl transition-all duration-500">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-12 h-12 bg-gradient-to-br from-third-eye-chakra to-crown-chakra rounded-full flex items-center justify-center text-white text-xl">
+              🏠
             </div>
+            <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
+              Arudha Padas (House Perceptions)
+            </h4>
+            <span className="ml-auto text-base font-normal text-muted">
+              {Object.keys(filteredArudhaPadas).length} pada{Object.keys(filteredArudhaPadas).length !== 1 ? 's' : ''}
+            </span>
           </div>
-        )}
-
-        {/* Image Stability */}
-        {Object.keys(imageStability).length > 0 && (
-          <div className="image-stability-section">
-            <h4 className="section-title">⚖️ Image Stability Analysis</h4>
-            <div className="stability-metrics">
-              {imageStability.stabilityScore && (
-                <div className="metric-item">
-                  <div className="metric-label">Stability Score</div>
-                  <div className="metric-value">{imageStability.stabilityScore}/10</div>
-                </div>
-              )}
-              {imageStability.stabilityFactors && Array.isArray(imageStability.stabilityFactors) && (
-                <div className="stability-factors">
-                  <h5>Stability Factors:</h5>
-                  <ul>
-                    {imageStability.stabilityFactors.map((factor, index) => (
-                      <li key={index}>{typeof factor === 'object' ? JSON.stringify(factor) : factor}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-              {imageStability.volatilityFactors && Array.isArray(imageStability.volatilityFactors) && (
-                <div className="volatility-factors">
-                  <h5>Volatility Factors:</h5>
-                  <ul>
-                    {imageStability.volatilityFactors.map((factor, index) => (
-                      <li key={index}>{typeof factor === 'object' ? JSON.stringify(factor) : factor}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Public Image Factors */}
-        {publicImageFactors.length > 0 && (
-          <div className="public-image-section">
-            <h4 className="section-title">👥 Public Image Factors</h4>
-            <div className="image-factors-grid">
-              {publicImageFactors.map((factor, index) => (
-                <div key={index} className="factor-card">
-                  <div className="factor-title">
-                    {typeof factor === 'object' ? (factor.type || factor.name || 'Factor') : factor}
-                  </div>
-                  <div className="factor-description">
-                    {typeof factor === 'object' ? (factor.description || '') : ''}
-                  </div>
-                  {factor.influence && (
-                    <div className="factor-influence">Influence: {factor.influence}</div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Reputation Cycles */}
-        {reputationCycles.length > 0 && (
-          <div className="reputation-cycles-section">
-            <h4 className="section-title">🔄 Reputation Cycles</h4>
-            <div className="cycles-timeline">
-              {reputationCycles.map((cycle, index) => (
-                <div key={index} className="cycle-item">
-                  <div className="cycle-period">
-                    {typeof cycle === 'object' ? (cycle.period || cycle.phase || 'Period') : cycle}
-                  </div>
-                  <div className="cycle-description">
-                    {typeof cycle === 'object' ? (cycle.description || '') : ''}
-                  </div>
-                  {cycle.characteristics && Array.isArray(cycle.characteristics) && (
-                    <div className="cycle-characteristics">
-                      {cycle.characteristics.map((char, i) => (
-                        <span key={i} className="cycle-trait">
-                          {typeof char === 'object' ? JSON.stringify(char) : char}
+          <div className="space-y-4">
+            {Object.entries(filteredArudhaPadas).map(([key, pada]) => {
+              // Extract house number from key (A1, A2, etc. or just 1, 2, etc.)
+              const houseNum = key.replace(/^[Aa]/i, '').trim();
+              const houseKey = key.startsWith('A') || key.startsWith('a') ? key.toUpperCase() : `A${houseNum}`;
+              
+              // Handle both object and primitive pada data - ensure it's an object
+              const padaData = typeof pada === 'object' && pada !== null && !Array.isArray(pada) ? pada : {};
+              
+              // Extract data from standard API response structure
+              const sign = padaData.sign || padaData.arudhaSign || '';
+              const house = padaData.arudhaHouse || padaData.calculatedArudhaHouse || houseNum;
+              const description = padaData.description || padaData.calculation || '';
+              const houseLord = padaData.houseLord || padaData.lord || '';
+              const originalHouse = padaData.originalHouse !== undefined ? padaData.originalHouse : (padaData.houseNumber !== undefined ? padaData.houseNumber : houseNum);
+              
+              // Skip if this doesn't look like valid pada data
+              if (!sign && !description && !houseLord && originalHouse === undefined && house === houseNum) {
+                return null;
+              }
+              
+              return (
+                <div key={key} className="group bg-white/5 border border-white/10 hover:border-saffron/30 transition-all duration-300 rounded-lg overflow-hidden">
+                  <div className="card-vedic hover:shadow-lg transition-all duration-300 p-5 bg-gradient-to-br from-white/5 to-white/10">
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className="w-14 h-14 rounded-full flex items-center justify-center bg-gradient-to-br from-saffron to-gold flex-shrink-0 shadow-lg">
+                        <span className="text-white text-base font-bold">
+                          {houseKey}
                         </span>
-                      ))}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h5 className="text-xl font-bold text-primary mb-2 leading-tight">
+                          {getHouseMeaning(houseNum)}
+                        </h5>
+                        <div className="text-sm text-secondary leading-relaxed">
+                          {sign ? (
+                            <div className="flex flex-wrap items-baseline gap-1">
+                              <span className="font-medium text-primary">{houseKey}</span>
+                              <span className="text-secondary">:</span>
+                              <span className="font-semibold text-saffron">{sign}</span>
+                              <span className="text-secondary">(House {house})</span>
+                            </div>
+                          ) : (
+                            <div className="flex flex-wrap items-baseline gap-1">
+                              <span className="font-medium text-primary">{houseKey}</span>
+                              <span className="text-secondary">:</span>
+                              <span className="text-secondary">House {house}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Detailed Information */}
+                    {(houseLord || description || padaData.lordPlacedInHouse || padaData.distanceToLord !== undefined) && (
+                      <div className="bg-white/5 p-4 rounded-lg space-y-2 mt-4 border-t border-white/10">
+                        {houseLord && (
+                          <div className="flex flex-wrap items-center gap-2 text-sm">
+                            <span className="font-semibold text-primary">House Lord:</span>
+                            <span className="text-secondary">{houseLord}</span>
+                          </div>
+                        )}
+                        {originalHouse && originalHouse.toString() !== houseNum && (
+                          <div className="flex flex-wrap items-center gap-2 text-sm">
+                            <span className="font-semibold text-primary">Original House:</span>
+                            <span className="text-secondary">{originalHouse}</span>
+                          </div>
+                        )}
+                        {padaData.lordPlacedInHouse && (
+                          <div className="flex flex-wrap items-center gap-2 text-sm">
+                            <span className="font-semibold text-primary">Lord placed in House:</span>
+                            <span className="text-secondary">{padaData.lordPlacedInHouse}</span>
+                          </div>
+                        )}
+                        {padaData.distanceToLord !== undefined && padaData.distanceToLord !== null && (
+                          <div className="flex flex-wrap items-center gap-2 text-sm">
+                            <span className="font-semibold text-primary">Distance to Lord:</span>
+                            <span className="text-secondary">{padaData.distanceToLord}</span>
+                          </div>
+                        )}
+                        {description && (
+                          <p className="text-secondary leading-relaxed mt-3 pt-3 border-t border-white/10">{description}</p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Image Stability */}
+      {Object.keys(imageStability).length > 0 && (
+        <div className="card-vedic group hover:shadow-xl transition-all duration-500">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-12 h-12 bg-gradient-to-br from-exalted to-friendly rounded-full flex items-center justify-center text-white text-xl">
+              ⚖️
+            </div>
+            <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
+              Image Stability Analysis
+            </h4>
+          </div>
+          <div className="space-y-4">
+            {imageStability.stabilityScore !== undefined && (
+              <div className="card-vedic group hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-exalted/20 rounded-full flex items-center justify-center">
+                    <span className="vedic-symbol text-exalted">📊</span>
+                  </div>
+                  <h5 className="text-lg font-semibold text-primary">Stability Score</h5>
+                </div>
+                <div className="text-3xl font-bold text-saffron">{imageStability.stabilityScore}/10</div>
+                <div className="text-sm text-secondary">Public image stability rating</div>
+              </div>
+            )}
+            {imageStability.stabilityFactors && Array.isArray(imageStability.stabilityFactors) && imageStability.stabilityFactors.length > 0 && (
+              <div className="card-cosmic">
+                <h5 className="text-lg font-semibold text-primary mb-3 flex items-center gap-2">
+                  <span className="vedic-symbol text-exalted">✓</span>
+                  Stability Factors
+                </h5>
+                <div className="space-y-2">
+                  {imageStability.stabilityFactors.map((factor, index) => {
+                    const factorText = typeof factor === 'object' ? (factor.name || factor.description || factor.text || JSON.stringify(factor)) : factor;
+                    return (
+                      <div key={index} className="flex items-center gap-2 p-2 bg-exalted/10 rounded">
+                        <span className="text-exalted">✓</span>
+                        <span className="text-secondary">{factorText}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+            {imageStability.volatilityFactors && Array.isArray(imageStability.volatilityFactors) && imageStability.volatilityFactors.length > 0 && (
+              <div className="card-cosmic">
+                <h5 className="text-lg font-semibold text-primary mb-3 flex items-center gap-2">
+                  <span className="vedic-symbol text-enemy">⚠</span>
+                  Volatility Factors
+                </h5>
+                <div className="space-y-2">
+                  {imageStability.volatilityFactors.map((factor, index) => {
+                    const factorText = typeof factor === 'object' ? (factor.name || factor.description || factor.text || JSON.stringify(factor)) : factor;
+                    return (
+                      <div key={index} className="flex items-center gap-2 p-2 bg-enemy/10 rounded">
+                        <span className="text-enemy">⚠</span>
+                        <span className="text-secondary">{factorText}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Public Image Factors */}
+      {publicImageFactors.length > 0 && (
+        <div className="card-cosmic group hover:shadow-xl transition-all duration-500">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-12 h-12 bg-gradient-to-br from-jupiter to-saffron rounded-full flex items-center justify-center text-white text-xl">
+              👥
+            </div>
+            <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
+              Public Image Factors
+            </h4>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {publicImageFactors.map((factor, index) => {
+              const factorObj = typeof factor === 'object' && factor !== null ? factor : { name: factor };
+              return (
+                <div key={index} className="card-vedic group hover:transform hover:scale-105 transition-all duration-300 hover:shadow-lg">
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="vedic-symbol text-jupiter">⭐</span>
+                    <h5 className="text-lg font-semibold text-primary">
+                      {factorObj.type || factorObj.name || 'Factor'}
+                    </h5>
+                  </div>
+                  {factorObj.description && (
+                    <p className="text-secondary text-sm mb-2">{factorObj.description}</p>
+                  )}
+                  {factorObj.influence && (
+                    <div className="text-xs text-secondary mt-2">
+                      <span className="font-semibold">Influence:</span> {factorObj.influence}
                     </div>
                   )}
                 </div>
-              ))}
-            </div>
+              );
+            })}
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Recommendations */}
-        {recommendations.length > 0 && (
-          <div className="recommendations-section">
-            <h4 className="section-title">💡 Image Enhancement Recommendations</h4>
-            <div className="recommendations-list">
-              {recommendations.map((rec, index) => (
-                <div key={index} className="recommendation-item">
-                  <span className="rec-icon">✨</span>
-                  <span className="rec-text">
-                    {typeof rec === 'object' ? (rec.text || JSON.stringify(rec)) : rec}
-                  </span>
-                  {rec.category && (
-                    <span className="rec-category">{rec.category}</span>
+      {/* Reputation Cycles */}
+      {reputationCycles.length > 0 && (
+        <div className="card-cosmic group hover:shadow-xl transition-all duration-500">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-12 h-12 bg-gradient-to-br from-friendly to-exalted rounded-full flex items-center justify-center text-white text-xl">
+              🔄
+            </div>
+            <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
+              Reputation Cycles
+            </h4>
+          </div>
+          <div className="space-y-4">
+            {reputationCycles.map((cycle, index) => {
+              const cycleObj = typeof cycle === 'object' && cycle !== null ? cycle : { period: cycle };
+              return (
+                <div key={index} className="card-vedic group hover:transform hover:scale-105 transition-all duration-300 hover:shadow-lg">
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="vedic-symbol text-friendly">🔄</span>
+                    <h5 className="text-lg font-semibold text-primary">
+                      {cycleObj.period || cycleObj.phase || 'Period'}
+                    </h5>
+                  </div>
+                  {cycleObj.description && (
+                    <p className="text-secondary text-sm mb-3">{cycleObj.description}</p>
+                  )}
+                  {cycleObj.characteristics && Array.isArray(cycleObj.characteristics) && cycleObj.characteristics.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {cycleObj.characteristics.map((char, i) => {
+                        const charText = typeof char === 'object' ? (char.name || char.text || JSON.stringify(char)) : char;
+                        return (
+                          <span key={i} className="badge-vedic bg-friendly/20 text-friendly text-xs px-2 py-1 rounded">
+                            {charText}
+                          </span>
+                        );
+                      })}
+                    </div>
                   )}
                 </div>
-              ))}
-            </div>
+              );
+            })}
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Fallback for debugging */}
-        {!arudhaLagna.lagnaSign && Object.keys(arudhaPadas).length === 0 && (
-          <div className="text-center text-muted">
-            <p>Arudha analysis will be available once comprehensive data is loaded.</p>
-            <pre className="text-xs mt-2 bg-gray-100 p-2 rounded">
-              Available data: {JSON.stringify(Object.keys(arudha), null, 2)}
-            </pre>
+      {/* Recommendations */}
+      {recommendations.length > 0 && (
+        <div className="card-cosmic group hover:shadow-xl transition-all duration-500">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-12 h-12 bg-gradient-to-br from-saffron to-gold rounded-full flex items-center justify-center text-white text-xl">
+              💡
+            </div>
+            <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
+              Image Enhancement Recommendations
+            </h4>
           </div>
-        )}
-      </div>
+          <div className="space-y-3">
+            {recommendations.map((rec, index) => {
+              const recObj = typeof rec === 'object' && rec !== null ? rec : { text: rec };
+              return (
+                <div key={index} className="card-vedic group hover:transform hover:scale-105 transition-all duration-300 hover:shadow-lg">
+                  <div className="flex items-start gap-3">
+                    <span className="vedic-symbol text-saffron text-xl">✨</span>
+                    <div className="flex-1">
+                      <p className="text-secondary leading-relaxed">
+                        {recObj.text || recObj.description || recObj}
+                      </p>
+                      {recObj.category && (
+                        <span className="inline-block mt-2 badge-vedic bg-saffron/20 text-saffron text-xs px-2 py-1 rounded">
+                          {recObj.category}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Display when no data available */}
+      {!arudhaLagna.lagnaSign && Object.keys(filteredArudhaPadas).length === 0 && (
+        <div className="card-vedic text-center">
+          <div className="text-6xl mb-4">🎯</div>
+          <p className="text-lg text-secondary">Arudha analysis will be available once comprehensive data is loaded.</p>
+        </div>
+      )}
     </div>
   );
 };
 
 const NavamsaDisplay = ({ data }) => {
   if (!data) return (
-    <div className="card-vedic text-center">
-      <div className="text-muted">🔄</div>
-      <p className="text-muted">No Navamsa chart data available</p>
+    <div className="card-cosmic text-center animate-pulse">
+      <div className="text-6xl mb-4 animate-float">🔄</div>
+      <p className="text-muted text-lg">No Navamsa chart data available</p>
     </div>
   );
 
   // Handle the actual API data structure
+  // The data structure can be: data.navamsa.analysis or data.analysis or just data
   const navamsa = data.navamsa || data.analysis || data;
+  
+  // Extract chart info - check multiple locations
   const chartInfo = navamsa.chartInfo || {};
-  const navamsaLagna = navamsa.navamsaLagna || {};
+  
+  // Extract navamsa lagna - handle different structures
+  let navamsaLagna = {};
+  if (navamsa.lagnaAnalysis && typeof navamsa.lagnaAnalysis === 'object') {
+    // Structure: lagnaAnalysis.navamsaLagna (string) or lagnaAnalysis.position (object)
+    if (typeof navamsa.lagnaAnalysis.navamsaLagna === 'string') {
+      navamsaLagna = {
+        sign: navamsa.lagnaAnalysis.navamsaLagna,
+        significance: navamsa.lagnaAnalysis.significance || ''
+      };
+    } else if (navamsa.lagnaAnalysis.position) {
+      navamsaLagna = {
+        sign: navamsa.lagnaAnalysis.position.sign || navamsa.lagnaAnalysis.navamsaLagna,
+        lord: navamsa.lagnaAnalysis.position.ruler || navamsa.lagnaAnalysis.lord,
+        degree: navamsa.lagnaAnalysis.position.degree,
+        house: navamsa.lagnaAnalysis.position.house,
+        significance: navamsa.lagnaAnalysis.significance || ''
+      };
+    } else {
+      navamsaLagna = navamsa.lagnaAnalysis;
+    }
+  } else if (navamsa.navamsaLagna) {
+    // Handle both string and object formats
+    if (typeof navamsa.navamsaLagna === 'string') {
+      navamsaLagna = { 
+        sign: navamsa.navamsaLagna,
+        significance: navamsa.significance || ''
+      };
+    } else if (typeof navamsa.navamsaLagna === 'object' && navamsa.navamsaLagna !== null) {
+      navamsaLagna = navamsa.navamsaLagna;
+    }
+  }
+  
+  // Extract lord from different possible locations
+  if (!navamsaLagna.lord && navamsaLagna.sign) {
+    // Try to get lord from sign if not already present
+    const signLords = {
+      'ARIES': 'Mars', 'TAURUS': 'Venus', 'GEMINI': 'Mercury', 'CANCER': 'Moon',
+      'LEO': 'Sun', 'VIRGO': 'Mercury', 'LIBRA': 'Venus', 'SCORPIO': 'Mars',
+      'SAGITTARIUS': 'Jupiter', 'CAPRICORN': 'Saturn', 'AQUARIUS': 'Saturn', 'PISCES': 'Jupiter'
+    };
+    navamsaLagna.lord = signLords[navamsaLagna.sign.toUpperCase()] || navamsaLagna.lord;
+  }
+  
+  // CRITICAL: Extract planetary strengths - handle multiple nested structures
+  // Check various possible locations in the API response
+  let planetaryStrengths = {};
+  
+  // First check direct location
+  if (navamsa.planetaryStrengths && typeof navamsa.planetaryStrengths === 'object' && !Array.isArray(navamsa.planetaryStrengths)) {
+    planetaryStrengths = navamsa.planetaryStrengths;
+  }
+  // Check in lagnaAnalysis
+  else if (navamsa.lagnaAnalysis?.planetaryStrengths && typeof navamsa.lagnaAnalysis.planetaryStrengths === 'object' && !Array.isArray(navamsa.lagnaAnalysis.planetaryStrengths)) {
+    planetaryStrengths = navamsa.lagnaAnalysis.planetaryStrengths;
+  }
+  // Check in planetaryAnalysis
+  else if (navamsa.planetaryAnalysis?.planetaryStrengths && typeof navamsa.planetaryAnalysis.planetaryStrengths === 'object' && !Array.isArray(navamsa.planetaryAnalysis.planetaryStrengths)) {
+    planetaryStrengths = navamsa.planetaryAnalysis.planetaryStrengths;
+  }
+  // Check if planets are directly at root level with strength data
+  else if (navamsa.planets && typeof navamsa.planets === 'object' && !Array.isArray(navamsa.planets)) {
+    // Extract planetary strengths from planets object structure
+    Object.entries(navamsa.planets).forEach(([planet, planetData]) => {
+      if (planetData && typeof planetData === 'object' && !Array.isArray(planetData)) {
+        const strength = planetData.strength || planetData.totalStrength || planetData.value;
+        const dignity = planetData.dignity || planetData.dignityStatus || 'Neutral';
+        const house = planetData.house || planetData.housePosition || planetData.houseNumber;
+        const grade = planetData.grade || '';
+        
+        if (strength !== undefined || dignity || house || grade) {
+          planetaryStrengths[planet] = {
+            totalStrength: strength,
+            strength: strength,
+            value: strength,
+            dignity: dignity,
+            dignityStatus: dignity,
+            house: house,
+            housePosition: house,
+            houseNumber: house,
+            grade: grade,
+            ...planetData
+          };
+        }
+      }
+    });
+  }
+  
+  // Filter out invalid entries from planetaryStrengths
+  const validPlanetaryStrengths = {};
+  Object.entries(planetaryStrengths).forEach(([planet, strengthData]) => {
+    // Only include if it has at least one valid property
+    if (strengthData && typeof strengthData === 'object' && !Array.isArray(strengthData)) {
+      const hasValidData = strengthData.strength !== undefined || 
+                          strengthData.totalStrength !== undefined || 
+                          strengthData.value !== undefined ||
+                          strengthData.dignity ||
+                          strengthData.house ||
+                          strengthData.grade;
+      if (hasValidData) {
+        validPlanetaryStrengths[planet] = strengthData;
+      }
+    }
+  });
+  planetaryStrengths = validPlanetaryStrengths;
+  
   const marriageIndications = navamsa.marriageIndications || {};
   const spiritualIndications = navamsa.spiritualIndications || {};
-  const planetaryStrengths = navamsa.planetaryStrengths || {};
   const vargottamaPlanets = navamsa.vargottamaPlanets || [];
   const yogaFormations = navamsa.yogaFormations || [];
-  const overallAnalysis = navamsa.overallAnalysis || {};
+  const overallAnalysis = navamsa.overallAnalysis || navamsa.summary || {};
   
   // Extract navamsa chart data for visualization
   const navamsaChartData = navamsa.chart || navamsa.navamsaChart || null;
+
+  // Planet name formatting - handle lowercase keys from API
+  const formatPlanetName = (planet) => {
+    if (!planet) return '';
+    // Handle lowercase planet names from API (sun, moon, etc.)
+    const planetMap = {
+      'sun': 'Sun', 'moon': 'Moon', 'mars': 'Mars', 'mercury': 'Mercury',
+      'jupiter': 'Jupiter', 'venus': 'Venus', 'saturn': 'Saturn',
+      'rahu': 'Rahu', 'ketu': 'Ketu'
+    };
+    const lowercase = planet.toLowerCase();
+    return planetMap[lowercase] || planet.charAt(0).toUpperCase() + planet.slice(1).toLowerCase();
+  };
 
   return (
     <div className="space-y-8">
@@ -924,46 +1336,98 @@ const NavamsaDisplay = ({ data }) => {
         </div>
       )}
 
-      <div className="space-vedic">
+      <div className="space-y-8">
         {/* Chart Info */}
-        {chartInfo.description && (
-          <div className="chart-info-section">
-            <h4 className="section-title">📊 Chart Information</h4>
-            <p className="chart-description">{chartInfo.description}</p>
-            {chartInfo.significance && (
-              <div className="chart-significance">
-                <strong>Significance:</strong> {chartInfo.significance}
+        {chartInfo.name && (
+          <div className="card-cosmic group hover:shadow-xl transition-all duration-500">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-12 h-12 bg-gradient-to-br from-saffron to-gold rounded-full flex items-center justify-center text-white text-xl">
+                📊
               </div>
-            )}
+              <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
+                Chart Information
+              </h4>
+            </div>
+            <div className="space-y-3">
+              <div className="text-lg font-semibold text-primary">{chartInfo.name}</div>
+              {chartInfo.description && (
+                <p className="text-secondary leading-relaxed">{chartInfo.description}</p>
+              )}
+              {chartInfo.significance && (
+                <div className="bg-white/5 p-4 rounded-lg">
+                  <div className="text-sm font-semibold text-primary mb-2">Significance:</div>
+                  <p className="text-secondary">{chartInfo.significance}</p>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
         {/* Navamsa Lagna */}
         {navamsaLagna.sign && (
-          <div className="navamsa-lagna-section">
-            <h4 className="section-title">🌟 Navamsa Lagna</h4>
-            <div className="insight-cards-grid">
-              <div className="insight-card primary">
-                <div className="insight-label">Navamsa Lagna Sign</div>
-                <div className="insight-value">{navamsaLagna.sign}</div>
-                <div className="insight-detail">Your inner spiritual nature</div>
+          <div className="card-cosmic group hover:shadow-xl transition-all duration-500">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-12 h-12 bg-gradient-to-br from-jupiter to-saffron rounded-full flex items-center justify-center text-white text-xl">
+                🌟
+              </div>
+              <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
+                Navamsa Lagna (Inner Spiritual Nature)
+              </h4>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="card-vedic group hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-jupiter/20 rounded-full flex items-center justify-center">
+                    <span className="vedic-symbol text-jupiter">⭐</span>
+                  </div>
+                  <h5 className="text-lg font-semibold text-primary">Navamsa Lagna Sign</h5>
+                </div>
+                <div className="text-3xl font-bold text-saffron">{navamsaLagna.sign}</div>
+                <div className="text-sm text-secondary">Your inner spiritual nature</div>
               </div>
 
-              {navamsaLagna.lord && (
-                <div className="insight-card">
-                  <div className="insight-label">Navamsa Lagna Lord</div>
-                  <div className="insight-value">{navamsaLagna.lord}</div>
-                  <div className="insight-detail">Ruler of inner self</div>
+              {navamsaLagna.lord && navamsaLagna.lord !== 'Unknown' && (
+                <div className="card-vedic group hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 bg-saffron/20 rounded-full flex items-center justify-center">
+                      <span className="vedic-symbol text-saffron">👑</span>
+                    </div>
+                    <h5 className="text-lg font-semibold text-primary">Navamsa Lagna Lord</h5>
+                  </div>
+                  <div className="text-3xl font-bold text-saffron">{formatPlanetName(navamsaLagna.lord)}</div>
+                  <div className="text-sm text-secondary">Ruler of inner self</div>
+                </div>
+              )}
+
+              {navamsaLagna.house !== undefined && (
+                <div className="card-vedic group hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 bg-gold/20 rounded-full flex items-center justify-center">
+                      <span className="vedic-symbol text-gold">📍</span>
+                    </div>
+                    <h5 className="text-lg font-semibold text-primary">House Position</h5>
+                  </div>
+                  <div className="text-3xl font-bold text-saffron">House {navamsaLagna.house}</div>
+                  <div className="text-sm text-secondary">Spiritual foundation</div>
                 </div>
               )}
             </div>
 
-            {navamsaLagna.characteristics && (
-              <div className="lagna-characteristics">
-                <h5>Spiritual Characteristics:</h5>
-                <ul>
+            {navamsaLagna.significance && (
+              <div className="mt-6 bg-white/5 p-4 rounded-lg border-t border-white/10">
+                <p className="text-secondary leading-relaxed">{navamsaLagna.significance}</p>
+              </div>
+            )}
+
+            {navamsaLagna.characteristics && Array.isArray(navamsaLagna.characteristics) && navamsaLagna.characteristics.length > 0 && (
+              <div className="mt-6 bg-white/5 p-4 rounded-lg border-t border-white/10">
+                <h5 className="text-lg font-semibold text-primary mb-3">Spiritual Characteristics:</h5>
+                <ul className="space-y-2">
                   {navamsaLagna.characteristics.map((char, index) => (
-                    <li key={index}>{char}</li>
+                    <li key={index} className="flex items-start gap-2 text-secondary">
+                      <span className="text-saffron mt-1">•</span>
+                      <span>{char}</span>
+                    </li>
                   ))}
                 </ul>
               </div>
@@ -973,91 +1437,159 @@ const NavamsaDisplay = ({ data }) => {
 
         {/* Vargottama Planets */}
         {vargottamaPlanets.length > 0 && (
-          <div className="vargottama-section">
-            <h4 className="section-title">⭐ Vargottama Planets</h4>
-            <p className="section-subtitle">Planets in same sign in both D1 and D9 charts</p>
-            <div className="vargottama-grid">
-              {vargottamaPlanets.map((planet, index) => (
-                <div key={index} className="vargottama-item">
-                  <div className="planet-name">{planet.planet || planet}</div>
-                  <div className="vargottama-sign">{planet.sign}</div>
-                  <div className="vargottama-effect">Enhanced strength and stability</div>
-                </div>
-              ))}
+          <div className="card-cosmic group hover:shadow-xl transition-all duration-500">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-12 h-12 bg-gradient-to-br from-gold to-saffron rounded-full flex items-center justify-center text-white text-xl">
+                ⭐
+              </div>
+              <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
+                Vargottama Planets
+              </h4>
+              <span className="ml-auto text-base font-normal text-muted">
+                {vargottamaPlanets.length} planet{vargottamaPlanets.length !== 1 ? 's' : ''}
+              </span>
+            </div>
+            <p className="text-secondary mb-4">Planets in same sign in both D1 and D9 charts - Enhanced strength and stability</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {vargottamaPlanets.map((planet, index) => {
+                const planetName = typeof planet === 'object' && planet !== null ? (planet.planet || planet.name || '') : planet;
+                const planetSign = typeof planet === 'object' && planet !== null ? (planet.sign || '') : '';
+                return (
+                  <div key={index} className="card-vedic group hover:transform hover:scale-[1.02] transition-all duration-300 hover:shadow-lg border border-white/10">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-10 h-10 bg-gradient-to-br from-gold to-saffron rounded-full flex items-center justify-center text-white font-bold">
+                        {formatPlanetName(planetName).charAt(0)}
+                      </div>
+                      <div>
+                        <div className="text-lg font-bold text-primary">{formatPlanetName(planetName)}</div>
+                        {planetSign && (
+                          <div className="text-sm text-secondary">Sign: <span className="font-semibold text-saffron">{planetSign}</span></div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="bg-white/5 p-3 rounded-lg">
+                      <div className="text-sm text-secondary">Enhanced strength and stability</div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
 
         {/* Planetary Strengths */}
         {Object.keys(planetaryStrengths).length > 0 && (
-          <div className="planetary-strengths-section">
-            <h4 className="section-title">💪 Planetary Strengths in D9</h4>
-            <div className="planet-strengths-grid">
+          <div className="card-cosmic group hover:shadow-xl transition-all duration-500">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-12 h-12 bg-gradient-to-br from-exalted to-friendly rounded-full flex items-center justify-center text-white text-xl">
+                💪
+              </div>
+              <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
+                Planetary Strengths in D9
+              </h4>
+              <span className="ml-auto text-base font-normal text-muted">
+                {Object.keys(planetaryStrengths).length} planet{Object.keys(planetaryStrengths).length !== 1 ? 's' : ''}
+              </span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {Object.entries(planetaryStrengths).map(([planet, strength]) => {
-                // Handle both numeric strength values and strength objects
-                const strengthValue = typeof strength === 'object' ?
-                  (strength.totalStrength || strength.grade || strength.value || 0) :
-                  strength;
-                const strengthDisplay = typeof strengthValue === 'string' ?
-                  strengthValue :
-                  `${strengthValue}`;
+                // Handle both numeric strength values and strength objects - ensure it's always an object
+                const strengthObj = typeof strength === 'object' && strength !== null && !Array.isArray(strength) 
+                  ? strength 
+                  : { totalStrength: typeof strength === 'number' ? strength : 0 };
+                
+                // Extract all possible field names for each property
+                const strengthValue = strengthObj.totalStrength !== undefined ? strengthObj.totalStrength 
+                  : (strengthObj.strength !== undefined ? strengthObj.strength 
+                  : (strengthObj.value !== undefined ? strengthObj.value 
+                  : (typeof strength === 'number' ? strength : 0)));
+                
+                const dignity = strengthObj.dignity || strengthObj.dignityStatus || strengthObj.dignityGrade || 'Neutral';
+                const house = strengthObj.housePosition !== undefined ? strengthObj.housePosition 
+                  : (strengthObj.house !== undefined ? strengthObj.house 
+                  : (strengthObj.houseNumber !== undefined ? strengthObj.houseNumber : ''));
+                const grade = strengthObj.grade || strengthObj.quality || strengthObj.assessment || '';
+
+                // Skip if no valid data at all
+                if (strengthValue === 0 && !dignity && !house && !grade) {
+                  return null;
+                }
 
                 return (
-                  <div key={planet} className="planet-strength-item">
-                    <span className="planet-name">{planet}</span>
-                    <div className="strength-details">
-                      {typeof strength === 'object' ? (
-                        <>
-                          {strength.totalStrength && (
-                            <div className="strength-metric">
-                              <span className="metric-label">Strength:</span>
-                              <span className="metric-value">{strength.totalStrength}/10</span>
-                              <div className="strength-bar">
-                                <div
-                                  className="strength-fill"
-                                  style={{ width: `${(strength.totalStrength / 10) * 100}%` }}
-                                ></div>
+                  <div key={planet} className="card-vedic group hover:transform hover:scale-[1.02] transition-all duration-300 hover:shadow-lg border border-white/10 rounded-lg overflow-hidden">
+                    <div className="bg-gradient-to-br from-white/5 to-white/10 p-5">
+                      <div className="flex items-start justify-between gap-4 mb-4">
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          <div className="w-14 h-14 rounded-full flex items-center justify-center bg-gradient-to-br from-saffron to-gold flex-shrink-0 shadow-lg">
+                            <span className="text-white text-lg font-bold">
+                              {formatPlanetName(planet).charAt(0)}
+                            </span>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h5 className="text-xl font-bold text-primary mb-1 break-words leading-tight">
+                              {formatPlanetName(planet)}
+                            </h5>
+                            {strengthValue > 0 && (
+                              <div className="text-sm text-secondary">
+                                Strength: <span className="font-semibold text-saffron">{strengthValue}/10</span>
                               </div>
-                            </div>
-                          )}
-                          {strength.dignity && (
-                            <div className="dignity-info">
-                              <span className="dignity-label">Dignity:</span>
-                              <span className="dignity-value">{strength.dignity}</span>
-                            </div>
-                          )}
-                          {strength.housePosition && (
-                            <div className="house-info">
-                              <span className="house-label">House:</span>
-                              <span className="house-value">{strength.housePosition}</span>
-                            </div>
-                          )}
-                          {strength.grade && (
-                            <div className="grade-info">
-                              <span className="grade-label">Grade:</span>
-                              <span className="grade-value">{strength.grade}</span>
-                            </div>
-                          )}
-                          {strength.effects && Array.isArray(strength.effects) && (
-                            <div className="effects-list">
-                              <span className="effects-label">Effects:</span>
-                              <ul>
-                                {strength.effects.map((effect, idx) => (
-                                  <li key={idx}>{effect}</li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-                        </>
-                      ) : (
-                        <div className="strength-bar">
-                          <div
-                            className="strength-fill"
-                            style={{ width: `${Math.min((strengthValue / 10) * 100, 100)}%` }}
-                          ></div>
-                          <span className="strength-value">{strengthDisplay}/10</span>
+                            )}
+                          </div>
                         </div>
-                      )}
+                      </div>
+
+                      <div className="bg-white/5 p-4 rounded-lg space-y-3 border-t border-white/10">
+                        {strengthValue > 0 && (
+                          <div className="w-full bg-white/10 rounded-full h-2.5 mb-2">
+                            <div
+                              className="bg-gradient-to-r from-saffron to-gold h-2.5 rounded-full transition-all duration-300"
+                              style={{ width: `${Math.min((strengthValue / 10) * 100, 100)}%` }}
+                            ></div>
+                          </div>
+                        )}
+                        
+                        <div className="grid grid-cols-1 gap-2 text-sm">
+                          {dignity && dignity !== 'Unknown' && dignity !== 'Neutral' && (
+                            <div className="flex items-center gap-2">
+                              <span className="font-semibold text-primary min-w-[80px]">Dignity:</span>
+                              <span className="text-secondary">{dignity}</span>
+                            </div>
+                          )}
+                          
+                          {house && (
+                            <div className="flex items-center gap-2">
+                              <span className="font-semibold text-primary min-w-[80px]">House:</span>
+                              <span className="text-secondary">{house}</span>
+                            </div>
+                          )}
+                          
+                          {grade && (
+                            <div className="flex items-center gap-2">
+                              <span className="font-semibold text-primary min-w-[80px]">Grade:</span>
+                              <span className="text-secondary">{grade}</span>
+                            </div>
+                          )}
+                        </div>
+                        
+                        {strengthObj.effects && Array.isArray(strengthObj.effects) && strengthObj.effects.length > 0 && (
+                          <div className="mt-3 pt-3 border-t border-white/10">
+                            <div className="text-xs font-semibold text-primary mb-2">Effects:</div>
+                            <ul className="space-y-1">
+                              {strengthObj.effects.map((effect, idx) => {
+                                const effectText = typeof effect === 'object' && effect !== null
+                                  ? (effect.description || effect.text || effect.name || String(effect))
+                                  : String(effect);
+                                return (
+                                  <li key={idx} className="text-xs text-secondary flex items-start gap-1">
+                                    <span className="text-saffron mt-0.5">•</span>
+                                    <span>{effectText}</span>
+                                  </li>
+                                );
+                              })}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 );
@@ -1068,147 +1600,251 @@ const NavamsaDisplay = ({ data }) => {
 
         {/* Marriage Indications */}
         {Object.keys(marriageIndications).length > 0 && (
-          <div className="marriage-section">
-            <h4 className="section-title">💒 Marriage & Partnership Analysis</h4>
-
-            {marriageIndications.marriageProspects && (
-              <div className="marriage-prospects">
-                <h5>Marriage Prospects:</h5>
-                <p>{marriageIndications.marriageProspects}</p>
+          <div className="card-cosmic group hover:shadow-xl transition-all duration-500">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-12 h-12 bg-gradient-to-br from-friendly to-exalted rounded-full flex items-center justify-center text-white text-xl">
+                💒
               </div>
-            )}
+              <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
+                Marriage & Partnership Analysis
+              </h4>
+            </div>
+            <div className="space-y-4">
+              {marriageIndications.marriageProspects && (
+                <div className="card-vedic group hover:shadow-lg transition-all duration-300 p-5">
+                  <h5 className="text-lg font-semibold text-primary mb-3 flex items-center gap-2">
+                    <span className="vedic-symbol text-saffron">💍</span>
+                    Marriage Prospects
+                  </h5>
+                  <p className="text-secondary leading-relaxed">{marriageIndications.marriageProspects}</p>
+                </div>
+              )}
 
-            {marriageIndications.spouseCharacteristics && (
-              <div className="spouse-characteristics">
-                <h5>Spouse Characteristics:</h5>
-                <ul>
-                  {marriageIndications.spouseCharacteristics.map((char, index) => (
-                    <li key={index}>{char}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
+              {marriageIndications.spouseCharacteristics && Array.isArray(marriageIndications.spouseCharacteristics) && marriageIndications.spouseCharacteristics.length > 0 && (
+                <div className="card-vedic group hover:shadow-lg transition-all duration-300 p-5">
+                  <h5 className="text-lg font-semibold text-primary mb-3 flex items-center gap-2">
+                    <span className="vedic-symbol text-saffron">👫</span>
+                    Spouse Characteristics
+                  </h5>
+                  <ul className="space-y-2">
+                    {marriageIndications.spouseCharacteristics.map((char, index) => (
+                      <li key={index} className="flex items-start gap-2 text-secondary">
+                        <span className="text-saffron mt-1">•</span>
+                        <span>{char}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
-            {marriageIndications.marriageTiming && (
-              <div className="marriage-timing">
-                <h5>Marriage Timing Indications:</h5>
-                <p>{marriageIndications.marriageTiming}</p>
-              </div>
-            )}
+              {marriageIndications.marriageTiming && (
+                <div className="card-vedic group hover:shadow-lg transition-all duration-300 p-5">
+                  <h5 className="text-lg font-semibold text-primary mb-3 flex items-center gap-2">
+                    <span className="vedic-symbol text-saffron">⏰</span>
+                    Marriage Timing Indications
+                  </h5>
+                  <p className="text-secondary leading-relaxed">{marriageIndications.marriageTiming}</p>
+                </div>
+              )}
 
-            {marriageIndications.relationshipHarmony && (
-              <div className="relationship-harmony">
-                <h5>Relationship Harmony:</h5>
-                <p>{marriageIndications.relationshipHarmony}</p>
-              </div>
-            )}
+              {marriageIndications.relationshipHarmony && (
+                <div className="card-vedic group hover:shadow-lg transition-all duration-300 p-5">
+                  <h5 className="text-lg font-semibold text-primary mb-3 flex items-center gap-2">
+                    <span className="vedic-symbol text-saffron">❤️</span>
+                    Relationship Harmony
+                  </h5>
+                  <p className="text-secondary leading-relaxed">{marriageIndications.relationshipHarmony}</p>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
         {/* Spiritual Indications */}
         {Object.keys(spiritualIndications).length > 0 && (
-          <div className="spiritual-section">
-            <h4 className="section-title">🕉️ Spiritual Indications</h4>
-
-            {spiritualIndications.spiritualInclination && (
-              <div className="spiritual-inclination">
-                <h5>Spiritual Inclination:</h5>
-                <p>{spiritualIndications.spiritualInclination}</p>
+          <div className="card-cosmic group hover:shadow-xl transition-all duration-500">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-12 h-12 bg-gradient-to-br from-third-eye-chakra to-crown-chakra rounded-full flex items-center justify-center text-white text-xl">
+                🕉️
               </div>
-            )}
+              <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
+                Spiritual Indications
+              </h4>
+            </div>
+            <div className="space-y-4">
+              {spiritualIndications.spiritualInclination && (
+                <div className="card-vedic group hover:shadow-lg transition-all duration-300 p-5">
+                  <h5 className="text-lg font-semibold text-primary mb-3 flex items-center gap-2">
+                    <span className="vedic-symbol text-saffron">🧘</span>
+                    Spiritual Inclination
+                  </h5>
+                  <p className="text-secondary leading-relaxed">{spiritualIndications.spiritualInclination}</p>
+                </div>
+              )}
 
-            {spiritualIndications.dharmaPath && (
-              <div className="dharma-path">
-                <h5>Dharma Path:</h5>
-                <p>{spiritualIndications.dharmaPath}</p>
-              </div>
-            )}
+              {spiritualIndications.dharmaPath && (
+                <div className="card-vedic group hover:shadow-lg transition-all duration-300 p-5">
+                  <h5 className="text-lg font-semibold text-primary mb-3 flex items-center gap-2">
+                    <span className="vedic-symbol text-saffron">🛤️</span>
+                    Dharma Path
+                  </h5>
+                  <p className="text-secondary leading-relaxed">{spiritualIndications.dharmaPath}</p>
+                </div>
+              )}
 
-            {spiritualIndications.spiritualPractices && (
-              <div className="spiritual-practices">
-                <h5>Recommended Spiritual Practices:</h5>
-                <ul>
-                  {spiritualIndications.spiritualPractices.map((practice, index) => (
-                    <li key={index}>{practice}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
+              {spiritualIndications.spiritualPractices && Array.isArray(spiritualIndications.spiritualPractices) && spiritualIndications.spiritualPractices.length > 0 && (
+                <div className="card-vedic group hover:shadow-lg transition-all duration-300 p-5">
+                  <h5 className="text-lg font-semibold text-primary mb-3 flex items-center gap-2">
+                    <span className="vedic-symbol text-saffron">📿</span>
+                    Recommended Spiritual Practices
+                  </h5>
+                  <ul className="space-y-2">
+                    {spiritualIndications.spiritualPractices.map((practice, index) => (
+                      <li key={index} className="flex items-start gap-2 text-secondary">
+                        <span className="text-saffron mt-1">•</span>
+                        <span>{practice}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
         {/* Yoga Formations */}
         {yogaFormations.length > 0 && (
-          <div className="yoga-formations-section">
-            <h4 className="section-title">🧘 Yoga Formations in D9</h4>
-            <div className="yogas-grid">
-              {yogaFormations.map((yoga, index) => (
-                <div key={index} className="yoga-card">
-                  <div className="yoga-name">{yoga.name}</div>
-                  <div className="yoga-description">{yoga.description}</div>
-                  {yoga.planets && (
-                    <div className="yoga-planets">Planets: {yoga.planets.join(', ')}</div>
-                  )}
-                  {yoga.effects && (
-                    <div className="yoga-effects">Effects: {yoga.effects}</div>
-                  )}
-                  {yoga.strength && (
-                    <div className="yoga-strength">Strength: {yoga.strength}</div>
-                  )}
-                </div>
-              ))}
+          <div className="card-cosmic group hover:shadow-xl transition-all duration-500">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-12 h-12 bg-gradient-to-br from-friendly to-exalted rounded-full flex items-center justify-center text-white text-xl">
+                🧘
+              </div>
+              <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
+                Yoga Formations in D9
+              </h4>
+              <span className="ml-auto text-base font-normal text-muted">
+                {yogaFormations.length} yoga{yogaFormations.length !== 1 ? 's' : ''}
+              </span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {yogaFormations.map((yoga, index) => {
+                const yogaObj = typeof yoga === 'object' && yoga !== null ? yoga : { name: yoga };
+                return (
+                  <div key={index} className="card-vedic group hover:transform hover:scale-[1.02] transition-all duration-300 hover:shadow-lg border border-white/10">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-10 h-10 bg-gradient-to-br from-friendly to-exalted rounded-full flex items-center justify-center text-white font-bold">
+                        🧘
+                      </div>
+                      <h5 className="text-lg font-bold text-primary">{yogaObj.name || 'Yoga Formation'}</h5>
+                    </div>
+                    <div className="bg-white/5 p-4 rounded-lg space-y-2">
+                      {yogaObj.description && (
+                        <p className="text-secondary leading-relaxed text-sm">{yogaObj.description}</p>
+                      )}
+                      {yogaObj.planets && Array.isArray(yogaObj.planets) && (
+                        <div className="text-sm">
+                          <span className="font-semibold text-primary">Planets: </span>
+                          <span className="text-secondary">{yogaObj.planets.map(p => formatPlanetName(p)).join(', ')}</span>
+                        </div>
+                      )}
+                      {yogaObj.effects && (
+                        <div className="text-sm">
+                          <span className="font-semibold text-primary">Effects: </span>
+                          <span className="text-secondary">{yogaObj.effects}</span>
+                        </div>
+                      )}
+                      {yogaObj.strength && (
+                        <div className="text-sm">
+                          <span className="font-semibold text-primary">Strength: </span>
+                          <span className="text-secondary">{yogaObj.strength}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
 
         {/* Overall Analysis */}
-        {overallAnalysis.summary && (
-          <div className="overall-analysis-section">
-            <h4 className="section-title">📋 Overall Navamsa Analysis</h4>
-            <p className="analysis-summary">{overallAnalysis.summary}</p>
-
-            {overallAnalysis.strengths && (
-              <div className="analysis-strengths">
-                <h5>Strengths:</h5>
-                <ul>
-                  {overallAnalysis.strengths.map((strength, index) => (
-                    <li key={index}>{strength}</li>
-                  ))}
-                </ul>
+        {(overallAnalysis.summary || overallAnalysis.strengths || overallAnalysis.challenges || overallAnalysis.recommendations) && (
+          <div className="card-cosmic group hover:shadow-xl transition-all duration-500">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-12 h-12 bg-gradient-to-br from-jupiter to-saffron rounded-full flex items-center justify-center text-white text-xl">
+                📋
               </div>
-            )}
+              <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
+                Overall Navamsa Analysis
+              </h4>
+            </div>
+            <div className="space-y-4">
+              {overallAnalysis.summary && (
+                <div className="card-vedic group hover:shadow-lg transition-all duration-300 p-5">
+                  <h5 className="text-lg font-semibold text-primary mb-3">Summary</h5>
+                  <p className="text-secondary leading-relaxed">{overallAnalysis.summary}</p>
+                </div>
+              )}
 
-            {overallAnalysis.challenges && (
-              <div className="analysis-challenges">
-                <h5>Challenges:</h5>
-                <ul>
-                  {overallAnalysis.challenges.map((challenge, index) => (
-                    <li key={index}>{challenge}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
+              {overallAnalysis.strengths && Array.isArray(overallAnalysis.strengths) && overallAnalysis.strengths.length > 0 && (
+                <div className="card-vedic group hover:shadow-lg transition-all duration-300 p-5">
+                  <h5 className="text-lg font-semibold text-primary mb-3 flex items-center gap-2">
+                    <span className="vedic-symbol text-exalted">✨</span>
+                    Strengths
+                  </h5>
+                  <ul className="space-y-2">
+                    {overallAnalysis.strengths.map((strength, index) => (
+                      <li key={index} className="flex items-start gap-2 text-secondary">
+                        <span className="text-exalted mt-1">•</span>
+                        <span>{strength}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
-            {overallAnalysis.recommendations && (
-              <div className="analysis-recommendations">
-                <h5>Recommendations:</h5>
-                <ul>
-                  {overallAnalysis.recommendations.map((rec, index) => (
-                    <li key={index}>{rec}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
+              {overallAnalysis.challenges && Array.isArray(overallAnalysis.challenges) && overallAnalysis.challenges.length > 0 && (
+                <div className="card-vedic group hover:shadow-lg transition-all duration-300 p-5">
+                  <h5 className="text-lg font-semibold text-primary mb-3 flex items-center gap-2">
+                    <span className="vedic-symbol text-enemy">⚠️</span>
+                    Challenges
+                  </h5>
+                  <ul className="space-y-2">
+                    {overallAnalysis.challenges.map((challenge, index) => (
+                      <li key={index} className="flex items-start gap-2 text-secondary">
+                        <span className="text-enemy mt-1">•</span>
+                        <span>{challenge}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {overallAnalysis.recommendations && Array.isArray(overallAnalysis.recommendations) && overallAnalysis.recommendations.length > 0 && (
+                <div className="card-vedic group hover:shadow-lg transition-all duration-300 p-5">
+                  <h5 className="text-lg font-semibold text-primary mb-3 flex items-center gap-2">
+                    <span className="vedic-symbol text-saffron">💡</span>
+                    Recommendations
+                  </h5>
+                  <ul className="space-y-2">
+                    {overallAnalysis.recommendations.map((rec, index) => (
+                      <li key={index} className="flex items-start gap-2 text-secondary">
+                        <span className="text-saffron mt-1">•</span>
+                        <span>{rec}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
-        {/* Fallback for debugging */}
-        {!navamsaLagna.sign && Object.keys(marriageIndications).length === 0 && (
-          <div className="text-center text-muted">
-            <p>Navamsa analysis will be available once comprehensive data is loaded.</p>
-            <pre className="text-xs mt-2 bg-gray-100 p-2 rounded">
-              Available data: {JSON.stringify(Object.keys(navamsa), null, 2)}
-            </pre>
+        {/* Display when no data available */}
+        {!navamsaLagna.sign && Object.keys(marriageIndications).length === 0 && Object.keys(planetaryStrengths).length === 0 && (
+          <div className="card-cosmic text-center">
+            <div className="text-6xl mb-4">🔄</div>
+            <p className="text-lg text-secondary">Navamsa analysis will be available once comprehensive data is loaded.</p>
           </div>
         )}
       </div>
@@ -1475,7 +2111,7 @@ const DashaDisplay = ({ data }) => {
           </div>
         )}
 
-        {/* Fallback for debugging */}
+        {/* Display when no data available */}
         {!currentDasha.planet && antardashas.length === 0 && timeline.length === 0 && (
           <div className="text-center text-muted">
             <p>Dasha analysis will be available once comprehensive data is loaded.</p>
@@ -1604,7 +2240,7 @@ const PreliminaryDisplay = ({ data }) => {
           </div>
         )}
 
-        {/* Fallback: If preliminary is the status object itself, handle it */}
+        {/* Handle preliminary analysis data */}
         {!preliminary.summary && !preliminary.keyPlacements && !preliminary.strengths && 
          !preliminary.challenges && !preliminary.recommendations && !preliminary.status &&
          typeof preliminary === 'object' && Object.keys(preliminary).length > 0 && (
@@ -1773,11 +2409,33 @@ const AnalysisPage = () => {
           }, 100);
         } else {
           console.error('❌ AnalysisPage: Failed to load data:', result.error);
-          setError(result.error);
+          
+          // PRODUCTION: Handle BIRTH_DATA_REQUIRED error with proper user guidance
+          if (result.error?.code === 'BIRTH_DATA_REQUIRED') {
+            setError({
+              message: result.error.userMessage || result.error.message,
+              code: result.error.code,
+              action: result.error.action,
+              requiresNavigation: true
+            });
+          } else {
+            setError(result.error);
+          }
         }
       } catch (error) {
         console.error('❌ AnalysisPage: Error during initialization:', error);
-        setError(error.message);
+        
+        // PRODUCTION: Handle birth data required error
+        if (error.code === 'BIRTH_DATA_REQUIRED') {
+          setError({
+            message: error.userMessage,
+            code: error.code,
+            action: error.action,
+            requiresNavigation: true
+          });
+        } else {
+          setError(error.message);
+        }
       } finally {
         setLoading(false);
       }
@@ -1787,9 +2445,9 @@ const AnalysisPage = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Empty dependency array for mount-only execution - dependencies handled internally
 
-  // Define all analysis endpoints
+  // FIXED: Define all analysis endpoints using correct API paths
   const analysisEndpoints = useMemo(() => ({
-    lagna: { url: '/api/v1/chart/analysis/lagna', label: 'Lagna Analysis', icon: '🌅' },
+    lagna: { url: '/api/v1/analysis/comprehensive', label: 'Lagna Analysis', icon: '🌅', note: 'Data extracted from comprehensive analysis' },
     preliminary: { url: '/api/v1/analysis/preliminary', label: 'Preliminary', icon: '📋' },
     houses: { url: '/api/v1/analysis/houses', label: 'Houses Analysis', icon: '🏠' },
     aspects: { url: '/api/v1/analysis/aspects', label: 'Planetary Aspects', icon: '🔗' },
@@ -1957,8 +2615,8 @@ const AnalysisPage = () => {
 
             extractedData.lagna = formattedLagnaData;
             console.log('✅ Extracted lagna data from section2');
-          } else {
-            // Fallback to entire section2 if specific lagna data not found
+          } else if (comprehensiveData.sections.section2) {
+            // Extract lagna data from section2 structure
             extractedData.lagna = { analysis: comprehensiveData.sections.section2, success: true };
           }
         }
@@ -1977,8 +2635,8 @@ const AnalysisPage = () => {
 
             extractedData.houses = formattedHousesData;
             console.log('✅ Extracted houses data from section3:', Object.keys(rawHousesData));
-          } else {
-            // Fallback to entire section3 if specific houses data not found
+          } else if (comprehensiveData.sections.section3) {
+            // Extract houses data from section3 structure
             extractedData.houses = { analysis: comprehensiveData.sections.section3, success: true };
           }
         }
@@ -2083,8 +2741,8 @@ const AnalysisPage = () => {
         return;
       }
 
-      // 4. Try to get data from session storage directly as fallback for ALL endpoints
-      console.log('🔍 Checking session storage directly for ALL endpoints...');
+      // 4. Try to get data from session storage directly
+      console.log('🔍 Checking session storage directly...');
       try {
         const sessionKeys = Object.keys(sessionStorage);
         const analysisDataFromSession = {};
@@ -2143,8 +2801,8 @@ const AnalysisPage = () => {
         console.log('⚠️ Error reading session storage:', err.message);
       }
 
-      // 5. Fallback: show empty state but don't redirect
-      console.log('❌ No analysis data found for any endpoints, showing empty state');
+      // 5. No analysis data found - show empty state
+      console.log('❌ No analysis data found, showing empty state');
       setAnalysisData({}); // Set empty object so page renders
       setLoading(false);
 
@@ -2542,6 +3200,60 @@ const AnalysisPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Error Handling UI */}
+      {error && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+          <div className="card-cosmic max-w-md w-full p-8 relative z-10">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center text-white text-2xl mb-4">
+                ⚠️
+              </div>
+              <h2 className="text-2xl font-bold text-white mb-2">Analysis Not Available</h2>
+            </div>
+            
+            <p className="text-white/90 text-center mb-6 leading-relaxed">
+              {error.message || 'Analysis data is not available. Please generate your birth chart first by filling out the birth data form.'}
+            </p>
+
+            {error.action === 'navigate_home' && (
+              <div className="space-y-4">
+                <div className="bg-white/10 rounded-lg p-4 border border-white/20">
+                  <p className="text-white/80 text-sm mb-3">To proceed with analysis:</p>
+                  <ol className="text-white/90 text-sm space-y-2 list-decimal list-inside">
+                    <li>Fill out your birth data form</li>
+                    <li>Click "Generate Vedic Chart"</li>
+                    <li>Return here to view your complete analysis</li>
+                  </ol>
+                </div>
+                
+                <button
+                  onClick={() => navigate('/')}
+                  className="btn-vedic-premium w-full"
+                >
+                  <span className="flex items-center justify-center space-x-2">
+                    <span className="vedic-symbol symbol-om">🕉️</span>
+                    <span>Go to Birth Data Form</span>
+                  </span>
+                </button>
+              </div>
+            )}
+
+            <button
+              onClick={() => {
+                setError(null);
+                if (error.action !== 'navigate_home') {
+                  window.location.reload();
+                }
+              }}
+              className="btn-secondary w-full mt-4"
+            >
+              {error.action === 'navigate_home' ? 'Dismiss' : 'Try Again'}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

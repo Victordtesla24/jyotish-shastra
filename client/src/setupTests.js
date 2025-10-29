@@ -30,6 +30,6 @@ global.sessionStorage = sessionStorageMock;
 global.fetch = jest.fn();
 
 // Mock environment variables
-process.env.REACT_APP_API_URL = 'http://localhost:3001/api';
+process.env.REACT_APP_API_URL = '/api';
 process.env.REACT_APP_GEOCODING_API_KEY = 'test-api-key';
 process.env.REACT_APP_GEOCODING_ENABLED = 'true';

@@ -14,8 +14,8 @@ class GeocodingService {
     this.apiKey = process.env.GEOCODING_API_KEY;
     this.apiUrl = 'https://api.opencagedata.com/geocode/v1/json';
 
-    // Validate API key in non-test environments
-    if (process.env.NODE_ENV !== 'test' && (!this.apiKey || this.apiKey === 'YOUR_OPENCAGE_API_KEY')) {
+    // Validate API key in non-test environments  
+    if (process.env.NODE_ENV !== 'test' && !this.apiKey) {
       throw new Error('GEOCODING_API_KEY is not configured. Please set it in your .env file.');
     }
 
@@ -26,7 +26,7 @@ class GeocodingService {
    * Geocode a location to get latitude and longitude
    * @param {Object} locationData - Location details
    * @returns {Object} Geocoded location data
-   * @throws {Error} If geocoding fails and no fallback is available
+   * @throws {Error} If geocoding fails - production code throws errors, no fallbacks
    */
   async geocodeLocation(locationData) {
     const { city, state, country, placeOfBirth } = locationData;
@@ -35,7 +35,7 @@ class GeocodingService {
     console.log('🌍 Geocoding request for:', query);
 
     // Check if API key is available
-    if (!this.apiKey || this.apiKey === 'YOUR_OPENCAGE_API_KEY') {
+    if (!this.apiKey) {
       throw new Error('Geocoding API key is not configured or invalid');
     }
 

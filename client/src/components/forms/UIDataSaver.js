@@ -122,6 +122,9 @@ class UIDataSaver {
       }
 
       if (apiResponseData.chart || apiResponseData.rasiChart) {
+        // CRITICAL FIX: Clear old chart data before saving new chart
+        this.clearOldChartData();
+        
         sessionStorage.setItem(
           `jyotish_api_chart_generate_${Date.now()}`,
           JSON.stringify({
@@ -153,6 +156,9 @@ class UIDataSaver {
       const timestamp = new Date().toISOString();
       const key = `jyotish_api_analysis_comprehensive_${Date.now()}`;
 
+      // CRITICAL FIX: Clear all old comprehensive analysis data to prevent stale cache
+      this.clearOldComprehensiveAnalysis();
+
       // Store comprehensive analysis with proper structure
       const comprehensiveData = {
         success: analysisData.success || true,
@@ -173,7 +179,7 @@ class UIDataSaver {
 
       sessionStorage.setItem(key, JSON.stringify(comprehensiveData));
 
-      console.log('✅ UIDataSaver: Comprehensive analysis saved', {
+      console.log('✅ UIDataSaver: Comprehensive analysis saved (old cache cleared)', {
         key: key,
         hasSections: !!(comprehensiveData.analysis?.sections),
         sectionCount: comprehensiveData.analysis?.sections ? Object.keys(comprehensiveData.analysis.sections).length : 0,
@@ -185,6 +191,46 @@ class UIDataSaver {
     } catch (error) {
       console.error('❌ UIDataSaver: Error saving comprehensive analysis:', error);
       return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Clear old comprehensive analysis data to prevent stale cache
+   * CRITICAL FIX: Ensures UI always displays fresh data
+   */
+  clearOldComprehensiveAnalysis() {
+    try {
+      const keys = Object.keys(sessionStorage);
+      const oldKeys = keys.filter(key => key.startsWith('jyotish_api_analysis_comprehensive_'));
+      
+      oldKeys.forEach(key => {
+        sessionStorage.removeItem(key);
+        console.log(`🧹 UIDataSaver: Removed old comprehensive analysis: ${key}`);
+      });
+
+      console.log(`✅ UIDataSaver: Cleared ${oldKeys.length} old comprehensive analysis entries`);
+    } catch (error) {
+      console.error('❌ UIDataSaver: Error clearing old comprehensive analysis:', error);
+    }
+  }
+
+  /**
+   * Clear old chart data to prevent stale cache
+   * CRITICAL FIX: Prevents displaying incorrect/outdated chart data
+   */
+  clearOldChartData() {
+    try {
+      const keys = Object.keys(sessionStorage);
+      const oldKeys = keys.filter(key => key.startsWith('jyotish_api_chart_'));
+      
+      oldKeys.forEach(key => {
+        sessionStorage.removeItem(key);
+        console.log(`🧹 UIDataSaver: Removed old chart data: ${key}`);
+      });
+
+      console.log(`✅ UIDataSaver: Cleared ${oldKeys.length} old chart entries`);
+    } catch (error) {
+      console.error('❌ UIDataSaver: Error clearing old chart data:', error);
     }
   }
 
@@ -262,7 +308,7 @@ class UIDataSaver {
         };
       }
 
-      // Fallback to regular analysis data
+      // Get regular analysis data
       const analysisData = session?.currentSession?.apiResponse?.analysis;
 
       console.log('📊 UIDataSaver: Getting analysis data', {
@@ -317,25 +363,7 @@ class UIDataSaver {
         return storedData;
       }
 
-      // Fallback: Try the old pattern for backwards compatibility
-      const oldKeys = Object.keys(sessionStorage).filter(key =>
-        key.startsWith(`jyotish_${analysisType}_analysis`)
-      );
-
-      if (oldKeys.length > 0) {
-        // Get the most recent one
-        const latestKey = oldKeys.sort().pop();
-        const storedData = JSON.parse(sessionStorage.getItem(latestKey));
-
-        console.log(`📊 UIDataSaver: Getting ${analysisType} analysis from old storage pattern`, {
-          key: latestKey,
-          hasAnalysis: !!(storedData?.analysis)
-        });
-
-        return storedData;
-      }
-
-      console.log(`📊 UIDataSaver: No ${analysisType} analysis found in any storage pattern`);
+      console.log(`📊 UIDataSaver: No ${analysisType} analysis found in standard storage pattern`);
       return null;
     } catch (error) {
       console.error(`❌ UIDataSaver: Error getting ${analysisType} analysis:`, error);
@@ -477,38 +505,7 @@ class UIDataSaver {
         return session.birthData;
       }
 
-      // Method 2: Try direct sessionStorage lookup (backwards compatibility)
-      const directBirthData = sessionStorage.getItem('birthData');
-      if (directBirthData) {
-        try {
-          const birthData = JSON.parse(directBirthData);
-          console.log('✅ UIDataSaver: Found birth data in direct sessionStorage');
-          return birthData;
-        } catch (parseError) {
-          console.warn('⚠️ UIDataSaver: Error parsing direct birth data:', parseError);
-        }
-      }
-
-      // Method 3: Search all sessionStorage keys for birth data patterns (fallback)
-      const allKeys = Object.keys(sessionStorage);
-      const birthDataKeys = allKeys.filter(key =>
-        key.includes('birthData') ||
-        key.includes('birth_data') ||
-        (key.includes('jyotish') && key.includes('form'))
-      );
-
-      for (const key of birthDataKeys) {
-        try {
-          const data = JSON.parse(sessionStorage.getItem(key));
-          // Check if this looks like birth data
-          if (data && (data.dateOfBirth || data.name || data.latitude)) {
-            console.log(`✅ UIDataSaver: Found birth data in ${key}`);
-            return data;
-          }
-        } catch (error) {
-          // Skip invalid JSON
-        }
-      }
+      // Production code only uses standard storage pattern - no backward compatibility or fallback methods
 
       console.log('❌ UIDataSaver: No birth data found in any storage location');
       return null;

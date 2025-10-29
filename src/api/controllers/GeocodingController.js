@@ -26,7 +26,7 @@ class GeocodingController {
       // Provide clearer HTTP status codes for known geocoding errors
       const lower = error.message.toLowerCase();
 
-      if (lower.includes('location not found')) {
+      if (lower.includes('location not found') || lower.includes('no geocoding results')) {
         return res.status(404).json({
           success: false,
           message: 'Location not found',
@@ -42,8 +42,12 @@ class GeocodingController {
         });
       }
 
-      // Fall back to generic 500 for unexpected errors
-      next(error);
+      // Return structured error response for all other errors
+      return res.status(500).json({
+        success: false,
+        message: 'Geocoding service error',
+        details: error.message
+      });
     }
   }
 
@@ -72,7 +76,7 @@ class GeocodingController {
       // Provide clearer HTTP status codes for known geocoding errors
       const lower = error.message.toLowerCase();
 
-      if (lower.includes('location not found')) {
+      if (lower.includes('location not found') || lower.includes('no geocoding results')) {
         return res.status(404).json({
           success: false,
           message: 'Location not found',
@@ -88,8 +92,12 @@ class GeocodingController {
         });
       }
 
-      // Fall back to generic 500 for unexpected errors
-      next(error);
+      // Return structured error response for all other errors
+      return res.status(500).json({
+        success: false,
+        message: 'Geocoding service error',
+        details: error.message
+      });
     }
   }
 

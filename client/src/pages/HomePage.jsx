@@ -32,7 +32,7 @@ const HomePage = () => {
       });
 
       // Call the chart generation API with correct v1 endpoint
-      const response = await fetch('http://localhost:3001/api/v1/chart/generate', {
+      const response = await fetch('/api/v1/chart/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -53,7 +53,7 @@ const HomePage = () => {
 
       // CRITICAL FIX: Also fetch comprehensive analysis data
       console.log('🔄 HomePage: Fetching comprehensive analysis...');
-      const analysisResponse = await fetch('http://localhost:3001/api/v1/analysis/comprehensive', {
+      const analysisResponse = await fetch('/api/v1/analysis/comprehensive', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -133,7 +133,10 @@ const HomePage = () => {
 
         <BirthDataForm
           onSubmit={handleFormSubmit}
-          onError={(error) => setError(error)}
+          onError={(error) => {
+            console.error('❌ HomePage: Form error received:', error);
+            setError(error);
+          }}
         />
       </Card>
     </div>

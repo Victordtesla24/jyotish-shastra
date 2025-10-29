@@ -12,7 +12,9 @@ const ResponseDataToUIDisplayAnalyser = {
    * @returns {Object} Formatted data for UI display
    */
   processComprehensiveAnalysis: (apiResponse) => {
-    if (!apiResponse) return null;
+    if (!apiResponse) {
+      throw new Error('API response is required for comprehensive analysis processing');
+    }
 
     // Handle multiple response formats
     let analysis;
@@ -21,11 +23,13 @@ const ResponseDataToUIDisplayAnalyser = {
     } else if (apiResponse.sections) {
       analysis = apiResponse; // Direct: {sections: {}}
     } else {
-      return null;
+      throw new Error('Invalid API response structure. Expected apiResponse.analysis or apiResponse.sections');
     }
 
     const { sections } = analysis;
-    if (!sections || Object.keys(sections).length === 0) return null;
+    if (!sections || Object.keys(sections).length === 0) {
+      throw new Error('Sections data is missing from API response. Expected analysis.sections with 8 sections (section1-section8).');
+    }
 
     return {
       success: apiResponse.success || true,
@@ -42,9 +46,12 @@ const ResponseDataToUIDisplayAnalyser = {
    * @returns {Object} Formatted data for UI display
    */
   processHouseAnalysis: (apiResponse) => {
-    if (!apiResponse || !apiResponse.analysis) {
-      console.error('Invalid houses analysis API response structure');
-      return null;
+    if (!apiResponse) {
+      throw new Error('API response is required for houses analysis processing');
+    }
+    
+    if (!apiResponse.analysis) {
+      throw new Error('Invalid houses analysis API response structure. Expected apiResponse.analysis with houses data.');
     }
 
     const { analysis } = apiResponse;
@@ -64,9 +71,12 @@ const ResponseDataToUIDisplayAnalyser = {
    * @returns {Object} Formatted data for UI display
    */
   processDashaAnalysis: (apiResponse) => {
-    if (!apiResponse || !apiResponse.analysis) {
-      console.error('Invalid dasha analysis API response structure');
-      return null;
+    if (!apiResponse) {
+      throw new Error('API response is required for dasha analysis processing');
+    }
+    
+    if (!apiResponse.analysis) {
+      throw new Error('Invalid dasha analysis API response structure. Expected apiResponse.analysis with dashaAnalysis data.');
     }
 
     const { analysis } = apiResponse;
@@ -88,9 +98,12 @@ const ResponseDataToUIDisplayAnalyser = {
    * @returns {Object} Formatted data for UI display
    */
   processNavamsaAnalysis: (apiResponse) => {
-    if (!apiResponse || !apiResponse.analysis) {
-      console.error('Invalid navamsa analysis API response structure');
-      return null;
+    if (!apiResponse) {
+      throw new Error('API response is required for navamsa analysis processing');
+    }
+    
+    if (!apiResponse.analysis) {
+      throw new Error('Invalid navamsa analysis API response structure. Expected apiResponse.analysis with navamsaAnalysis data.');
     }
 
     const { analysis } = apiResponse;
@@ -110,9 +123,12 @@ const ResponseDataToUIDisplayAnalyser = {
    * @returns {Object} Formatted data for UI display
    */
   processAspectsAnalysis: (apiResponse) => {
-    if (!apiResponse || !apiResponse.analysis) {
-      console.error('Invalid aspects analysis API response structure');
-      return null;
+    if (!apiResponse) {
+      throw new Error('API response is required for aspects analysis processing');
+    }
+    
+    if (!apiResponse.analysis) {
+      throw new Error('Invalid aspects analysis API response structure. Expected apiResponse.analysis with aspects data.');
     }
 
     const { analysis } = apiResponse;
@@ -149,9 +165,12 @@ const ResponseDataToUIDisplayAnalyser = {
    * @returns {Object} Formatted data for UI display
    */
   processArudhaAnalysis: (apiResponse) => {
-    if (!apiResponse || !apiResponse.analysis) {
-      console.error('Invalid arudha analysis API response structure');
-      return null;
+    if (!apiResponse) {
+      throw new Error('API response is required for arudha analysis processing');
+    }
+    
+    if (!apiResponse.analysis) {
+      throw new Error('Invalid arudha analysis API response structure. Expected apiResponse.analysis with arudhaAnalysis data.');
     }
 
     const { analysis } = apiResponse;
@@ -189,9 +208,12 @@ const ResponseDataToUIDisplayAnalyser = {
    * @returns {Object} Formatted data for UI display
    */
   processLagnaAnalysis: (apiResponse) => {
-    if (!apiResponse || !apiResponse.analysis) {
-      console.error('Invalid lagna analysis API response structure');
-      return null;
+    if (!apiResponse) {
+      throw new Error('API response is required for lagna analysis processing');
+    }
+    
+    if (!apiResponse.analysis) {
+      throw new Error('Invalid lagna analysis API response structure. Expected apiResponse.analysis with lagna data.');
     }
 
     const { analysis } = apiResponse;
@@ -210,9 +232,12 @@ const ResponseDataToUIDisplayAnalyser = {
    * @returns {Object} Formatted data for UI display
    */
   processPreliminaryAnalysis: (apiResponse) => {
-    if (!apiResponse || !apiResponse.analysis) {
-      console.error('Invalid preliminary analysis API response structure');
-      return null;
+    if (!apiResponse) {
+      throw new Error('API response is required for preliminary analysis processing');
+    }
+    
+    if (!apiResponse.analysis) {
+      throw new Error('Invalid preliminary analysis API response structure. Expected apiResponse.analysis with preliminary data.');
     }
 
     const { analysis } = apiResponse;
@@ -248,8 +273,11 @@ const ResponseDataToUIDisplayAnalyser = {
    */
   processGenericAnalysis: (apiResponse, analysisType) => {
     if (!apiResponse) {
-      console.error(`Invalid ${analysisType} analysis API response structure`);
-      return null;
+      throw new Error(`API response is required for ${analysisType} analysis processing`);
+    }
+    
+    if (!apiResponse.analysis && !apiResponse.success) {
+      throw new Error(`Invalid ${analysisType} analysis API response structure. Expected apiResponse.analysis or apiResponse with success status.`);
     }
 
     console.log(`Processing ${analysisType} analysis data:`, apiResponse);
@@ -296,23 +324,53 @@ const ResponseDataToUIDisplayAnalyser = {
             console.log('✅ [ResponseDataToUIDisplayAnalyser] Extracted preliminary data from section1');
           }
 
-          // SECTION 2: Preliminary Chart Analysis: Lagna, Luminaries, and Overall Patterns
+          // SECTION 2: Preliminary Chart Analysis: Lagna, Luminaries, and Overall Patterns - FIXED
           if (sections.section2?.analyses?.lagna) {
             const rawLagnaData = sections.section2.analyses.lagna;
             const formattedLagnaData = {
               analysis: {
-                sign: rawLagnaData.lagnaSign?.sign,
-                signLord: rawLagnaData.lagnaSign?.ruler,
-                element: rawLagnaData.lagnaSign?.element,
-                characteristics: rawLagnaData.lagnaSign?.characteristics,
-                degree: rawLagnaData.lagnaLord?.currentPosition?.degree,
-                nakshatra: rawLagnaData.lagnaLord?.currentPosition?.nakshatra,
-                fullData: rawLagnaData
+                // Extract actual lagna data from API response
+                sign: rawLagnaData.sign || rawLagnaData.lagnaSign?.sign,
+                signLord: rawLagnaData.signLord || rawLagnaData.ruler,
+                element: rawLagnaData.element,
+                characteristics: rawLagnaData.characteristics || [],
+                degree: rawLagnaData.degree,
+                nakshatra: rawLagnaData.nakshatra,
+                lagnaLord: rawLagnaData.lagnaLord,
+                dignity: rawLagnaData.dignity,
+                fullData: rawLagnaData,
+                // Handle luminaries data
+                luminaries: sections.section2.analyses.luminaries || {}
               },
               success: true
             };
             loadedData.lagna = formattedLagnaData;
             console.log('✅ [ResponseDataToUIDisplayAnalyser] Extracted lagna data from section2');
+          } else if (sections.section2) {
+            // PRODUCTION: Extract lagna data from section2 if structured correctly
+            const rawLagnaData = sections.section2.analyses?.lagna || sections.section2.lagna;
+            if (!rawLagnaData) {
+              throw new Error('Lagna analysis data not found in section2. Required structure: sections.section2.analyses.lagna');
+            }
+            const formattedLagnaData = {
+              analysis: {
+                sign: rawLagnaData.sign || rawLagnaData.lagnaSign?.sign,
+                signLord: rawLagnaData.signLord || rawLagnaData.ruler,
+                element: rawLagnaData.element,
+                characteristics: rawLagnaData.characteristics || [],
+                degree: rawLagnaData.degree,
+                nakshatra: rawLagnaData.nakshatra,
+                lagnaLord: rawLagnaData.lagnaLord,
+                dignity: rawLagnaData.dignity,
+                fullData: rawLagnaData,
+                luminaries: sections.section2.analyses?.luminaries || {}
+              },
+              success: true
+            };
+            loadedData.lagna = formattedLagnaData;
+            console.log('✅ [ResponseDataToUIDisplayAnalyser] Extracted lagna data from section2');
+          } else {
+            throw new Error('Lagna analysis data not found. Required in sections.section2.analyses.lagna or sections.section1');
           }
 
           // SECTION 3: House-by-House Examination (1st-12th Bhavas)
@@ -431,9 +489,15 @@ const ResponseDataToUIDisplayAnalyser = {
       }
 
       // Get birth data for API call
-      const birthData = UIDataSaver.getBirthData();
+      let birthData = UIDataSaver.getBirthData();
+
+      // PRODUCTION: Require birth data, no fallbacks
       if (!birthData) {
-        throw new Error('No birth data found. Please fill the birth data form first.');
+        const error = new Error('Birth data is required for analysis. Please generate a chart first by filling out the birth data form.');
+        error.code = 'BIRTH_DATA_REQUIRED';
+        error.userMessage = 'Please fill out the birth data form on the homepage and generate your chart to view analysis results.';
+        error.action = 'navigate_home';
+        throw error;
       }
 
       console.log('🔄 [ResponseDataToUIDisplayAnalyser] No cached data found, fetching from API...');
@@ -475,23 +539,39 @@ const ResponseDataToUIDisplayAnalyser = {
           console.log('✅ [ResponseDataToUIDisplayAnalyser] Extracted preliminary data from API section1');
         }
 
-        // SECTION 2: Preliminary Chart Analysis: Lagna, Luminaries, and Overall Patterns
+        // SECTION 2: Preliminary Chart Analysis: Lagna, Luminaries, and Overall Patterns - FIXED
         if (sections.section2?.analyses?.lagna) {
           const rawLagnaData = sections.section2.analyses.lagna;
           const formattedLagnaData = {
             analysis: {
-              sign: rawLagnaData.lagnaSign?.sign,
-              signLord: rawLagnaData.lagnaSign?.ruler,
-              element: rawLagnaData.lagnaSign?.element,
-              characteristics: rawLagnaData.lagnaSign?.characteristics,
-              degree: rawLagnaData.lagnaLord?.currentPosition?.degree,
-              nakshatra: rawLagnaData.lagnaLord?.currentPosition?.nakshatra,
-              fullData: rawLagnaData
+              // Extract actual lagna data from API response
+              sign: rawLagnaData.sign || rawLagnaData.lagnaSign?.sign,
+              signLord: rawLagnaData.signLord || rawLagnaData.ruler,
+              element: rawLagnaData.element,
+              characteristics: rawLagnaData.characteristics || [],
+              degree: rawLagnaData.degree,
+              nakshatra: rawLagnaData.nakshatra,
+              lagnaLord: rawLagnaData.lagnaLord,
+              dignity: rawLagnaData.dignity,
+              fullData: rawLagnaData,
+              // Handle luminaries data
+              luminaries: sections.section2.analyses.luminaries || {}
             },
             success: true
           };
           loadedData.lagna = formattedLagnaData;
           console.log('✅ [ResponseDataToUIDisplayAnalyser] Extracted lagna data from API section2');
+        } else if (sections.section2) {
+          // Extract lagna data from section2 structure
+          loadedData.lagna = {
+            analysis: {
+              fullData: sections.section2,
+              sign: sections.section2.lagnaSign || sections.section2.sign || 'Data available in section2',
+              message: 'Lagna analysis data extracted from section2'
+            },
+            success: true
+          };
+          console.log('✅ [ResponseDataToUIDisplayAnalyser] Extracted lagna data from section2');
         }
 
         // SECTION 3: House-by-House Examination (1st-12th Bhavas)
@@ -641,9 +721,15 @@ const ResponseDataToUIDisplayAnalyser = {
       }
 
       // Get birth data for API call
-      const birthData = UIDataSaver.getBirthData();
+      let birthData = UIDataSaver.getBirthData();
+
+      // PRODUCTION: Require birth data, no fallbacks
       if (!birthData) {
-        throw new Error('No birth data found for individual analysis');
+        const error = new Error('Birth data is required for analysis. Please generate a chart first by filling out the birth data form.');
+        error.code = 'BIRTH_DATA_REQUIRED';
+        error.userMessage = 'Please fill out the birth data form on the homepage and generate your chart to view analysis results.';
+        error.action = 'navigate_home';
+        throw error;
       }
 
       // Get endpoint for this analysis type
@@ -735,16 +821,16 @@ const ResponseDataToUIDisplayAnalyser = {
             analysis: apiData.analysis.lagnaAnalysis
           });
         } else {
-          // Fallback: process as comprehensive and extract lagna section
+          // Process as comprehensive and extract lagna section
           const comprehensiveData = ResponseDataToUIDisplayAnalyser.processComprehensiveAnalysis(apiData);
-          if (comprehensiveData && comprehensiveData.sections && comprehensiveData.sections.section2) {
-            return {
-              success: true,
-              analysis: comprehensiveData.sections.section2,
-              message: 'Lagna analysis extracted from comprehensive analysis'
-            };
+          if (!comprehensiveData || !comprehensiveData.sections || !comprehensiveData.sections.section2) {
+            throw new Error('Lagna analysis data not found in API response. Please ensure the comprehensive analysis endpoint returns section2 data.');
           }
-          return ResponseDataToUIDisplayAnalyser.processLagnaAnalysis(apiData);
+          return {
+            success: true,
+            analysis: comprehensiveData.sections.section2,
+            message: 'Lagna analysis extracted from comprehensive analysis'
+          };
         }
       case 'preliminary':
         return ResponseDataToUIDisplayAnalyser.processPreliminaryAnalysis(apiData);

@@ -1312,36 +1312,15 @@ class HouseAnalysisService {
       throw new Error('Chart data required for house analysis');
     }
 
-    try {
-      const allHousesAnalysis = [];
+    const allHousesAnalysis = [];
 
-      for (let houseNumber = 1; houseNumber <= 12; houseNumber++) {
-        try {
-          const houseAnalysis = this.analyzeHouse(houseNumber, chartToUse);
-          allHousesAnalysis.push(houseAnalysis);
-        } catch (houseError) {
-          // If individual house analysis fails, provide fallback
-          allHousesAnalysis.push({
-            houseNumber,
-            error: `Failed to analyze house ${houseNumber}: ${houseError.message}`,
-            houseData: this.houseSignifications[houseNumber],
-            analysis: {
-              summary: `House ${houseNumber} analysis unavailable`,
-              strengths: [],
-              challenges: [],
-              recommendations: []
-            }
-          });
-        }
-      }
-
-      return allHousesAnalysis;
-    } catch (error) {
-      // PRODUCTION REQUIREMENT: NO FAKE DATA GENERATION
-      // Throw error instead of returning fake analysis data
-      console.error('❌ Houses analysis failed:', error.message);
-      throw new Error(`Houses analysis failed: ${error.message}. Please ensure valid chart data is provided.`);
+    // PRODUCTION REQUIREMENT: NO FALLBACK DATA - throw errors immediately
+    for (let houseNumber = 1; houseNumber <= 12; houseNumber++) {
+      const houseAnalysis = this.analyzeHouse(houseNumber, chartToUse);
+      allHousesAnalysis.push(houseAnalysis);
     }
+
+    return allHousesAnalysis;
   }
 }
 

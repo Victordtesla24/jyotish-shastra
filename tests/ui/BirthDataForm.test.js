@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import BirthDataForm from './BirthDataForm';
-import geocodingService from '../../services/geocodingService';
+import BirthDataForm from '../../client/src/components/forms/BirthDataForm';
+import geocodingService from '../../client/src/services/geocodingService';
 
 // Mock the UIDataSaver
 jest.mock('./UIDataSaver');
@@ -14,8 +14,8 @@ jest.mock('./UIToAPIDataInterpreter');
 jest.mock('../../services/geocodingService');
 
 // Import the mocked modules
-import UIDataSaver from './UIDataSaver';
-import UIToAPIDataInterpreter from './UIToAPIDataInterpreter';
+import UIDataSaver from '../../client/src/components/forms/UIDataSaver';
+import UIToAPIDataInterpreter from '../../client/src/components/forms/UIToAPIDataInterpreter';
 
 // Set up default mock implementations
 beforeEach(() => {

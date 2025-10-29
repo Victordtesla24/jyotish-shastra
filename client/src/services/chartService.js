@@ -4,6 +4,7 @@
  * Layer 1: validateAndPrepareInput() → Layer 2: API Call + transformApiResponse() → Layer 3: Caching
  */
 
+import axios from 'axios';
 import { APIError } from '../utils/APIResponseInterpreter';
 
 class ChartService {
@@ -93,6 +94,10 @@ class ChartService {
    * @returns {Array} Processed planets array
    */
   processPlanets(chartData) {
+    if (!chartData) {
+      throw new Error('Chart data is required for planet processing');
+    }
+
     let planetsData = chartData.planets;
 
     // Handle planetaryPositions object format
@@ -104,19 +109,42 @@ class ChartService {
     }
 
     if (!planetsData || !Array.isArray(planetsData)) {
-      return [];
+      throw new Error('Planetary positions data is required. Expected planets array or planetaryPositions object in chart data.');
     }
 
-    return planetsData.map(planet => ({
-      name: planet.name,
-      signId: planet.signId,
-      sign: planet.sign || '',
-      degrees: planet.degrees || 0,
-      house: planet.house || 1,
-      dignity: planet.dignity || '',
-      longitude: planet.longitude || 0,
-      retrograde: planet.retrograde || false
-    }));
+    // Calculate house for each planet based on longitude
+    if (!chartData.housePositions || !Array.isArray(chartData.housePositions) || chartData.housePositions.length !== 12) {
+      throw new Error('House positions are required for accurate planet processing. Expected array of 12 house cusps.');
+    }
+    
+    const housePositions = chartData.housePositions;
+    
+    return planetsData.map(planet => {
+      // Determine house based on longitude and ascendant
+      let house = 1;
+      if (housePositions && Object.keys(housePositions).length > 0 && chartData.ascendant) {
+        const ascendantLongitude = chartData.ascendant.longitude;
+        const planetLongitude = planet.longitude || 0;
+        
+        // Calculate house (simplified - each house spans 30 degrees)
+        let adjustedDiff = planetLongitude - ascendantLongitude;
+        if (adjustedDiff < 0) adjustedDiff += 360;
+        house = Math.floor(adjustedDiff / 30) + 1;
+        if (house > 12) house = 12;
+      }
+
+      return {
+        name: planet.name,
+        signId: planet.signId,
+        sign: planet.sign || '',
+        degrees: planet.degrees || planet.degree || 0,
+        house: house,
+        dignity: planet.dignity || '',
+        longitude: planet.longitude || 0,
+        retrograde: planet.isRetrograde || planet.retrograde || false,
+        combust: planet.isCombust || false
+      };
+    });
   }
 
   /**
@@ -125,17 +153,40 @@ class ChartService {
    * @returns {Array} Processed houses array
    */
   processHouses(chartData) {
+    if (!chartData) {
+      throw new Error('Chart data is required for house processing');
+    }
+
+    if (!chartData.housePositions || !Array.isArray(chartData.housePositions) || chartData.housePositions.length !== 12) {
+      throw new Error('House positions are required for house processing. Expected array of 12 house cusps.');
+    }
+
     const houses = [];
-    const housePositions = chartData.housePositions || {};
+    const housePositions = chartData.housePositions;
     const planets = this.processPlanets(chartData);
 
-    // Create 12 houses with planets grouped by sign
-    for (let i = 1; i <= 12; i++) {
-      const houseSign = housePositions[i] || i;
-      const planetsInHouse = planets.filter(planet => planet.house === i);
+    // Create 12 houses with planets grouped by house
+    for (let i = 0; i < 12; i++) {
+      const houseNumber = i + 1;
+      const housePosition = housePositions[i];
+      
+      if (!housePosition) {
+        throw new Error(`House position data missing for house ${houseNumber}. Expected house positions array with 12 elements.`);
+      }
+      
+      // Extract signId from house position (can be object with signId or direct number)
+      const houseSign = (typeof housePosition === 'object' && housePosition.signId) 
+        ? housePosition.signId 
+        : (typeof housePosition === 'number' ? housePosition : null);
+        
+      if (houseSign === null || houseSign < 1 || houseSign > 12) {
+        throw new Error(`Invalid house sign for house ${houseNumber}. Expected signId between 1-12, got: ${JSON.stringify(housePosition)}`);
+      }
+      
+      const planetsInHouse = planets.filter(planet => planet.house === houseNumber);
 
       houses.push({
-        number: i,
+        number: houseNumber,
         sign: houseSign,
         signName: this.getSignName(houseSign),
         planets: planetsInHouse,

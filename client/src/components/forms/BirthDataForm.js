@@ -67,9 +67,10 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
       }
     } catch (error) {
       console.error('Geocoding error:', error);
+      const errorMessage = error.message || error.toString() || 'Failed to geocode location';
       setErrors(prev => ({
         ...prev,
-        placeOfBirth: 'Failed to geocode location'
+        placeOfBirth: errorMessage
       }));
     } finally {
       setGeocoding(false);
@@ -96,12 +97,29 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       if (formData.placeOfBirth && formData.placeOfBirth.length > 3) {
+        console.log('🔍 BirthDataForm: Debounced geocoding triggered for:', formData.placeOfBirth);
         geocodeLocation(formData.placeOfBirth);
       }
     }, 1000);
 
     return () => clearTimeout(timer);
   }, [formData.placeOfBirth, geocodeLocation]);
+
+  // Safety cleanup for loading state
+  useEffect(() => {
+    const safetyTimeout = setTimeout(() => {
+      if (loading) {
+        console.log('⚠️ BirthDataForm: Loading state stuck, clearing it');
+        setLoading(false);
+      }
+      if (geocoding) {
+        console.log('⚠️ BirthDataForm: Geocoding state stuck, clearing it');
+        setGeocoding(false);
+      }
+    }, 30000); // 30 second timeout
+
+    return () => clearTimeout(safetyTimeout);
+  }, [loading, geocoding]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -174,8 +192,15 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
 
       // Submit to parent component
       console.log('🚀 BirthDataForm: Calling onSubmit with requestBody:', requestBody);
-      await onSubmit(requestBody);
-      console.log('✅ BirthDataForm: onSubmit completed successfully');
+      
+      try {
+        await onSubmit(requestBody);
+        console.log('✅ BirthDataForm: onSubmit completed successfully');
+      } catch (submitError) {
+        console.error('BirthDataForm: onSubmit failed:', submitError);
+        // Re-throw the error to be caught by the outer catch block
+        throw submitError;
+      }
 
     } catch (error) {
       console.error('Form submission error:', error);
@@ -461,6 +486,30 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
             disabled={loading || geocoding}
             data-testid="generate-chart-button"
             className="btn-vedic btn-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+            onClick={(e) => {
+              console.log('🔍 BirthDataForm: Generate Chart button clicked');
+              console.log('🔍 BirthDataForm: Current state:', {
+                loading,
+                geocoding,
+                formData,
+                coordinates,
+                errors
+              });
+              
+              // Add debug if button appears to not work
+              if (!loading && !geocoding) {
+                console.log('🔍 BirthDataForm: Button should submit - enabled state');
+              } else {
+                console.log('🔍 BirthDataForm: Button disabled - loading:', loading, 'geocoding:', geocoding);
+                e.preventDefault();
+                if (loading) {
+                  console.log('🔍 BirthDataForm: Still loading from previous submission');
+                }
+                if (geocoding) {
+                  console.log('🔍 BirthDataForm: Still geocoding location');
+                }
+              }
+            }}
           >
             <span className="flex items-center justify-center space-x-2">
               {loading ? (

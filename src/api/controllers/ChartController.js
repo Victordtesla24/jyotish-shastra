@@ -475,13 +475,50 @@ class ChartController {
    */
   async analyzeLagna(req, res) {
     try {
-      const chartData = req.body.chart;
+      // Accept both birth data and pre-generated chart data
+      const birthData = req.body;
+      let chartData;
 
-      if (!chartData) {
-        return res.status(400).json({
-          success: false,
-          message: 'Chart data is required'
-        });
+      if (req.body.chart) {
+        // Pre-generated chart data provided
+        chartData = req.body.chart;
+      } else {
+        // Birth data provided - generate chart first
+        const validationResult = validateChartRequest(birthData);
+        if (!validationResult.isValid) {
+          return res.status(400).json({
+            success: false,
+            message: 'Invalid birth data provided',
+            errors: validationResult.errors
+          });
+        }
+
+        // Process timezone format conversion
+        const processedBirthData = this.processTimezoneFormat(validationResult.data);
+
+        // Extract coordinates from nested or flat structure
+        let latitude = processedBirthData.latitude;
+        let longitude = processedBirthData.longitude;
+
+        // Check for nested placeOfBirth structure
+        if (!latitude && !longitude && processedBirthData.placeOfBirth) {
+          latitude = processedBirthData.placeOfBirth.latitude;
+          longitude = processedBirthData.placeOfBirth.longitude;
+        }
+
+        // Geocode location only if coordinates are not provided
+        if (!latitude || !longitude) {
+          const geocodedData = await this.geocodingService.geocodeLocation(processedBirthData);
+          Object.assign(processedBirthData, geocodedData);
+        } else {
+          // Ensure flat structure for downstream processing
+          processedBirthData.latitude = latitude;
+          processedBirthData.longitude = longitude;
+        }
+
+        // Generate comprehensive chart
+        const generatedChart = await this.chartService.generateComprehensiveChart(processedBirthData);
+        chartData = generatedChart.rasiChart;
       }
 
       const lagnaAnalysis = this.lagnaService.analyzeLagna(chartData);

@@ -12,6 +12,14 @@ module.exports = {
         warnings: false,
       },
     },
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+        secure: false,
+        logLevel: 'debug',
+      },
+    },
   },
   webpack: {
     configure: (webpackConfig) => {

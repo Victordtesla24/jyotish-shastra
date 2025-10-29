@@ -66,7 +66,16 @@ const RASI_NUMBERS = {
  * Get Rasi number from API sign name
  */
 function getRasiNumberFromSign(signName) {
-  return RASI_NUMBERS[signName] || 1; // Default to Aries if not found
+  if (!signName || typeof signName !== 'string') {
+    throw new Error(`Invalid sign name: ${signName}. Expected a valid zodiac sign name.`);
+  }
+  
+  const rasiNumber = RASI_NUMBERS[signName];
+  if (!rasiNumber || rasiNumber < 1 || rasiNumber > 12) {
+    throw new Error(`Invalid sign name "${signName}". Expected one of: Aries, Taurus, Gemini, Cancer, Leo, Virgo, Libra, Scorpio, Sagittarius, Capricorn, Aquarius, Pisces`);
+  }
+  
+  return rasiNumber;
 }
 
 /**
@@ -76,7 +85,7 @@ function getRasiNumberFromSign(signName) {
  */
 function calculateRasiForHouse(houseNumber, ascendantRasi) {
   if (!ascendantRasi || houseNumber < 1 || houseNumber > 12) {
-    return houseNumber; // Fallback to house number if invalid data
+    return houseNumber; // Return house number when data is invalid
   }
 
   // CORRECT Vedic calculation:
@@ -143,13 +152,24 @@ const RASI_NUMBER_POSITIONS = {
  */
 function processChartData(chartData) {
   if (!chartData) {
-    return { planets: [], ascendant: null };
+    throw new Error('Chart data is required for processing. Expected rasiChart or navamsaChart data from API.');
   }
+
+  // CRITICAL DEBUG: Log incoming chart data for validation
+  console.log('🔍 VedicChartDisplay: Processing chart data', {
+    hasChartData: !!chartData,
+    hasAscendant: !!chartData.ascendant,
+    ascendantSign: chartData.ascendant?.sign,
+    ascendantDegree: chartData.ascendant?.degree,
+    ascendantLongitude: chartData.ascendant?.longitude,
+    hasPlanets: !!chartData.planets || !!chartData.planetaryPositions,
+    planetCount: chartData.planets?.length || Object.keys(chartData.planetaryPositions || {}).length
+  });
 
   // Handle direct chart data structure (chartData is rasiChart or navamsaChart directly)
   const chart = chartData;
 
-  // Use planetaryPositions if available (from API), otherwise fall back to planets array
+  // Use planetaryPositions if available (from API), otherwise use planets array
   let planetsData = [];
   if (chart.planetaryPositions && typeof chart.planetaryPositions === 'object') {
     // Convert planetaryPositions object to array with planet names
@@ -160,12 +180,25 @@ function processChartData(chartData) {
   } else if (chart.planets && Array.isArray(chart.planets)) {
     planetsData = chart.planets;
   } else {
-    return { planets: [], ascendant: null };
+    throw new Error('Planetary positions data is required. Expected chart.planetaryPositions object or chart.planets array from API.');
+  }
+  
+  if (!planetsData || planetsData.length === 0) {
+    throw new Error('No planetary data found in chart. Expected at least one planet in planetaryPositions or planets array.');
   }
 
+  // Validate ascendant is present and has longitude
+  if (!chart.ascendant || typeof chart.ascendant.longitude !== 'number') {
+    throw new Error('Ascendant data is required with longitude. Expected chart.ascendant.longitude from API.');
+  }
+  
   // Process planets with cultural enhancement and accessibility
   const planets = planetsData.map(planet => {
-    const house = calculateHouseFromLongitude(planet.longitude, chart.ascendant?.longitude || 0);
+    if (typeof planet.longitude !== 'number' || isNaN(planet.longitude)) {
+      throw new Error(`Invalid longitude for planet ${planet.name || 'unknown'}: ${planet.longitude}. Expected a valid number from API.`);
+    }
+    
+    const house = calculateHouseFromLongitude(planet.longitude, chart.ascendant.longitude);
     const degrees = planet.degree !== undefined ? Math.floor(planet.degree) : Math.floor(planet.longitude % 30);
     const minutes = planet.degree !== undefined ?
       Math.floor((planet.degree - Math.floor(planet.degree)) * 60) :
@@ -239,9 +272,13 @@ function processChartData(chartData) {
  * Fixed to match API response house positions accurately
  */
 function calculateHouseFromLongitude(planetLongitude, ascendantLongitude) {
-  // Ensure both longitudes are valid numbers
-  if (typeof planetLongitude !== 'number' || typeof ascendantLongitude !== 'number') {
-    return 1; // Default to 1st house
+  // PRODUCTION: Require valid longitudes - throw error instead of fallback
+  if (typeof planetLongitude !== 'number' || isNaN(planetLongitude)) {
+    throw new Error(`Invalid planet longitude: ${planetLongitude}. Expected a valid number.`);
+  }
+  
+  if (typeof ascendantLongitude !== 'number' || isNaN(ascendantLongitude)) {
+    throw new Error(`Invalid ascendant longitude: ${ascendantLongitude}. Expected a valid number from chart.ascendant.longitude.`);
   }
 
   // Normalize longitudes to 0-360 range

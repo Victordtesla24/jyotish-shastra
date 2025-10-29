@@ -135,23 +135,8 @@ const ChartPage = () => {
 
       setChartData(apiResponse.data);
     } else {
-      // Fallback for direct chart data
-      console.log('⚠️ ChartPage: Using fallback apiResponse:', apiResponse);
-      console.log('⚠️ Fallback data structure:', Object.keys(apiResponse || {}));
-
-      // Save fallback data too
-      if (apiResponse) {
-        UIDataSaver.saveApiResponse({
-          chart: apiResponse.rasiChart,
-          navamsa: apiResponse.navamsaChart,
-          analysis: apiResponse.analysis,
-          success: true,
-          originalResponse: apiResponse
-        });
-        console.log('💾 ChartPage: Fallback chart data saved to UIDataSaver');
-      }
-
-      setChartData(apiResponse);
+      // Production code: Standard API response format required
+      throw new Error('Invalid API response format. Expected response.data structure with rasiChart property.');
     }
   }, [currentChart, navigate]);
 

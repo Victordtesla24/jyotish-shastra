@@ -34,7 +34,7 @@ const ReportPage = () => {
         const birthData = JSON.parse(birthDataStr);
 
         // Call comprehensive analysis API with correct v1 endpoint
-        const response = await fetch('http://localhost:3001/api/v1/analysis/comprehensive', {
+        const response = await fetch('/api/v1/analysis/comprehensive', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

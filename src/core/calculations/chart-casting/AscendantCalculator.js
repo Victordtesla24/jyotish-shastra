@@ -45,14 +45,7 @@ class AscendantCalculator {
             this.initialized = true;
 
         } catch (error) {
-            // CRITICAL FIX: Silent fallback in production/test to avoid console noise
-            // Only log in development environment for debugging
-            if (process.env.NODE_ENV === 'development') {
-                console.warn('Swiss Ephemeris initialization warning:', error.message);
-                console.warn('Falling back to Moshier ephemeris');
-            }
-            // Continue with Moshier as fallback
-            this.initialized = false;
+            throw new Error(`Swiss Ephemeris initialization failed: ${error.message}. Please ensure ephemeris files are properly configured.`);
         }
     }
 
@@ -106,12 +99,13 @@ class AscendantCalculator {
             throw new Error(`Invalid coordinates: latitude=${latitude}, longitude=${longitude}`);
         }
 
-        try {
-            // PRODUCTION-GRADE: Multiple calculation strategies with fallbacks
-            return this.calculateWithFallback(julianDay, latitude, longitude);
+        if (!this.initialized) {
+            throw new Error('Swiss Ephemeris not initialized. Cannot calculate ascendant.');
+        }
 
+        try {
+            return this.calculateUsingSwissEphemeris(julianDay, latitude, longitude);
         } catch (error) {
-            // Re-throw the error to be handled by the calling service
             throw new Error(`Ascendant calculation failed: ${error.message}`);
         }
     }
@@ -129,36 +123,6 @@ class AscendantCalculator {
         );
     }
 
-    /**
-     * PRODUCTION-GRADE: Multiple calculation strategies with fallbacks
-     * Based on research: Swiss Ephemeris can fail, use fallbacks
-     */
-    calculateWithFallback(julianDay, latitude, longitude) {
-        // Strategy 1: Try Swiss Ephemeris with proper error handling
-        if (this.initialized) {
-            try {
-                return this.calculateUsingSwissEphemeris(julianDay, latitude, longitude);
-            } catch (error) {
-                // CRITICAL FIX: Silent fallback to eliminate console noise in production/test
-                if (process.env.NODE_ENV === 'development') {
-                    console.warn('Swiss Ephemeris calculation failed, trying fallback:', error.message);
-                }
-            }
-        }
-
-        // Strategy 2: Use Moshier as fallback
-        try {
-            return this.calculateUsingMoshier(julianDay, latitude, longitude);
-        } catch (error) {
-            // CRITICAL FIX: Silent fallback to eliminate console noise in production/test
-            if (process.env.NODE_ENV === 'development') {
-                console.warn('Moshier calculation failed, using manual calculation:', error.message);
-            }
-        }
-
-        // Strategy 3: Manual calculation as last resort
-        return this.calculateManually(julianDay, latitude, longitude);
-    }
 
     /**
      * CRITICAL FIX: Calculate using Swiss Ephemeris with proper error handling
@@ -219,125 +183,6 @@ class AscendantCalculator {
         }
     }
 
-    /**
-     * CRITICAL FIX: Fallback calculation using Moshier (no data files required)
-     * Enhanced with proper Moshier flag usage and validation
-     */
-    calculateUsingMoshier(julianDay, latitude, longitude) {
-        try {
-            // CRITICAL FIX: Properly set Moshier ephemeris flag before calculation
-            const moshierFlag = swisseph.SEFLG_MOSEPH || 4;
-
-            // CRITICAL FIX: Use swe_houses_ex with explicit Moshier flag
-            const result = swisseph.swe_houses_ex(julianDay, moshierFlag, latitude, longitude, 'P', {});
-
-            // CRITICAL FIX: Enhanced validation of Moshier results
-            if (!result ||
-                typeof result.ascendant !== 'number' ||
-                isNaN(result.ascendant) ||
-                result.ascendant < 0 ||
-                result.ascendant >= 360) {
-
-                throw new Error('Invalid result from Moshier house calculation');
-            }
-
-            // CRITICAL FIX: Use improved ayanamsa calculation for Moshier
-            const ayanamsa = this.calculateImprovedLahiriAyanamsa(julianDay);
-
-            if (typeof ayanamsa !== 'number' || isNaN(ayanamsa)) {
-                throw new Error('Invalid ayanamsa calculation in Moshier fallback');
-            }
-
-            let siderealAscendant = result.ascendant - ayanamsa;
-
-            // CRITICAL FIX: Proper normalization
-            while (siderealAscendant < 0) {
-                siderealAscendant += 360;
-            }
-            siderealAscendant = siderealAscendant % 360;
-
-            const signInfo = getSign(siderealAscendant);
-
-            if (!signInfo || typeof signInfo.signIndex !== 'number') {
-                throw new Error('Invalid sign calculation in Moshier fallback');
-            }
-
-            return {
-                longitude: siderealAscendant,
-                sign: getSignName(signInfo.signIndex),
-                signId: getSignId(signInfo.signIndex),
-                signIndex: signInfo.signIndex,
-                degree: signInfo.degreeInSign,
-            };
-
-        } catch (error) {
-            // CRITICAL FIX: Provide more informative error and fallback
-            throw new Error(`Moshier calculation failed: ${error.message}`);
-        }
-    }
-
-    /**
-     * Manual calculation as absolute fallback using proper astronomical formulas
-     * Based on accurate sidereal time and spherical astronomy calculations
-     */
-    calculateManually(julianDay, latitude, longitude) {
-        // Manual calculation based on rigorous astronomical formulas
-        // This provides accurate results when Swiss Ephemeris is unavailable
-
-        // Calculate Julian centuries from J2000.0 epoch
-        const T = (julianDay - 2451545.0) / 36525.0;
-
-        // Calculate Greenwich Mean Sidereal Time (GMST) using IAU 2000 formula
-        let gmst = 280.46061837 + 360.98564736629 * (julianDay - 2451545.0) +
-                  0.000387933 * T * T - (T * T * T) / 38710000.0;
-
-        // Normalize GMST to 0-360 degree range
-        gmst = gmst % 360;
-        if (gmst < 0) gmst += 360;
-
-        // Calculate Local Sidereal Time (LST) by adding longitude
-        const lst = (gmst + longitude) % 360;
-
-        // Calculate obliquity of the ecliptic using IAU 2000 formula
-        const obliquity = 23.43929111 - 0.0130042 * T - 0.00000164 * T * T + 0.000000503 * T * T * T;
-
-        // Convert latitude to radians for spherical calculations
-        const latRad = latitude * Math.PI / 180;
-        const oblRad = obliquity * Math.PI / 180;
-        const lstRad = lst * Math.PI / 180;
-
-        // Calculate ascendant using spherical astronomy formulas
-        // This is the exact formula for ascendant calculation
-        const numerator = Math.cos(lstRad);
-        const denominator = -Math.sin(lstRad) * Math.cos(oblRad) - Math.tan(latRad) * Math.sin(oblRad);
-
-        let ascendant = Math.atan2(numerator, denominator) * 180 / Math.PI;
-
-        // Normalize ascendant to 0-360 range
-        if (ascendant < 0) ascendant += 360;
-        ascendant = ascendant % 360;
-
-        // Apply accurate Lahiri ayanamsa correction
-        const ayanamsa = this.calculateImprovedLahiriAyanamsa(julianDay);
-        let siderealAscendant = ascendant - ayanamsa;
-
-        // Normalize sidereal ascendant to 0-360 range
-        if (siderealAscendant < 0) {
-            siderealAscendant += 360;
-        }
-        siderealAscendant = siderealAscendant % 360;
-
-        // Calculate sign information
-        const signInfo = getSign(siderealAscendant);
-
-        return {
-            longitude: siderealAscendant,
-            sign: getSignName(signInfo.signIndex),
-            signId: getSignId(signInfo.signIndex),
-            signIndex: signInfo.signIndex,
-            degree: signInfo.degreeInSign,
-        };
-    }
 
     /**
      * Get accurate Lahiri Ayanamsa using improved calculation
@@ -345,29 +190,28 @@ class AscendantCalculator {
      * @returns {number} Ayanamsa value in degrees
      */
     getAccurateLahiriAyanamsa(julianDay) {
+        if (!this.initialized) {
+            throw new Error('Swiss Ephemeris not initialized. Cannot calculate ayanamsa.');
+        }
+
         try {
-            // First attempt: Use Swiss Ephemeris with proper Lahiri mode
-            if (this.initialized) {
-                // Set sidereal mode to Lahiri explicitly
-                swisseph.swe_set_sid_mode(swisseph.SE_SIDM_LAHIRI || 1);
+            // Set sidereal mode to Lahiri explicitly
+            swisseph.swe_set_sid_mode(swisseph.SE_SIDM_LAHIRI || 1);
 
-                const ayanamsaResult = swisseph.swe_get_ayanamsa_ut(julianDay);
+            // CRITICAL FIX: Swiss Ephemeris swe_get_ayanamsa_ut returns a number directly, not an object
+            const ayanamsaValue = swisseph.swe_get_ayanamsa_ut(julianDay);
 
-                if (!ayanamsaResult.error &&
-                    typeof ayanamsaResult.ayanamsa === 'number' &&
-                    !isNaN(ayanamsaResult.ayanamsa) &&
-                    ayanamsaResult.ayanamsa >= 10 &&
-                    ayanamsaResult.ayanamsa <= 30) { // Reasonable bounds for modern era
-                    return ayanamsaResult.ayanamsa;
-                }
+            // Validate the returned value
+            if (typeof ayanamsaValue !== 'number' ||
+                isNaN(ayanamsaValue) ||
+                ayanamsaValue < 10 ||
+                ayanamsaValue > 30) {
+                throw new Error(`Invalid ayanamsa value from Swiss Ephemeris: ${ayanamsaValue}`);
             }
 
-            // Fallback: Use improved manual Lahiri calculation
-            return this.calculateImprovedLahiriAyanamsa(julianDay);
-
+            return ayanamsaValue;
         } catch (error) {
-            // Ultimate fallback: Use improved manual calculation
-            return this.calculateImprovedLahiriAyanamsa(julianDay);
+            throw new Error(`Ayanamsa calculation failed: ${error.message}`);
         }
     }
 
