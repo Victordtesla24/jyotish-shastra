@@ -11,6 +11,10 @@
   },
   "rewrites": [
     {
+      "source": "/api/(.*)",
+      "destination": "/api/[...path].js"
+    },
+    {
       "source": "/((?!api|_next|static).*)",
       "destination": "/index.html"
     }

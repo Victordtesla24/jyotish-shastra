@@ -151,6 +151,27 @@ app.get('/health', (req, res) => {
   });
 });
 
+// API health endpoint for /api/v1/health compatibility
+app.get('/api/v1/health', (req, res) => {
+  res.status(200).json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV || 'development',
+    platform: isServerless ? 'serverless' : 'traditional',
+    vercel: isVercel ? {
+      env: process.env.VERCEL_ENV,
+      url: process.env.VERCEL_URL,
+      deployment: process.env.VERCEL_DEPLOYMENT_ID,
+    } : null,
+    services: {
+      geocoding: 'active',
+      chartGeneration: 'active',
+      analysis: 'active'
+    }
+  });
+});
+
 // API routes
 app.use('/api', indexRoutes);
 app.use('/api', clientErrorLogRoutes);

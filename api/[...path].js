@@ -8,9 +8,9 @@ import app from '../src/index.serverless.js';
 
 /**
  * Vercel serverless function handler
- * Wraps Express app for serverless execution
+ * Simply forwards to Express app - Vercel req/res are Express-compatible
  */
-export default async function handler(req, res) {
+export default function handler(req, res) {
   // Handle preflight OPTIONS requests explicitly for CORS
   if (req.method === 'OPTIONS') {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -25,24 +25,8 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
   
-  // Forward to Express app using Promise wrapper
-  return new Promise((resolve, reject) => {
-    // Express app handles the request
-    // In Vercel, app(req, res) is sufficient as Vercel provides Express-compatible objects
-    app(req, res, (err) => {
-      if (err) {
-        console.error('Express error in serverless function:', err);
-        if (!res.headersSent) {
-          res.status(500).json({
-            error: 'Internal server error',
-            message: process.env.NODE_ENV === 'development' ? err.message : 'An error occurred',
-            timestamp: new Date().toISOString(),
-          });
-        }
-        reject(err);
-      } else {
-        resolve();
-      }
-    });
-  });
+  // Forward directly to Express app
+  // Vercel provides Express-compatible req/res objects
+  // Errors are handled by Express error middleware
+  return app(req, res);
 }

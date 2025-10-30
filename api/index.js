@@ -6,7 +6,7 @@
 
 import app from '../src/index.serverless.js';
 
-export default async function handler(req, res) {
+export default function handler(req, res) {
   // Handle preflight OPTIONS requests explicitly for CORS
   if (req.method === 'OPTIONS') {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -21,22 +21,6 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
   
-  // Forward to Express app
-  return new Promise((resolve, reject) => {
-    app(req, res, (err) => {
-      if (err) {
-        console.error('Express error in serverless function:', err);
-        if (!res.headersSent) {
-          res.status(500).json({
-            error: 'Internal server error',
-            message: process.env.NODE_ENV === 'development' ? err.message : 'An error occurred',
-            timestamp: new Date().toISOString(),
-          });
-        }
-        reject(err);
-      } else {
-        resolve();
-      }
-    });
-  });
+  // Forward directly to Express app
+  return app(req, res);
 }
