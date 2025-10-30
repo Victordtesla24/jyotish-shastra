@@ -22,19 +22,8 @@ module.exports = {
     },
   },
   babel: {
-    presets: [
-      [
-        '@babel/preset-react',
-        {
-          runtime: 'automatic',
-          development: process.env.NODE_ENV !== 'production',
-        },
-      ],
-    ],
-    plugins: [
-      // React Scripts automatically handles react-refresh/babel plugin
-      // No need to add it manually to avoid duplicates
-    ],
+    // Let React Scripts handle all Babel configuration automatically
+    // This prevents conflicts with JSX transforms and react-refresh
   },
   webpack: {
     configure: (webpackConfig) => {
