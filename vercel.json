@@ -3,35 +3,20 @@
   "buildCommand": "cd client && npm install && npm run build",
   "outputDirectory": "client/build",
   "installCommand": "npm install --ignore-scripts --no-optional",
-  "builds": [
-    {
-      "src": "api/**/*.js",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": [
-          "ephemeris/**",
-          "src/**",
-          "package.json",
-          "package-lock.json"
-        ],
-        "maxLambdaSize": "50mb"
-      }
-    },
-    {
-      "src": "client/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "build"
-      }
+  "functions": {
+    "api/[...path].js": {
+      "includeFiles": [
+        "ephemeris/**",
+        "src/**",
+        "package.json",
+        "package-lock.json"
+      ],
+      "maxDuration": 30
     }
-  ],
+  },
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
-    },
-    {
-      "source": "/(.*)",
+      "source": "/((?!api|_next|static).*)",
       "destination": "/index.html"
     }
   ],
@@ -50,6 +35,27 @@
         {
           "key": "Access-Control-Allow-Headers",
           "value": "Content-Type, Authorization, X-Requested-With"
+        },
+        {
+          "key": "Access-Control-Max-Age",
+          "value": "86400"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
         }
       ]
     }

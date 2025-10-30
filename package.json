@@ -18,7 +18,10 @@
     "test:all-chart": "npm run validate:chart && npm run test:chart && npm run test:e2e",
     "test:visual": "node scripts/visual-comparison.js",
     "lint:chart": "eslint src/components/VedicChartDisplay.jsx",
-    "format:chart": "prettier --write src/components/VedicChartDisplay.jsx"
+    "format:chart": "prettier --write src/components/VedicChartDisplay.jsx",
+    "vercel-build": "cd client && npm install && npm run build",
+    "deploy:vercel": "node scripts/deploy-vercel.js",
+    "postinstall": "node -e \"try { require('swisseph') } catch(e) { console.log('Swisseph: optional module, skipping build') }\""
   },
   "dependencies": {
     "axios": "^1.10.0",
@@ -34,7 +37,9 @@
     "moment-timezone": "^0.5.43",
     "mongoose": "^8.16.1",
     "morgan": "^1.10.1",
-    "opencage-api-client": "^1.1.0",
+    "opencage-api-client": "^1.1.0"
+  },
+  "optionalDependencies": {
     "swisseph": "^0.5.17"
   },
   "devDependencies": {
