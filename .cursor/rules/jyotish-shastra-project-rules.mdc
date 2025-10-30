@@ -1,0 +1,192 @@
+---
+alwaysApply: true
+description: Jyotish Shastra Vedic Astrology Application - Comprehensive project rules for development, testing, and deployment
+---
+
+# Jyotish Shastra Project Rules
+
+## Vedic Astrology Domain Rules
+
+### 1. Calculation Authenticity
+- **Swiss Ephemeris Integration**: Use swisseph library for all astronomical calculations
+- **Ayanamsa Standards**: Default to Lahiri ayanamsa with configurable alternatives
+- **Precision Requirements**: Maintain 4+ decimal places for planetary positions
+- **Traditional Systems**: Follow Parasara principles for house calculations (Placidus system)
+- **Sanskrit Terminology**: Preserve traditional terms with English translations
+- **Divisional Charts**: Support Navamsa (D9) and other standard divisional charts
+
+### 2. Astrological Data Structures
+```javascript
+// Standard chart data format must follow this structure
+{
+  rasiChart: {
+    ascendant: { degree: number, sign: string, lord: string },
+    planetaryPositions: [
+      { planet: string, sign: string, degree: number, retrograde: boolean }
+    ],
+    housePositions: Array[12], // Houses 1-12
+    bhavaMadhya: Array[12],    // House cusps
+    vimshottariDasha: {
+      major: { lord: string, start: date, end: date },
+      minor: { lord: string, start: date, end: date }
+    }
+  }
+}
+```
+
+## Full-Stack Architecture Rules
+
+### 3. Backend Development (Node.js/Express)
+- **Module System**: Use ES6 import/export throughout codebase
+- **API Pattern**: `/api/v1/{service}/{action}` (e.g., `/api/v1/chart/generate`)
+- **Controllers**: Keep route handlers lean (<50 lines), delegate to services
+- **Service Layer**: Complex astrological calculations in `/src/core/`, business logic in `/src/services/`
+- **Error Handling**: Use Express middleware with consistent error responses
+- **Validation**: Joi schemas for all API inputs with comprehensive validation messages
+
+### 4. Frontend Development (React 18+)
+- **Component Pattern**: Functional components with hooks only (no class components)
+- **State Management**: Use React Query for server state, local state for UI state
+- **Styling**: Tailwind CSS for consistent design system
+- **Animation**: Framer Motion for chart transitions and UI animations
+- **Chart Rendering**: Custom SVG components for Vedic chart visualizations
+- **Responsive Design**: Mobile-first approach with touch gesture support
+
+### 5. API Integration Rules
+- **Service Layer**: Centralized in `/client/src/services/`
+- **Error Boundaries**: React error boundaries for chart rendering failures
+- **Loading States**: Show loading indicators for all API calls >500ms
+- **Data Validation**: Transform API responses to frontend data structures
+- **Environment Config**: Use `REACT_APP_API_URL` for endpoint configuration
+
+## Code Quality & Testing Rules
+
+### 6. JavaScript/TypeScript Standards
+- **Strict Mode**: Follow TypeScript patterns in JavaScript JSDoc comments
+- **Function Length**: Keep functions <30 lines, extract complex logic
+- **Naming Convention**: camelCase for variables/functions, PascalCase for classes
+- **Documentation**: JSDoc for all public functions with parameter types
+- **No Magic Numbers**: Define constants for astrological degrees, house counts, etc.
+
+### 7. Testing Requirements
+- **Coverage**: Maintain >90% Jest test coverage
+- **Test Structure**: 
+  - Unit tests: `/tests/unit/**/*.test.js`
+  - Integration tests: `/tests/integration/**/*.test.js`
+  - E2E tests: `/tests/e2e/**/*.cy.js` (Cypress)
+- **Test Data**: Use `/tests/test-data/` for sample charts and API responses
+- **Mocking**: Only mock external APIs (OpenCage), test calculations with real data
+- **CI/CD**: Pre-commit hooks for test quality checks
+
+### 8. Astrological Calculation Testing
+- **Input Validation**: Test edge cases for birth dates, times, coordinates
+- **Precision Testing**: Verify planetary positions against known ephemeris data
+- **Regression Testing**: Preserve historical accuracy with locked test data
+- **Cross-Validation**: Compare results with established Vedic astrology software
+
+## Directory Structure Rules
+
+### 9. Backend Organization
+```
+src/
+├── api/                    # Express routes and middleware
+│   ├── controllers/        # Request handlers
+│   ├── middleware/          # Authentication, validation, logging
+│   ├── routes/             # API route definitions
+│   └── validators/          # Joi validation schemas
+├── core/                   # Vedic astrology calculations
+│   ├── calculations/       # Swiss Ephemeris integrations
+│   ├── analysis/          # Yoga, dasha, house analysis
+│   └── charts/             # Chart generation algorithms
+├── services/              # Business logic orchestrators
+├── data/                  # Data access layer
+│   └── repositories/       # MongoDB/document storage
+├── utils/                 # Helper utilities
+└── config/                # Configuration files
+```
+
+### 10. Frontend Organization
+```
+client/src/
+├── components/
+│   ├── charts/            # Vedic chart display components
+│   ├── forms/             # Birth data input forms
+│   ├── ui/                # Reusable UI components
+│   └── layout/            # Page layout components
+├── pages/                 # Route-level components
+├── services/              # API integration services
+├── utils/                 # Frontend utilities
+└── styles/                # Tailwind CSS customizations
+```
+
+## Performance & Deployment Rules
+
+### 11. API Performance Standards
+- **Response Time**: <5s for chart generation, <1s for geocoding
+- **Memory Usage**: Monitor Swiss Ephemeris memory allocation
+- **Caching Strategy**: Cache geocoding results and pre-calculated charts
+- **Rate Limiting**: Implement API throttling for expensive calculations
+- **Error Recovery**: Graceful degradation when astronomical calculations fail
+
+### 12. Frontend Performance Rules
+- **Chart Rendering**: Optimize SVG rendering for complex astrological charts
+- **Bundle Size**: Use code splitting for chart calculation libraries
+- **Image Generation**: Efficient HTML-to-PDF for chart print functionality
+- **Mobile Optimization**: Touch gestures for chart exploration
+- **Progressive Loading**: Load chart data progressively for large calculations
+
+### 13. Deployment Configuration
+- **Vercel Serverless**: Use `/api` directory for serverless functions
+- **Environment Variables**: Secure handling of geocoding API keys
+- **Build Optimization**: CRACO configuration for production builds
+- **Static Assets**: Proper hosting of ephemeris data files
+- **Monitoring**: Error tracking for astrological calculation failures
+
+## Security & Data Rules
+
+### 14. Data Privacy and Security
+- **PII Protection**: Encrypt birth date/time at rest for privacy
+- **Input Sanitization**: Comprehensive validation for location inputs
+- **API Security**: Implement proper authentication for chart storage
+- **No Persistent Personal Data**: Don't store name/identifying info permanently
+- **GDPR Compliance**: Allow data deletion upon user request
+
+### 15. Vedic Astrology Data Integrity
+- **Time Zone Accuracy**: Proper handling of DST changes historically
+- **Coordinate Precision**: Validate geocoding coordinates to 6 decimals
+- **Astrological Standards**: Follow established Vedic astrology authorities
+- **Version Control**: Track changes to calculation algorithms
+
+## Development Workflow Rules
+
+### 16. Development Environment Setup
+- **Port Configuration**: Backend on 3001, Frontend on 3000
+- **Hot Reloading**: Use nodemon for backend, React hot reload for frontend
+- **Database**: MongoDB for persistent chart storage
+- **Local Testing**: Docker-compose for full environment setup
+- **Debug Mode**: Verbose logging for astrological calculations
+
+### 17. Git and Version Control
+- **Branch Naming**: feature/astrology-feature-name format
+- **Commit Messages**: Include Jyotish context (e.g., "feat: add navamsa chart rendering")
+- **Pull Requests**: Require passing tests for astrological accuracy
+- **Release Management**: Version calculation algorithms separately from UI
+- **Documentation**: Update astrology documentation with every calculation change
+
+## Testing Specific Rules
+
+### 18. Astrological Calculation Testing
+- **Sample Charts**: Use actual birth charts for testing data
+- **Precision Verification**: Match results against established Vedic software
+- **Edge Case Coverage**: Test extreme latitudes, historical dates, leap years
+- **Regression Protection**: Lock test data that passes verification
+- **Manual Validation**: Periodic expert review of calculation accuracy
+
+### 19. Integration Testing Rules
+- **API Contract Testing**: Verify request/response schemas
+- **Frontend-Backend Integration**: Test complete user workflows
+- **Database Integration**: Ensure chart storage/retrieval accuracy  
+- **Error Scenarios**: Test geocoding failures, invalid birth data
+- **Performance Testing**: Load testing with concurrent chart generations
+
+These rules ensure the Jyotish Shastra application maintains high quality, accuracy, and performance while preserving the authenticity of Vedic astrology calculations.

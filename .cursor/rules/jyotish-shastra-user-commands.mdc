@@ -1,0 +1,234 @@
+---
+alwaysApply: true
+description: Jyotish Shastra - Domain-specific user commands for Vedic astrology analysis and development workflows
+---
+
+# Jyotish Shastra User Commands
+
+## Astrological Analysis Commands
+
+### 1. Complete Birth Chart Analysis
+```bash
+@comprehensive-analysis --name="John Doe" --dob="1990-01-01" --time="12:30" --place="Mumbai, India"
+# Generate complete Vedic astrology analysis with all planetary positions,
+# houses, dashas, and predictive insights
+
+@quick-analysis --coords="19.076,72.877" --datetime="1990-01-01T12:30:00" --timezone="Asia/Kolkata"
+# Quick analysis from coordinates and datetime
+
+@historical-analysis --dob="1500-05-20" --time="14:00" --place="Varanasi, India" --historic-calendar=true
+# Analysis for historical dates with calendar conversion
+```
+
+### 2. Specific Chart Type Analysis
+```bash
+@rasi-chart --name="User" --data="birth-data" --validate-positions=true
+# Generate primary birth chart (D1) with position validation
+
+@navamsa-chart --parent-chart-id="chart123" --show-relationships=true
+# Generate Navamsa chart (D9) for relationship and marriage analysis
+
+@divisional-charts --types="D9,D10,D12" --base-chart="rasi-chart-id"
+# Generate multiple divisional charts for specific life areas
+
+@transit-comparison --natal-chart="chart123" --transit-date="2024-12-30" --planets="Saturn,Jupiter"
+# Compare current planetary transits with natal chart positions
+```
+
+### 3. Dasha and Prediction Commands
+```bash
+@vimshottari-dasha --chart-id="chart123" --time-range="2020-2030" --major-minor=true
+# Calculate Vimshottari dasha periods with major and minor periods timeline
+
+@current-dasha --chart-id="chart123" --today=true --events=true
+# Show current dasha period and upcoming major events
+
+@pratyantar-dasha --date-range="2024-12-01 to 2024-12-31" --chart="chart123" --precision=detailed
+# Calculate pratyantar (third-level) dasha for specific time period
+
+@yoga-analysis --chart-id="chart123" --types="Raj Yoga,Dhan Yoga" --strength=true
+# Identify and analyze Vedic yogas in the chart
+```
+
+### 4. House and Aspect Analysis
+```bash
+@house-analysis --chart-id="chart123" --houses="1,4,7,10" --aspects=true
+# Analyze specific houses with planetary aspects
+
+@lagna-analysis --chart-id="chart123" --strength-calculation=true --lord-analysis=true
+# Detailed ascendant analysis with strength calculations
+
+@planetary-aspects --chart-id="chart123" --planet="Saturn" --aspect-type="all" --strength=true
+# Calculate and analyze specific planetary aspects
+
+@bhava-analysis --chart-id="chart123" --system="Placidus" --bhava-madhya=true
+# Advanced house cusp (bhava) analysis with midpoint calculations
+```
+
+## Geocoding and Location Commands
+
+### 5. Location Validation and Conversion
+```bash
+@geocode-location --place="Bangalore, Karnataka, India" --validate=true
+# Convert place name to coordinates with validation
+
+@timezone-validate --coords="12.9716,77.5946" --date="1990-01-01" --dst-aware=true
+# Validate timezone data for coordinates with historical DST awareness
+
+@location-history --place="Delhi, India" --time-range="1700-2024" --timezone-changes=true
+# Check historical location and timezone data accuracy
+
+@coordinate-precision --bounds="true" --precision="6-decimals" --source="opencage"
+# Ensure coordinate precision meets Vedic astrology calculation requirements
+```
+
+### 6. Edge Case Location Testing
+```bash
+@polar-location --coords="90.0000,0.0000" --date="2024-06-21" --test-accuracy=true
+# Test calculations for extreme northern latitude
+
+@international-date-line --coords="0.0000,180.0000" --handle-date-line=true
+# Test date line crossing for birth time calculations
+
+@historical-timezone --place="London, UK" --date="1850-01-01" --gregorian-conversion=true
+# Handle historical timezone and calendar changes
+```
+
+## Quality Assurance Commands
+
+### 7. Calculation Accuracy Validation
+```bash
+@verify-astronomical-accuracy --chart-id="chart123" --reference="kundli-software" --tolerance="0.01°"
+# Verify planetary positions against established Vedic astrology software
+
+@validate-house-calculation --chart-id="chart123" --system="Placidus" --test-edge-cases=true
+# Validate house calculations against reference implementations
+
+@cross-verify-dates --input-datetime="1990-01-01T12:30:00" --chart-id="chart123" --timezone-accurate=true
+# Cross-verify date/time conversions and timezone handling
+
+@validate-retrogrades --date-range="2024-01-01 to 2024-12-31" --planets="Mercury,Venus,Mars" --accuracy-check=true
+# Verify retrograde calculations against astronomical data
+```
+
+### 8. Data Integrity Tests
+```bash
+@validate-birth-data --name="User" --check-completeness=true --validate-input=true
+# Validate birth data completeness and format
+
+@test-data-consistency --chart-sets="multiple" --cross-reference=true
+# Ensure consistency across related chart calculations
+
+@boundary-value-testing --dates="leap-year,month-end,year-end" --validate-calculations=true
+# Test edge cases in date/time calculations
+```
+
+## Development Workflow Commands
+
+### 9. Feature Development Commands
+```bash
+@add-vedic-calculator --type="GrahaDrishti" --aspects="all" --strength-algorithm=true
+# Add new Vedic astrology calculation component with validation
+
+@implement-dasha-system --system="Yogini Dasha" --algorithm="traditional" --test-data="sample"
+# Implement new dasha calculation system with comprehensive testing
+
+@create-chart-component --name="LagnaKundli" --features="aspects,yogas,dashas" --responsive=true
+# Create new Vedic chart display component with astrological features
+
+@extend-api-endpoint --route="/api/v1/chart/yoga" --methods="GET,POST" --validation="birth-data"
+# Extend existing API capabilities with new Vedic astrology features
+```
+
+### 10. Debugging and Troubleshooting
+```bash
+@debug-calculation --chart-id="chart123" --show-steps=true --precision="detailed" --trace=true
+# Debug specific calculation with detailed step-by-step output
+
+@compare-calculations --algorithm-versions="v1,v2" --input="sample-data" --highlight-differences=true
+# Compare calculation algorithms between versions
+
+@validation-error-triage --error="house-calculation-failure" --context="arctic-circle" --fix-suggestions=true
+# Get specific error resolution suggestions based on context
+
+@performance-profiling --operation="chart-generation" --memory-trace=true --timing-detailed=true
+# Profile performance of specific astrological calculations
+```
+
+## User Interface Testing Commands
+
+### 11. UI Component Validation
+```bash
+@test-chart-rendering --chart-type="rasi" --screen-sizes="mobile,tablet,desktop" --validate-interactions=true
+# Test Vedic chart rendering across different screen sizes
+
+@validate-form-dataflow --from="BirthDataForm" --to="ChartDisplay" --include-errors=true
+# Test complete data flow from user input to chart display
+
+@accessibility-test --components="chart-display,birth-form" --wcag-compliance=true
+# Test UI components for accessibility compliance
+
+@responsive-chart-test --viewport-ranges="320px-1920px" --touch-gestures=true --zoom="2x-4x"
+# Test chart responsiveness and touch interactions
+```
+
+### 12. Integration Testing
+```bash
+@test-frontend-backend --workflow="chart-generation" --error-handling=true --performance=true
+# Test complete frontend-backend integration workflow
+
+@api-contract-test --endpoint="/api/v1/chart/generate" --schema-validation=true --error-scenarios=true
+# Test API contract adherence and error handling
+
+@data-transformation-test --source="api-response" --target="ui-component" --format="vedic-chart"
+# Test data transformation between backend and frontend
+
+@browser-compatibility --browsers="chrome,firefox,safari,edge" --chart-features="all" --mobile="ios,android"
+# Test cross-browser compatibility for chart rendering
+```
+
+## Specialized Domain Commands
+
+### 13. Research and Analysis
+```bash
+@yoka-research --chart-database="historical-figures" --yaml="Raj Yoga" --statistical=true
+# Research specific yoga patterns across sample charts
+
+@planetary-effects-research --planet="Saturn" --houses="10,11" --samples="1000" --correlation=true
+# Research planetary effects in specific houses across sample data
+
+@timing-accuracy-study --predictions="major-life-events" --historical-data="verified-cases" --accuracy="%"
+# Study accuracy of Vedic timing predictions across verified cases
+
+@regional-astrology --region="South India" --tradition="Parasara" --calculation-variations=true
+# Research regional variations in Vedic astrology calculations
+```
+
+### 14. Educational and Documentation
+```bash
+@generate-chart-explanation --chart-id="chart123" --audience="beginner" --level="detailed"
+# Generate human-readable explanations for Vedic chart elements
+
+@create-tutorial --topic="Dasha calculation" --examples="step-by-step" --interactive=true
+# Create interactive tutorial for specific Vedic astrology concepts
+
+@validate-educational-content --content="yoga-explanations" --accuracy="verified-sources" --update=true
+# Validate educational content against established Vedic astrology authorities
+
+@generate-documentation --feature="new-calculator" --api-endpoints="all" --examples="practical"
+# Generate comprehensive documentation for new features
+```
+
+## Production Monitoring
+```bash
+@monitor-calculation-health --metrics="accuracy,performance" --alerts="automatic" --threshold="error-rate<1%"
+# Monitor Vedic astrology calculation health in production
+
+@validate-production-data --sample-size="100" --time-range="24h" --quality-check="comprehensive"
+# Continuously validate calculation accuracy with production data
+
+@performance-alerting --operations="chart-generation,dasha-calculation" --threshold="response-time>5s" --notify=true
+# Set up performance monitoring for critical calculation operations
+```
+
+These user commands provide specialized functionality for Vedic astrology analysis, development workflows, and quality assurance specific to the Jyotish Shastra application domain.

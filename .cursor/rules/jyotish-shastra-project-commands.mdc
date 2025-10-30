@@ -1,0 +1,344 @@
+---
+alwaysApply: true
+description: Jyotish Shastra - Development workflow commands and automation scripts for Vedic astrology application
+---
+
+# Jyotish Shastra Project Commands
+
+## Development Environment Commands
+
+### 1. Full Application Start
+```bash
+# Terminal 1 - Backend Server
+npm run dev
+# Starts Node.js backend on port 3001 with hot reload
+
+# Terminal 2 - Frontend Development
+cd client && npm start
+# Starts React frontend on port 3000 with CRACO configuration
+
+# Full Development Stack (Recommended workflow)
+npm run dev & cd client && npm start
+# Parallel startup for complete development environment
+```
+
+### 2. Environment Setup Commands
+```bash
+# Environment File Setup
+cp .env.example .env
+# Edit .env with your OpenCage API key and database settings
+
+# Frontend Environment
+cd client && echo "REACT_APP_API_URL=http://localhost:3001/api" > .env.local
+echo "GENERATE_SOURCEMAP=false" >> .env.local
+
+# Dependency Installation
+npm install && cd client && npm install
+# Install both backend and frontend dependencies
+```
+
+## Testing Commands
+
+### 3. Comprehensive Test Suite
+```bash
+# Unit & Integration Tests
+npm run test
+# Run Jest with detailed verbose output
+
+# UI Component Testing
+npm run test:ui
+# React component tests with user interaction simulation
+
+# Chart-Specific Testing
+npm run test:chart
+# Test Vedic chart generation and rendering
+
+# Watch Mode for Development
+npm run test:chart-watch
+# Continuous testing during chart component development
+
+# E2E Testing with Cypress
+npm run test:e2e
+# End-to-end application testing
+npm run test:e2e-open
+# Interactive Cypress test runner
+npm run test:e2e-headed
+# Headed mode for debugging test failures
+```
+
+### 4. Astrological Calculation Validation
+```bash
+# Chart Generation Validation
+npm run validate:chart
+# Comprehensive validation of Vedic chart calculations
+
+# Chart Accuracy Tests
+npm run test:chart-coverage
+# Validate chart rendering with coverage reports
+
+# Position Calculation Testing
+node scripts/test-rasi-positions-v2.cjs
+# Test planetary position calculations
+
+# ascendant Calculation Tests
+node scripts/test-ascendant-accuracy.cjs
+# Validate ascendant calculations against known data
+
+# Integration Pipeline Testing
+npm run test:all-chart
+# Complete pipeline: birth data → chart generation → UI display
+```
+
+## API Testing Commands
+
+### 5. Backend API Testing
+```bash
+# Basic Health Check
+curl http://localhost:3001/api/health
+
+# Chart Generation Test
+curl -X POST http://localhost:3001/api/v1/chart/generate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Test User",
+    "dateOfBirth": "1990-01-01",
+    "timeOfBirth": "12:00",
+    "placeOfBirth": "Mumbai, Maharashtra, India",
+    "latitude": 19.076,
+    "longitude": 72.8777,
+    "timezone": "Asia/Kolkata"
+  }'
+
+# Geocoding Test
+curl -X POST http://localhost:3001/api/v1/geocoding/location \
+  -H "Content-Type: application/json" \
+  -d '{"placeOfBirth": "Pune, Maharashtra, India"}'
+
+# Comprehensive Analysis Test
+curl -X POST http://localhost:3001/api/v1/analysis/comprehensive \
+  -H "Content-Type: application/json" \
+  -d @tests/test-data/sample-chart-data.json
+
+# Error Scenario Testing
+node scripts/test-api-error-handling.js
+# Test various error conditions and recovery mechanisms
+```
+
+### 6. Database and Integration Testing
+```bash
+# MongoDB Integration Test
+npm run test:db-integration
+# Test chart storage and retrieval with MongoDB
+
+# Real Data Validation
+node tests/integration/real-data-validation.cjs
+# Validate calculations against real astrological data
+
+# API Integration Testing
+npm run test:api-integration
+# Full API stack testing from request to response
+```
+
+## Code Quality Commands
+
+### 7. Linting and Formatting
+```bash
+# ESLint for Code Quality
+npm run lint:chart
+# Lint chart components for best practices
+
+# Prettier Formatting
+npm run format:chart
+# Format chart-related code consistently
+
+# Style Guides Check
+npm run lint:all
+# Lint all JavaScript/JSX files
+
+# Import Organization
+npx eslint --fix src/services/chart/ChartGenerationService.js
+# Fix import organization and code style
+```
+
+### 8. Code Validation and Analysis
+```bash
+# Duplicate Code Detection
+node scripts/duplicate-detector.js
+# Find and eliminate duplicate astrological calculations
+
+# Code Complexity Analysis
+node scripts/analyze-complexity.js
+# Identify overly complex functions requiring refactoring
+
+# Production Code Validation
+node scripts/validate-production-code.js
+# Ensure all code meets production standards
+
+# Security Audit
+npm audit fix
+# Check for security vulnerabilities in dependencies
+```
+
+## Performance and Optimization Commands
+
+### 9. Performance Benchmarking
+```bash
+# Chart Generation Performance
+node scripts/benchmark-pipeline.js
+# Benchmark chart generation speed and memory usage
+
+# API Response Time Testing
+node scripts/measure-api-performance.js
+# Measure API endpoint response times
+
+# Frontend Bundle Analysis
+cd client && npm run analyze
+# Analyze webpack bundle size and optimization opportunities
+
+# Memory Leak Detection
+node scripts/memory-leak-test.js
+# Test for memory leaks in chart calculations
+```
+
+## Deployment Commands
+
+### 10. Vercel Deployment
+```bash
+# Production Build
+npm run vercel-build
+# Build both backend and frontend for production
+
+# Deploy to Vercel
+npm run deploy:vercel
+# Deploy to Vercel platform
+
+# Production Validation
+curl https://your-app-url.vercel.app/api/health
+# Validate production deployment
+
+# Environment Setup for Production
+node scripts/setup-production-env.js
+# Configure production environment variables
+```
+
+### 11. Continuous Integration Commands
+```bash
+# Pre-commit Testing
+npm run test:pre-commit
+# Quick tests for git pre-commit hooks
+
+# Build Verification
+npm run verify-build
+# Ensure application builds successfully
+
+# Production Testing
+npm run test:production
+# Run tests against production-like environment
+
+# Health Check Monitoring
+node scripts/health-check-monitor.js
+# Monitor application health in production
+```
+
+## Astrology Domain Commands
+
+### 12. Vedic Chart Generation
+```bash
+# Generate Sample Charts
+node scripts/generate-sample-charts.js
+# Create test data for various birth dates and locations
+
+# Validate Chart Accuracy
+node scripts/validate-with-known-charts.js
+# Check calculations against verified Vedic charts
+
+# Planetary Position Testing
+node scripts/test-planetary-positions.js
+# Validate planetary calculations for specific dates
+
+# Dasha Calculation Verification
+node scripts/verify-dasha-calculations.js
+# Test Vimshottari dasha period calculations
+```
+
+### 13. Specialized Astrological Features
+```bash
+# Yoga Analysis Testing
+node scripts/test-yoga-analysis.js
+# Validate identification of Vedic yogas
+
+# House System Comparison
+node scripts/compare-house-systems.js
+# Test different house calculation methods
+
+# Divisional Chart Generation
+node scripts/test-divisional-charts.js
+# Validate Navamsa and other divisional chart calculations
+
+# Transit Prediction Testing
+node scripts/test-transit-predictions.js
+# Verify transit prediction calculations
+```
+
+## Debugging and Troubleshooting Commands
+
+### 14. Debug Scenarios
+```bash
+# Chart Generation Debug
+node scripts/debug-chart-generation.js
+# Step-by-step chart calculation debugging
+
+# Geocoding Issues
+node scripts/debug-geocoding.js
+# Debug location to coordinate conversion problems
+
+# UI Rendering Debug
+cd client && npm run debug:chart-rendering
+# Debug chart component rendering issues
+
+# API Integration Debug
+node scripts/debug-api-integration.js
+# Verify API request/response flows
+```
+
+### 15. System Diagnostics
+```bash
+# Full System Check
+node scripts/system-diagnostics.js
+# Check all system components and dependencies
+
+# Database Health Check
+node scripts/database-diagnostics.js
+# Verify database connectivity and data integrity
+
+# External Service Check
+node scripts/check-external-apis.js
+# Verify OpenCage and other external services
+
+# Version Compatibility Check
+node scripts/check-version-compatibility.js
+# Ensure all dependencies are compatible
+```
+
+## Development Workflow Automation
+
+### 16. Feature Development Scripts
+```bash
+# New Astrology Feature Setup
+node scripts/setup-new-feature.js --feature=yoga-analysis
+# Scaffold new feature with tests and documentation
+
+# Chart Component Creation
+node scripts/create-chart-component.js --name="RasiChartDisplay"
+# Create new chart component with standard structure
+
+# API Endpoint Creation
+node scripts/create-api-endpoint.js --route="/api/v1/yoga/analyze"
+# Generate new API endpoint with validation and tests
+
+# Test Data Generation
+node scripts/generate-test-data.js --type="edge-cases"
+# Generate comprehensive test data for specific scenarios
+```
+
+These commands provide a comprehensive development workflow for the Jyotish Shastra application, covering development, testing, deployment, and specialized Vedic astrology functionality.
