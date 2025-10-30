@@ -32,10 +32,8 @@ module.exports = {
       ],
     ],
     plugins: [
-      // Only enable React Refresh in development
-      ...(process.env.NODE_ENV !== 'production'
-        ? [['react-refresh/babel', { skipEnvCheck: false }]]
-        : []),
+      // React Scripts automatically handles react-refresh/babel plugin
+      // No need to add it manually to avoid duplicates
     ],
   },
   webpack: {
@@ -49,70 +47,8 @@ module.exports = {
                           !process.env.NODE_ENV || 
                           webpackConfig.mode === 'production';
       
-      if (isProduction) {
-        // Find and remove React Refresh plugin
-        if (webpackConfig.plugins) {
-          webpackConfig.plugins = webpackConfig.plugins.filter(
-            (plugin) => {
-              // Check if plugin is ReactRefreshPlugin or react-refresh
-              const pluginName = plugin?.constructor?.name || '';
-              return !pluginName.includes('ReactRefresh') && 
-                     !pluginName.includes('react-refresh');
-            }
-          );
-        }
-        
-        // Remove React Refresh from babel-loader options
-        const processBabelLoader = (useItem) => {
-          if (useItem.loader && useItem.loader.includes('babel-loader')) {
-            if (useItem.options && useItem.options.plugins) {
-              useItem.options.plugins = useItem.options.plugins.filter(
-                (plugin) => {
-                  // Remove react-refresh plugin
-                  if (Array.isArray(plugin)) {
-                    const pluginPath = plugin[0] || '';
-                    return !String(pluginPath).includes('react-refresh') &&
-                           !String(pluginPath).includes('react-refresh/babel');
-                  }
-                  return !String(plugin).includes('react-refresh');
-                }
-              );
-            }
-          }
-        };
-        
-        webpackConfig.module.rules.forEach((rule) => {
-          if (rule.oneOf) {
-            rule.oneOf.forEach((loader) => {
-              if (loader.use && Array.isArray(loader.use)) {
-                loader.use.forEach(processBabelLoader);
-              } else if (loader.use) {
-                processBabelLoader(loader.use);
-              }
-            });
-          }
-          
-          // Also check regular rules
-          if (rule.use) {
-            if (Array.isArray(rule.use)) {
-              rule.use.forEach(processBabelLoader);
-            } else {
-              processBabelLoader(rule.use);
-            }
-          }
-        });
-        
-        // Also check for babel-loader in test rules
-        webpackConfig.module.rules.forEach((rule) => {
-          if (rule.test && String(rule.test).includes('jsx')) {
-            if (rule.use && Array.isArray(rule.use)) {
-              rule.use.forEach(processBabelLoader);
-            } else if (rule.use) {
-              processBabelLoader(rule.use);
-            }
-          }
-        });
-      }
+      // React Scripts handles react-refresh automatically in development
+      // No need to manually remove it in production
       
       // Completely remove ESLint from webpack config
       webpackConfig.module.rules = webpackConfig.module.rules.filter(rule => {
