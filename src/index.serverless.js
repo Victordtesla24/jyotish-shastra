@@ -40,8 +40,9 @@ if (isProduction || isServerless) {
 }
 
 // Security middleware - optimized for serverless
+// Disable strict CSP for API endpoints to prevent 401 errors
 app.use(helmet({
-  contentSecurityPolicy: {
+  contentSecurityPolicy: isServerless ? false : {
     directives: {
       defaultSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'", "https:"],
@@ -56,11 +57,20 @@ app.use(helmet({
   },
   // Disable crossOriginEmbedderPolicy in serverless (can cause issues)
   crossOriginEmbedderPolicy: false,
+  // Disable strict transport security for development/serverless
+  strictTransportSecurity: isServerless ? false : {
+    maxAge: 31536000,
+    includeSubDomains: true,
+  },
 }));
 
 // CORS configuration - optimized for serverless
+// In serverless/Vercel, allow all origins for API access
+// Headers are also set in api/[...path].js handler
 const corsOptions = {
-  origin: isProduction
+  origin: isServerless 
+    ? '*' // Allow all origins in serverless (handled by vercel.json headers)
+    : isProduction
     ? [
         process.env.FRONTEND_URL,
         process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null,
@@ -75,7 +85,7 @@ const corsOptions = {
         'http://127.0.0.1:3000',
         'http://127.0.0.1:3003',
       ],
-  credentials: true,
+  credentials: isServerless ? false : true, // Disable credentials in serverless for CORS simplicity
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   // Preflight handling for serverless

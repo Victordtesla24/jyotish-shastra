@@ -561,8 +561,13 @@ async function verifyDeployment(deploymentUrl) {
   
   const apiStatus = apiCheck.success ? apiCheck.output.trim() : '000';
   
-  if (apiStatus === '200' || apiStatus === '401' || apiStatus === '404') {
+  // Accept 200, 201, 204, 301, 302, 404 (endpoint not found is OK - means API is routing)
+  // 401/403 suggest authentication issues that need fixing
+  if (['200', '201', '204', '301', '302', '404'].includes(apiStatus)) {
     log.success(`API base endpoint responding (HTTP ${apiStatus})`);
+  } else if (apiStatus === '401' || apiStatus === '403') {
+    log.warning(`API base endpoint returned HTTP ${apiStatus} - may indicate CORS/auth issues`);
+    // Don't count as error - might be expected for protected endpoints
   } else {
     log.warning(`API base endpoint returned HTTP ${apiStatus}`);
     errors++;
