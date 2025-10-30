@@ -191,7 +191,7 @@ description: Jyotish Shastra - Domain-specific user commands for Vedic astrology
 
 ### 13. Research and Analysis
 ```bash
-@yoka-research --chart-database="historical-figures" --yaml="Raj Yoga" --statistical=true
+@yoga-research --chart-database="historical-figures" --yoga="Raj Yoga" --statistical=true
 # Research specific yoga patterns across sample charts
 
 @planetary-effects-research --planet="Saturn" --houses="10,11" --samples="1000" --correlation=true

@@ -11,6 +11,9 @@ import { VedicLoadingSpinner, ErrorMessage } from '../components/ui';
 // Import chart visualization components
 import VedicChartDisplay from '../components/charts/VedicChartDisplay';
 
+// Import birth time rectification component
+import BirthTimeRectification from '../components/BirthTimeRectification';
+
 // Import contexts
 import { useChart } from '../contexts/ChartContext';
 import { useAnalysis } from '../contexts/AnalysisContext';
@@ -18,6 +21,142 @@ import { useAnalysis } from '../contexts/AnalysisContext';
 // Import singleton data flow components
 import UIDataSaver from '../components/forms/UIDataSaver';
 import ResponseDataToUIDisplayAnalyser from '../components/analysis/ResponseDataToUIDisplayAnalyser';
+
+// ===== REUSABLE SUMMARY DISPLAY COMPONENT (ENHANCED) =====
+
+const SummaryDisplay = ({ summary, title = '', compact = false }) => {
+  if (!summary) return null;
+
+  // Handle string summary
+  if (typeof summary === 'string') {
+    return (
+      <div className={`summary-vedic ${compact ? 'text-sm' : ''}`}>
+        {title && <h4 className="summary-title">{title}</h4>}
+        <p className="summary-text leading-relaxed">{summary}</p>
+      </div>
+    );
+  }
+
+  // Handle object summary with proper formatting
+  if (typeof summary === 'object' && summary !== null) {
+    const formatValue = (key, value) => {
+      if (value === null || value === undefined) return <span className="text-muted">N/A</span>;
+      
+      if (typeof value === 'boolean') {
+        return (
+          <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold ${
+            value ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+          }`}>
+            {value ? '✅ Complete' : '❌ Incomplete'}
+          </span>
+        );
+      }
+      
+      if (typeof value === 'number') {
+        // Format numbers nicely
+        if (key.toLowerCase().includes('age') || key.toLowerCase().includes('year')) {
+          return <span className="font-semibold text-primary">{value.toFixed(1)} years</span>;
+        }
+        if (key.toLowerCase().includes('percent') || key.toLowerCase().includes('completeness')) {
+          return (
+            <div className="flex items-center gap-2">
+              <span className="font-semibold text-primary">{value}%</span>
+              <div className="flex-1 bg-gray-200 rounded-full h-2 max-w-[100px]">
+                <div 
+                  className={`h-2 rounded-full transition-all ${
+                    value === 100 ? 'bg-green-500' : value >= 75 ? 'bg-yellow-500' : 'bg-orange-500'
+                  }`}
+                  style={{ width: `${value}%` }}
+                />
+              </div>
+            </div>
+          );
+        }
+        return <span className="font-semibold text-primary">{value.toString()}</span>;
+      }
+      
+      if (typeof value === 'object') {
+        // Handle nested objects (like readyForAnalysis)
+        if (value.planet && value.startAge !== undefined) {
+          return (
+            <div className="bg-gradient-to-r from-saffron/10 to-gold/10 p-3 rounded-lg border border-saffron/20">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-lg font-bold text-saffron">{value.planet}</span>
+                <span className="text-sm text-secondary">Dasha Period</span>
+              </div>
+              <div className="text-sm text-secondary space-y-1">
+                <div>Age Range: <span className="font-semibold text-primary">{value.startAge} - {value.endAge} years</span></div>
+                {value.remainingYears !== undefined && (
+                  <div>Remaining: <span className="font-semibold text-primary">{value.remainingYears.toFixed(1)} years</span></div>
+                )}
+              </div>
+            </div>
+          );
+        }
+        // Other nested objects - display as formatted list
+        return (
+          <div className="space-y-1 text-sm">
+            {Object.entries(value).map(([nestedKey, nestedValue]) => (
+              <div key={nestedKey} className="flex justify-between">
+                <span className="text-secondary">{nestedKey.replace(/([A-Z])/g, ' $1').trim()}:</span>
+                <span className="font-semibold text-primary">
+                  {typeof nestedValue === 'object' ? JSON.stringify(nestedValue) : String(nestedValue)}
+                </span>
+              </div>
+            ))}
+          </div>
+        );
+      }
+      
+      return <span className="text-primary">{String(value)}</span>;
+    };
+
+    const formatLabel = (key) => {
+      const labelMap = {
+        status: 'Analysis Status',
+        completeness: 'Completeness',
+        chartsGenerated: 'Charts Generated',
+        ascendantCalculated: 'Ascendant Calculated',
+        planetsCalculated: 'Planets Calculated',
+        dashaCalculated: 'Dasha Calculated',
+        readyForAnalysis: 'Current Dasha Period'
+      };
+      return labelMap[key] || key.replace(/([A-Z])/g, ' $1').trim().replace(/^\w/, c => c.toUpperCase());
+    };
+
+    const statusItems = Object.entries(summary).filter(([key]) => 
+      !['readyForAnalysis'].includes(key) || typeof summary[key] !== 'object'
+    );
+    const readyForAnalysis = summary.readyForAnalysis && typeof summary.readyForAnalysis === 'object' 
+      ? summary.readyForAnalysis 
+      : null;
+
+    return (
+      <div className={`summary-vedic ${compact ? 'compact' : ''}`}>
+        {title && <h4 className="summary-title mb-4">{title}</h4>}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {statusItems.map(([key, value]) => (
+            <div key={key} className="bg-white/50 backdrop-blur-sm p-4 rounded-lg border border-sacred/20 hover:border-saffron/40 transition-all duration-300 hover:shadow-md">
+              <div className="text-xs font-semibold text-secondary uppercase tracking-wide mb-2">
+                {formatLabel(key)}
+              </div>
+              <div className="text-base">
+                {formatValue(key, value)}
+              </div>
+            </div>
+          ))}
+        </div>
+        {readyForAnalysis && (
+          <div className="mt-4">
+            {formatValue('readyForAnalysis', readyForAnalysis)}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return null;
+};
 
 // ===== SPECIALIZED DISPLAY COMPONENTS (ENHANCED) =====
 
@@ -1781,8 +1920,7 @@ const NavamsaDisplay = ({ data }) => {
             <div className="space-y-4">
               {overallAnalysis.summary && (
                 <div className="card-vedic group hover:shadow-lg transition-all duration-300 p-5">
-                  <h5 className="text-lg font-semibold text-primary mb-3">Summary</h5>
-                  <p className="text-secondary leading-relaxed">{overallAnalysis.summary}</p>
+                  <SummaryDisplay summary={overallAnalysis.summary} title="Summary" />
                 </div>
               )}
 
@@ -2127,95 +2265,108 @@ const DashaDisplay = ({ data }) => {
 
 const PreliminaryDisplay = ({ data }) => {
   if (!data) return (
-    <div className="card-vedic text-center">
-      <div className="text-muted">📋</div>
-      <p className="text-muted">No preliminary analysis data available</p>
+    <div className="card-cosmic text-center animate-pulse">
+      <div className="text-6xl mb-4 animate-float">📋</div>
+      <p className="text-muted text-lg">No preliminary analysis data available</p>
     </div>
   );
 
   const preliminary = data.analysis || data.preliminary || data;
 
   return (
-    <div className="card-vedic">
-      <div className="section-header-vedic">
-        <h3 className="section-title-vedic">📋 Preliminary Analysis</h3>
-        <p className="section-subtitle-vedic">Initial chart assessment and overview</p>
+    <div className="space-y-8">
+      {/* Enhanced Header */}
+      <div className="bg-gradient-to-r from-saffron/20 via-gold/20 to-white rounded-xl p-8 border-2 border-saffron/30 shadow-xl">
+        <div className="flex items-center gap-4 mb-2">
+          <div className="w-16 h-16 bg-gradient-to-br from-saffron to-gold rounded-full flex items-center justify-center text-3xl animate-glow">
+            📋
+          </div>
+          <div>
+            <h3 className="text-3xl font-bold text-primary">Preliminary Analysis</h3>
+            <p className="text-secondary mt-1">Initial chart assessment and overview</p>
+          </div>
+        </div>
       </div>
 
-      <div className="space-vedic">
+      <div className="space-y-6">
         {/* Handle summary as either string or object */}
         {preliminary.summary && (
-          <div className="summary-vedic">
-            <h4 className="summary-title">Chart Overview</h4>
-            {typeof preliminary.summary === 'object' ? (
-              <div className="status-grid-premium">
-                {Object.entries(preliminary.summary).map(([key, value]) => (
-                  <div key={key} className="status-item-premium">
-                    <div className="status-label">{key.replace(/([A-Z])/g, ' $1').trim()}</div>
-                    <div className="status-value">
-                      {typeof value === 'boolean' ? (value ? '✅' : '❌') :
-                       typeof value === 'object' ? JSON.stringify(value) : String(value)}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="summary-text">{String(preliminary.summary)}</p>
-            )}
+          <div className="bg-gradient-to-br from-saffron/10 via-gold/10 to-white rounded-xl p-6 border border-saffron/20 shadow-lg">
+            <SummaryDisplay summary={preliminary.summary} title="Chart Overview" compact={false} />
           </div>
         )}
 
         {preliminary.keyPlacements && Array.isArray(preliminary.keyPlacements) && (
-          <div className="placements-vedic">
-            <h4 className="placements-title">🪐 Key Planetary Placements</h4>
-            <div className="placements-grid">
+          <div className="bg-gradient-to-r from-blue/10 to-cyan/10 rounded-xl p-6 border border-blue/20 shadow-lg">
+            <h4 className="text-xl font-bold text-primary mb-4 flex items-center gap-2">
+              <span className="text-2xl">🪐</span>
+              Key Planetary Placements
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {preliminary.keyPlacements.map((placement, index) => (
-                <div key={index} className="placement-item">
-                  <span className="placement-planet">{placement.planet}</span>
-                  <span className="placement-sign">{placement.sign}</span>
-                  <span className="placement-house">House {placement.house}</span>
+                <div key={index} className="bg-white/50 backdrop-blur-sm p-4 rounded-lg border border-blue/20 hover:border-blue/40 transition-all duration-300 hover:shadow-md">
+                  <div className="font-bold text-lg text-primary mb-2">{placement.planet}</div>
+                  <div className="text-sm text-secondary space-y-1">
+                    <div>Sign: <span className="font-semibold text-saffron">{placement.sign}</span></div>
+                    <div>House: <span className="font-semibold text-primary">House {placement.house}</span></div>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        {preliminary.strengths && Array.isArray(preliminary.strengths) && (
-          <div className="chart-strengths-vedic">
-            <h4 className="strengths-title">💪 Chart Strengths</h4>
-            <div className="strengths-list">
+        {preliminary.strengths && Array.isArray(preliminary.strengths) && preliminary.strengths.length > 0 && (
+          <div className="bg-gradient-to-r from-green/10 to-emerald/10 rounded-xl p-6 border border-green/20 shadow-lg">
+            <h4 className="text-xl font-bold text-primary mb-4 flex items-center gap-2">
+              <span className="text-2xl">💪</span>
+              Chart Strengths
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {preliminary.strengths.map((strength, index) => (
-                <div key={index} className="strength-item">
-                  <span className="strength-icon">✨</span>
-                  <span>{typeof strength === 'object' ? JSON.stringify(strength) : strength}</span>
+                <div key={index} className="bg-white/50 backdrop-blur-sm p-4 rounded-lg border border-green/20 hover:border-green/40 transition-all duration-300">
+                  <div className="flex items-start gap-3">
+                    <span className="text-xl">✨</span>
+                    <span className="text-secondary leading-relaxed flex-1">{typeof strength === 'object' ? JSON.stringify(strength) : strength}</span>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        {preliminary.challenges && Array.isArray(preliminary.challenges) && (
-          <div className="chart-challenges-vedic">
-            <h4 className="challenges-title">⚡ Areas for Growth</h4>
-            <div className="challenges-list">
+        {preliminary.challenges && Array.isArray(preliminary.challenges) && preliminary.challenges.length > 0 && (
+          <div className="bg-gradient-to-r from-orange/10 to-red/10 rounded-xl p-6 border border-orange/20 shadow-lg">
+            <h4 className="text-xl font-bold text-primary mb-4 flex items-center gap-2">
+              <span className="text-2xl">⚡</span>
+              Areas for Growth
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {preliminary.challenges.map((challenge, index) => (
-                <div key={index} className="challenge-item">
-                  <span className="challenge-icon">⚠️</span>
-                  <span>{typeof challenge === 'object' ? JSON.stringify(challenge) : challenge}</span>
+                <div key={index} className="bg-white/50 backdrop-blur-sm p-4 rounded-lg border border-orange/20 hover:border-orange/40 transition-all duration-300">
+                  <div className="flex items-start gap-3">
+                    <span className="text-xl">⚠️</span>
+                    <span className="text-secondary leading-relaxed flex-1">{typeof challenge === 'object' ? JSON.stringify(challenge) : challenge}</span>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        {preliminary.recommendations && Array.isArray(preliminary.recommendations) && (
-          <div className="recommendations-vedic">
-            <h4 className="recommendations-title">🎯 Initial Recommendations</h4>
-            <div className="recommendations-list">
+        {preliminary.recommendations && Array.isArray(preliminary.recommendations) && preliminary.recommendations.length > 0 && (
+          <div className="bg-gradient-to-r from-purple/10 to-pink/10 rounded-xl p-6 border border-purple/20 shadow-lg">
+            <h4 className="text-xl font-bold text-primary mb-4 flex items-center gap-2">
+              <span className="text-2xl">🎯</span>
+              Initial Recommendations
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {preliminary.recommendations.map((rec, index) => (
-                <div key={index} className="recommendation-item">
-                  <span className="recommendation-icon">💡</span>
-                  <span>{typeof rec === 'object' ? JSON.stringify(rec) : rec}</span>
+                <div key={index} className="bg-white/50 backdrop-blur-sm p-4 rounded-lg border border-purple/20 hover:border-purple/40 transition-all duration-300">
+                  <div className="flex items-start gap-3">
+                    <span className="text-xl">💡</span>
+                    <span className="text-secondary leading-relaxed flex-1">{typeof rec === 'object' ? JSON.stringify(rec) : rec}</span>
+                  </div>
                 </div>
               ))}
             </div>
@@ -2224,39 +2375,25 @@ const PreliminaryDisplay = ({ data }) => {
 
         {/* Handle status object properly */}
         {preliminary.status && typeof preliminary.status === 'object' && (
-          <div className="status-section-vedic">
-            <h4 className="status-title">📊 Analysis Status</h4>
-            <div className="status-grid-premium">
-              {Object.entries(preliminary.status).map(([key, value]) => (
-                <div key={key} className="status-item-premium">
-                  <div className="status-label">{key}</div>
-                  <div className="status-value">
-                    {typeof value === 'boolean' ? (value ? '✅' : '❌') :
-                     typeof value === 'object' ? JSON.stringify(value) : String(value)}
-                  </div>
-                </div>
-              ))}
-            </div>
+          <div className="bg-gradient-to-br from-saffron/10 via-gold/10 to-white rounded-xl p-6 border border-saffron/20 shadow-lg">
+            <h4 className="text-xl font-bold text-primary mb-4 flex items-center gap-2">
+              <span className="text-2xl">📊</span>
+              Analysis Status
+            </h4>
+            <SummaryDisplay summary={preliminary.status} title="" compact={false} />
           </div>
         )}
 
-        {/* Handle preliminary analysis data */}
+        {/* Handle preliminary analysis data fallback */}
         {!preliminary.summary && !preliminary.keyPlacements && !preliminary.strengths && 
          !preliminary.challenges && !preliminary.recommendations && !preliminary.status &&
          typeof preliminary === 'object' && Object.keys(preliminary).length > 0 && (
-          <div className="status-section-vedic">
-            <h4 className="status-title">📊 Chart Status</h4>
-            <div className="status-grid-premium">
-              {Object.entries(preliminary).map(([key, value]) => (
-                <div key={key} className="status-item-premium">
-                  <div className="status-label">{key.replace(/([A-Z])/g, ' $1').trim()}</div>
-                  <div className="status-value">
-                    {typeof value === 'boolean' ? (value ? '✅' : '❌') :
-                     typeof value === 'object' ? JSON.stringify(value) : String(value)}
-                  </div>
-                </div>
-              ))}
-            </div>
+          <div className="bg-gradient-to-br from-saffron/10 via-gold/10 to-white rounded-xl p-6 border border-saffron/20 shadow-lg">
+            <h4 className="text-xl font-bold text-primary mb-4 flex items-center gap-2">
+              <span className="text-2xl">📊</span>
+              Chart Status
+            </h4>
+            <SummaryDisplay summary={preliminary} title="" compact={false} />
           </div>
         )}
       </div>
@@ -2266,39 +2403,170 @@ const PreliminaryDisplay = ({ data }) => {
 
 const ComprehensiveDisplay = ({ data }) => {
   if (!data) return (
-    <div className="card-vedic text-center">
-      <div className="text-muted">📊</div>
-      <p className="text-muted">No comprehensive analysis data available</p>
+    <div className="card-cosmic text-center animate-pulse">
+      <div className="text-6xl mb-4 animate-float">📊</div>
+      <p className="text-muted text-lg">No comprehensive analysis data available</p>
     </div>
   );
 
   const comprehensive = data.analysis || data.comprehensive || data;
 
   return (
-    <div className="card-vedic">
-      <div className="section-header-vedic">
-        <h3 className="section-title-vedic">📊 Comprehensive Analysis</h3>
-        <p className="section-subtitle-vedic">Complete 8-section astrological assessment</p>
+    <div className="space-y-8">
+      {/* Enhanced Header */}
+      <div className="bg-gradient-to-r from-saffron/20 via-gold/20 to-white rounded-xl p-8 border-2 border-saffron/30 shadow-xl">
+        <div className="flex items-center gap-4 mb-2">
+          <div className="w-16 h-16 bg-gradient-to-br from-saffron to-gold rounded-full flex items-center justify-center text-3xl animate-glow">
+            📊
+          </div>
+          <div>
+            <h3 className="text-3xl font-bold text-primary">Comprehensive Analysis</h3>
+            <p className="text-secondary mt-1">Complete 8-section astrological assessment</p>
+          </div>
+        </div>
       </div>
 
-      <div className="space-vedic">
+      <div className="space-y-8">
+        {/* Analysis Status Overview */}
+        {comprehensive.sections?.section1?.summary && (
+          <div className="bg-gradient-to-br from-saffron/10 via-gold/10 to-white rounded-xl p-6 border border-saffron/20 shadow-lg">
+            <h4 className="text-xl font-bold text-primary mb-4 flex items-center gap-2">
+              <span className="text-2xl">📊</span>
+              Analysis Status Overview
+            </h4>
+            <SummaryDisplay summary={comprehensive.sections.section1.summary} compact={false} />
+          </div>
+        )}
+
+        {/* Sections Overview */}
         {comprehensive.sections && typeof comprehensive.sections === 'object' && (
-          <div className="sections-overview-vedic">
-            <h4 className="sections-title">Analysis Sections Overview</h4>
-            <div className="sections-grid">
-              {Object.entries(comprehensive.sections).map(([sectionKey, section]) => (
-                <div key={sectionKey} className="section-summary-card">
-                  <div className="section-name">{section.name || sectionKey}</div>
-                  <div className="section-status">
-                    {section.questions?.length > 0 && (
-                      <span className="section-metric">{section.questions.length} insights</span>
+          <div className="sections-overview-enhanced">
+            <h4 className="text-2xl font-bold text-primary mb-6 flex items-center gap-3">
+              <span className="text-3xl">📚</span>
+              Analysis Sections Overview
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Object.entries(comprehensive.sections).map(([sectionKey, section]) => {
+                const sectionNumber = sectionKey.replace('section', '');
+                const sectionIcons = {
+                  '1': '📋',
+                  '2': '🌅',
+                  '3': '🏠',
+                  '4': '🔗',
+                  '5': '🎯',
+                  '6': '🔄',
+                  '7': '⏳',
+                  '8': '📊'
+                };
+                
+                return (
+                  <div 
+                    key={sectionKey} 
+                    className="group bg-white rounded-xl p-6 border-2 border-sacred/20 hover:border-saffron/60 transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+                  >
+                    <div className="flex items-start gap-3 mb-3">
+                      <div className="text-3xl group-hover:scale-110 transition-transform">
+                        {sectionIcons[sectionNumber] || '📄'}
+                      </div>
+                      <div className="flex-1">
+                        <div className="font-bold text-lg text-primary mb-1">
+                          {section.name || sectionKey.replace(/([A-Z])/g, ' $1').trim()}
+                        </div>
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {section.questions?.length > 0 && (
+                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-semibold">
+                              <span>💡</span>
+                              {section.questions.length} insights
+                            </span>
+                          )}
+                          {section.analyses && Object.keys(section.analyses).length > 0 && (
+                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-semibold">
+                              <span>🔍</span>
+                              {Object.keys(section.analyses).length} analyses
+                            </span>
+                          )}
+                          {section.houses && Object.keys(section.houses).length > 0 && (
+                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold">
+                              <span>🏠</span>
+                              {Object.keys(section.houses).length} houses
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    {section.summary && typeof section.summary === 'object' && sectionKey === 'section1' && (
+                      <div className="mt-4 pt-4 border-t border-sacred/20">
+                        <SummaryDisplay summary={section.summary} title="" compact={true} />
+                      </div>
                     )}
-                    {section.analyses && Object.keys(section.analyses).length > 0 && (
-                      <span className="section-metric">{Object.keys(section.analyses).length} analyses</span>
+                    {section.summary && typeof section.summary === 'string' && (
+                      <div className="mt-3 pt-3 border-t border-sacred/20">
+                        <p className="text-sm text-secondary leading-relaxed line-clamp-2">
+                          {section.summary}
+                        </p>
+                      </div>
                     )}
                   </div>
-                  {section.summary && (
-                    <div className="section-preview">{section.summary}</div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {comprehensive.overallTheme && (
+          <div className="bg-gradient-to-r from-purple/10 to-pink/10 rounded-xl p-6 border border-purple/20 shadow-lg">
+            <h4 className="text-xl font-bold text-primary mb-3 flex items-center gap-2">
+              <span className="text-2xl">🌟</span>
+              Life Theme
+            </h4>
+            <p className="text-secondary leading-relaxed text-lg">{comprehensive.overallTheme}</p>
+          </div>
+        )}
+
+        {comprehensive.keyInsights && Array.isArray(comprehensive.keyInsights) && comprehensive.keyInsights.length > 0 && (
+          <div className="bg-gradient-to-r from-blue/10 to-cyan/10 rounded-xl p-6 border border-blue/20 shadow-lg">
+            <h4 className="text-xl font-bold text-primary mb-4 flex items-center gap-2">
+              <span className="text-2xl">🔑</span>
+              Key Insights
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {comprehensive.keyInsights.map((insight, index) => (
+                <div key={index} className="bg-white/50 backdrop-blur-sm p-4 rounded-lg border border-blue/20 hover:border-blue/40 transition-all duration-300">
+                  <div className="flex items-start gap-3">
+                    <span className="text-xl">💎</span>
+                    <span className="text-secondary leading-relaxed flex-1">{insight}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {comprehensive.lifeAreas && typeof comprehensive.lifeAreas === 'object' && Object.keys(comprehensive.lifeAreas).length > 0 && (
+          <div className="bg-gradient-to-r from-green/10 to-emerald/10 rounded-xl p-6 border border-green/20 shadow-lg">
+            <h4 className="text-xl font-bold text-primary mb-4 flex items-center gap-2">
+              <span className="text-2xl">🏗️</span>
+              Life Areas Assessment
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {Object.entries(comprehensive.lifeAreas).map(([area, assessment]) => (
+                <div key={area} className="bg-white/50 backdrop-blur-sm p-5 rounded-lg border border-green/20 hover:border-green/40 transition-all duration-300 hover:shadow-md">
+                  <div className="font-bold text-lg text-primary mb-2">{area}</div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="text-2xl font-bold text-saffron">{assessment.rating}/10</div>
+                    <div className="flex-1 bg-gray-200 rounded-full h-2">
+                      <div 
+                        className={`h-2 rounded-full transition-all ${
+                          assessment.rating >= 8 ? 'bg-green-500' : assessment.rating >= 6 ? 'bg-yellow-500' : 'bg-orange-500'
+                        }`}
+                        style={{ width: `${(assessment.rating / 10) * 100}%` }}
+                      />
+                    </div>
+                  </div>
+                  {assessment.summary && (
+                    <div className="text-sm text-secondary leading-relaxed">
+                      {typeof assessment.summary === 'string' ? assessment.summary : <SummaryDisplay summary={assessment.summary} title="" compact={true} />}
+                    </div>
                   )}
                 </div>
               ))}
@@ -2306,53 +2574,16 @@ const ComprehensiveDisplay = ({ data }) => {
           </div>
         )}
 
-        {comprehensive.overallTheme && (
-          <div className="theme-vedic">
-            <h4 className="theme-title">🌟 Life Theme</h4>
-            <p className="theme-text">{comprehensive.overallTheme}</p>
-          </div>
-        )}
-
-        {comprehensive.keyInsights && Array.isArray(comprehensive.keyInsights) && (
-          <div className="insights-vedic">
-            <h4 className="insights-title">🔑 Key Insights</h4>
-            <div className="insights-list">
-              {comprehensive.keyInsights.map((insight, index) => (
-                <div key={index} className="insight-item">
-                  <span className="insight-icon">💎</span>
-                  <span>{insight}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {comprehensive.lifeAreas && typeof comprehensive.lifeAreas === 'object' && (
-          <div className="life-areas-vedic">
-            <h4 className="life-areas-title">🏗️ Life Areas Assessment</h4>
-            <div className="life-areas-grid">
-              {Object.entries(comprehensive.lifeAreas).map(([area, assessment]) => (
-                <div key={area} className="life-area-card">
-                  <div className="area-name">{area}</div>
-                  <div className="area-rating" data-rating={assessment.rating}>
-                    {assessment.rating}/10
-                  </div>
-                  <div className="area-summary">{assessment.summary}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div className="comprehensive-action">
-          <p className="action-text">
-            For detailed section-by-section analysis, visit the
-            <strong> 8-Section Comprehensive Analysis</strong> page.
+        {/* Action Callout */}
+        <div className="bg-gradient-to-r from-saffron/5 to-gold/5 rounded-xl p-6 border border-saffron/20 text-center">
+          <p className="text-secondary leading-relaxed">
+            For detailed section-by-section analysis, visit the{' '}
+            <strong className="text-primary">8-Section Comprehensive Analysis</strong> page.
           </p>
-            </div>
-      </div>
         </div>
-      );
+      </div>
+    </div>
+  );
 };
 
 // ===== MAIN COMPONENT =====
@@ -2834,9 +3065,13 @@ const AnalysisPage = () => {
         setAnalysisData(comprehensiveResult.data);
 
         // Mark all loaded types as completed
+        // PRODUCTION: Only set status strings, never objects
         const completedStages = {};
         Object.keys(comprehensiveResult.data).forEach(type => {
-          completedStages[type] = 'completed';
+          // Only set status for valid analysis endpoint keys (not data objects)
+          if (analysisEndpoints[type]) {
+            completedStages[type] = 'completed';
+          }
         });
         setLoadingStages(prev => ({ ...prev, ...completedStages }));
       } else {
@@ -2895,18 +3130,25 @@ const AnalysisPage = () => {
             text="Calculating cosmic influences..."
           />
           <div className="mt-6 space-y-2">
-            {Object.entries(loadingStages).map(([stage, status]) => (
-              <div key={stage} className="flex items-center justify-center space-x-2">
-                <span className={`w-3 h-3 rounded-full ${
-                  status === 'completed' ? 'bg-success' :
-                  status === 'loading' ? 'bg-warning animate-pulse' :
-                  status === 'error' ? 'bg-error' : 'bg-neutral'
-                }`} />
-                <span className="text-sm text-muted capitalize">
-                  {analysisEndpoints[stage]?.label || stage}
-                </span>
-              </div>
-            ))}
+            {Object.entries(loadingStages).map(([stage, status]) => {
+              // PRODUCTION: Ensure status is always a string, never an object
+              const statusValue = typeof status === 'string' ? status : 
+                                  (typeof status === 'object' && status !== null && status.status) ? status.status :
+                                  'pending';
+              
+              return (
+                <div key={stage} className="flex items-center justify-center space-x-2">
+                  <span className={`w-3 h-3 rounded-full ${
+                    statusValue === 'completed' ? 'bg-success' :
+                    statusValue === 'loading' ? 'bg-warning animate-pulse' :
+                    statusValue === 'error' ? 'bg-error' : 'bg-neutral'
+                  }`} />
+                  <span className="text-sm text-muted capitalize">
+                    {analysisEndpoints[stage]?.label || stage}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -3102,6 +3344,21 @@ const AnalysisPage = () => {
           <div className="max-w-7xl mx-auto">
             {/* Enhanced Header Section */}
             <div className="text-center mb-12 float-cosmic">
+              {/* Birth Time Rectification Component */}
+              <div className="mb-8">
+                <BirthTimeRectification 
+                  onRectificationComplete={(rectifiedData, results) => {
+                    console.log('BTR completed:', rectifiedData, results);
+                    // Update analysis data if rectification was successful
+                    if (rectifiedData) {
+                      // Trigger re-analysis with rectified time
+                      fetchAllAnalysisData();
+                    }
+                  }}
+                  showOptional={true}
+                />
+              </div>
+              
               <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-vedic-saffron to-vedic-gold rounded-full mb-6 shadow-lg animate-pulse">
                 <span className="text-3xl vedic-symbol symbol-mandala text-cosmic-glow"></span>
               </div>
@@ -3147,17 +3404,24 @@ const AnalysisPage = () => {
                         <div className="flex items-center gap-3">
                           <span className="text-xl transition-transform group-hover:scale-110">{tab.icon}</span>
                           <span className="font-medium">{tab.label}</span>
-                          {loadingStages[tab.key] && (
-                            <span className={`badge-vedic-sm ${
-                              loadingStages[tab.key] === 'completed' ? 'badge-complete' :
-                              loadingStages[tab.key] === 'loading' ? 'badge-pending' :
-                              loadingStages[tab.key] === 'error' ? 'badge-error' : 'badge-neutral'
-                            }`}>
-                              {loadingStages[tab.key] === 'loading' ? '⏳' : 
-                               loadingStages[tab.key] === 'completed' ? '✓' : 
-                               loadingStages[tab.key] === 'error' ? '✗' : '○'}
-                            </span>
-                          )}
+                          {loadingStages[tab.key] && (() => {
+                            // PRODUCTION: Ensure status is always a string, never an object
+                            const statusValue = typeof loadingStages[tab.key] === 'string' ? loadingStages[tab.key] :
+                                                (typeof loadingStages[tab.key] === 'object' && loadingStages[tab.key] !== null && loadingStages[tab.key].status) ? loadingStages[tab.key].status :
+                                                'pending';
+                            
+                            return (
+                              <span className={`badge-vedic-sm ${
+                                statusValue === 'completed' ? 'badge-complete' :
+                                statusValue === 'loading' ? 'badge-pending' :
+                                statusValue === 'error' ? 'badge-error' : 'badge-neutral'
+                              }`}>
+                                {statusValue === 'loading' ? '⏳' : 
+                                 statusValue === 'completed' ? '✓' : 
+                                 statusValue === 'error' ? '✗' : '○'}
+                              </span>
+                            );
+                          })()}
                         </div>
                       </button>
                     ))}

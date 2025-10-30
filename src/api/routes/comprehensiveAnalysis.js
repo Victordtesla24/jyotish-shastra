@@ -269,23 +269,58 @@ router.post('/houses', async (req, res) => {
 
         const finalBirthData = validationResult.data.birthData || validationResult.data;
         const charts = await orchestrator.generateCharts(finalBirthData);
-        const analysis = await orchestrator.executeSection3Analysis(charts, {});
-
-        // PRODUCTION: No fallback analysis - throw error if analysis fails
-        const housesResult = analysis.sections?.section3?.houses;
-
-        if (!housesResult || Object.keys(housesResult).length === 0) {
-            throw new Error('Houses analysis failed to generate results. Please verify birth data and try again.');
+        
+        // PRODUCTION: Validate charts were generated successfully
+        if (!charts || !charts.rasiChart) {
+            throw new Error('Failed to generate charts. Please verify birth data and try again.');
         }
+        
+        // PRODUCTION: Initialize proper analysis context with required structure
+        const analysisContext = {
+            errors: [],
+            warnings: [],
+            birthData: finalBirthData,
+            sections: {},
+            charts: charts
+        };
+        
+        try {
+            const section3 = await orchestrator.executeSection3Analysis(charts, analysisContext);
 
-        return res.status(200).json({
-            success: true,
-            analysis: {
-                section: 'House Analysis',
-                houses: housesResult,
-                message: 'House analysis completed successfully'
+            // PRODUCTION: No fallback analysis - throw error if analysis fails
+            // executeSection3Analysis returns section directly, not wrapped in sections.section3
+            const housesResult = section3?.houses;
+
+            if (!housesResult || Object.keys(housesResult).length === 0) {
+                console.error('House analysis validation failed:', {
+                    hasSection3: !!section3,
+                    section3Keys: section3 ? Object.keys(section3) : [],
+                    hasHouses: !!housesResult,
+                    housesKeys: housesResult ? Object.keys(housesResult) : [],
+                    errors: analysisContext.errors
+                });
+                throw new Error('Houses analysis failed to generate results. Please verify birth data and try again.');
             }
-        });
+
+            return res.status(200).json({
+                success: true,
+                analysis: {
+                    section: 'House Analysis',
+                    houses: housesResult,
+                    message: 'House analysis completed successfully'
+                }
+            });
+        } catch (analysisError) {
+            // Log detailed error information
+            console.error('House analysis execution error:', {
+                message: analysisError.message,
+                stack: analysisError.stack,
+                contextErrors: analysisContext.errors,
+                hasCharts: !!charts,
+                hasRasiChart: !!charts?.rasiChart
+            });
+            throw analysisError;
+        }
     } catch (error) {
         console.error('House analysis error:', error);
         return res.status(500).json({ success: false, error: 'House analysis failed', message: error.message });
@@ -397,31 +432,58 @@ router.post('/navamsa', async (req, res) => {
         const finalBirthData = validationResult.data.birthData || validationResult.data;
         const charts = await orchestrator.generateCharts(finalBirthData);
 
-        // Initialize proper analysis object structure
+        // PRODUCTION: Validate charts were generated successfully
+        if (!charts || !charts.rasiChart || !charts.navamsaChart) {
+            throw new Error('Failed to generate charts. Both Rasi and Navamsa charts are required for Navamsa analysis.');
+        }
+
+        // PRODUCTION: Initialize proper analysis object structure with required properties
         const analysisContext = {
             errors: [],
             warnings: [],
             birthData: finalBirthData,
-            sections: {}
+            sections: {},
+            charts: charts
         };
 
-        const analysis = await orchestrator.executeSection6Analysis(charts, analysisContext);
+        try {
+            const section6 = await orchestrator.executeSection6Analysis(charts, analysisContext);
 
-        // PRODUCTION: No fallback analysis - throw error if analysis fails
-        const navamsaResult = analysis.sections?.section6?.navamsaAnalysis;
+            // PRODUCTION: No fallback analysis - throw error if analysis fails
+            // executeSection6Analysis returns section6 directly, which contains navamsaAnalysis
+            const navamsaResult = section6?.navamsaAnalysis;
 
-        if (!navamsaResult || Object.keys(navamsaResult).length === 0) {
-            throw new Error('Navamsa analysis failed to generate results. Please verify birth data and try again.');
-        }
-
-        return res.status(200).json({
-            success: true,
-            analysis: {
-                section: 'Navamsa Analysis',
-                navamsaAnalysis: navamsaResult,
-                message: 'Navamsa analysis completed successfully'
+            if (!navamsaResult || Object.keys(navamsaResult).length === 0) {
+                console.error('Navamsa analysis validation failed:', {
+                    hasSection6: !!section6,
+                    section6Keys: section6 ? Object.keys(section6) : [],
+                    hasNavamsaAnalysis: !!navamsaResult,
+                    navamsaKeys: navamsaResult ? Object.keys(navamsaResult) : [],
+                    errors: analysisContext.errors
+                });
+                throw new Error('Navamsa analysis failed to generate results. Please verify birth data and try again.');
             }
-        });
+
+            return res.status(200).json({
+                success: true,
+                analysis: {
+                    section: 'Navamsa Analysis',
+                    navamsaAnalysis: navamsaResult,
+                    message: 'Navamsa analysis completed successfully'
+                }
+            });
+        } catch (analysisError) {
+            // Log detailed error information
+            console.error('Navamsa analysis execution error:', {
+                message: analysisError.message,
+                stack: analysisError.stack,
+                contextErrors: analysisContext.errors,
+                hasCharts: !!charts,
+                hasRasiChart: !!charts?.rasiChart,
+                hasNavamsaChart: !!charts?.navamsaChart
+            });
+            throw analysisError;
+        }
     } catch (error) {
         console.error('Navamsa analysis error:', error);
         return res.status(500).json({ success: false, error: 'Navamsa analysis failed', message: error.message });

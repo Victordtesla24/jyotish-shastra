@@ -6,6 +6,7 @@
 import express from 'express';
 import chartRoutes from './chart.js';
 import comprehensiveAnalysisRoutes from './comprehensiveAnalysis.js';
+import birthTimeRectificationRoutes from './birthTimeRectification.js';
 import geocodingRoutes from './geocoding.js';
 import clientErrorLogRoutes from './clientErrorLog.js';
 
@@ -19,6 +20,9 @@ router.use(`${API_VERSION}/chart`, chartRoutes);
 
 // Comprehensive Analysis routes
 router.use(`${API_VERSION}/analysis`, comprehensiveAnalysisRoutes);
+
+// Birth Time Rectification routes
+router.use(`${API_VERSION}/rectification`, birthTimeRectificationRoutes);
 
 // Geocoding routes
 router.use(`${API_VERSION}/geocoding`, geocodingRoutes);
@@ -73,6 +77,13 @@ router.get('/', (req, res) => {
         userHistory: 'GET /v1/analysis/user/:userId',
         delete: 'DELETE /v1/analysis/:analysisId',
         progress: 'GET /v1/analysis/progress/:analysisId'
+      },
+      rectification: {
+        analyze: 'POST /v1/rectification/analyze',
+        withEvents: 'POST /v1/rectification/with-events',
+        quick: 'POST /v1/rectification/quick',
+        methods: 'POST /v1/rectification/methods',
+        test: 'GET /v1/rectification/test'
       },
       geocoding: {
         location: 'POST /geocoding/location',
