@@ -5,12 +5,7 @@
   "installCommand": "npm install --ignore-scripts --no-optional",
   "functions": {
     "api/[...path].js": {
-      "includeFiles": [
-        "ephemeris/**",
-        "src/**",
-        "package.json",
-        "package-lock.json"
-      ],
+      "includeFiles": "ephemeris/**,src/**,package.json,package-lock.json",
       "maxDuration": 30
     }
   },
