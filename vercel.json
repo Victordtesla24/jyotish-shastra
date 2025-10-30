@@ -1,22 +1,30 @@
 {
   "version": 2,
-  "buildCommand": "cd client && npm install && npm run build",
-  "outputDirectory": "client/build",
-  "installCommand": "npm install --ignore-scripts --no-optional",
-  "functions": {
-    "api/[...path].js": {
-      "includeFiles": "ephemeris/**,src/**,package.json,package-lock.json",
-      "maxDuration": 30
-    }
-  },
-  "rewrites": [
+  "builds": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/[...path].js"
+      "src": "client/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "src": "client",
+        "distDir": "build"
+      }
     },
     {
-      "source": "/((?!api|_next|static).*)",
-      "destination": "/index.html"
+      "src": "api/[...path].js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/[...path].js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/client/build/$1"
     }
   ],
   "headers": [
