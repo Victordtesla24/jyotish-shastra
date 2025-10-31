@@ -11,8 +11,8 @@ import { Button, Card, Alert, LoadingSpinner } from '../components/ui';
 import BirthDataForm from '../components/forms/BirthDataForm';
 import UIDataSaver from '../components/forms/UIDataSaver';
 import UIToAPIDataInterpreter from '../components/forms/UIToAPIDataInterpreter';
-import BPHSInfographicPROD from '../components/btr/BPHSInfographic-PROD';
-import InteractiveLifeEventsQuestionnairePROD from '../components/btr/InteractiveLifeEventsQuestionnaire-PROD';
+import BPHSInfographicPROD from '../components/btr/BPHSInfographic';
+import InteractiveLifeEventsQuestionnairePROD from '../components/btr/InteractiveLifeEventsQuestionnaire';
 
 // Import contexts
 import { useChart } from '../contexts/ChartContext';
