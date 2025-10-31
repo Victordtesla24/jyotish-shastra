@@ -4,7 +4,17 @@
  * "Birth Data Collection and Chart Casting"
  */
 
-import swisseph from 'swisseph';
+// Optional swisseph import for serverless compatibility (not currently used but imported)
+let swisseph = null;
+(async () => {
+  try {
+    const swissephModule = await import('swisseph');
+    swisseph = swissephModule.default || swissephModule;
+  } catch (error) {
+    // Swisseph not available - service doesn't require it currently
+  }
+})();
+
 import moment from 'moment';
 import { getSign, getSignName } from '../../utils/helpers/astrologyHelpers.js';
 

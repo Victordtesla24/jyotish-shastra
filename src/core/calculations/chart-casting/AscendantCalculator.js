@@ -1,4 +1,26 @@
-import swisseph from 'swisseph';
+// Optional swisseph import for serverless compatibility
+let swisseph = null;
+let swissephAvailable = false;
+
+(async () => {
+  try {
+    const swissephModule = await import('swisseph');
+    swisseph = swissephModule.default || swissephModule;
+    swissephAvailable = true;
+  } catch (error) {
+    console.warn('⚠️  AscendantCalculator: swisseph not available:', error.message);
+    swissephAvailable = false;
+    swisseph = {
+      swe_set_ephe_path: () => {},
+      swe_set_sid_mode: () => {},
+      SE_SIDM_LAHIRI: 1,
+      swe_houses: () => {
+        throw new Error('Swiss Ephemeris not available');
+      }
+    };
+  }
+})();
+
 import { getSign, getSignName, getSignId } from '../../../utils/helpers/astrologyHelpers.js';
 import path from 'path';
 import fs from 'fs';
@@ -17,8 +39,16 @@ class AscendantCalculator {
         this.ayanamsaType = ayanamsa;
         this.initialized = false;
         this.ephePath = null;
+        this.swisseph = swisseph;
+        this.swissephAvailable = swissephAvailable;
 
         try {
+            if (!this.swissephAvailable) {
+                console.warn('⚠️  AscendantCalculator: Swiss Ephemeris not available - calculations disabled');
+                this.initialized = false;
+                return;
+            }
+
             // CRITICAL FIX: Enhanced Swiss Ephemeris initialization based on research
             // Use absolute path resolution for better reliability
             this.ephePath = path.resolve(__dirname, '../../../../ephemeris');
@@ -28,14 +58,14 @@ class AscendantCalculator {
 
             // CRITICAL FIX: Proper Swiss Ephemeris initialization sequence
             // 1. Set ephemeris path first (required before any calculations)
-            swisseph.swe_set_ephe_path(this.ephePath);
+            this.swisseph.swe_set_ephe_path(this.ephePath);
 
             // 2. Set sidereal mode to Lahiri explicitly during initialization
-            swisseph.swe_set_sid_mode(swisseph.SE_SIDM_LAHIRI || 1);
+            this.swisseph.swe_set_sid_mode(this.swisseph.SE_SIDM_LAHIRI || 1);
 
             // 3. Test Swiss Ephemeris functionality with a known date
             const testDate = 2451545.0; // J2000.0
-            const testResult = swisseph.swe_houses(testDate, 28.7041, 77.1025, 'P');
+            const testResult = this.swisseph.swe_houses(testDate, 28.7041, 77.1025, 'P');
 
             // 4. Validate that Swiss Ephemeris is working properly
             if (!testResult || typeof testResult.ascendant !== 'number' || isNaN(testResult.ascendant)) {
@@ -45,7 +75,12 @@ class AscendantCalculator {
             this.initialized = true;
 
         } catch (error) {
-            throw new Error(`Swiss Ephemeris initialization failed: ${error.message}. Please ensure ephemeris files are properly configured.`);
+            if (!this.swissephAvailable) {
+                console.warn('⚠️  AscendantCalculator: Swiss Ephemeris unavailable:', error.message);
+                this.initialized = false;
+            } else {
+                throw new Error(`Swiss Ephemeris initialization failed: ${error.message}. Please ensure ephemeris files are properly configured.`);
+            }
         }
     }
 
@@ -132,7 +167,10 @@ class AscendantCalculator {
         try {
             // CRITICAL FIX: Enhanced Swiss Ephemeris house calculation
             // Use Placidus house system ('P') - most reliable according to documentation
-            const tropicalResult = swisseph.swe_houses(julianDay, latitude, longitude, 'P');
+            if (!this.swissephAvailable) {
+                throw new Error('Swiss Ephemeris calculations are not available');
+            }
+            const tropicalResult = this.swisseph.swe_houses(julianDay, latitude, longitude, 'P');
 
             // CRITICAL FIX: Enhanced error detection and handling
             if (tropicalResult && tropicalResult.error) {
@@ -196,10 +234,13 @@ class AscendantCalculator {
 
         try {
             // Set sidereal mode to Lahiri explicitly
-            swisseph.swe_set_sid_mode(swisseph.SE_SIDM_LAHIRI || 1);
+            if (!this.swissephAvailable) {
+                throw new Error('Swiss Ephemeris calculations are not available');
+            }
+            this.swisseph.swe_set_sid_mode(this.swisseph.SE_SIDM_LAHIRI || 1);
 
             // CRITICAL FIX: Swiss Ephemeris swe_get_ayanamsa_ut returns a number directly, not an object
-            const ayanamsaValue = swisseph.swe_get_ayanamsa_ut(julianDay);
+            const ayanamsaValue = this.swisseph.swe_get_ayanamsa_ut(julianDay);
 
             // Validate the returned value
             if (typeof ayanamsaValue !== 'number' ||

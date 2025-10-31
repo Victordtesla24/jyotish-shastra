@@ -4,7 +4,68 @@
  * Enhanced with geocoding integration and comprehensive analysis
  */
 
-import swisseph from 'swisseph';
+// Optional swisseph import - handled dynamically for serverless compatibility
+let swisseph = null;
+let swissephAvailable = false;
+let swissephInitializing = false;
+let swissephInitPromise = null;
+
+/**
+ * Initialize swisseph module (handles serverless environments gracefully)
+ */
+async function initializeSwisseph() {
+  if (swisseph !== null || swissephInitializing) {
+    return swissephInitPromise || Promise.resolve();
+  }
+  
+  swissephInitializing = true;
+  
+  swissephInitPromise = (async () => {
+    try {
+      const swissephModule = await import('swisseph');
+      swisseph = swissephModule.default || swissephModule;
+      swissephAvailable = true;
+      console.log('✅ Swiss Ephemeris initialized successfully');
+    } catch (error) {
+      console.warn('⚠️  Swiss Ephemeris (swisseph) not available:', error.message);
+      console.warn('📝 Chart calculations will be limited. Some features may not work.');
+      swissephAvailable = false;
+      // Create minimal mock to prevent crashes
+      swisseph = {
+        swe_set_ephe_path: () => {},
+        swe_set_sid_mode: () => {},
+        SEFLG_SIDEREAL: 256,
+        SEFLG_SPEED: 2,
+        SE_SIDM_LAHIRI: 1,
+        SE_SUN: 0,
+        SE_MOON: 1,
+        SE_MARS: 4,
+        SE_MERCURY: 2,
+        SE_JUPITER: 5,
+        SE_VENUS: 3,
+        SE_SATURN: 6,
+        SE_MEAN_NODE: 11,
+        SE_GREG_CAL: 1,
+        swe_calc_ut: () => {
+          throw new Error('Swiss Ephemeris not available in serverless environment');
+        },
+        swe_julday: () => {
+          throw new Error('Swiss Ephemeris not available in serverless environment');
+        },
+        swe_houses: () => {
+          throw new Error('Swiss Ephemeris not available in serverless environment');
+        }
+      };
+    }
+    swissephInitializing = false;
+  })();
+  
+  return swissephInitPromise;
+}
+
+// Start initialization immediately
+initializeSwisseph();
+
 import { v4 as uuidv4 } from 'uuid';
 import moment from 'moment-timezone';
 import GeocodingService from '../geocoding/GeocodingService.js';
@@ -24,22 +85,52 @@ import AscendantCalculator from '../../core/calculations/chart-casting/Ascendant
 
 class ChartGenerationService {
   constructor(geocodingService) {
-    this.initializeSwissEphemeris();
     this.geocodingService = geocodingService || new GeocodingService();
+    // Store reference - will be updated when initialization completes
+    this.swisseph = swisseph;
+    this.swissephAvailable = swissephAvailable;
+    this.initializeSwissEphemeris();
+  }
+
+  /**
+   * Ensure swisseph is initialized before use
+   */
+  async ensureSwissephInitialized() {
+    if (swisseph === null && swissephInitializing) {
+      await swissephInitPromise;
+    }
+    if (swisseph === null) {
+      await initializeSwisseph();
+    }
+    this.swisseph = swisseph;
+    this.swissephAvailable = swissephAvailable;
   }
 
   /**
    * Initialize Swiss Ephemeris with required settings
    */
   initializeSwissEphemeris() {
-    // Set ephemeris path
-    swisseph.swe_set_ephe_path(astroConfig.CALCULATION_SETTINGS.EPHEMERIS_PATH);
+    if (!this.swissephAvailable) {
+      console.warn('⚠️  Chart generation will use limited calculations without Swiss Ephemeris');
+      // Set default flags even without swisseph
+      this.calcFlags = 256 | 2; // SEFLG_SIDEREAL | SEFLG_SPEED
+      return;
+    }
+    
+    try {
+      // Set ephemeris path
+      this.swisseph.swe_set_ephe_path(astroConfig.CALCULATION_SETTINGS.EPHEMERIS_PATH);
 
-    // Set calculation flags for Vedic astrology
-    this.calcFlags = swisseph.SEFLG_SIDEREAL | swisseph.SEFLG_SPEED;
+      // Set calculation flags for Vedic astrology
+      this.calcFlags = this.swisseph.SEFLG_SIDEREAL | this.swisseph.SEFLG_SPEED;
 
-    // Set Lahiri Ayanamsa for Vedic calculations
-    swisseph.swe_set_sid_mode(swisseph.SE_SIDM_LAHIRI);
+      // Set Lahiri Ayanamsa for Vedic calculations
+      this.swisseph.swe_set_sid_mode(this.swisseph.SE_SIDM_LAHIRI);
+    } catch (error) {
+      console.error('Failed to initialize Swiss Ephemeris:', error);
+      this.swissephAvailable = false;
+      this.calcFlags = 256 | 2; // Default flags
+    }
   }
 
   /**
@@ -48,6 +139,9 @@ class ChartGenerationService {
    * @returns {Object} Complete chart data
    */
   async generateComprehensiveChart(birthData) {
+    // Ensure swisseph is initialized
+    await this.ensureSwissephInitialized();
+    
     console.log('🚀 CHART GENERATION SERVICE - Starting comprehensive chart generation...');
     console.log('📊 Input Birth Data:', JSON.stringify(birthData, null, 2));
 
@@ -384,18 +478,22 @@ class ChartGenerationService {
     try {
       const planets = {};
       const planetIds = {
-        sun: swisseph.SE_SUN,
-        moon: swisseph.SE_MOON,
-        mars: swisseph.SE_MARS,
-        mercury: swisseph.SE_MERCURY,
-        jupiter: swisseph.SE_JUPITER,
-        venus: swisseph.SE_VENUS,
-        saturn: swisseph.SE_SATURN,
-        rahu: swisseph.SE_MEAN_NODE // Mean Node (Rahu)
+        sun: this.swisseph.SE_SUN,
+        moon: this.swisseph.SE_MOON,
+        mars: this.swisseph.SE_MARS,
+        mercury: this.swisseph.SE_MERCURY,
+        jupiter: this.swisseph.SE_JUPITER,
+        venus: this.swisseph.SE_VENUS,
+        saturn: this.swisseph.SE_SATURN,
+        rahu: this.swisseph.SE_MEAN_NODE // Mean Node (Rahu)
       };
 
+      if (!this.swissephAvailable) {
+        throw new Error('Swiss Ephemeris calculations are not available in this serverless environment');
+      }
+
       for (const [planetName, planetId] of Object.entries(planetIds)) {
-        const result = swisseph.swe_calc_ut(jd, planetId, this.calcFlags);
+        const result = this.swisseph.swe_calc_ut(jd, planetId, this.calcFlags);
 
         if (result.error) {
           throw new Error(`Error calculating ${planetName}: ${result.error}`);
@@ -453,7 +551,11 @@ class ChartGenerationService {
 
     try {
       const adjustedLatitude = Math.max(-89.999999, Math.min(89.999999, latitude));
-      const houses = swisseph.swe_houses(jd, adjustedLatitude, longitude, 'P');
+      if (!this.swissephAvailable) {
+        throw new Error('Swiss Ephemeris calculations are not available in this serverless environment');
+      }
+      
+      const houses = this.swisseph.swe_houses(jd, adjustedLatitude, longitude, 'P');
 
       if (!houses || !houses.house || houses.house.length < 12) {
         throw new Error('Swiss Ephemeris returned invalid house data');
@@ -974,7 +1076,11 @@ class ChartGenerationService {
       const day = utcDateTime.date();
       const hour = utcDateTime.hour() + utcDateTime.minute() / 60 + utcDateTime.second() / 3600;
 
-      return swisseph.swe_julday(year, month, day, hour, swisseph.SE_GREG_CAL);
+      if (!this.swissephAvailable) {
+        throw new Error('Swiss Ephemeris calculations are not available in this serverless environment');
+      }
+      
+      return this.swisseph.swe_julday(year, month, day, hour, this.swisseph.SE_GREG_CAL);
     } catch (error) {
       throw new Error(`Failed to calculate Julian Day: ${error.message}`);
     }

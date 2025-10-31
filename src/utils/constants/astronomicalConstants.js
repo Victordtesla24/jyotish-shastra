@@ -3,68 +3,109 @@
  * Configuration constants for Vedic astrological calculations
  */
 
-import swisseph from 'swisseph';
+// Optional swisseph import for serverless compatibility
+let swisseph = null;
+let swissephAvailable = false;
+
+(async () => {
+  try {
+    const swissephModule = await import('swisseph');
+    swisseph = swissephModule.default || swissephModule;
+    swissephAvailable = true;
+  } catch (error) {
+    console.warn('⚠️  astronomicalConstants: swisseph not available:', error.message);
+    swissephAvailable = false;
+    // Provide fallback constants
+    swisseph = {
+      SE_JUL_CAL: 0,
+      SE_GREG_CAL: 1,
+      SEFLG_SWIEPH: 2,
+      SEFLG_SIDEREAL: 256,
+      SEFLG_SPEED: 2,
+      SE_SUN: 0,
+      SE_MOON: 1,
+      SE_MERCURY: 2,
+      SE_VENUS: 3,
+      SE_MARS: 4,
+      SE_JUPITER: 5,
+      SE_SATURN: 6,
+      SE_URANUS: 7,
+      SE_NEPTUNE: 8,
+      SE_PLUTO: 9,
+      SE_MEAN_NODE: 11,
+      SE_TRUE_NODE: 12
+    };
+  }
+})();
+
+// Helper to get swisseph values safely
+function getSwissephValue(prop, defaultValue) {
+  if (swisseph && swisseph[prop] !== undefined) {
+    return swisseph[prop];
+  }
+  return defaultValue;
+}
 
 const SWISS_EPHEMERIS = {
   // Calendar types
   CALENDAR: {
-    JULIAN: swisseph.SE_JUL_CAL,
-    GREGORIAN: swisseph.SE_GREG_CAL
+    JULIAN: getSwissephValue('SE_JUL_CAL', 0),
+    GREGORIAN: getSwissephValue('SE_GREG_CAL', 1)
   },
 
   // Calculation flags
   FLAGS: {
-    SWIEPH: swisseph.SEFLG_SWIEPH,
-    SIDEREAL: swisseph.SEFLG_SIDEREAL,
-    SPEED: swisseph.SEFLG_SPEED,
-    NOGEO: swisseph.SEFLG_NOGEO,
-    NOLIGHT: swisseph.SEFLG_NOLIGHT,
-    NOABER: swisseph.SEFLG_NOABER,
-    NONEUT: swisseph.SEFLG_NONEUT,
-    HELCTR: swisseph.SEFLG_HELCTR,
-    EQUATORIAL: swisseph.SEFLG_EQUATORIAL,
-    MOSEPH: swisseph.SEFLG_MOSEPH,
-    JPLEPH: swisseph.SEFLG_JPLEPH
+    SWIEPH: getSwissephValue('SEFLG_SWIEPH', 2),
+    SIDEREAL: getSwissephValue('SEFLG_SIDEREAL', 256),
+    SPEED: getSwissephValue('SEFLG_SPEED', 2),
+    NOGEO: getSwissephValue('SEFLG_NOGEO', 0),
+    NOLIGHT: getSwissephValue('SEFLG_NOLIGHT', 0),
+    NOABER: getSwissephValue('SEFLG_NOABER', 0),
+    NONEUT: getSwissephValue('SEFLG_NONEUT', 0),
+    HELCTR: getSwissephValue('SEFLG_HELCTR', 0),
+    EQUATORIAL: getSwissephValue('SEFLG_EQUATORIAL', 0),
+    MOSEPH: getSwissephValue('SEFLG_MOSEPH', 0),
+    JPLEPH: getSwissephValue('SEFLG_JPLEPH', 0)
   },
 
   // Planet IDs
   PLANETS: {
-    SUN: swisseph.SE_SUN,
-    MOON: swisseph.SE_MOON,
-    MERCURY: swisseph.SE_MERCURY,
-    VENUS: swisseph.SE_VENUS,
-    MARS: swisseph.SE_MARS,
-    JUPITER: swisseph.SE_JUPITER,
-    SATURN: swisseph.SE_SATURN,
-    URANUS: swisseph.SE_URANUS,
-    NEPTUNE: swisseph.SE_NEPTUNE,
-    PLUTO: swisseph.SE_PLUTO,
-    RAHU: swisseph.SE_MEAN_NODE,
-    KETU: swisseph.SE_MEAN_APOG,
-    TRUE_RAHU: swisseph.SE_TRUE_NODE,
-    ASCENDANT: swisseph.SE_ASC,
-    MC: swisseph.SE_MC
+    SUN: getSwissephValue('SE_SUN', 0),
+    MOON: getSwissephValue('SE_MOON', 1),
+    MERCURY: getSwissephValue('SE_MERCURY', 2),
+    VENUS: getSwissephValue('SE_VENUS', 3),
+    MARS: getSwissephValue('SE_MARS', 4),
+    JUPITER: getSwissephValue('SE_JUPITER', 5),
+    SATURN: getSwissephValue('SE_SATURN', 6),
+    URANUS: getSwissephValue('SE_URANUS', 7),
+    NEPTUNE: getSwissephValue('SE_NEPTUNE', 8),
+    PLUTO: getSwissephValue('SE_PLUTO', 9),
+    RAHU: getSwissephValue('SE_MEAN_NODE', 11),
+    KETU: getSwissephValue('SE_MEAN_APOG', 10),
+    TRUE_RAHU: getSwissephValue('SE_TRUE_NODE', 12),
+    ASCENDANT: getSwissephValue('SE_ASC', 999),
+    MC: getSwissephValue('SE_MC', 999)
   },
 
   // Ayanamsa systems
   AYANAMSA: {
-    LAHIRI: swisseph.SE_SIDM_LAHIRI,
-    KRISHNAMURTI: swisseph.SE_SIDM_KRISHNAMURTI,
-    DJWHAL_KHUL: swisseph.SE_SIDM_DJWHAL_KHUL,
-    YUKTESHWAR: swisseph.SE_SIDM_YUKTESHWAR,
-    JN_BHASIN: swisseph.SE_SIDM_JN_BHASIN,
-    BABYL_KUGLER1: swisseph.SE_SIDM_BABYL_KUGLER1,
-    BABYL_KUGLER2: swisseph.SE_SIDM_BABYL_KUGLER2,
-    BABYL_KUGLER3: swisseph.SE_SIDM_BABYL_KUGLER3,
-    BABYL_HUBER: swisseph.SE_SIDM_BABYL_HUBER,
-    BABYL_ETPSC: swisseph.SE_SIDM_BABYL_ETPSC,
-    ALDEBARAN_15TAU: swisseph.SE_SIDM_ALDEBARAN_15TAU,
-    HIPPARCHOS: swisseph.SE_SIDM_HIPPARCHOS,
-    SASSANIAN: swisseph.SE_SIDM_SASSANIAN,
-    GALCENT_0SAG: swisseph.SE_SIDM_GALCENT_0SAG,
-    J2000: swisseph.SE_SIDM_J2000,
-    J1900: swisseph.SE_SIDM_J1900,
-    B1950: swisseph.SE_SIDM_B1950
+    LAHIRI: getSwissephValue('SE_SIDM_LAHIRI', 1),
+    KRISHNAMURTI: getSwissephValue('SE_SIDM_KRISHNAMURTI', 0),
+    DJWHAL_KHUL: getSwissephValue('SE_SIDM_DJWHAL_KHUL', 0),
+    YUKTESHWAR: getSwissephValue('SE_SIDM_YUKTESHWAR', 0),
+    JN_BHASIN: getSwissephValue('SE_SIDM_JN_BHASIN', 0),
+    BABYL_KUGLER1: getSwissephValue('SE_SIDM_BABYL_KUGLER1', 0),
+    BABYL_KUGLER2: getSwissephValue('SE_SIDM_BABYL_KUGLER2', 0),
+    BABYL_KUGLER3: getSwissephValue('SE_SIDM_BABYL_KUGLER3', 0),
+    BABYL_HUBER: getSwissephValue('SE_SIDM_BABYL_HUBER', 0),
+    BABYL_ETPSC: getSwissephValue('SE_SIDM_BABYL_ETPSC', 0),
+    ALDEBARAN_15TAU: getSwissephValue('SE_SIDM_ALDEBARAN_15TAU', 0),
+    HIPPARCHOS: getSwissephValue('SE_SIDM_HIPPARCHOS', 0),
+    SASSANIAN: getSwissephValue('SE_SIDM_SASSANIAN', 0),
+    GALCENT_0SAG: getSwissephValue('SE_SIDM_GALCENT_0SAG', 0),
+    J2000: getSwissephValue('SE_SIDM_J2000', 0),
+    J1900: getSwissephValue('SE_SIDM_J1900', 0),
+    B1950: getSwissephValue('SE_SIDM_B1950', 0)
   },
 
   // House systems
@@ -88,14 +129,14 @@ const SWISS_EPHEMERIS = {
   // Coordinate systems
   COORDINATES: {
     ECLIPTIC: 0,
-    EQUATORIAL: swisseph.SEFLG_EQUATORIAL,
+    EQUATORIAL: getSwissephValue('SEFLG_EQUATORIAL', 0),
     HORIZONTAL: 1
   },
 
   // Error codes
   ERRORS: {
-    OK: swisseph.OK,
-    ERR: swisseph.ERR
+    OK: getSwissephValue('OK', 0),
+    ERR: getSwissephValue('ERR', -1)
   }
 };
 

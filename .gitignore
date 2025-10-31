@@ -321,3 +321,4 @@ Thumbs.db
 # PROJECT SPECIFIC (ADD YOUR CUSTOM PATTERNS BELOW)
 # -----------------------------------------------------------------------------
 # Add any project-specific patterns here
+.vercel
