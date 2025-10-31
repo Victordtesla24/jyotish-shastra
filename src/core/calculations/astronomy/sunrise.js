@@ -1,3 +1,5 @@
+import { calculateJulianDay, julianDayToDate } from '../../../utils/calculations/julianDay.js';
+
 // Optional swisseph import for serverless compatibility
 let swisseph = null;
 let swissephAvailable = false;
@@ -49,29 +51,37 @@ function initSwissEphemeris() {
 }
 
 function toJulianDayUT(dateUtc) {
-  if (!swissephAvailable) {
-    throw new Error('Swiss Ephemeris not available - sunrise calculations disabled');
-  }
   // Convert JS Date (UTC) to Julian Day (UT)
   const year = dateUtc.getUTCFullYear();
   const month = dateUtc.getUTCMonth() + 1;
   const day = dateUtc.getUTCDate();
   const hour = dateUtc.getUTCHours() + dateUtc.getUTCMinutes() / 60 + dateUtc.getUTCSeconds() / 3600;
-  const gregflag = 1; // Gregorian calendar
-  const jd = swisseph.swe_julday(year, month, day, hour, gregflag);
-  return jd;
+  
+  if (swissephAvailable && swisseph && typeof swisseph.swe_julday === 'function') {
+    // Use swisseph if available (local development)
+    const result = swisseph.swe_julday(year, month, day, hour, 1);
+    return typeof result === 'object' && result.julianDay ? result.julianDay : result;
+  } else {
+    // Use pure JavaScript calculation for serverless environments
+    console.log('📝 sunrise: Using pure JavaScript Julian Day calculation (swisseph unavailable)');
+    return calculateJulianDay(year, month, day, hour, 1);
+  }
 }
 
 function fromJulianDayUT(jd) {
-  if (!swissephAvailable) {
-    throw new Error('Swiss Ephemeris not available - sunrise calculations disabled');
+  if (swissephAvailable && swisseph && typeof swisseph.swe_revjul === 'function') {
+    // Use swisseph if available (local development)
+    const gregflag = 1;
+    const { year, month, day, hour } = swisseph.swe_revjul(jd, gregflag);
+    const h = Math.floor(hour);
+    const m = Math.floor((hour - h) * 60);
+    const s = Math.floor(((hour - h) * 60 - m) * 60);
+    return new Date(Date.UTC(year, month - 1, day, h, m, s));
+  } else {
+    // Use pure JavaScript conversion for serverless environments
+    console.log('📝 sunrise: Using pure JavaScript Julian Day to Date conversion (swisseph unavailable)');
+    return julianDayToDate(jd);
   }
-  const gregflag = 1;
-  const { year, month, day, hour } = swisseph.swe_revjul(jd, gregflag);
-  const h = Math.floor(hour);
-  const m = Math.floor((hour - h) * 60);
-  const s = Math.floor(((hour - h) * 60 - m) * 60);
-  return new Date(Date.UTC(year, month - 1, day, h, m, s));
 }
 
 function parseTimezoneOffsetHours(timezone) {

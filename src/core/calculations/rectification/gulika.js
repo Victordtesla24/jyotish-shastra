@@ -1,4 +1,6 @@
 import { computeSunriseSunset, normalizeDegrees } from '../astronomy/sunrise.js';
+import { calculateJulianDay } from '../../../utils/calculations/julianDay.js';
+
 // Optional swisseph import for serverless compatibility
 let swisseph = null;
 let swissephAvailable = false;
@@ -43,15 +45,21 @@ const NIGHT_GULIKA_SEGMENT_INDEX = {
 };
 
 function toJulianDayUT(dateUtc) {
-  if (!swissephAvailable) {
-    throw new Error('Swiss Ephemeris not available - Gulika calculations disabled');
-  }
   const y = dateUtc.getUTCFullYear();
   const m = dateUtc.getUTCMonth() + 1;
   const d = dateUtc.getUTCDate();
   const hour = dateUtc.getUTCHours() + dateUtc.getUTCMinutes() / 60 + dateUtc.getUTCSeconds() / 3600;
-  const gregflag = swisseph.SE_GREG_CAL || 1;
-  return swisseph.swe_julday(y, m, d, hour, gregflag);
+  const gregflag = swisseph?.SE_GREG_CAL || 1;
+  
+  if (swissephAvailable && swisseph && typeof swisseph.swe_julday === 'function') {
+    // Use swisseph if available (local development)
+    const result = swisseph.swe_julday(y, m, d, hour, gregflag);
+    return typeof result === 'object' && result.julianDay ? result.julianDay : result;
+  } else {
+    // Use pure JavaScript calculation for serverless environments
+    console.log('📝 gulika: Using pure JavaScript Julian Day calculation (swisseph unavailable)');
+    return calculateJulianDay(y, m, d, hour, gregflag);
+  }
 }
 
 export async function computeGulikaLongitude({

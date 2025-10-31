@@ -141,10 +141,96 @@ After analyzing the BPHS Birth Time Rectification Integration document (Microsof
 9. Improve error handling and user guidance
 10. Add performance monitoring and optimization
 
+### 8. Production/Serverless Environment Errors
+
+#### Gap 8.1: Critical - Julian Day Calculation Failure in Serverless
+- **Location**: `src/services/chart/ChartGenerationService.js:1080`
+- **Error**: "Failed to calculate Julian Day: Swiss Ephemeris calculations are not available in this serverless environment"
+- **Root Cause**: `calculateJulianDay` method throws error when `swisseph` is unavailable, but Julian Day can be calculated with pure JavaScript
+- **Impact**: CRITICAL - Prevents all chart generation in Vercel serverless environment
+- **Priority**: CRITICAL - Blocking production deployment
+- **Affected Endpoints**:
+  - `POST /api/v1/chart/generate` - Returns 500 error
+  - Any endpoint requiring Julian Day calculation
+- **Error Flow**:
+  1. User submits birth data via UI
+  2. ChartGenerationService.generateComprehensiveChart() called
+  3. calculateJulianDay() called with birth data
+  4. Method checks `swissephAvailable` flag (false in serverless)
+  5. Throws error instead of using pure JS alternative
+  6. Chart generation fails with 500 error
+
+#### Gap 8.2: Related Calculations Failures
+- **Location**: Multiple files dependent on swisseph for Julian Day
+  - `src/core/calculations/astronomy/sunrise.js:61` - `toJulianDayUT()` throws error
+  - `src/core/calculations/rectification/gulika.js:54` - `toJulianDayUT()` throws error
+  - `src/core/calculations/transits/TransitCalculator.js:102` - Uses `swisseph.swe_julday`
+- **Root Cause**: All these files depend on swisseph.swe_julday() which is unavailable in serverless
+- **Impact**: HIGH - Blocks sunrise, gulika, and transit calculations
+- **Priority**: CRITICAL - Required for production functionality
+
+#### Gap 8.3: Missing Pure JavaScript Julian Day Implementation
+- **Location**: Not implemented
+- **Issue**: No pure JavaScript alternative for Julian Day calculation when swisseph unavailable
+- **Note**: `src/utils/helpers/dateTimeHelpers.js` has `dateToJulianDay()` but uses CommonJS (require) and takes Date object, not year/month/day/hour format matching swisseph API
+- **Impact**: CRITICAL - No fallback mechanism for serverless environments
+- **Priority**: CRITICAL
+
+#### Gap 8.4: API Response Error Handling
+- **Location**: `src/api/controllers/ChartController.js:115`
+- **Error Flow**: Chart generation error propagates to API response with 500 status
+- **Issue**: Error message indicates swisseph unavailability but doesn't provide actionable solution
+- **Impact**: Medium - Poor user experience, unclear error messaging
+- **Priority**: Medium
+
+#### Gap 8.5: UI Error Display
+- **Location**: Frontend components handling chart generation errors
+- **Issue**: UI may not properly display serverless-specific errors to users
+- **Impact**: Low - User experience
+- **Priority**: Low
+
+## Production Error Summary
+
+### Critical Production Errors (Vercel Serverless)
+
+**Error**: Chart generation completely fails in production serverless environment
+**Root Cause**: Swiss Ephemeris native module unavailable in Vercel serverless, causing all Julian Day calculations to fail
+**Affected Files**:
+1. `src/services/chart/ChartGenerationService.js` - calculateJulianDay() method
+2. `src/core/calculations/astronomy/sunrise.js` - toJulianDayUT() function  
+3. `src/core/calculations/rectification/gulika.js` - toJulianDayUT() function
+4. `src/core/calculations/transits/TransitCalculator.js` - Direct swisseph.swe_julday usage
+
+**Required Fixes**:
+1. Create pure JavaScript Julian Day calculation module (`src/utils/calculations/julianDay.js`)
+2. Modify ChartGenerationService.calculateJulianDay() to use pure JS when swisseph unavailable
+3. Fix sunrise.js to use pure JS Julian Day fallback
+4. Fix gulika.js to use pure JS Julian Day fallback
+5. Fix TransitCalculator.js to use pure JS Julian Day fallback
+6. Ensure all Julian Day calculations gracefully degrade to pure JS in serverless
+
+**Test Commands** (from curl-commands.md):
+```bash
+# This currently fails with 500 error:
+curl -X POST https://jjyotish-shastra.vercel.app/api/v1/chart/generate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Farhan",
+    "dateOfBirth": "1997-12-18",
+    "timeOfBirth": "00:00",
+    "latitude": 32.4935378,
+    "longitude": 74.5411575,
+    "timezone": "Asia/Karachi",
+    "gender": "male"
+  }'
+```
+
 ## Conclusion
 
-The current BPHS-BTR implementation provides a solid foundation with the core Praanapada, Moon, and Gulika methods implemented. However, significant gaps exist in advanced BPHS methodologies, particularly around specialized charts, comprehensive event correlation, and detailed dasha analysis. Addressing the high and medium priority gaps would bring the implementation much closer to the documented requirements.
+The current BPHS-BTR implementation provides a solid foundation with the core Praanapada, Moon, and Gulika methods implemented. However, significant gaps exist in advanced BPHS methodologies, particularly around specialized charts, comprehensive event correlation, and detailed dasha analysis. Additionally, **critical production errors prevent chart generation in Vercel serverless environment** due to Swiss Ephemeris dependency. Addressing the high and medium priority gaps would bring the implementation much closer to the documented requirements.
 
 **Overall Implementation Completeness**: Approximately 60-70% based on identified gaps.
 
-**Critical Path Items**: Special chart calculations and enhanced event correlation are the most critical gaps to address for full BPHS compliance.
+**Critical Path Items**: 
+1. **IMMEDIATE**: Fix Julian Day calculation for serverless (blocks production)
+2. Special chart calculations and enhanced event correlation are the most critical gaps to address for full BPHS compliance.

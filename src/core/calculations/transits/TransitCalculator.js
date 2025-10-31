@@ -96,10 +96,20 @@ class TransitCalculator {
     const hour = date.getUTCHours() + date.getUTCMinutes() / 60 + date.getUTCSeconds() / 3600;
 
     if (!this.swissephAvailable) {
-      throw new Error('Swiss Ephemeris not available - transit calculations disabled');
+      throw new Error('Swiss Ephemeris not available - transit calculations disabled. Transit calculations require swisseph for planetary positions.');
     }
     this.swisseph.swe_set_ephe_path(__dirname + '/../../../ephemeris');
-    const julianDay = this.swisseph.swe_julday(year, month, day, hour, this.swisseph.SE_GREG_CAL || 1);
+    
+    // Use swisseph for Julian Day if available, otherwise use pure JS
+    let julianDay;
+    if (this.swisseph && typeof this.swisseph.swe_julday === 'function') {
+      const result = this.swisseph.swe_julday(year, month, day, hour, this.swisseph.SE_GREG_CAL || 1);
+      julianDay = typeof result === 'object' && result.julianDay ? result.julianDay : result;
+    } else {
+      console.log('📝 TransitCalculator: Using pure JavaScript Julian Day calculation (swisseph unavailable)');
+      julianDay = calculateJulianDay(year, month, day, hour, this.swisseph?.SE_GREG_CAL || 1);
+    }
+    
     this.swisseph.swe_set_sid_mode(this.swisseph.SE_SIDM_LAHIRI || 1);
 
     const planets = ['sun', 'moon', 'mars', 'mercury', 'jupiter', 'venus', 'saturn', 'rahu', 'ketu'];

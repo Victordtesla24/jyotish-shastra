@@ -4,6 +4,8 @@
  * Enhanced with geocoding integration and comprehensive analysis
  */
 
+import { calculateJulianDay } from '../../utils/calculations/julianDay.js';
+
 // Optional swisseph import - handled dynamically for serverless compatibility
 let swisseph = null;
 let swissephAvailable = false;
@@ -1076,11 +1078,16 @@ class ChartGenerationService {
       const day = utcDateTime.date();
       const hour = utcDateTime.hour() + utcDateTime.minute() / 60 + utcDateTime.second() / 3600;
 
-      if (!this.swissephAvailable) {
-        throw new Error('Swiss Ephemeris calculations are not available in this serverless environment');
+      if (this.swissephAvailable && this.swisseph && typeof this.swisseph.swe_julday === 'function') {
+        // Use swisseph if available (local development)
+        const result = this.swisseph.swe_julday(year, month, day, hour, this.swisseph.SE_GREG_CAL || 1);
+        // swisseph.swe_julday may return object with julianDay property or direct number
+        return typeof result === 'object' && result.julianDay ? result.julianDay : result;
+      } else {
+        // Use pure JavaScript calculation for serverless environments
+        console.log('📝 Using pure JavaScript Julian Day calculation (swisseph unavailable)');
+        return calculateJulianDay(year, month, day, hour, 1);
       }
-      
-      return this.swisseph.swe_julday(year, month, day, hour, this.swisseph.SE_GREG_CAL);
     } catch (error) {
       throw new Error(`Failed to calculate Julian Day: ${error.message}`);
     }
