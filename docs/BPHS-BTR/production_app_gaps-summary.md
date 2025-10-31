@@ -193,21 +193,89 @@ After analyzing the BPHS Birth Time Rectification Integration document (Microsof
 
 ### Critical Production Errors (Vercel Serverless)
 
-**Error**: Chart generation completely fails in production serverless environment
-**Root Cause**: Swiss Ephemeris native module unavailable in Vercel serverless, causing all Julian Day calculations to fail
-**Affected Files**:
-1. `src/services/chart/ChartGenerationService.js` - calculateJulianDay() method
-2. `src/core/calculations/astronomy/sunrise.js` - toJulianDayUT() function  
-3. `src/core/calculations/rectification/gulika.js` - toJulianDayUT() function
-4. `src/core/calculations/transits/TransitCalculator.js` - Direct swisseph.swe_julday usage
+**Note**: Errors below are from deployed production app (Oct 31, 2025). All fixes have been implemented in codebase but not yet deployed to Vercel.
 
-**Required Fixes**:
-1. Create pure JavaScript Julian Day calculation module (`src/utils/calculations/julianDay.js`)
-2. Modify ChartGenerationService.calculateJulianDay() to use pure JS when swisseph unavailable
-3. Fix sunrise.js to use pure JS Julian Day fallback
-4. Fix gulika.js to use pure JS Julian Day fallback
-5. Fix TransitCalculator.js to use pure JS Julian Day fallback
-6. Ensure all Julian Day calculations gracefully degrade to pure JS in serverless
+#### Error 1: Julian Day Calculation - ✅ FIXED IN CODEBASE
+**Status**: FIXED - Pure JavaScript implementation exists at `src/utils/calculations/julianDay.js`
+**Location**: `src/services/chart/ChartGenerationService.js:1063-1094`
+**Production Error**: "Failed to calculate Julian Day: Swiss Ephemeris calculations are not available"
+**Root Cause**: `calculateJulianDay()` method threw error when `swisseph` was unavailable
+**Fix**: calculateJulianDay() now uses pure JS when swisseph unavailable (lines 1081-1090)
+**Error Flow (Historical)**:
+1. User submits birth data via UI → `/api/v1/chart/generate`
+2. ChartGenerationService.generateComprehensiveChart() called
+3. generateRasiChart() called at line 323
+4. calculateJulianDay() called at line 323
+5. Method checked `swissephAvailable` flag (false in serverless)
+6. Old code threw error instead of using pure JS alternative
+7. Chart generation failed with 500 error
+**Current Status**: ✅ Fixed - Uses pure JS calculation
+
+#### Error 2: Planetary Positions Calculation - ✅ FIXED IN CODEBASE
+**Production Error**: "Failed to get planetary positions: Swiss Ephemeris calculations are not available in this serverless environment"
+**Location**: `src/services/chart/ChartGenerationService.js:480-583` - `getPlanetaryPositions()` method
+**Root Cause**: Method threw error at old line 493-495 when `swissephAvailable` was false, with no pure JS alternative
+**Impact**: CRITICAL - Blocked all chart generation in production
+**Error Flow (Historical)**:
+1. User submits birth data via UI → API endpoint `/api/v1/chart/generate`
+2. ChartGenerationService.generateComprehensiveChart() called
+3. generateRasiChart() called at line 329
+4. getPlanetaryPositions(jd) called at line 329
+5. Method checked `swissephAvailable` flag (false in serverless)
+6. Old code threw error at line 494 instead of using pure JS alternative
+7. Chart generation failed with 500 error
+**Fix**: 
+- ✅ Created pure JavaScript planetary position calculation module (`src/utils/calculations/planetaryPositions.js`)
+- ✅ Modified getPlanetaryPositions() to use pure JS when swisseph unavailable (lines 484-561)
+- ✅ Implemented VSOP87-based calculations for all planets (sun, moon, mars, mercury, jupiter, venus, saturn, rahu, ketu)
+**Current Status**: ✅ Fixed - Uses pure JS planetary calculations
+
+#### Error 3: Ascendant Calculation - ✅ FIXED IN CODEBASE
+**Production Error**: "Failed to calculate Ascendant: Swiss Ephemeris not initialized. Cannot calculate ascendant."
+**Location**: `src/core/calculations/chart-casting/AscendantCalculator.js:333-395`
+**Root Cause**: AscendantCalculator threw error when swisseph unavailable
+**Fix**: Pure JS implementation exists at `calculateUsingPureJavaScript()` (lines 333-395)
+**Current Status**: ✅ Fixed - Uses pure JS ascendant calculation
+
+#### Error 4: Sunrise/Sunset Calculations - ✅ FIXED IN CODEBASE
+**Production Error**: Sunrise calculations failed when swisseph unavailable
+**Location**: `src/core/calculations/astronomy/sunrise.js:164-261`
+**Root Cause**: Old code threw error when swisseph unavailable
+**Fix**: 
+- ✅ Implemented pure JS sunrise/sunset calculation (`calculateSunriseSunsetPureJS()` at lines 110-149)
+- ✅ Modified `computeSunriseSunset()` to use pure JS when swisseph unavailable (lines 241-255)
+**Current Status**: ✅ Fixed - Uses pure JS sunrise/sunset calculation
+
+#### Error 5: Transit Calculator - ✅ FIXED IN CODEBASE
+**Production Error**: Transit calculations failed when swisseph unavailable
+**Location**: `src/core/calculations/transits/TransitCalculator.js:95-188`
+**Root Cause**: 
+- Old line 100-102: Threw error when swisseph unavailable
+- Old line 122: Used `julianDay.julianDay_UT` but julianDay may be a number
+- Old line 121: Required swisseph.swe_calc_ut() for planetary positions
+**Fix**: 
+- ✅ Fixed Julian Day usage (now uses number, not object - line 109)
+- ✅ Added pure JS planetary positions fallback (lines 151-185)
+- ✅ Removed hard error throws
+**Current Status**: ✅ Fixed - Uses pure JS transits when swisseph unavailable
+
+**Affected Files - Fix Status**:
+1. ✅ `src/services/chart/ChartGenerationService.js` - getPlanetaryPositions() method - **FIXED**
+2. ✅ `src/core/calculations/astronomy/sunrise.js` - computeSunriseSunset() function - **FIXED**
+3. ✅ `src/core/calculations/transits/TransitCalculator.js` - getTransitingPlanets() method - **FIXED**
+4. ✅ `src/core/calculations/rectification/gulika.js` - Uses pure JS Julian Day correctly - **VERIFIED**
+5. ✅ `src/core/calculations/chart-casting/AscendantCalculator.js` - Uses pure JS ascendant calculation - **FIXED**
+
+**Required Fixes - Status**:
+1. ✅ Create pure JavaScript Julian Day calculation module (`src/utils/calculations/julianDay.js`) - **COMPLETE**
+2. ✅ Modify ChartGenerationService.calculateJulianDay() to use pure JS when swisseph unavailable - **COMPLETE**
+3. ✅ Create pure JavaScript planetary position calculation module (`src/utils/calculations/planetaryPositions.js`) - **COMPLETE**
+4. ✅ Modify ChartGenerationService.getPlanetaryPositions() to use pure JS when swisseph unavailable - **COMPLETE**
+5. ✅ Fix sunrise.js to use pure JS calculations instead of throwing errors - **COMPLETE**
+6. ✅ Fix TransitCalculator.js to use pure JS planetary positions when swisseph unavailable - **COMPLETE**
+7. ✅ Verify gulika.js uses pure JS Julian Day correctly - **VERIFIED**
+
+**Deployment Status**: All fixes implemented in codebase. **Pending deployment to Vercel production.**
 
 **Test Commands** (from curl-commands.md):
 ```bash

@@ -1,4 +1,5 @@
 import { calculateJulianDay, julianDayToDate } from '../../../utils/calculations/julianDay.js';
+import { calculatePlanetPosition } from '../../../utils/calculations/planetaryPositions.js';
 
 // Optional swisseph import for serverless compatibility
 let swisseph = null;
@@ -98,15 +99,69 @@ function parseTimezoneOffsetHours(timezone) {
 // Note: Swiss Ephemeris in Node.js works synchronously, not with callbacks
 // The issue with result.data undefined is likely due to missing ephemeris data or incorrect parameters
 
+/**
+ * Calculate sunrise and sunset using pure JavaScript (no Swiss Ephemeris)
+ * Based on Meeus Astronomical Algorithms
+ * @param {number} julianDay - Julian Day Number
+ * @param {number} latitude - Latitude in degrees
+ * @param {number} longitude - Longitude in degrees
+ * @returns {Object} Object with sunriseUtc and sunsetUtc as Julian Day numbers
+ */
+function calculateSunriseSunsetPureJS(julianDay, latitude, longitude) {
+  // Calculate Julian Day at noon
+  const jdNoon = Math.floor(julianDay) + 0.5;
+  const n = jdNoon - 2451545.0 + 0.0008;
+  
+  // Calculate approximate local solar time
+  const jStar = n - longitude / 360;
+  
+  // Calculate mean solar noon
+  const M = (357.5291 + 0.98560028 * jStar) % 360;
+  const C = 1.9148 * Math.sin(degreesToRadians(M)) +
+            0.02 * Math.sin(degreesToRadians(2 * M)) +
+            0.0003 * Math.sin(degreesToRadians(3 * M));
+  const lambda = (M + 102.9372 + C + 180) % 360;
+  
+  // Calculate solar transit (noon)
+  const jTransit = 2451545.0 + jStar + 0.0053 * Math.sin(degreesToRadians(M)) - 
+                   0.0069 * Math.sin(degreesToRadians(2 * lambda));
+  
+  // Calculate declination of sun
+  const declination = Math.asin(Math.sin(degreesToRadians(23.44)) * 
+                                Math.sin(degreesToRadians(lambda)));
+  
+  // Calculate hour angle
+  const latRad = degreesToRadians(latitude);
+  const hourAngle = Math.acos(
+    (Math.sin(degreesToRadians(-0.833)) - Math.sin(latRad) * Math.sin(declination)) /
+    (Math.cos(latRad) * Math.cos(declination))
+  );
+  
+  // Calculate sunrise and sunset in Julian Days
+  const sunriseJD = jTransit - (radiansToDegrees(hourAngle) / 360);
+  const sunsetJD = jTransit + (radiansToDegrees(hourAngle) / 360);
+  
+  return {
+    sunriseJD,
+    sunsetJD,
+    transitJD: jTransit
+  };
+}
+
+function degreesToRadians(degrees) {
+  return degrees * Math.PI / 180;
+}
+
+function radiansToDegrees(radians) {
+  return radians * 180 / Math.PI;
+}
+
 // Production grade error handling - no fallback calculations
 function throwSunriseCalculationError(error) {
   throw new Error(`Sunrise calculation failed: ${error.message}. Please ensure valid coordinates and timezone are provided.`);
 }
 
 export async function computeSunriseSunset(dateLocal, latitude, longitude, timezone, options = {}) {
-  // Production grade calculation with no fallbacks
-  initSwissEphemeris();
-
   // Validate inputs
   if (!dateLocal || !(dateLocal instanceof Date) || isNaN(dateLocal.getTime())) {
     console.error(`❌ SUNRISE VALIDATION FAILED: dateLocal=${dateLocal}, typeof=${typeof dateLocal}, instanceof Date=${dateLocal instanceof Date}, getTime()=${dateLocal?.getTime()}, isNaN=${dateLocal ? isNaN(dateLocal.getTime()) : 'N/A'}, toString=${dateLocal?.toString()}, toISOString=${dateLocal?.toISOString?.()}`);
@@ -124,88 +179,83 @@ export async function computeSunriseSunset(dateLocal, latitude, longitude, timez
 
   try {
     const jd = toJulianDayUT(dateLocal);
-    const jdNext = jd + 1;
-
-    // Sun position at midnight and next midnight - Swiss Ephemeris works synchronously in Node.js
-    // Use SEFLG_SWIEPH for ecliptic coordinates (longitude, latitude, distance)
-    if (!swissephAvailable) {
-      throw new Error('Swiss Ephemeris not available - sunrise calculations disabled');
-    }
-    const result = swisseph.swe_calc_ut(jd, swisseph.SE_SUN, swisseph.SEFLG_SWIEPH);
-    if (result.error) {
-      throw new Error(`Swiss Ephemeris calculation error: ${result.error}`);
-    }
-    if (result.longitude === undefined) {
-      throw new Error(`Swiss Ephemeris returned no data for sun position calculation at Julian Day ${jd}. Please ensure valid coordinates and timezone are provided.`);
-    }
-    const sunLongMidnight = result.longitude; // Ecliptic longitude
-
-    const resultNext = swisseph.swe_calc_ut(jdNext, swisseph.SE_SUN, swisseph.SEFLG_SWIEPH);
-    if (resultNext.error) {
-      throw new Error(`Swiss Ephemeris calculation error: ${resultNext.error}`);
-    }
-    if (resultNext.longitude === undefined) {
-      throw new Error(`Swiss Ephemeris returned no data for sun position calculation at Julian Day ${jdNext}. Please ensure valid coordinates and timezone are provided.`);
-    }
-    const sunLongNext = resultNext.longitude; // Ecliptic longitude
-
-    // Calculate sunrise and sunset using Swiss Ephemeris swe_rise_trans
-    // Parameters: jd_start, ipl, starname, epheflag, rsmi, geopos[3], atpress, attemp
-    const geopos = [longitude, latitude, 0]; // [longitude, latitude, altitude in meters]
-    const atpress = 1013.25; // atmospheric pressure in mbar
-    const attemp = 15; // atmospheric temperature in Celsius
     
-    // Calculate sunrise (rsmi = 1 for rise)
-    const sunriseResult = swisseph.swe_rise_trans(
-      jd - 1, // Start search from previous day to ensure we find today's sunrise
-      swisseph.SE_SUN || 0,
-      '',
-      swisseph.SEFLG_SWIEPH || 2,
-      1, // rsmi = 1 for rise
-      geopos,
-      atpress,
-      attemp
-    );
+    // Use Swiss Ephemeris if available, otherwise use pure JavaScript calculations
+    if (swissephAvailable && swisseph) {
+      initSwissEphemeris();
+      
+      // Calculate sunrise and sunset using Swiss Ephemeris swe_rise_trans
+      const geopos = [longitude, latitude, 0]; // [longitude, latitude, altitude in meters]
+      const atpress = 1013.25; // atmospheric pressure in mbar
+      const attemp = 15; // atmospheric temperature in Celsius
+      
+      // Calculate sunrise (rsmi = 1 for rise)
+      const sunriseResult = swisseph.swe_rise_trans(
+        jd - 1, // Start search from previous day to ensure we find today's sunrise
+        swisseph.SE_SUN || 0,
+        '',
+        swisseph.SEFLG_SWIEPH || 2,
+        1, // rsmi = 1 for rise
+        geopos,
+        atpress,
+        attemp
+      );
 
-    if (sunriseResult.error) {
-      throw new Error(`Sunrise calculation error: ${sunriseResult.error}`);
+      if (sunriseResult.error) {
+        throw new Error(`Sunrise calculation error: ${sunriseResult.error}`);
+      }
+      
+      if (!sunriseResult.transitTime) {
+        throw new Error(`Sunrise calculation returned no transit time. Result: ${JSON.stringify(sunriseResult)}`);
+      }
+
+      // Calculate sunset (rsmi = 2 for set)
+      const sunsetResult = swisseph.swe_rise_trans(
+        jd, // Start search from current day
+        swisseph.SE_SUN || 0,
+        '',
+        swisseph.SEFLG_SWIEPH || 2,
+        2, // rsmi = 2 for set
+        geopos,
+        atpress,
+        attemp
+      );
+
+      if (sunsetResult.error) {
+        throw new Error(`Sunset calculation error: ${sunsetResult.error}`);
+      }
+      
+      if (!sunsetResult.transitTime) {
+        throw new Error(`Sunset calculation returned no transit time. Result: ${JSON.stringify(sunsetResult)}`);
+      }
+
+      const sunriseUtc = fromJulianDayUT(sunriseResult.transitTime);
+      const sunsetUtc = fromJulianDayUT(sunsetResult.transitTime);
+
+      // Convert to local timezone
+      const tzOffsetHours = parseTimezoneOffsetHours(timezone);
+      const sunriseLocal = new Date(sunriseUtc.getTime() + tzOffsetHours * 3600 * 1000);
+      const sunsetLocal = new Date(sunsetUtc.getTime() + tzOffsetHours * 3600 * 1000);
+
+      return { sunriseLocal, sunsetLocal, tzOffsetHours };
+    } else {
+      // Use pure JavaScript sunrise/sunset calculation for serverless environment
+      console.log('📝 sunrise: Using pure JavaScript sunrise/sunset calculation (swisseph unavailable)');
+      
+      const sunriseSunset = calculateSunriseSunsetPureJS(jd, latitude, longitude);
+      
+      const sunriseUtc = julianDayToDate(sunriseSunset.sunriseJD);
+      const sunsetUtc = julianDayToDate(sunriseSunset.sunsetJD);
+
+      // Convert to local timezone
+      const tzOffsetHours = parseTimezoneOffsetHours(timezone);
+      const sunriseLocal = new Date(sunriseUtc.getTime() + tzOffsetHours * 3600 * 1000);
+      const sunsetLocal = new Date(sunsetUtc.getTime() + tzOffsetHours * 3600 * 1000);
+
+      return { sunriseLocal, sunsetLocal, tzOffsetHours };
     }
-    
-    if (!sunriseResult.transitTime) {
-      throw new Error(`Sunrise calculation returned no transit time. Result: ${JSON.stringify(sunriseResult)}`);
-    }
-
-    // Calculate sunset (rsmi = 2 for set)
-    const sunsetResult = swisseph.swe_rise_trans(
-      jd, // Start search from current day
-      swisseph.SE_SUN || 0,
-      '',
-      swisseph.SEFLG_SWIEPH || 2,
-      2, // rsmi = 2 for set
-      geopos,
-      atpress,
-      attemp
-    );
-
-    if (sunsetResult.error) {
-      throw new Error(`Sunset calculation error: ${sunsetResult.error}`);
-    }
-    
-    if (!sunsetResult.transitTime) {
-      throw new Error(`Sunset calculation returned no transit time. Result: ${JSON.stringify(sunsetResult)}`);
-    }
-
-    const sunriseUtc = fromJulianDayUT(sunriseResult.transitTime);
-    const sunsetUtc = fromJulianDayUT(sunsetResult.transitTime);
-
-    // Convert to local timezone
-    const tzOffsetHours = parseTimezoneOffsetHours(timezone);
-    const sunriseLocal = new Date(sunriseUtc.getTime() + tzOffsetHours * 3600 * 1000);
-    const sunsetLocal = new Date(sunsetUtc.getTime() + tzOffsetHours * 3600 * 1000);
-
-    return { sunriseLocal, sunsetLocal, tzOffsetHours };
   } catch (error) {
-    // Production grade error handling - no fallbacks
+    // Production grade error handling
     throwSunriseCalculationError(error);
   }
 }

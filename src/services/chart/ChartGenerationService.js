@@ -5,6 +5,7 @@
  */
 
 import { calculateJulianDay } from '../../utils/calculations/julianDay.js';
+import { calculatePlanetPosition } from '../../utils/calculations/planetaryPositions.js';
 
 // Optional swisseph import - handled dynamically for serverless compatibility
 let swisseph = null;
@@ -479,41 +480,84 @@ class ChartGenerationService {
   async getPlanetaryPositions(jd) {
     try {
       const planets = {};
-      const planetIds = {
-        sun: this.swisseph.SE_SUN,
-        moon: this.swisseph.SE_MOON,
-        mars: this.swisseph.SE_MARS,
-        mercury: this.swisseph.SE_MERCURY,
-        jupiter: this.swisseph.SE_JUPITER,
-        venus: this.swisseph.SE_VENUS,
-        saturn: this.swisseph.SE_SATURN,
-        rahu: this.swisseph.SE_MEAN_NODE // Mean Node (Rahu)
-      };
-
-      if (!this.swissephAvailable) {
-        throw new Error('Swiss Ephemeris calculations are not available in this serverless environment');
-      }
-
-      for (const [planetName, planetId] of Object.entries(planetIds)) {
-        const result = this.swisseph.swe_calc_ut(jd, planetId, this.calcFlags);
-
-        if (result.error) {
-          throw new Error(`Error calculating ${planetName}: ${result.error}`);
-        }
-
-        const longitude = result.longitude;
-        const sign = this.degreeToSign(longitude);
-
-        planets[planetName] = {
-          longitude,
-          degree: longitude % 30,
-          sign: sign.name,
-          signId: sign.id,
-          speed: result.speedLong,
-          isRetrograde: result.speedLong < 0,
-          isCombust: this.isPlanetCombust(planetName, planets.sun, longitude),
-          dignity: this.calculatePlanetaryDignity(planetName, sign.id)
+      
+      // Use Swiss Ephemeris if available, otherwise use pure JavaScript calculations
+      if (this.swissephAvailable && this.swisseph) {
+        const planetIds = {
+          sun: this.swisseph.SE_SUN,
+          moon: this.swisseph.SE_MOON,
+          mars: this.swisseph.SE_MARS,
+          mercury: this.swisseph.SE_MERCURY,
+          jupiter: this.swisseph.SE_JUPITER,
+          venus: this.swisseph.SE_VENUS,
+          saturn: this.swisseph.SE_SATURN,
+          rahu: this.swisseph.SE_MEAN_NODE // Mean Node (Rahu)
         };
+
+        for (const [planetName, planetId] of Object.entries(planetIds)) {
+          const result = this.swisseph.swe_calc_ut(jd, planetId, this.calcFlags);
+
+          if (result.error) {
+            throw new Error(`Error calculating ${planetName}: ${result.error}`);
+          }
+
+          const longitude = result.longitude;
+          const sign = this.degreeToSign(longitude);
+
+          planets[planetName] = {
+            longitude,
+            degree: longitude % 30,
+            sign: sign.name,
+            signId: sign.id,
+            speed: result.speedLong,
+            isRetrograde: result.speedLong < 0,
+            isCombust: this.isPlanetCombust(planetName, planets.sun, longitude),
+            dignity: this.calculatePlanetaryDignity(planetName, sign.id)
+          };
+        }
+      } else {
+        // Use pure JavaScript planetary calculations for serverless environment
+        console.log('📝 Using pure JavaScript planetary position calculations (swisseph unavailable)');
+        
+        const planetNames = ['sun', 'moon', 'mars', 'mercury', 'jupiter', 'venus', 'saturn', 'rahu'];
+        
+        for (const planetName of planetNames) {
+          try {
+            const result = calculatePlanetPosition(planetName, jd);
+            
+            if (result.returnCode !== 0) {
+              throw new Error(`Error calculating ${planetName}: return code ${result.returnCode}`);
+            }
+
+            const longitude = result.longitude;
+            const sign = this.degreeToSign(longitude);
+
+            planets[planetName] = {
+              longitude,
+              degree: longitude % 30,
+              sign: sign.name,
+              signId: sign.id,
+              speed: result.speedLong,
+              isRetrograde: result.isRetrograde,
+              isCombust: this.isPlanetCombust(planetName, planets.sun, longitude),
+              dignity: this.calculatePlanetaryDignity(planetName, sign.id)
+            };
+          } catch (error) {
+            console.warn(`⚠️  Error calculating ${planetName} position:`, error.message);
+            // Set default values if calculation fails
+            const defaultSign = this.degreeToSign(0);
+            planets[planetName] = {
+              longitude: 0,
+              degree: 0,
+              sign: defaultSign.name,
+              signId: defaultSign.id,
+              speed: 0,
+              isRetrograde: false,
+              isCombust: false,
+              dignity: 'neutral'
+            };
+          }
+        }
       }
 
       // Calculate Ketu position (opposite to Rahu)

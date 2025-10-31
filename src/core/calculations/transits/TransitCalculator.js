@@ -4,6 +4,7 @@
  * Integrates with Swiss Ephemeris for precise calculations
  */
 import { calculateJulianDay } from '../../../utils/calculations/julianDay.js';
+import { calculatePlanetPosition } from '../../../utils/calculations/planetaryPositions.js';
 
 // Optional swisseph import for serverless compatibility
 let swisseph = null;
@@ -97,38 +98,91 @@ class TransitCalculator {
     const day = date.getUTCDate();
     const hour = date.getUTCHours() + date.getUTCMinutes() / 60 + date.getUTCSeconds() / 3600;
 
-    if (!this.swissephAvailable) {
-      throw new Error('Swiss Ephemeris not available - transit calculations disabled. Transit calculations require swisseph for planetary positions.');
-    }
-    this.swisseph.swe_set_ephe_path(__dirname + '/../../../ephemeris');
-    
-    // Use swisseph for Julian Day if available, otherwise use pure JS
+    // Calculate Julian Day - use pure JS if swisseph unavailable
     let julianDay;
-    if (this.swisseph && typeof this.swisseph.swe_julday === 'function') {
+    if (this.swissephAvailable && this.swisseph && typeof this.swisseph.swe_julday === 'function') {
+      this.swisseph.swe_set_ephe_path(__dirname + '/../../../ephemeris');
       const result = this.swisseph.swe_julday(year, month, day, hour, this.swisseph.SE_GREG_CAL || 1);
       julianDay = typeof result === 'object' && result.julianDay ? result.julianDay : result;
     } else {
       console.log('📝 TransitCalculator: Using pure JavaScript Julian Day calculation (swisseph unavailable)');
-      julianDay = calculateJulianDay(year, month, day, hour, this.swisseph?.SE_GREG_CAL || 1);
+      julianDay = calculateJulianDay(year, month, day, hour, 1);
     }
-    
-    this.swisseph.swe_set_sid_mode(this.swisseph.SE_SIDM_LAHIRI || 1);
 
     const planets = ['sun', 'moon', 'mars', 'mercury', 'jupiter', 'venus', 'saturn', 'rahu', 'ketu'];
     const positions = {};
 
-    planets.forEach(planet => {
-        const planetId = this.swisseph[`SE_${planet.toUpperCase()}`];
-        const result = this.swisseph.swe_calc_ut(julianDay.julianDay_UT, planetId, this.swisseph.SEFLG_SPEED || 2);
-        if (result.returnCode === 0) {
+    // Use Swiss Ephemeris if available, otherwise use pure JavaScript calculations
+    if (this.swissephAvailable && this.swisseph) {
+      this.swisseph.swe_set_sid_mode(this.swisseph.SE_SIDM_LAHIRI || 1);
+
+      planets.forEach(planet => {
+        // Handle Ketu separately (opposite to Rahu)
+        if (planet === 'ketu') {
+          if (positions.rahu) {
+            const ketuLongitude = (positions.rahu.longitude + 180) % 360;
             positions[planet] = {
-                longitude: result.longitude,
-                sign: Math.floor(result.longitude / 30),
-                degree: result.longitude % 30,
-                signName: this.getSignName(Math.floor(result.longitude / 30))
+              longitude: ketuLongitude,
+              sign: Math.floor(ketuLongitude / 30),
+              degree: ketuLongitude % 30,
+              signName: this.getSignName(Math.floor(ketuLongitude / 30))
             };
+          }
+          return;
         }
-    });
+
+        const planetId = this.swisseph[`SE_${planet.toUpperCase()}`];
+        if (planetId === undefined) {
+          console.warn(`⚠️  TransitCalculator: Planet ID not found for ${planet}`);
+          return;
+        }
+
+        // Fix: julianDay is already a number, not an object
+        const result = this.swisseph.swe_calc_ut(julianDay, planetId, this.swisseph.SEFLG_SPEED || 2);
+        if (result && result.returnCode === 0) {
+          positions[planet] = {
+            longitude: result.longitude,
+            sign: Math.floor(result.longitude / 30),
+            degree: result.longitude % 30,
+            signName: this.getSignName(Math.floor(result.longitude / 30))
+          };
+        }
+      });
+    } else {
+      // Use pure JavaScript planetary calculations for serverless environment
+      console.log('📝 TransitCalculator: Using pure JavaScript planetary position calculations (swisseph unavailable)');
+      
+      planets.forEach(planet => {
+        // Handle Ketu separately (opposite to Rahu)
+        if (planet === 'ketu') {
+          if (positions.rahu) {
+            const ketuLongitude = (positions.rahu.longitude + 180) % 360;
+            positions[planet] = {
+              longitude: ketuLongitude,
+              sign: Math.floor(ketuLongitude / 30),
+              degree: ketuLongitude % 30,
+              signName: this.getSignName(Math.floor(ketuLongitude / 30))
+            };
+          }
+          return;
+        }
+
+        try {
+          const result = calculatePlanetPosition(planet, julianDay);
+          
+          if (result && result.returnCode === 0) {
+            positions[planet] = {
+              longitude: result.longitude,
+              sign: Math.floor(result.longitude / 30),
+              degree: result.longitude % 30,
+              signName: this.getSignName(Math.floor(result.longitude / 30))
+            };
+          }
+        } catch (error) {
+          console.warn(`⚠️  TransitCalculator: Error calculating ${planet} position:`, error.message);
+        }
+      });
+    }
 
     return positions;
   }
