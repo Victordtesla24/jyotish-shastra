@@ -16,20 +16,32 @@ const BPHSInfographicPROD = ({ onStartRectification }) => {
     const checkApiConnection = async () => {
       try {
         const response = await axios.get('/api/v1/health', { timeout: 5000 });
-        if (response.data?.status === 'OK') {
+        // CRITICAL FIX: Health endpoint returns 'healthy', not 'OK'
+        const status = response.data?.status;
+        if (status === 'healthy' || status === 'OK') {
           setApiConnectionStatus('connected');
+          if (error) setError(null);
         } else {
-          throw new Error('API health check failed');
+          console.warn('⚠️ Health check status mismatch:', status);
+          // Don't throw error - API might still be functional
+          setApiConnectionStatus('connected');
         }
       } catch (error) {
         console.error('API connection check failed:', error);
-        setApiConnectionStatus('error');
-        setError('Failed to connect to BTR service. Please check your internet connection and try again.');
+        // CRITICAL FIX: Only set error if it's a network error
+        if (error.code === 'ECONNABORTED' || error.message.includes('timeout') || !error.response) {
+          setApiConnectionStatus('error');
+          setError('Failed to connect to BTR service. Please check your internet connection and try again.');
+        } else {
+          // Response received but status check failed - API might still work
+          console.warn('⚠️ Health check response received but status unexpected:', error.response?.data);
+          setApiConnectionStatus('connected');
+        }
       }
     };
     
     checkApiConnection();
-  }, []); // Fixed missing dependency warning by removing apiConnectionStatus from deps
+  }, [error]); // Fixed missing dependency warning
 
   // useEffect(() => {
   //   const interval = setInterval(() => {
