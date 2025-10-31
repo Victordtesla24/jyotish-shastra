@@ -2633,13 +2633,21 @@ const AnalysisPage = () => {
           // PRODUCTION: Handle BIRTH_DATA_REQUIRED error with proper user guidance
           if (result.error?.code === 'BIRTH_DATA_REQUIRED') {
             setError({
-              message: result.error.userMessage || result.error.message,
+              message: result.error.userMessage || result.error.message || 'Birth data is required for analysis. Please fill out the birth data form first.',
               code: result.error.code,
-              action: result.error.action,
+              action: result.error.action || 'navigate_home',
               requiresNavigation: true
             });
           } else {
-            setError(result.error);
+            // CRITICAL FIX: Ensure error is always a user-friendly message
+            const errorMessage = typeof result.error === 'string' 
+              ? result.error 
+              : result.error?.message || result.error?.details || 'Failed to load analysis data. Please try again or generate your birth chart first.';
+            setError({
+              message: errorMessage,
+              code: result.error?.code || 'ANALYSIS_LOAD_FAILED',
+              action: 'navigate_home'
+            });
           }
         }
       } catch (error) {
@@ -2648,13 +2656,19 @@ const AnalysisPage = () => {
         // PRODUCTION: Handle birth data required error
         if (error.code === 'BIRTH_DATA_REQUIRED') {
           setError({
-            message: error.userMessage,
+            message: error.userMessage || 'Birth data is required for analysis. Please fill out the birth data form first.',
             code: error.code,
-            action: error.action,
+            action: error.action || 'navigate_home',
             requiresNavigation: true
           });
         } else {
-          setError(error.message);
+          // CRITICAL FIX: Ensure error is always a user-friendly message
+          const errorMessage = error.message || error.toString() || 'Failed to load analysis data. Please try again or generate your birth chart first.';
+          setError({
+            message: errorMessage,
+            code: error.code || 'ANALYSIS_INIT_ERROR',
+            action: 'navigate_home'
+          });
         }
       } finally {
         setLoading(false);
@@ -3021,8 +3035,13 @@ const AnalysisPage = () => {
         console.log('⚠️ Error reading session storage:', err.message);
       }
 
-      // 5. No analysis data found - show empty state
-      console.log('❌ No analysis data found, showing empty state');
+      // 5. No analysis data found - show error state
+      console.log('❌ No analysis data found, showing error state');
+      setError({
+        message: 'Analysis data is not available. Please generate your birth chart first by filling out the birth data form.',
+        code: 'NO_ANALYSIS_DATA',
+        action: 'navigate_home'
+      });
       setAnalysisData({}); // Set empty object so page renders
       setLoading(false);
 

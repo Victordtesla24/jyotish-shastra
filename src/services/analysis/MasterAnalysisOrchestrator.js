@@ -73,9 +73,21 @@ class MasterAnalysisOrchestrator {
       analysis.sections.section1 = await this.executeSection1Analysis(birthData, analysis);
       this.updateProgress(analysis, 'section1');
 
-      // Ensure charts are generated successfully before proceeding
-      if (!analysis.sections.section1 || !analysis.sections.section1.summary || !analysis.sections.section1.summary.readyForAnalysis) {
-        throw new Error('Insufficient birth data for comprehensive analysis. Complete birth data required.');
+      // CRITICAL FIX: Check if section1 has error and handle gracefully
+      if (!analysis.sections.section1) {
+        throw new Error('Section 1 analysis failed. Unable to collect birth data.');
+      }
+      
+      // CRITICAL FIX: Ensure summary exists and check readyForAnalysis
+      if (!analysis.sections.section1.summary) {
+        throw new Error('Section 1 summary missing. Birth data analysis incomplete.');
+      }
+      
+      // CRITICAL FIX: Check readyForAnalysis with better error message
+      if (!analysis.sections.section1.summary.readyForAnalysis) {
+        const errorDetails = analysis.sections.section1.summary.error || 
+                            `Completeness: ${analysis.sections.section1.summary.completeness || 0}%`;
+        throw new Error(`Insufficient birth data for comprehensive analysis. ${errorDetails}`);
       }
 
       const { rasiChart, navamsaChart } = await this.generateCharts(birthData);
@@ -227,7 +239,23 @@ class MasterAnalysisOrchestrator {
       return section;
     } catch (error) {
       analysis.errors.push(`Section 1 error: ${error.message}`);
-      return { name: "Birth Data Collection", error: error.message };
+      // CRITICAL FIX: Always return section with summary structure to prevent failure
+      return {
+        name: "Birth Data Collection and Chart Casting",
+        questions: [],
+        summary: {
+          status: 'incomplete',
+          completeness: 0,
+          chartsGenerated: 0,
+          ascendantCalculated: false,
+          planetsCalculated: 0,
+          dashaCalculated: false,
+          readyForAnalysis: false,
+          error: error.message
+        },
+        completeness: 0,
+        error: error.message
+      };
     }
   }
 

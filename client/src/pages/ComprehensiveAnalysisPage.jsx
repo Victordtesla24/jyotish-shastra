@@ -68,8 +68,22 @@ const ComprehensiveAnalysisPage = () => {
         success: apiData.success,
         hasAnalysis: !!apiData.analysis,
         hasSections: !!apiData.analysis?.sections,
-        sectionCount: apiData.analysis?.sections ? Object.keys(apiData.analysis.sections).length : 0
+        sectionCount: apiData.analysis?.sections ? Object.keys(apiData.analysis.sections).length : 0,
+        status: apiData.metadata?.status,
+        error: apiData.error
       });
+
+      // CRITICAL FIX: Check if API returned an error
+      if (!apiData.success || apiData.metadata?.status === 'failed') {
+        const errorMessage = apiData.error?.message || apiData.error?.details || apiData.message || 
+                            'Comprehensive analysis failed. Please verify your birth data and try again.';
+        throw new Error(errorMessage);
+      }
+
+      // CRITICAL FIX: Validate sections exist in API response
+      if (!apiData.analysis || !apiData.analysis.sections || Object.keys(apiData.analysis.sections).length === 0) {
+        throw new Error('Sections data is missing from API response. Expected analysis.sections with 8 sections (section1-section8).');
+      }
 
       // Process data with ResponseDataToUIDisplayAnalyser
       const processedData = ResponseDataToUIDisplayAnalyser.processComprehensiveAnalysis(apiData);
@@ -92,10 +106,13 @@ const ComprehensiveAnalysisPage = () => {
 
     } catch (err) {
       console.error('❌ [ComprehensiveAnalysisPage] Error fetching comprehensive analysis:', err);
-      setError(err.message);
+      // CRITICAL FIX: Ensure error message is always user-friendly
+      const errorMessage = err.message || err.toString() || 
+                          'Failed to load comprehensive analysis. Please verify your birth data and try again.';
+      setError(errorMessage);
     } finally {
-        setLoading(false);
-      }
+      setLoading(false);
+    }
   }, [navigate]);
 
   useEffect(() => {

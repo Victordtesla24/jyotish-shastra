@@ -114,6 +114,37 @@ router.post('/comprehensive', async (req, res) => {
             legacyFormat: false
         });
 
+        // CRITICAL FIX: Check if analysis failed before sending response
+        if (analysis.status === 'failed' || !analysis.sections || Object.keys(analysis.sections).length === 0) {
+          const errorMessage = analysis.error || analysis.message || 'Comprehensive analysis failed. Unable to generate sections.';
+          console.error('Comprehensive analysis failed:', errorMessage);
+          
+          return res.status(500).json({
+            success: false,
+            error: {
+              message: 'Comprehensive analysis failed',
+              details: errorMessage,
+              code: 'ANALYSIS_FAILED',
+              timestamp: new Date().toISOString()
+            },
+            analysis: {
+              sections: {},
+              status: 'failed'
+            },
+            metadata: {
+              timestamp: new Date().toISOString(),
+              analysisId: analysis.id || `analysis_${Date.now()}`,
+              dataSource: 'MasterAnalysisOrchestrator',
+              status: 'failed'
+            }
+          });
+        }
+
+        // CRITICAL FIX: Validate sections exist before sending response
+        if (!analysis.sections || Object.keys(analysis.sections).length === 0) {
+          throw new Error('Analysis completed but sections are missing. Expected 8 sections (section1-section8).');
+        }
+
         // CRITICAL FIX: Only log in development environment
         if (process.env.NODE_ENV === 'development') {
           console.log('Analysis completed successfully');

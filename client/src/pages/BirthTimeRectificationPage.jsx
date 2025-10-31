@@ -39,7 +39,8 @@ const BirthTimeRectificationPageEnhanced = () => {
     const checkApiConnection = async () => {
       try {
         const response = await axios.get('/api/v1/health', { timeout: 5000 });
-        if (!response.data?.status === 'OK') {
+        // CRITICAL FIX: Fix incorrect boolean logic - check if status is NOT 'OK'
+        if (!response.data || response.data.status !== 'OK') {
           throw new Error('API health check failed');
         }
       } catch (error) {

@@ -16,6 +16,13 @@ const ResponseDataToUIDisplayAnalyser = {
       throw new Error('API response is required for comprehensive analysis processing');
     }
 
+    // CRITICAL FIX: Check if API returned an error
+    if (!apiResponse.success || apiResponse.metadata?.status === 'failed') {
+      const errorMessage = apiResponse.error?.message || apiResponse.error?.details || apiResponse.message || 
+                          'Comprehensive analysis failed. Unable to process response.';
+      throw new Error(errorMessage);
+    }
+
     // Handle multiple response formats
     let analysis;
     if (apiResponse.analysis) {
@@ -29,6 +36,12 @@ const ResponseDataToUIDisplayAnalyser = {
     const { sections } = analysis;
     if (!sections || Object.keys(sections).length === 0) {
       throw new Error('Sections data is missing from API response. Expected analysis.sections with 8 sections (section1-section8).');
+    }
+
+    // CRITICAL FIX: Validate section count (should be 8 sections)
+    const sectionKeys = Object.keys(sections);
+    if (sectionKeys.length < 8) {
+      console.warn(`⚠️ [ResponseDataToUIDisplayAnalyser] Expected 8 sections but found ${sectionKeys.length}. Sections: ${sectionKeys.join(', ')}`);
     }
 
     return {
