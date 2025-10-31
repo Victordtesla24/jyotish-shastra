@@ -4,13 +4,34 @@
  * Optimized for Vercel serverless functions
  */
 
-import app from '../src/index.serverless.js';
+let app;
+try {
+  app = await import('../src/index.serverless.js');
+  app = app.default || app;
+} catch (importError) {
+  console.error('Failed to import Express app:', importError);
+  throw importError;
+}
 
 /**
  * Vercel serverless function handler
  * Simply forwards to Express app - Vercel req/res are Express-compatible
  */
 export default async function handler(req, res) {
+  // Ensure app is loaded
+  if (!app) {
+    try {
+      const module = await import('../src/index.serverless.js');
+      app = module.default || module;
+    } catch (error) {
+      console.error('Failed to load Express app:', error);
+      return res.status(500).json({
+        error: 'Server initialization failed',
+        message: error.message,
+        timestamp: new Date().toISOString()
+      });
+    }
+  }
   try {
     // Handle preflight OPTIONS requests explicitly for CORS
     if (req.method === 'OPTIONS') {
