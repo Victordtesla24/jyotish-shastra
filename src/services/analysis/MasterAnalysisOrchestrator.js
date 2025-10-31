@@ -1224,11 +1224,63 @@ class MasterAnalysisOrchestrator {
   }
 
   generateRemedialRecommendations(analysis) {
-    const planetaryAnalysis = analysis.sections.section2?.analyses?.dignity;
-    if (!planetaryAnalysis) {
-      throw new Error('Cannot generate remedial recommendations: Comprehensive planetary dignity analysis required');
+    // Check if section2 exists and has analyses property (not an error object)
+    if (!analysis.sections.section2 || !analysis.sections.section2.analyses || analysis.sections.section2.error) {
+      throw new Error('Cannot generate remedial recommendations: Preliminary analysis (section2) failed or is incomplete');
     }
-    return planetaryAnalysis.remedialMeasures || ["Comprehensive planetary analysis required for remedial recommendations"];
+    
+    const planetaryAnalysis = analysis.sections.section2.analyses.dignity;
+    if (!planetaryAnalysis) {
+      throw new Error('Cannot generate remedial recommendations: Planetary dignity analysis is missing from preliminary analysis');
+    }
+    
+    // Generate remedial measures from dignity analysis data
+    const remedialMeasures = [];
+    
+    // Recommendations for debilitated planets
+    if (Array.isArray(planetaryAnalysis.debilitated) && planetaryAnalysis.debilitated.length > 0) {
+      planetaryAnalysis.debilitated.forEach(({ planet }) => {
+        remedialMeasures.push(`Strengthen ${planet} through specific remedies`);
+        remedialMeasures.push(`Wear gemstone for ${planet} after consultation`);
+        remedialMeasures.push(`Chant mantras for ${planet}`);
+      });
+    }
+    
+    // Recommendations for exalted planets
+    if (Array.isArray(planetaryAnalysis.exalted) && planetaryAnalysis.exalted.length > 0) {
+      planetaryAnalysis.exalted.forEach(({ planet }) => {
+        remedialMeasures.push(`Maintain the strength of exalted ${planet} through regular practices`);
+      });
+    }
+    
+    // Recommendations based on summary if available
+    if (planetaryAnalysis.summary && typeof planetaryAnalysis.summary === 'object') {
+      const summary = planetaryAnalysis.summary;
+      
+      // Check for weakest planet
+      if (summary.weakestPlanet) {
+        remedialMeasures.push(`Focus remedial measures on ${summary.weakestPlanet}`);
+      }
+      
+      // Check for debilitated count
+      if (summary.debilitatedCount > 0) {
+        remedialMeasures.push(`Address debilitation issues through appropriate remedies`);
+      }
+      
+      // Check for overall strength
+      if (summary.overallStrength && summary.overallStrength < 5) {
+        remedialMeasures.push(`Chart requires strengthening through comprehensive remedial measures`);
+      }
+    }
+    
+    // General recommendations if no specific issues found
+    if (remedialMeasures.length === 0) {
+      remedialMeasures.push("Chart shows balanced planetary positions");
+      remedialMeasures.push("Regular spiritual practices recommended");
+      remedialMeasures.push("Maintain positive planetary energies through regular practices");
+    }
+    
+    return remedialMeasures;
   }
 
   /**
