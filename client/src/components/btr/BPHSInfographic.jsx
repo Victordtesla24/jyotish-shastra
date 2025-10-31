@@ -1,17 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Alert } from '../ui';
 
 const BPHSInfographic = ({ onStartRectification }) => {
   const [activeSection, setActiveSection] = useState('intro');
-  const [animationPhase, setAnimationPhase] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setAnimationPhase(prev => (prev + 1) % 4);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
 
   // Ancient Wisdom Section
   const AncientWisdomSection = () => (
