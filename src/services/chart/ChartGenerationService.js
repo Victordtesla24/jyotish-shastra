@@ -595,34 +595,44 @@ class ChartGenerationService {
       throw new Error('Julian day, latitude, and longitude are required for house position calculation');
     }
 
+    if (!ascendant || typeof ascendant.longitude !== 'number') {
+      throw new Error('Ascendant data with longitude is required for house position calculation');
+    }
+
     try {
-      const adjustedLatitude = Math.max(-89.999999, Math.min(89.999999, latitude));
-      if (!this.swissephAvailable) {
-        throw new Error('Swiss Ephemeris calculations are not available in this serverless environment');
-      }
-      
-      const houses = this.swisseph.swe_houses(jd, adjustedLatitude, longitude, 'P');
+      // Use Swiss Ephemeris if available, otherwise use pure JavaScript calculations
+      if (this.swissephAvailable && this.swisseph && typeof this.swisseph.swe_houses === 'function') {
+        const adjustedLatitude = Math.max(-89.999999, Math.min(89.999999, latitude));
+        const houses = this.swisseph.swe_houses(jd, adjustedLatitude, longitude, 'P');
 
-      if (!houses || !houses.house || houses.house.length < 12) {
-        throw new Error('Swiss Ephemeris returned invalid house data');
-      }
-
-      const housePositions = [];
-      for (let i = 0; i < 12; i++) {
-        const houseDegree = houses.house[i];
-        if (houseDegree === undefined || isNaN(houseDegree)) {
-          throw new Error(`Invalid house cusp for house ${i+1}`);
+        if (!houses || !houses.house || houses.house.length < 12) {
+          throw new Error('Swiss Ephemeris returned invalid house data');
         }
-        const sign = this.degreeToSign(houseDegree);
-        housePositions.push({
-          houseNumber: i + 1,
-          degree: houseDegree,
-          sign: sign.name,
-          signId: sign.id,
-          longitude: houseDegree
-        });
+
+        const housePositions = [];
+        for (let i = 0; i < 12; i++) {
+          const houseDegree = houses.house[i];
+          if (houseDegree === undefined || isNaN(houseDegree)) {
+            throw new Error(`Invalid house cusp for house ${i+1}`);
+          }
+          const sign = this.degreeToSign(houseDegree);
+          housePositions.push({
+            houseNumber: i + 1,
+            degree: houseDegree,
+            sign: sign.name,
+            signId: sign.id,
+            longitude: houseDegree
+          });
+        }
+        return housePositions;
+      } else {
+        // Use pure JavaScript whole sign house calculation for serverless environment
+        console.log('📝 Using pure JavaScript house calculation (swisseph unavailable)');
+        
+        // For serverless, use whole sign houses based on ascendant
+        // This is a simplified but valid Vedic house system
+        return this.generateWholeSignHouses(ascendant);
       }
-      return housePositions;
     } catch (error) {
       throw new Error(`House position calculation failed: ${error.message}`);
     }
