@@ -126,14 +126,14 @@ const InteractiveLifeEventsQuestionnaire = ({ onComplete, onProgressUpdate }) =>
   // Notify parent of progress updates
   useEffect(() => {
     if (onProgressUpdate) {
-      const totalQuestions = Object.values(questionCategories).reduce((acc, cat) => acc + cat.questions.length, 0);
-      const answeredQuestions = Object.keys(answers).length;
-      const progressPercentage = Math.round((answeredQuestions / totalQuestions) * 100);
+      const currentTotalQuestions = Object.values(questionCategories).reduce((acc, cat) => acc + cat.questions.length, 0);
+      const currentAnsweredQuestions = Object.keys(answers).length;
+      const currentProgressPercentage = Math.round((currentAnsweredQuestions / currentTotalQuestions) * 100);
       
       onProgressUpdate({
-        answeredQuestions,
-        totalQuestions,
-        progressPercentage,
+        answeredQuestions: currentAnsweredQuestions,
+        totalQuestions: currentTotalQuestions,
+        progressPercentage: currentProgressPercentage,
         completedCategories: Array.from(completedCategories)
       });
     }
@@ -205,6 +205,11 @@ const InteractiveLifeEventsQuestionnaire = ({ onComplete, onProgressUpdate }) =>
       onComplete(formattedEvents);
     }
   };
+
+  // Calculate progress values at component level
+  const totalQuestions = Object.values(questionCategories).reduce((acc, cat) => acc + cat.questions.length, 0);
+  const answeredQuestions = Object.keys(answers).length;
+  const progressPercentage = Math.round((answeredQuestions / totalQuestions) * 100);
 
   // Progress Bar Component
   const ProgressBar = () => (
