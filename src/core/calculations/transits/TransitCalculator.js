@@ -106,7 +106,7 @@ class TransitCalculator {
     const positions = {};
 
     planets.forEach(planet => {
-        const planetId = swisseph[`SE_${planet.toUpperCase()}`];
+        const planetId = this.swisseph[`SE_${planet.toUpperCase()}`];
         const result = this.swisseph.swe_calc_ut(julianDay.julianDay_UT, planetId, this.swisseph.SEFLG_SPEED || 2);
         if (result.returnCode === 0) {
             positions[planet] = {

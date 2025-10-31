@@ -49,6 +49,9 @@ function initSwissEphemeris() {
 }
 
 function toJulianDayUT(dateUtc) {
+  if (!swissephAvailable) {
+    throw new Error('Swiss Ephemeris not available - sunrise calculations disabled');
+  }
   // Convert JS Date (UTC) to Julian Day (UT)
   const year = dateUtc.getUTCFullYear();
   const month = dateUtc.getUTCMonth() + 1;
@@ -60,6 +63,9 @@ function toJulianDayUT(dateUtc) {
 }
 
 function fromJulianDayUT(jd) {
+  if (!swissephAvailable) {
+    throw new Error('Swiss Ephemeris not available - sunrise calculations disabled');
+  }
   const gregflag = 1;
   const { year, month, day, hour } = swisseph.swe_revjul(jd, gregflag);
   const h = Math.floor(hour);
@@ -112,6 +118,9 @@ export async function computeSunriseSunset(dateLocal, latitude, longitude, timez
 
     // Sun position at midnight and next midnight - Swiss Ephemeris works synchronously in Node.js
     // Use SEFLG_SWIEPH for ecliptic coordinates (longitude, latitude, distance)
+    if (!swissephAvailable) {
+      throw new Error('Swiss Ephemeris not available - sunrise calculations disabled');
+    }
     const result = swisseph.swe_calc_ut(jd, swisseph.SE_SUN, swisseph.SEFLG_SWIEPH);
     if (result.error) {
       throw new Error(`Swiss Ephemeris calculation error: ${result.error}`);
@@ -139,9 +148,9 @@ export async function computeSunriseSunset(dateLocal, latitude, longitude, timez
     // Calculate sunrise (rsmi = 1 for rise)
     const sunriseResult = swisseph.swe_rise_trans(
       jd - 1, // Start search from previous day to ensure we find today's sunrise
-      swisseph.SE_SUN,
+      swisseph.SE_SUN || 0,
       '',
-      swisseph.SEFLG_SWIEPH,
+      swisseph.SEFLG_SWIEPH || 2,
       1, // rsmi = 1 for rise
       geopos,
       atpress,
@@ -159,9 +168,9 @@ export async function computeSunriseSunset(dateLocal, latitude, longitude, timez
     // Calculate sunset (rsmi = 2 for set)
     const sunsetResult = swisseph.swe_rise_trans(
       jd, // Start search from current day
-      swisseph.SE_SUN,
+      swisseph.SE_SUN || 0,
       '',
-      swisseph.SEFLG_SWIEPH,
+      swisseph.SEFLG_SWIEPH || 2,
       2, // rsmi = 2 for set
       geopos,
       atpress,
