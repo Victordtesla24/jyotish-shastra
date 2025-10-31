@@ -16,6 +16,7 @@ import HomePage from './pages/HomePage';
 import ChartPage from './pages/ChartPage';
 import AnalysisPage from './pages/AnalysisPage';
 import ComprehensiveAnalysisPage from './pages/ComprehensiveAnalysisPage';
+import BirthTimeRectificationPage from './pages/BirthTimeRectificationPage';
 import ReportPage from './pages/ReportPage';
 
 // Details pages
@@ -186,6 +187,7 @@ function App() {
                   <Route path="/chart" element={<ChartPage />} />
                   <Route path="/analysis" element={<AnalysisPage />} />
                   <Route path="/comprehensive-analysis" element={<ComprehensiveAnalysisPage />} />
+                  <Route path="/birth-time-rectification" element={<BirthTimeRectificationPage />} />
                   <Route path="/report" element={<ReportPage />} />
                   <Route path="/report/:id" element={<ReportPage />} />
                   <Route path="/rashi/mesha" element={<MeshaPage />} />

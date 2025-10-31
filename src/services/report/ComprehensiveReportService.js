@@ -1014,14 +1014,35 @@ class ComprehensiveReportService {
    * @returns {string} Overall personality assessment
    */
   synthesizePersonalityAssessment(lagnaAnalysis, moonAnalysis, sunAnalysis, arudhaAnalysis, comparison) {
-    // Safely extract sign values with fallbacks
-    const lagnaSign = lagnaAnalysis?.sign || 'Unknown';
-    const arudhaSign = arudhaAnalysis?.arudhaSign || 'Unknown';
-    const element = lagnaAnalysis?.element || 'unknown';
-    const quality = lagnaAnalysis?.quality || 'unknown';
+    // Production code - require valid data structure
+    if (!lagnaAnalysis?.sign) {
+      throw new Error('Invalid lagna analysis: missing required sign data. Ensure complete analysis is provided.');
+    }
+    if (!arudhaAnalysis?.arudhaSign) {
+      throw new Error('Invalid arudha analysis: missing required arudha sign data. Ensure complete analysis is provided.');
+    }
+    if (!lagnaAnalysis?.element) {
+      throw new Error('Invalid lagna analysis: missing required element data. Ensure complete analysis is provided.');
+    }
+    if (!lagnaAnalysis?.quality) {
+      throw new Error('Invalid lagna analysis: missing required quality data. Ensure complete analysis is provided.');
+    }
+    if (!moonAnalysis?.emotionalPattern) {
+      throw new Error('Invalid moon analysis: missing required emotional pattern data. Ensure complete analysis is provided.');
+    }
+    if (!sunAnalysis?.lifePurpose) {
+      throw new Error('Invalid sun analysis: missing required life purpose data. Ensure complete analysis is provided.');
+    }
+
+    const lagnaSign = lagnaAnalysis.sign;
+    const arudhaSign = arudhaAnalysis.arudhaSign;
+    const element = lagnaAnalysis.element;
+    const quality = lagnaAnalysis.quality;
+    const emotionalPattern = moonAnalysis.emotionalPattern;
+    const lifePurpose = sunAnalysis.lifePurpose;
 
     let assessment = `You possess a ${element.toLowerCase()} nature with ${quality.toLowerCase()} qualities. `;
-    assessment += `Your emotional makeup is ${moonAnalysis.emotionalPattern || 'balanced'}, while your core identity seeks ${sunAnalysis.lifePurpose || 'self-expression'}. `;
+    assessment += `Your emotional makeup is ${emotionalPattern}, while your core identity seeks ${lifePurpose}. `;
 
     if (comparison.areSame) {
       assessment += 'Your public image authentically reflects your true self, creating natural charisma.';

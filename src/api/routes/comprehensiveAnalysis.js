@@ -123,12 +123,12 @@ router.post('/comprehensive', async (req, res) => {
         const response = {
           success: true,
           analysis: {
-            // Preserve sections structure for test compatibility
-            sections: analysis.sections || {},
+            // Production code - require valid data structure
+            sections: analysis.sections,
             // Include other essential analysis properties
-            synthesis: analysis.synthesis || {},
-            recommendations: analysis.recommendations || {},
-            verification: analysis.verification || {},
+            synthesis: analysis.synthesis,
+            recommendations: analysis.recommendations,
+            verification: analysis.verification,
             // Legacy compatibility
             lagnaAnalysis: analysis.lagnaAnalysis,
             houseAnalysis: analysis.houseAnalysis,

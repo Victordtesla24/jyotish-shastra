@@ -57,8 +57,7 @@ const ComprehensiveAnalysisDisplay = ({ analysisData }) => {
     console.log('✅ [ComprehensiveAnalysisDisplay] Final processed data:', {
       sectionsCount: Object.keys(sections).length,
       sectionOrder: order,
-      availableSections: Object.keys(sections),
-      sampleSectionContent: sections.section1 ? 'Section1 has content' : 'Section1 empty'
+      availableSections: Object.keys(sections)
     });
 
     return {

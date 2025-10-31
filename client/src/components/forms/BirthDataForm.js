@@ -483,7 +483,14 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
 
           <button
             type="submit"
-            disabled={loading || geocoding}
+            disabled={
+              loading ||
+              geocoding ||
+              !formData.dateOfBirth ||
+              !formData.timeOfBirth ||
+              !coordinates?.latitude ||
+              !coordinates?.longitude
+            }
             data-testid="generate-chart-button"
             className="btn-vedic btn-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             onClick={(e) => {

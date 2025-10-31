@@ -67,7 +67,7 @@ async function testNoFallbacks() {
             const response = await axios.post('http://localhost:3002/api/v1/geocoding/location', {
                 placeOfBirth: 'InvalidLocationThatDoesNotExist'
             }, {
-                headers: { 'Content-Type: 'application/json' }
+                headers: { 'Content-Type': 'application/json' }
             });
             
             // Should fail with actual error, not return demo data
@@ -104,7 +104,7 @@ async function testNoFallbacks() {
         try {
             // Step 1: Generate Chart
             const chartResponse = await axios.post('http://localhost:3002/api/v1/chart/generate', validTestData, {
-                headers: { 'Content-Type: 'application/json' }
+                headers: { 'Content-Type': 'application/json' }
             });
             
             if (!chartResponse.data.success) {

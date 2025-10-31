@@ -386,6 +386,81 @@ curl -X POST http://localhost:3001/log-client-error \
 
 ---
 
+## Birth Time Rectification Endpoints
+
+### 27. BTR Test Endpoint
+```bash
+curl -X GET http://localhost:3001/api/v1/rectification/test | jq .
+```
+
+### 28. BTR Methods Information
+```bash
+curl -X POST http://localhost:3001/api/v1/rectification/methods \
+  -H "Content-Type: application/json" \
+  -d '{}' | jq .
+```
+
+### 29. BTR Quick Validation
+```bash
+curl -X POST http://localhost:3001/api/v1/rectification/quick \
+  -H "Content-Type: application/json" \
+  -d '{
+      "birthData": {
+          "dateOfBirth": "1997-12-18",
+          "timeOfBirth": "02:30",
+          "latitude": 32.4935378,
+          "longitude": 74.5411575,
+          "timezone": "Asia/Karachi",
+          "placeOfBirth": "Sialkot, Pakistan"
+      },
+      "proposedTime": "02:30"
+  }' | jq .
+```
+
+### 30. BTR Full Analysis
+```bash
+curl -X POST http://localhost:3001/api/v1/rectification/analyze \
+  -H "Content-Type: application/json" \
+  -d '{
+      "birthData": {
+          "dateOfBirth": "1997-12-18",
+          "timeOfBirth": "02:30",
+          "latitude": 32.4935378,
+          "longitude": 74.5411575,
+          "timezone": "Asia/Karachi",
+          "placeOfBirth": "Sialkot, Pakistan"
+      },
+      "options": {
+          "methods": ["praanapada", "moon", "gulika"]
+      }
+  }' | jq .
+```
+
+### 31. BTR Analysis with Life Events
+```bash
+curl -X POST http://localhost:3001/api/v1/rectification/with-events \
+  -H "Content-Type: application/json" \
+  -d '{
+      "birthData": {
+          "dateOfBirth": "1997-12-18",
+          "timeOfBirth": "02:30",
+          "latitude": 32.4935378,
+          "longitude": 74.5411575,
+          "timezone": "Asia/Karachi",
+          "placeOfBirth": "Sialkot, Pakistan"
+      },
+      "lifeEvents": [
+          {"date": "2015-06-01", "description": "Marriage"},
+          {"date": "2020-01-15", "description": "Job promotion"}
+      ],
+      "options": {
+          "methods": ["praanapada", "moon", "gulika", "events"]
+      }
+  }' | jq .
+```
+
+---
+
 ## Advanced Usage Examples
 
 ### Sequential Analysis Workflow

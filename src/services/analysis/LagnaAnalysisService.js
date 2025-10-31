@@ -660,27 +660,28 @@ class LagnaAnalysisService {
       const signAnalysis = this.analyzeLagnaSign(ascendant.sign);
       const lordAnalysis = this.analyzeLagnaLord('lagnaLord', lagnaLordPosition);
 
-      // Safe access to characteristics with fallbacks
-      const firstCharacteristic = signAnalysis.characteristics && signAnalysis.characteristics[0]
-        ? signAnalysis.characteristics[0].toLowerCase()
-        : 'distinctive traits';
+      // Production code - require valid data structure
+      if (!signAnalysis.characteristics || !Array.isArray(signAnalysis.characteristics) || signAnalysis.characteristics.length < 2) {
+        throw new Error('Invalid sign analysis: missing required characteristics data. Ensure complete analysis data is provided.');
+      }
 
-      const secondCharacteristic = signAnalysis.characteristics && signAnalysis.characteristics[1]
-        ? signAnalysis.characteristics[1].toLowerCase()
-        : 'notable qualities';
+      if (!lordAnalysis.effects || !Array.isArray(lordAnalysis.effects) || lordAnalysis.effects.length < 1) {
+        throw new Error('Invalid lord analysis: missing required effects data. Ensure complete analysis data is provided.');
+      }
 
-      // Safe access to effects with fallbacks
-      const firstEffect = lordAnalysis.effects && lordAnalysis.effects[0]
-        ? lordAnalysis.effects[0].toLowerCase()
-        : 'significant influences';
+      if (!lordAnalysis.house) {
+        throw new Error('Invalid lord analysis: missing house position. Ensure complete analysis data is provided.');
+      }
 
-      // Safe access to house with fallback
-      const housePosition = lordAnalysis.house || 'an influential';
+      const firstCharacteristic = signAnalysis.characteristics[0].toLowerCase();
+      const secondCharacteristic = signAnalysis.characteristics[1].toLowerCase();
+      const firstEffect = lordAnalysis.effects[0].toLowerCase();
+      const housePosition = lordAnalysis.house;
 
       return `You have a ${ascendant.sign} Ascendant, which gives you ${firstCharacteristic}. Your Lagna lord is placed in the ${housePosition}th house, indicating ${firstEffect}. Overall, this suggests a ${this.getStrengthDescription(lordAnalysis.strength)} personality with ${secondCharacteristic}.`;
     } catch (error) {
-      // Fallback summary if analysis fails
-      return `You have a ${ascendant.sign} Ascendant. Further detailed analysis of the Lagna requires complete chart data.`;
+      // Production grade error handling - no fallback responses
+      throw new Error(`Lagna analysis failed: ${error.message}. Please ensure valid birth data is provided.`);
     }
   }
 

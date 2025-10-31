@@ -33,8 +33,14 @@ const Header = () => {
               Analysis
             </button>
             <button
+              onClick={() => navigate('/birth-time-rectification')}
+              className="nav-item hidden md:inline-flex bg-gradient-to-r from-saffron to-gold text-white px-3 py-1 rounded-full text-sm font-semibold hover:from-saffron-light hover:to-gold-light transition-all duration-300"
+            >
+              🕉️ BTR
+            </button>
+            <button
               onClick={() => navigate('/comprehensive-analysis')}
-              className="nav-item hidden md:inline-flex"
+              className="nav-item hidden lg:inline-flex"
             >
               Comprehensive
             </button>

@@ -120,8 +120,12 @@ class DetailedDashaAnalysisService {
   analyzeDashaPeriodEffects(dashaLord, antardashLord, chart) {
     const { ascendant, planetaryPositions } = chart;
 
-    // Handle case where chart structure might vary
-    const lagnaSign = ascendant?.sign?.toUpperCase() || 'ARIES'; // Default fallback
+    // Production code - require valid chart structure
+    if (!ascendant?.sign) {
+      throw new Error('Invalid chart data: missing required ascendant sign. Ensure valid birth data is provided.');
+    }
+    
+    const lagnaSign = ascendant.sign.toUpperCase();
 
     // Get houses ruled by both planets
     const dashaHouses = this.getHousesRuledByPlanet(dashaLord, lagnaSign);
@@ -1047,16 +1051,9 @@ class DetailedDashaAnalysisService {
       }
     }
 
-    // Handle case where currentMahadasha is still null
+    // Production code - require valid mahadasha data
     if (!currentMahadasha) {
-      // Return default values if no matching dasha is found
-      return {
-        planet: 'Unknown',
-        startAge: 0,
-        endAge: 0,
-        period: 0,
-        remainingYears: 0
-      };
+      throw new Error('Invalid dasha calculation: unable to determine current mahadasha. Ensure valid birth data and calculation parameters.');
     }
 
     // Return current mahadasha info in simplified format expected by tests

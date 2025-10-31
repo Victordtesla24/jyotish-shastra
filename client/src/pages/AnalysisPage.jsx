@@ -2384,18 +2384,7 @@ const PreliminaryDisplay = ({ data }) => {
           </div>
         )}
 
-        {/* Handle preliminary analysis data fallback */}
-        {!preliminary.summary && !preliminary.keyPlacements && !preliminary.strengths && 
-         !preliminary.challenges && !preliminary.recommendations && !preliminary.status &&
-         typeof preliminary === 'object' && Object.keys(preliminary).length > 0 && (
-          <div className="bg-gradient-to-br from-saffron/10 via-gold/10 to-white rounded-xl p-6 border border-saffron/20 shadow-lg">
-            <h4 className="text-xl font-bold text-primary mb-4 flex items-center gap-2">
-              <span className="text-2xl">📊</span>
-              Chart Status
-            </h4>
-            <SummaryDisplay summary={preliminary} title="" compact={false} />
-          </div>
-        )}
+        
       </div>
     </div>
   );
@@ -3452,6 +3441,13 @@ const AnalysisPage = () => {
               >
                 <span className="vedic-symbol symbol-chakra mr-2 group-hover:scale-110 transition-transform"></span>
                 Deep Analysis Report
+              </button>
+              <button
+                onClick={() => navigate('/birth-time-rectification')}
+                className="btn-vedic-premium group bg-gradient-to-r from-saffron to-gold hover:from-saffron-light hover:to-gold-light"
+              >
+                <span className="mr-2">🔮</span>
+                Birth Time Rectification
               </button>
               <button
                 onClick={() => fetchAllAnalysisData()}

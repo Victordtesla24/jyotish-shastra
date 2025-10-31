@@ -241,6 +241,34 @@ const ChartPage = () => {
                   <span>View Analysis</span>
                 </span>
               </button>
+              <button
+                onClick={() => {
+                  // Save birth data to sessionStorage for BTR page
+                  try {
+                    const birthDataForBTR = {
+                      name: chartData?.birthData?.name || 'User',
+                      dateOfBirth: chartData?.birthData?.dateOfBirth,
+                      timeOfBirth: chartData?.birthData?.timeOfBirth,
+                      placeOfBirth: chartData?.birthData?.geocodingInfo?.formattedAddress || 'Unknown',
+                      latitude: chartData?.birthData?.latitude,
+                      longitude: chartData?.birthData?.longitude,
+                      timezone: chartData?.birthData?.timezone,
+                      chartId: chartData?.chartId
+                    };
+                    sessionStorage.setItem('birthDataForBTR', JSON.stringify(birthDataForBTR));
+                    navigate('/birth-time-rectification');
+                  } catch (error) {
+                    console.error('Failed to save data for BTR:', error);
+                    navigate('/birth-time-rectification');
+                  }
+                }}
+                className="btn-primary px-8 py-3 bg-gradient-to-r from-saffron to-gold text-white hover:shadow-celestial hover:-translate-y-1 transition-all duration-300 rounded-xl font-cinzel font-medium"
+              >
+                <span className="flex items-center justify-center space-x-2">
+                  <span>🕉️</span>
+                  <span>BTR Analysis</span>
+                </span>
+              </button>
             </div>
 
             {/* Sacred Divider */}

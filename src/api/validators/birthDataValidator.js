@@ -33,7 +33,7 @@ const latitudeSchema = Joi.number()
   .min(-90)
   .max(90)
   .precision(6)
-  .required()
+  .optional()
   .messages({
     'number.base': 'Latitude must be a number',
     'number.min': 'Latitude must be between -90 and 90 degrees',
@@ -46,7 +46,7 @@ const longitudeSchema = Joi.number()
   .min(-180)
   .max(180)
   .precision(6)
-  .required()
+  .optional()
   .messages({
     'number.base': 'Longitude must be a number',
     'number.min': 'Longitude must be between -180 and 180 degrees',
@@ -62,7 +62,7 @@ const timezoneSchema = Joi.alternatives().try(
   Joi.string().pattern(/^[+-](0?[0-9]|1[0-4]):[0-5][0-9]$/),
   // UTC/GMT
   Joi.string().valid('UTC', 'GMT')
-).required().messages({
+).optional().messages({
   'alternatives.match': 'Timezone must be in IANA format (e.g., Asia/Kolkata) or UTC offset format (±HH:MM) or UTC/GMT',
   'any.required': 'Timezone is required'
 });
@@ -347,6 +347,106 @@ const rectificationSchema = Joi.object({
     endMinutes: Joi.number().min(-120).max(120).default(30),
     stepMinutes: Joi.number().min(1).max(15).default(5)
   }).optional()
+});
+
+/**
+ * Analysis schema for all analysis endpoints, with name being optional.
+ * Moved above rectification schemas to avoid temporal dead zone.
+ */
+const analysisRequiredSchema = Joi.object({
+  name: nameSchema.optional(),
+  dateOfBirth: dateSchema,
+  timeOfBirth: timeSchema,
+  latitude: latitudeSchema.optional(),
+  longitude: longitudeSchema.optional(),
+  timezone: timezoneSchema.optional(),
+  placeOfBirth: Joi.alternatives().try(
+    Joi.object({
+      name: placeNameSchema.optional(),
+      latitude: latitudeSchema,
+      longitude: longitudeSchema,
+      timezone: timezoneSchema,
+      country: Joi.string().max(50).optional(),
+      state: Joi.string().max(50).optional()
+    }),
+    Joi.string().min(2).max(100)
+  ).optional(),
+  gender: genderSchema.optional(),
+  calculationSettings: Joi.object({
+    ayanamsa: ayanamsaSchema,
+    chartStyle: chartStyleSchema,
+    houseSystem: Joi.string()
+      .valid('placidus', 'koch', 'equal', 'whole_sign', 'campanus', 'regiomontanus')
+      .default('placidus'),
+    coordinateSystem: Joi.string()
+      .valid('tropical', 'sidereal')
+      .default('sidereal')
+  }).optional()
+}).custom((value, helpers) => {
+  const hasTopLevelCoordinates = value.latitude && value.longitude;
+  const hasNestedCoordinates = value.placeOfBirth && typeof value.placeOfBirth === 'object' && value.placeOfBirth.latitude && value.placeOfBirth.longitude;
+  const hasPlaceString = value.placeOfBirth && typeof value.placeOfBirth === 'string';
+
+  // Basic validation: require at least some location information
+  if (!hasTopLevelCoordinates && !hasNestedCoordinates && !hasPlaceString) {
+    return helpers.error('custom.multifield', {
+      errors: [
+        { field: 'location', message: 'Location is required - provide coordinates or place name' }
+      ]
+    });
+  }
+
+  return value;
+}).messages({
+  'custom.multifield': 'Either coordinates (latitude, longitude) or place of birth information must be provided'
+});
+
+/**
+ * BTR: Rectification Analyze request schema
+ * Accepts either nested placeOfBirth or top-level lat/long/timezone via analysisRequiredSchema
+ */
+const rectificationAnalyzeRequestSchema = Joi.object({
+  birthData: analysisRequiredSchema.required(),
+  options: Joi.object({
+    methods: Joi.array()
+      .items(Joi.string().valid('praanapada', 'moon', 'gulika', 'events'))
+      .default(['praanapada', 'moon', 'gulika']),
+    lifeEvents: Joi.array()
+      .items(Joi.object({
+        date: Joi.date().required(),
+        description: Joi.string().min(3).max(200).required()
+      }))
+      .default([]),
+    timeRange: Joi.object({ hours: Joi.number().min(1).max(6).default(2) })
+  }).default({})
+});
+
+/**
+ * BTR: Rectification With Events schema
+ */
+const rectificationWithEventsRequestSchema = Joi.object({
+  birthData: analysisRequiredSchema.required(),
+  lifeEvents: Joi.array()
+    .items(Joi.object({
+      date: Joi.date().required(),
+      description: Joi.string().min(3).max(200).required()
+    }))
+    .min(1)
+    .required(),
+  options: Joi.object({
+    methods: Joi.array()
+      .items(Joi.string().valid('praanapada', 'moon', 'gulika', 'events'))
+      .default(['praanapada', 'moon', 'gulika', 'events']),
+    timeRange: Joi.object({ hours: Joi.number().min(1).max(6).default(2) })
+  }).default({})
+});
+
+/**
+ * BTR: Quick validation schema (fast but production-grade checks)
+ */
+const rectificationQuickRequestSchema = Joi.object({
+  birthData: analysisRequiredSchema.required(),
+  proposedTime: timeSchema.required()
 });
 
 /**
@@ -1095,59 +1195,188 @@ function generateValidationSuggestions(errorDetails) {
   return [...new Set(suggestions)]; // Remove duplicates
 }
 
+// (moved above)
+
 /**
- * Analysis schema for all analysis endpoints, with name being optional.
+ * NEW: Enhanced schemas for BPHS-BTR features
  */
-const analysisRequiredSchema = Joi.object({
-  name: nameSchema.optional(), // Name is explicitly optional for all analysis endpoints
-  dateOfBirth: dateSchema,
-  timeOfBirth: timeSchema,
-  latitude: latitudeSchema.optional(),
-  longitude: longitudeSchema.optional(),
-  timezone: timezoneSchema.optional(),
-  placeOfBirth: Joi.alternatives().try(
-    // Nested format
-    Joi.object({
-      name: placeNameSchema.optional(),
-      latitude: latitudeSchema,
-      longitude: longitudeSchema,
-      timezone: timezoneSchema,
-      country: Joi.string().max(50).optional(),
-      state: Joi.string().max(50).optional()
-    }),
-    // String format
-    Joi.string().min(2).max(100)
-  ).optional(),
-  gender: genderSchema.optional(),
-  calculationSettings: Joi.object({
-    ayanamsa: ayanamsaSchema,
-    chartStyle: chartStyleSchema,
-    houseSystem: Joi.string()
-      .valid('placidus', 'koch', 'equal', 'whole_sign', 'campanus', 'regiomontanus')
-      .default('placidus'),
-    coordinateSystem: Joi.string()
-      .valid('tropical', 'sidereal')
-      .default('sidereal')
+
+// BTR: Hora Analysis Request Schema
+const horaAnalysisRequestSchema = Joi.object({
+  birthData: analysisRequiredSchema.required(),
+  options: Joi.object({
+    includeDetailedAnalysis: Joi.boolean().default(false),
+    includeRecommendations: Joi.boolean().default(true),
+    validateByBPHSStandards: Joi.boolean().default(true)
+  }).default({})
+});
+
+// BTR: Shashtiamsa/Times Division Verification Request Schema
+const shashtiamsaVerificationRequestSchema = Joi.object({
+  birthData: analysisRequiredSchema.required(),
+  timeCandidates: Joi.array()
+    .items(Joi.object({
+      time: timeSchema.required(),
+      score: Joi.number().optional(),
+      source: Joi.string().max(50).optional()
+    }))
+    .min(1)
+    .max(100)
+    .required(),
+  options: Joi.object({
+    includeGhatiAnalysis: Joi.boolean().default(true),
+    includeVighatiAnalysis: Joi.boolean().default(true),
+    validatePrecision: Joi.boolean().default(true)
+  }).default({})
+});
+
+// BTR: Configuration Request Schema
+const configurationRequestSchema = Joi.object({
+  userOptions: Joi.object({
+    methodWeights: Joi.object({
+      praanapada: Joi.number().min(0).max(1).default(0.4),
+      moon: Joi.number().min(0).max(1).default(0.3),
+      gulika: Joi.number().min(0).max(1).default(0.2),
+      events: Joi.number().min(0).max(1).default(0.1),
+      hora: Joi.number().min(0).max(1).default(0).optional(),
+      timeDivisions: Joi.number().min(0).max(1).default(0).optional(),
+      conditionalDashas: Joi.number().min(0).max(1).default(0).optional()
+    }).optional(),
+    thresholds: Joi.object({
+      confidence: Joi.object({
+        high: Joi.number().min(0).max(100).default(80),
+        moderate: Joi.number().min(0).max(100).default(60),
+        low: Joi.number().min(0).max(100).default(40)
+      }).optional(),
+      alignmentScore: Joi.number().min(0).max(100).default(50),
+      correlationScore: Joi.number().min(0).max(100).default(40),
+      methodConsistency: Joi.number().min(0).max(100).default(70)
+    }).optional(),
+    preset: Joi.string().valid('strict', 'balanced', 'relaxed', 'enhanced').optional(),
+    validationRules: Joi.object({
+      requireMinimumMethods: Joi.number().integer().min(1).max(10).default(2),
+      allowZeroWeight: Joi.boolean().default(false),
+      enforceWeightSum: Joi.boolean().default(true)
+    }).optional()
+  }).optional(),
+  context: Joi.string().valid('general', 'detailed', 'preliminary', 'research', 'staging', 'development', 'production').default('general')
+});
+
+// BTR: Enhanced Rectification Request Schema (for conditional dasha correlation)
+const rectificationEnhancedRequestSchema = Joi.object({
+  birthData: analysisRequiredSchema.required(),
+  lifeEvents: Joi.array()
+    .items(Joi.object({
+      date: Joi.date().required(),
+      description: Joi.string().min(3).max(500).required(),
+      importance: Joi.string().valid('high', 'medium', 'low').default('medium'),
+      category: Joi.string().optional(),
+      subcategory: Joi.string().optional()
+    }))
+    .min(1)
+    .max(50)
+    .required(),
+  options: Joi.object({
+    methods: Joi.array()
+      .items(Joi.string().valid('praanapada', 'moon', 'gulika', 'events', 'conditionalDashas', 'enhancedEvents'))
+      .default(['praanapada', 'moon', 'gulika', 'events', 'conditionalDashas']),
+    includeEventClassification: Joi.boolean().default(true),
+    includeDushaAnalysis: Joi.boolean().default(true),
+    detailedEventCorrelation: Joi.boolean().default(true),
+    correlationThreshold: Joi.number().min(0).max(100).default(50)
+  }).default({})
+});
+
+// BTR: Configuration Update Schema
+const btrConfigurationUpdateSchema = Joi.object({
+  birthData: analysisRequiredSchema.required(),
+  configuration: Joi.object({
+    methodWeights: Joi.object({
+      praanapada: Joi.number().min(0).max(1).default(0.4),
+      moon: Joi.number().min(0).max(1).default(0.3),
+      gulika: Joi.number().min(0).max(1).default(0.2),
+      events: Joi.number().min(0).max(1).default(0.1),
+      hora: Joi.number().min(0).max(1).default(0),
+      timeDivisions: Joi.number().min(0).max(1).default(0),
+      conditionalDashas: Joi.number().min(0).max(1).default(0)
+    }).optional(),
+    thresholds: Joi.object({
+      confidence: Joi.object({
+        high: Joi.number().min(0).max(100).default(80),
+        moderate: Joi.number().min(0).max(100).default(60),
+        low: Joi.number().min(0).max(100).default(40)
+      }).optional(),
+      alignmentScore: Joi.number().min(0).max(100).default(50),
+      correlationScore: Joi.number().min(0).max(100).default(40),
+      methodConsistency: Joi.number().min(0).max(100).default(70)
+    }).optional(),
+    preset: Joi.string().valid('strict', 'balanced', 'relaxed', 'enhanced').optional(),
+    validationRules: Joi.object({
+      requireMinimumMethods: Joi.number().integer().min(1).max(10).default(2),
+      allowZeroWeight: Joi.boolean().default(false),
+      enforceWeightSum: Joi.boolean().default(true)
+    }).optional()
+  }).required()
+});
+
+// BTR: Enhanced Analyze Request Schema
+const rectificationEnhancedAnalyzeRequestSchema = Joi.object({
+  birthData: analysisRequiredSchema.required(),
+  options: Joi.object({
+    methods: Joi.array()
+      .items(Joi.string().valid(
+        'praanapada', 'moon', 'gulika', 'events', 
+        'hora', 'timeDivisions', 'divisionalCharts', 
+        'enhancedEvents', 'conditionalDashas'
+      ))
+      .default(['praanapada', 'moon', 'gulika']),
+    includeDivisionalCharts: Joi.boolean().default(false),
+    enableEnhancedFeatures: Joi.boolean().default(false),
+    configuration: Joi.object({
+    methodWeights: Joi.object({
+      praanapada: Joi.number().min(0).max(1).default(0.4),
+      moon: Joi.number().min(0).max(1).default(0.3),
+      gulika: Joi.number().min(0).max(1).default(0.2),
+      events: Joi.number().min(0).max(1).default(0.1),
+      hora: Joi.number().min(0).max(1).default(0),
+      timeDivisions: Joi.number().min(0).max(1).default(0),
+      conditionalDashas: Joi.number().min(0).max(1).default(0)
+    }).optional(),
+    thresholds: Joi.object({
+      confidence: Joi.object({
+        high: Joi.number().min(0).max(100).default(80),
+        moderate: Joi.number().min(0).max(100).default(60),
+        low: Joi.number().min(0).max(100).default(40)
+      }).optional(),
+      alignmentScore: Joi.number().min(0).max(100).default(50),
+      correlationScore: Joi.number().min(0).max(100).default(40),
+      methodConsistency: Joi.number().min(0).max(100).default(70)
+    }).optional(),
+    preset: Joi.string().valid('strict', 'balanced', 'relaxed', 'enhanced').optional(),
+    validationRules: Joi.object({
+      requireMinimumMethods: Joi.number().integer().min(1).max(10).default(2),
+      allowZeroWeight: Joi.boolean().default(false),
+      enforceWeightSum: Joi.boolean().default(true)
+    }).optional()
   }).optional()
-}).custom((value, helpers) => {
-  // PRODUCTION-GRADE: Ensure either coordinates or place information is provided
-  const hasTopLevelCoordinates = value.latitude && value.longitude;
-  const hasNestedCoordinates = value.placeOfBirth && typeof value.placeOfBirth === 'object' && value.placeOfBirth.latitude && value.placeOfBirth.longitude;
-  const hasPlaceString = value.placeOfBirth && typeof value.placeOfBirth === 'string';
+  }).default({})
+});
 
-  if (!hasTopLevelCoordinates && !hasNestedCoordinates && !hasPlaceString) {
-    return helpers.error('custom.multifield', {
-      errors: [
-        { field: 'latitude', message: 'Latitude is required when place information is not provided' },
-        { field: 'longitude', message: 'Longitude is required when place information is not provided' },
-        { field: 'timezone', message: 'Timezone is required for accurate calculations' }
-      ]
-    });
-  }
-
-  return value;
-}).messages({
-  'custom.multifield': 'Either coordinates (latitude, longitude) or place of birth information must be provided'
+// BTR: Batch Event Classification Schema
+const batchEventClassificationSchema = Joi.object({
+  events: Joi.array()
+    .items(Joi.object({
+      description: Joi.string().min(3).max(500).required(),
+      date: Joi.date().required()
+    }))
+    .min(1)
+    .max(100)
+    .required(),
+  options: Joi.object({
+    includeConfidenceScores: Joi.boolean().default(true),
+    includeBPHSAlignment: Joi.boolean().default(true),
+    detailedClassification: Joi.boolean().default(false)
+  }).default({})
 });
 
 export {
@@ -1170,4 +1399,18 @@ export {
   comprehensiveAnalysisSchema,
   birthDataValidationSchema,
   analysisRequiredSchema
+  ,
+  // BTR specific request schemas (existing)
+  rectificationAnalyzeRequestSchema,
+  rectificationWithEventsRequestSchema,
+  rectificationQuickRequestSchema,
+  
+  // NEW: Enhanced BPHS-BTR request schemas
+  horaAnalysisRequestSchema,
+  shashtiamsaVerificationRequestSchema,
+  configurationRequestSchema,
+  rectificationEnhancedRequestSchema,
+  btrConfigurationUpdateSchema,
+  rectificationEnhancedAnalyzeRequestSchema,
+  batchEventClassificationSchema
 };

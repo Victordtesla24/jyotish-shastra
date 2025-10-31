@@ -21,7 +21,12 @@
     "format:chart": "prettier --write src/components/VedicChartDisplay.jsx",
     "vercel-build": "cd client && npm install && npm run build",
     "deploy:vercel": "node scripts/deploy-vercel.js",
-    "postinstall": "node -e \"try { require('swisseph') } catch(e) { console.log('Swisseph: optional module, skipping build') }\""
+    "postinstall": "node -e \"try { require('swisseph') } catch(e) { console.log('Swisseph: optional module, skipping build') }\"",
+    "test:summary": "node scripts/test-summary.js",
+    "test:summary-full": "node scripts/test-summary.js && open user-docs",
+    "test:comprehensive": "node scripts/comprehensive-test-summary.js",
+    "test:report": "bash scripts/generate-test-summary.sh",
+    "test:summary-simple": "bash scripts/test-summary-report.sh"
   },
   "dependencies": {
     "axios": "^1.10.0",

@@ -55,7 +55,7 @@ describe('ChartGenerationService', () => {
       // This is a placeholder test.
       // The actual implementation will require a more sophisticated test
       // with known inputs and expected outputs validated against astrological software.
-      const jd = chartGenerationService.calculateJulianDay(sampleBirthData.dateOfBirth, sampleBirthData.timeOfBirth, sampleBirthData.timeZone);
+      const jd = chartGenerationService.calculateJulianDay(sampleBirthData.dateOfBirth, sampleBirthData.timeOfBirth, sampleBirthData.timezone);
       const ascendant = await chartGenerationService.calculateAscendant(jd, sampleBirthData);
       expect(ascendant).toBeDefined();
       expect(ascendant).toHaveProperty('sign');
@@ -67,7 +67,7 @@ describe('ChartGenerationService', () => {
     it('should retrieve planetary positions accurately', async () => {
       // This is a placeholder test.
       // Actual testing would involve comparing results against a trusted ephemeris source.
-      const jd = chartGenerationService.calculateJulianDay(sampleBirthData.dateOfBirth, sampleBirthData.timeOfBirth, sampleBirthData.timeZone);
+      const jd = chartGenerationService.calculateJulianDay(sampleBirthData.dateOfBirth, sampleBirthData.timeOfBirth, sampleBirthData.timezone);
       const planets = await chartGenerationService.getPlanetaryPositions(jd);
       expect(planets).toBeDefined();
       // Check for planets object instead of length

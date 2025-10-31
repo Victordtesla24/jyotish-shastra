@@ -693,7 +693,11 @@ class TransitCalculator {
       }
     };
 
-    return coefficients[planet] || coefficients['mercury']; // Default fallback
+    if (!coefficients[planet]) {
+      throw new Error(`Invalid planet specified: ${planet}. Supported planets are: ${Object.keys(coefficients).join(', ')}`);
+    }
+    
+    return coefficients[planet];
   }
 
   /**

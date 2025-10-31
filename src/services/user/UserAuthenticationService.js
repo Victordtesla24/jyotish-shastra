@@ -471,8 +471,6 @@ class UserAuthenticationService {
       }
     } catch (error) {
       console.error('Error logging login attempt:', error);
-      // Fallback logging to ensure audit trail is maintained
-      this.fallbackLog(`LOGIN_ATTEMPT: User ${userId}, IP: ${ipAddress}, Success: ${success}, Time: ${new Date()}`);
     }
   }
 
@@ -500,8 +498,6 @@ class UserAuthenticationService {
 
     } catch (error) {
       console.error('Error logging logout:', error);
-      // Fallback logging to ensure audit trail is maintained
-      this.fallbackLog(`LOGOUT: User ${userId}, Time: ${new Date()}`);
     }
   }
 
@@ -611,7 +607,6 @@ class UserAuthenticationService {
       await SecurityAuditRepository.create(auditLog);
     } catch (error) {
       console.error('Error storing security log:', error);
-      this.fallbackLog(JSON.stringify(auditLog));
     }
   }
 
@@ -745,38 +740,7 @@ class UserAuthenticationService {
     } catch (error) {
       console.error('Error getting location from IP:', error);
 
-      // Fallback to alternative service if primary fails
-      try {
-        const fallbackResponse = await fetch(`https://ipinfo.io/${ipAddress}/json`, {
-          method: 'GET',
-          headers: {
-            'User-Agent': 'VedicAstrologyApp/1.0',
-            'Accept': 'application/json'
-          },
-          timeout: 5000
-        });
-
-        if (fallbackResponse.ok) {
-          const fallbackData = await fallbackResponse.json();
-          const [lat, lon] = (fallbackData.loc || '0,0').split(',').map(Number);
-
-          return {
-            country: fallbackData.country || 'Unknown',
-            region: fallbackData.region || 'Unknown',
-            city: fallbackData.city || 'Unknown',
-            latitude: lat || 0,
-            longitude: lon || 0,
-            isp: fallbackData.org || 'Unknown',
-            timezone: fallbackData.timezone || 'UTC',
-            country_code: fallbackData.country || 'XX',
-            region_code: fallbackData.region || 'XX'
-          };
-        }
-      } catch (fallbackError) {
-        console.error('Fallback geolocation service also failed:', fallbackError);
-      }
-
-      // Return minimal data if all services fail
+      // Return minimal data if service fails
       return {
         country: 'Unknown',
         region: 'Unknown',
@@ -799,33 +763,7 @@ class UserAuthenticationService {
     return require('crypto').randomBytes(32).toString('hex');
   }
 
-  /**
-   * Fallback logging method
-   * @param {string} message - Log message
-   */
-  fallbackLog(message) {
-    const logEntry = `[${new Date().toISOString()}] SECURITY_LOG: ${message}`;
-            // Only log in development mode to avoid cluttering test output
-        if (process.env.NODE_ENV === 'development') {
-            console.log(logEntry);
-        }
-
-    // In production, you might also want to write to a file or send to an external service
-    try {
-      const fs = require('fs');
-      const path = require('path');
-      const logDir = path.join(process.cwd(), 'logs');
-      const logFile = path.join(logDir, 'security-audit.log');
-
-      if (!fs.existsSync(logDir)) {
-        fs.mkdirSync(logDir, { recursive: true });
-      }
-
-      fs.appendFileSync(logFile, logEntry + '\n');
-    } catch (fileError) {
-      console.error('Error writing to fallback log file:', fileError);
-    }
-  }
+  
 
   /**
    * Store in blacklist cache/database

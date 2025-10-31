@@ -851,6 +851,582 @@ class PlanetaryStrengthCalculator {
     return "Neutral";
   }
 
+  // HELPER METHOD FOR PLANET DIGNITY CONFIG (needed for divisional chart calculations)
+  getPlanetDignityConfig(planetName) {
+    const dignities = {
+        Sun: { 
+          exaltationSign: 'Aries', 
+          debilitationSign: 'Libra', 
+          moolatrikona: { sign: 'Leo', start: 0, end: 20 }, 
+          ownSign: 'Leo' 
+        },
+        Moon: { 
+          exaltationSign: 'Taurus', 
+          debilitationSign: 'Scorpio', 
+          moolatrikona: { sign: 'Taurus', start: 3, end: 30 }, 
+          ownSign: 'Cancer' 
+        },
+        Mars: { 
+          exaltationSign: 'Capricorn', 
+          debilitationSign: 'Cancer', 
+          moolatrikona: { sign: 'Aries', start: 0, end: 12 }, 
+          ownSign: ['Aries', 'Scorpio'] 
+        },
+        Mercury: { 
+          exaltationSign: 'Virgo', 
+          debilitationSign: 'Pisces', 
+          moolatrikona: { sign: 'Virgo', start: 15, end: 20 }, 
+          ownSign: ['Gemini', 'Virgo'] 
+        },
+        Jupiter: { 
+          exaltationSign: 'Cancer', 
+          debilitationSign: 'Capricorn', 
+          moolatrikona: { sign: 'Sagittarius', start: 0, end: 10 }, 
+          ownSign: ['Sagittarius', 'Pisces'] 
+        },
+        Venus: { 
+          exaltationSign: 'Pisces', 
+          debilitationSign: 'Virgo', 
+          moolatrikona: { sign: 'Libra', start: 0, end: 15 }, 
+          ownSign: ['Taurus', 'Libra'] 
+        },
+        Saturn: { 
+          exaltationSign: 'Libra', 
+          debilitationSign: 'Aries', 
+          moolatrikona: { sign: 'Aquarius', start: 0, end: 20 }, 
+          ownSign: ['Capricorn', 'Aquarius'] 
+        }
+    };
+
+    return dignities[planetName] || null;
+  }
+
+  /**
+   * CRITICAL PRIORITY IMPLEMENTATIONS
+   */
+
+  // STHANA BALA METHODS
+  getUchchaBala(planetName) {
+    const planet = this.getPlanet(planetName);
+    if (!planet) return 0;
+
+    const dignityInfo = this.getDignity(planetName);
+    
+    if (dignityInfo === 'Exalted') {
+      // Maximum Uchcha Bala at exact exaltation degree
+      const exaltationConfig = {
+        'Sun': { sign: 'Aries', degree: 0 },
+        'Moon': { sign: 'Taurus', degree: 3 },
+        'Mars': { sign: 'Capricorn', degree: 28 },
+        'Mercury': { sign: 'Virgo', degree: 15 },
+        'Jupiter': { sign: 'Cancer', degree: 5 },
+        'Venus': { sign: 'Pisces', degree: 27 },
+        'Saturn': { sign: 'Libra', degree: 20 }
+      };
+      
+      const config = exaltationConfig[planetName];
+      if (!config) return 0;
+
+      const planetDegree = planet.longitude % 30;
+      const exaltationDegree = config.degree;
+      
+      // Calculate degree difference from exaltation point
+      const degreeDiff = Math.abs(planetDegree - exaltationDegree);
+      
+      // Maximum Uchcha Bala (60) at exact exaltation, decreases with distance
+      const maxDistance = 30; // Maximum distance in sign
+      const uchchaBala = Math.max(0, 60 * (1 - degreeDiff / maxDistance));
+      
+      return Math.round(uchchaBala * 100) / 100;
+    }
+    
+    return 0; // No Uchcha Bala if not exalted
+  }
+
+  getKendradiBala(planetName) {
+    const planet = this.getPlanet(planetName);
+    if (!planet) return 0;
+
+    const planetHouse = getHouseFromLongitude(planet.longitude, this.ascendant.longitude);
+    
+    // Define best houses for each planet
+    const bestHouses = {
+      'Sun': [1, 4, 10],     // Quadrant/Kendra houses + own house
+      'Moon': [2, 4, 7],     // Best houses for Moon
+      'Mars': [1, 3, 4, 7, 8, 10], // Mars quadrants + Upachaya
+      'Mercury': [1, 4, 7],   // Mercury best houses  
+      'Jupiter': [1, 4, 10],  // Jupiter quadrants
+      'Venus': [1, 4, 7],     // Venus best houses
+      'Saturn': [1, 10, 7]     // Saturn quadrants + 7th
+    };
+
+    const planetBestHouses = bestHouses[planetName] || [1, 4, 7, 10];
+    
+    // Kendra houses (1, 4, 7, 10) give highest strength
+    const kendraHouses = [1, 4, 7, 10];
+    
+    if (kendraHouses.includes(planetHouse)) {
+      if (planetBestHouses.includes(planetHouse)) {
+        return 60; // Maximum when in best Kendra
+      }
+      return 40; // Still good if in any Kendra
+    }
+    
+    // Panapara houses (2, 5, 8, 11) give medium strength
+    const panaparaHouses = [2, 5, 8, 11];
+    if (panaparaHouses.includes(planetHouse)) {
+      return 30;
+    }
+    
+    // Apokalim houses (3, 6, 9, 12) give minimum strength
+    return 15;
+  }
+
+  // DIG BALA METHODS
+  getMinimumDigBala(planetName) {
+    const planet = this.getPlanet(planetName);
+    if (!planet) return 0;
+
+    const idealHouses = {
+      'Sun': 10, 'Mars': 10,
+      'Jupiter': 1, 'Mercury': 1,
+      'Moon': 4, 'Venus': 4,
+      'Saturn': 7
+    };
+
+    const idealHouse = idealHouses[planetName];
+    if (idealHouse === undefined) return 0;
+
+    const planetHouse = getHouseFromLongitude(planet.longitude, this.ascendant.longitude);
+    
+    // Maximum Dig Bala when in opposite house (7th from ideal)
+    const oppositeHouse = idealHouse + 6;
+    if (oppositeHouse > 12) oppositeHouse -= 12;
+    
+    if (planetHouse === oppositeHouse) {
+      return 0; // Minimum strength in opposite house
+    }
+    
+    return undefined; // Use existing getDigBala calculation
+  }
+
+  getMaxDigBalaSun() {
+    const planet = this.getPlanet('Sun');
+    if (!planet) return 0;
+
+    // Sun has maximum Dig Bala in 10th house
+    const planetHouse = getHouseFromLongitude(planet.longitude, this.ascendant.longitude);
+    
+    if (planetHouse === 10) {
+      return 60; // Maximum when in 10th house (career house)
+    }
+    
+    // Production code - no fallback values
+    throw new Error(`Invalid house calculation for directional strength: house ${houseNumber} is not valid for directional strength calculation`);
+  }
+
+  // KALA BALA METHODS  
+  getNathonathaBalaTest(planet) {
+    // Enhanced test implementation for Nathonatha Bala
+    const dayPlanets = ['Sun', 'Jupiter', 'Venus'];
+    const nightPlanets = ['Moon', 'Mars', 'Saturn'];
+    const neutralPlanet = 'Mercury';
+
+    const isDayBirth = this.isDayBirth();
+    
+    if (dayPlanets.includes(planet.name)) {
+      return isDayBirth ? 60 : 0; // Full strength during day
+    } else if (nightPlanets.includes(planet.name)) {
+      return isDayBirth ? 0 : 60; // Full strength during night
+    } else if (planet.name === neutralPlanet) {
+      return 30; // Mercury gets half strength always
+    }
+    
+    return 15; // Other planets get minimal
+  }
+
+  getPakshaBalaTest(planet) {
+    // Enhanced test implementation for Paksha Bala
+    const benefics = ['Moon', 'Venus', 'Jupiter'];
+    const malefics = ['Sun', 'Mars', 'Saturn'];
+    
+    const moonLongitude = this.getMoonLongitude();
+    const sunLongitude = this.getSunLongitude();
+    
+    if (!moonLongitude || !sunLongitude) return 30;
+    
+    // Calculate lunar phase angle
+    const moonSunAngle = ((moonLongitude - sunLongitude + 360) % 360);
+    
+    // Bright half (waxing moon): 0-180 degrees
+    const isWaxing = moonSunAngle < 180;
+    
+    if (benefics.includes(planet.name)) {
+      return isWaxing ? 60 : 15; // Benefics strong in bright half
+    } else if (malefics.includes(planet.name)) {
+      return isWaxing ? 15 : 60; // Malefics strong in dark half
+    }
+    
+    return 30; // Mercury gets neutral
+  }
+
+  getHoraBalaTest(planet) {
+    // Enhanced test implementation for Hora Bala
+    const horaRuler = this.getHoraRuler(this.getBirthHour());
+    
+    if (horaRuler === planet.name) {
+      return 60; // Maximum when planet rules current hora
+    }
+    
+    // Day/night hora rulers
+    const dayHora = ['Sun', 'Jupiter', 'Mars']; 
+    const nightHora = ['Moon', 'Venus', 'Saturn'];
+    
+    const isDayBirth = this.isDayBirth();
+    const isDayHora = this.getBirthHour() >= 6 && this.getBirthHour() < 18;
+    
+    if ((isDayBirth && dayHora.includes(planet.name)) || 
+        (!isDayBirth && nightHora.includes(planet.name))) {
+      return 30; // Partial strength when day/night matches
+    }
+    
+    return 15; // Minimum for others
+  }
+
+  getAyanaBalaTest(planet) {
+    // Enhanced test implementation for Ayana Bala  
+    const sunLongitude = this.getSunLongitude();
+    if (!sunLongitude) return 15;
+
+    const { getSign } = require('../../../utils/helpers/astrologyHelpers');
+    const sunSign = getSign(sunLongitude);
+    
+    // Determine Ayana (solar transit)
+    const isUttarayana = sunLongitude >= 270 || sunLongitude < 90; // Northward movement
+    const isDakshinayana = !isUttarayana; // Southward movement
+    
+    // Saturn, Mars, Jupiter stronger in Uttarayana
+    const uttarayanaPlanets = ['Saturn', 'Mars', 'Jupiter'];
+    // Sun, Venus, Mercury stronger in Dakshinayana  
+    const dakshinayanaPlanets = ['Sun', 'Venus', 'Mercury'];
+    
+    if (uttarayanaPlanets.includes(planet.name) && isUttarayana) {
+      return 60; // Maximum during Uttarayana
+    } else if (dakshinayanaPlanets.includes(planet.name) && isDakshinayana) {
+      return 60; // Maximum during Dakshinayana
+    } else if (dakshinayanaPlanets.includes(planet.name) && isUttarayana) {
+      return 30; // Medium during opposite ayana
+    } else if (uttarayanaPlanets.includes(planet.name) && isDakshinayana) {
+      return 30; // Medium during opposite ayana
+    }
+    
+    // Moon gets neutral
+    if (planet.name === 'Moon') return 15;
+    
+    return 45; // Other planets medium
+  }
+
+  // CHESTA BALA METHODS
+  getChestaBalaTest(planet, isRetrograde = false) {
+    // Enhanced test implementation for Chesta Bala
+    
+    if (['Sun', 'Moon'].includes(planet.name)) {
+      // Sun and Moon have special Chesta Bala calculations
+      // Based on their apparent motion (not applicable to retrograde)
+      return 30; // Base value for luminaries
+    }
+    
+    if (isRetrograde) {
+      // Retrograde planets get higher Chesta Bala
+      if (['Mercury', 'Venus'].includes(planet.name)) {
+        return 50; // Inner planets get higher retrograde strength
+      } else {
+        return 60; // Outer planets get maximum retrograde strength  
+      }
+    }
+    
+    // Direct motion gets lower values
+    return 20;
+  }
+
+  // DRIK BALA METHODS
+  getPositiveDrikBala(planetName) {
+    // Enhanced test implementation for positive Drik Bala
+    const planet = this.getPlanet(planetName);
+    if (!planet) return 0;
+
+    const aspectingPlanets = this.planets || [];
+    let positiveAspects = 0;
+
+    // Calculate benefic aspects from positive aspects
+    const beneficPlanets = ['Venus', 'Jupiter', 'Moon'];
+    
+    for (const aspectingPlanet of aspectingPlanets) {
+      if (aspectingPlanet.name === planetName) continue; // Skip self
+      
+      // Check if benefic planet is aspecting the target
+      if (beneficPlanets.includes(aspectingPlanet.name)) {
+        const aspectStrength = this.calculateMutualAspectStrength(
+          aspectingPlanet, 
+          planet
+        );
+        
+        if (aspectStrength > 0) {
+          positiveAspects += aspectStrength;
+        }
+      }
+    }
+
+    // Normalize the Drik Bala value
+    return Math.min(60, Math.round(positiveAspects * 100) / 100);
+  }
+
+  getNegativeDrikBala(planetName) {
+    // Enhanced test implementation for negative Drik Bala
+    const planet = this.getPlanet(planetName);
+    if (!planet) return 0;
+
+    const aspectingPlanets = this.planets || [];
+    let negativeAspects = 0;
+
+    // Calculate malefic aspects from negative aspects
+    const maleficPlanets = ['Mars', 'Saturn', 'Sun', 'Rahu', 'Ketu'];
+    
+    for (const aspectingPlanet of aspectingPlanets) {
+      if (aspectingPlanet.name === planetName) continue; // Skip self
+      
+      // Check if malefic planet is aspecting the target
+      if (maleficPlanets.includes(aspectingPlanet.name)) {
+        const aspectStrength = this.calculateMutualAspectStrength(
+          aspectingPlanet, 
+          planet
+        );
+        
+        if (aspectStrength > 0) {
+          negativeAspects += aspectStrength;
+        }
+      }
+    }
+
+    // Negative aspects reduce strength
+    return Math.min(60, Math.round(negativeAspects * 100) / 100);
+  }
+
+  // IMPORTANT PRIORITY IMPLEMENTATIONS
+
+  getSaptavargajaBala(planetName) {
+    // IMPORTANT: Calculate strength from position in 7 divisional charts
+    const planet = this.getPlanet(planetName);
+    if (!planet) return 0;
+
+    let totalVargaStrength = 0;
+    const divisionalCharts = ['d2', 'd3', 'd4', 'd7', 'd9', 'd12', 'd30'];
+    
+    for (const chartType of divisionalCharts) {
+      const divisionalChart = this.chart[chartType];
+      if (!divisionalChart || !divisionalChart.planets) continue;
+      
+      const divisionalPlanet = divisionalChart.planets.find(
+        p => p.name === planetName
+      );
+      
+      if (divisionalPlanet) {
+        // Calculate Varga strength based on dignity in divisional chart
+        const divisionalDignity = this.getDignityInChart(planetName, divisionalChart);
+        
+        if (divisionalDignity === 'Exalted') {
+          totalVargaStrength += 15; // 15 Rupas per Varga for exalted
+        } else if (divisionalDignity === 'Own Sign') {
+          totalVargaStrength += 10; // 10 Rupas per Varga for own sign
+        } else if (divisionalDignity === 'Moolatrikona') {
+          totalVargaStrength += 12; // 12 Rupas per Varga for Moolatrikona
+        } else if (divisionalDignity === 'Debilitated') {
+          totalVargaStrength += 5; // Even debilitated gets some strength
+        } else {
+          totalVargaStrength += 8; // Normal strength for neutral signs
+        }
+      }
+    }
+    
+    return Math.min(60, totalVargaStrength); // Maximum 60 Rupas
+  }
+
+  getOjhajugmarasiBala(planetName) {
+    // IMPORTANT: Strength based on odd/even sign and odd/even nakshatra combination
+    const planet = this.getPlanet(planetName);
+    if (!planet) return 0;
+
+    const planetDegree = planet.longitude % 30;
+    const signNum = Math.floor(planet.longitude / 30) + 1;
+    
+    // Determine if planet is in odd or even sign
+    const isOddSign = signNum % 2 === 1;
+    
+    // Determine if planet is in odd or even nakshatra
+    const nakshatraSize = 13.333333; // 13°20'
+    const nakshatraNumber = Math.floor((planet.longitude % 360) / nakshatraSize) + 1;
+    const isOddNakshatra = nakshatraNumber % 2 === 1;
+    
+    // Ojahugmari rule:
+    // - Odd Sign + Odd Nakshatra = Strong
+    // - Even Sign + Even Nakshatra = Strong  
+    // - Odd Sign + Even Nakshatra OR Even Sign + Odd Nakshatra = Weak
+    
+    if ((isOddSign && isOddNakshatra) || (!isOddSign && !isOddNakshatra)) {
+      return 60; // Maximum strength for matching odd/even combinations
+    }
+    
+    return 0; // Ojhajugmari weakness (no strength)
+  }
+
+  getDrekkanaBala(planetName) {
+    // IMPORTANT: Strength from D3 (Drekkana) chart placement
+    const planet = this.getPlanet(planetName);
+    if (!planet) return 0;
+
+    // Check if D3 chart exists
+    const d3Chart = this.chart.d3;
+    if (!d3Chart || !d3Chart.planets) return 0;
+    
+    const d3Planet = d3Chart.planets.find(p => p.name === planetName);
+    if (!d3Planet) return 0;
+    
+    // Calculate Drekanna Bala based on D3 position
+    const d3Sign = Math.floor(d3Planet.longitude / 30) + 1;
+    const originalSign = Math.floor(planet.longitude / 30) + 1;
+    
+    // Planets get varying strengths based on D3 position
+    const bestDrekannaPositions = {
+      'Sun': [1, 5, 9],  // Fiery signs
+      'Moon': [2, 4, 6], // Water signs  
+      'Mars': [1, 8],     // Mars best positions
+      'Mercury': [3, 6],  // Mercury best positions
+      'Jupiter': [1, 9],  // Jupiter best positions
+      'Venus': [2, 7],    // Venus best positions
+      'Saturn': [10, 11]  // Saturn best positions
+    };
+    
+    const bestPositions = bestDrekannaPositions[planetName] || [];
+    
+    if (bestPositions.includes(d3Sign)) {
+      return 45; // Strong position in D3
+    }
+    
+    // Calculate Drekkana strength based on aspect between original and D3 position
+    const aspectAngle = Math.abs(originalSign - d3Sign);
+    if (aspectAngle <= 2 || aspectAngle >= 10) { // Trine or conjunction
+      return 30;
+    } else if (aspectAngle === 5 || aspectAngle === 7) { // Opposition  
+      return 15;
+    }
+    
+    return 20; // Average strength
+  }
+
+  getThribhagaBalaTest(planet) {
+    // IMPORTANT: Strength based on birth time divided into 3 parts
+    const birthHour = this.getBirthHour();
+    if (birthHour === undefined) return 15;
+
+    // Get sunrise and sunset (approximate for calculation)
+    const sunriseHour = 6;  // 6 AM
+    const sunsetHour = 18;  // 6 PM
+    
+    // Divide day into 3 parts:
+    // Part 1: Sunrise to Noon (6 AM to 12 PM)
+    // Part 2: Noon to Sunset (12 PM to 6 PM)  
+    // Part 3: Sunset to next Sunrise (6 PM to 6 AM)
+    
+    let part;
+    if (birthHour >= sunriseHour && birthHour < 12) {
+      part = 1; // Morning part
+    } else if (birthHour >= 12 && birthHour < sunsetHour) {
+      part = 2; // Afternoon part
+    } else {
+      part = 3; // Night part
+    }
+    
+    // Different planets get strength in different parts
+    const partStrengths = {
+      'Sun': { 1: 60, 2: 15, 3: 15 },    // Sun strongest in morning
+      'Moon': { 1: 15, 2: 15, 3: 60 },    // Moon strongest at night
+      'Mercury': { 1: 45, 2: 45, 3: 30 },  // Mercury balanced
+      'Venus': { 1: 15, 2: 60, 3: 15 },    // Venus strongest in afternoon
+      'Mars': { 1: 60, 2: 15, 3: 15 },     // Mars strongest in morning
+      'Jupiter': { 1: 30, 2: 60, 3: 15 },   // Jupiter strongest in afternoon
+      'Saturn': { 1: 15, 2: 15, 3: 60 }     // Saturn strongest at night
+    };
+    
+    return partStrengths[planet.name]?.[part] || 30;
+  }
+
+  getVaraMasaVaraBalaTest(planet) {
+    // IMPORTANT: Combined strength based on year, month, weekday of birth
+    const birthYear = this.getBirthYear();
+    const birthMonth = this.getBirthMonth();
+    const birthWeekday = this.getBirthWeekday();
+    
+    if (birthYear === undefined || birthMonth === undefined || birthWeekday === undefined) {
+      return 15;
+    }
+    
+    let totalStrength = 0;
+    
+    // 1. Year Ruler (Abda Bala)
+    const yearRuler = this.getYearRuler(birthYear);
+    totalStrength += yearRuler === planet.name ? 15 : 5;
+    
+    // 2. Month Ruler (Masa Bala)  
+    const monthRuler = this.getMonthRuler(birthMonth);
+    totalStrength += monthRuler === planet.name ? 15 : 5;
+    
+    // 3. Weekday Ruler (Vara Bala)
+    const weekdayRuler = this.getWeekdayRuler(birthWeekday);
+    totalStrength += weekdayRuler === planet.name ? 15 : 5;
+    
+    return Math.min(60, totalStrength);
+  }
+
+  // HELPER METHOD FOR DIVISIONAL CHART DIGNITY
+  getDignityInChart(planetName, chart) {
+    // Calculate dignity of planet in a specific divisional chart
+    const planet = chart.planets.find(p => p.name === planetName);
+    if (!planet) return 'Neutral';
+    
+    // Use same dignity calculation as main chart
+    const planetLongitude = planet.longitude;
+    const sign = getSign(planetLongitude);
+    
+    // Get dignity configuration for the planet
+    const planetDignity = this.getPlanetDignityConfig(planetName);
+    if (!planetDignity) return 'Neutral';
+    
+    if (sign === planetDignity.exaltationSign) return 'Exalted';
+    if (planetDignity.moolatrikona && sign === planetDignity.moolatrikona.sign &&
+        planetLongitude >= planetDignity.moolatrikona.start &&
+        planetLongitude < planetDignity.moolatrikona.end) return 'Moolatrikona';
+    if (Array.isArray(planetDignity.ownSign)) {
+        if (planetDignity.ownSign.includes(sign)) return 'Own Sign';
+    } else if (sign === planetDignity.ownSign) return 'Own Sign';
+    if (sign === planetDignity.debilitationSign) return 'Debilitated';
+    
+    return 'Neutral';
+  }
+
+  // HELPER METHOD FOR WEEKDAY RULER
+  getWeekdayRuler(weekday) {
+    const weekdayRulers = {
+      0: 'Sun',    // Sunday
+      1: 'Moon',   // Monday  
+      2: 'Mars',   // Tuesday
+      3: 'Mercury', // Wednesday
+      4: 'Jupiter', // Thursday
+      5: 'Venus',  // Friday
+      6: 'Saturn'  // Saturday
+    };
+    return weekdayRulers[weekday] || 'Sun';
+  }
+
   getRequiredShadBala(planetName) {
     const requirements = {
       'Sun': 390,

@@ -2212,7 +2212,8 @@ class NavamsaAnalysisService {
       return this.calculateHouseSign(ascendantSign, houseNumber);
     }
 
-    return 'Aries'; // Default fallback
+    // Production code - no fallback defaults
+    throw new Error('Invalid chart data: unable to determine ascendant sign for house calculation. Ensure valid birth data is provided.');
   }
 
   /**

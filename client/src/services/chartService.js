@@ -124,7 +124,11 @@ class ChartService {
       let house = 1;
       if (housePositions && Object.keys(housePositions).length > 0 && chartData.ascendant) {
         const ascendantLongitude = chartData.ascendant.longitude;
-        const planetLongitude = planet.longitude || 0;
+        const planetLongitude = planet.longitude;
+        
+        if (planetLongitude === undefined || planetLongitude === null) {
+          throw new Error(`Invalid planet data: missing longitude for ${planet.name}. Ensure complete planetary position data is provided.`);
+        }
         
         // Calculate house (simplified - each house spans 30 degrees)
         let adjustedDiff = planetLongitude - ascendantLongitude;
@@ -136,13 +140,13 @@ class ChartService {
       return {
         name: planet.name,
         signId: planet.signId,
-        sign: planet.sign || '',
-        degrees: planet.degrees || planet.degree || 0,
+        sign: planet.sign,
+        degrees: planet.degrees || planet.degree,
         house: house,
-        dignity: planet.dignity || '',
-        longitude: planet.longitude || 0,
-        retrograde: planet.isRetrograde || planet.retrograde || false,
-        combust: planet.isCombust || false
+        dignity: planet.dignity,
+        longitude: planet.longitude,
+        retrograde: planet.isRetrograde || planet.retrograde,
+        combust: planet.isCombust
       };
     });
   }

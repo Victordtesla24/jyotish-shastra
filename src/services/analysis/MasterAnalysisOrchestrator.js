@@ -799,60 +799,62 @@ class MasterAnalysisOrchestrator {
   }
 
   /**
-   * Safe methods that don't throw errors - provide fallback analysis
+   * Production method - throws errors for invalid data instead of providing fallbacks
    */
-  extractKeyPersonalityTraitsSafe(lagna, luminaries, arudha) {
-    try {
-      if (!lagna || !luminaries?.moonAnalysis) {
-        return ["Analysis requires complete birth chart data"];
-      }
-      const lagnaTraits = lagna.lagnaSign?.characteristics || [];
-      const moonTraits = luminaries.moonAnalysis?.signCharacteristics?.characteristics || [];
-      return [...lagnaTraits, ...moonTraits];
-    } catch (error) {
-      return ["Personality traits analysis available in detailed report"];
+  extractKeyPersonalityTraits(lagna, luminaries, arudha) {
+    if (!lagna || !luminaries?.moonAnalysis) {
+      throw new Error('Invalid analysis data: missing required lagna or luminaries analysis. Ensure complete birth chart data is provided.');
     }
+    
+    if (!lagna.lagnaSign?.characteristics || !Array.isArray(lagna.lagnaSign.characteristics)) {
+      throw new Error('Invalid lagna analysis: missing required characteristics data.');
+    }
+    
+    if (!luminaries.moonAnalysis?.signCharacteristics?.characteristics || !Array.isArray(luminaries.moonAnalysis.signCharacteristics.characteristics)) {
+      throw new Error('Invalid moon analysis: missing required characteristics data.');
+    }
+    
+    const lagnaTraits = lagna.lagnaSign.characteristics;
+    const moonTraits = luminaries.moonAnalysis.signCharacteristics.characteristics;
+    return [...lagnaTraits, ...moonTraits];
   }
 
-  identifyPersonalityStrengthsSafe(analysis) {
-    try {
-      const dignity = analysis.sections.section2?.analyses?.dignity;
-      if (!dignity) {
-        return ["Planetary strength analysis available in detailed report"];
-      }
-
-      // Try exalted planets first
-      if (Array.isArray(dignity.exalted) && dignity.exalted.length > 0) {
-        return dignity.exalted;
-      }
-
-      // Try own sign planets
-      if (Array.isArray(dignity.ownSign) && dignity.ownSign.length > 0) {
-        return dignity.ownSign;
-      }
-
-      // Fallback to lagna lord
-      const lagnaLord = analysis.sections.section2?.analyses?.lagna?.lagnaLord;
-      if (lagnaLord) {
-        return [{ planet: lagnaLord, reason: 'Lagna Lord provides core strength' }];
-      }
-
-      return ["Strength analysis available in comprehensive report"];
-    } catch (error) {
-      return ["Planetary strength analysis available in detailed report"];
+  identifyPersonalityStrengths(analysis) {
+    const dignity = analysis.sections.section2?.analyses?.dignity;
+    if (!dignity) {
+      throw new Error('Invalid analysis data: missing required dignity analysis. Ensure comprehensive analysis is completed.');
     }
+
+    if (!dignity.exalted && !dignity.ownSign) {
+      throw new Error('Invalid dignity analysis: missing required planetary strength data.');
+    }
+
+    // Return exalted planets if available
+    if (Array.isArray(dignity.exalted) && dignity.exalted.length > 0) {
+      return dignity.exalted;
+    }
+
+    // Return own sign planets if available
+    if (Array.isArray(dignity.ownSign) && dignity.ownSign.length > 0) {
+      return dignity.ownSign;
+    }
+
+    throw new Error('No planetary strengths found in dignity analysis.');
   }
 
-  identifyPersonalityChallengesSafe(analysis) {
-    try {
-      const dignity = analysis.sections.section2?.analyses?.dignity;
-      if (!dignity) {
-        return ["Challenge analysis available in detailed report"];
-      }
+  identifyPersonalityChallenges(analysis) {
+    const dignity = analysis.sections.section2?.analyses?.dignity;
+    if (!dignity) {
+      throw new Error('Invalid analysis data: missing required dignity analysis. Ensure comprehensive analysis is completed.');
+    }
 
-      // Try debilitated planets first
-      if (Array.isArray(dignity.debilitated) && dignity.debilitated.length > 0) {
-        return dignity.debilitated;
+    if (!dignity.debilitated && !dignity.weak && !dignity.afflicted) {
+      throw new Error('Invalid dignity analysis: missing required challenge data.');
+    }
+
+    // Return debilitated planets if available
+    if (Array.isArray(dignity.debilitated) && dignity.debilitated.length > 0) {
+      return dignity.debilitated;
       }
 
       // Try enemy sign planets
@@ -860,10 +862,17 @@ class MasterAnalysisOrchestrator {
         return dignity.enemySign;
       }
 
-      return ["Challenge analysis available in comprehensive report"];
-    } catch (error) {
-      return ["Challenge analysis available in detailed report"];
-    }
+      // Try weak planets
+      if (Array.isArray(dignity.weak) && dignity.weak.length > 0) {
+        return dignity.weak;
+      }
+
+      // Try afflicted planets
+      if (Array.isArray(dignity.afflicted) && dignity.afflicted.length > 0) {
+        return dignity.afflicted;
+      }
+
+      throw new Error('No planetary challenges found in dignity analysis.');
   }
 
   /**

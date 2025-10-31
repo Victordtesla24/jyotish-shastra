@@ -158,6 +158,8 @@ class ChartGenerationService {
         ...birthData,
         latitude,
         longitude,
+        // Flatten timezone if provided only within nested placeOfBirth
+        timezone: birthData.timezone || birthData.timeZone || birthData.placeOfBirth?.timezone || birthData.timezone,
         geocodingInfo: {
           service: 'user_provided',
           accuracy: 'high',
@@ -184,6 +186,8 @@ class ChartGenerationService {
           ...birthData,
           latitude: geocoded.latitude,
           longitude: geocoded.longitude,
+          // Use timezone returned by geocoding when available
+          timezone: birthData.timezone || birthData.timeZone || geocoded.timezone || birthData.placeOfBirth?.timezone,
           geocodingInfo: {
             service: geocoded.service_used,
             accuracy: geocoded.accuracy,
@@ -206,8 +210,8 @@ class ChartGenerationService {
   async generateRasiChart(birthData) {
     try {
       const { dateOfBirth, timeOfBirth } = birthData;
-      // Production code: Use standard property names only
-      const timeZone = birthData.timezone;
+      // Accept common aliases and nested timezone
+      const timeZone = birthData.timezone || birthData.timeZone || birthData.placeOfBirth?.timezone;
       const latitude = birthData.latitude;
       const longitude = birthData.longitude;
       
