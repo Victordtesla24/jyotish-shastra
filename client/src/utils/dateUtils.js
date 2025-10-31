@@ -214,6 +214,77 @@ export const formatTime = (timeString, use12Hour = false) => {
 };
 
 /**
+ * Format time string to HH:MM:SS format
+ * Handles HH:MM, HH:MM:SS formats and normalizes malformed values
+ * @param {string} timeString - Time string in HH:MM or HH:MM:SS format
+ * @returns {string} Formatted time string in HH:MM:SS format
+ */
+export const formatTimeToHHMMSS = (timeString) => {
+  if (!timeString || typeof timeString !== 'string') {
+    return '';
+  }
+
+  // Split time string by colon
+  const parts = timeString.trim().split(':');
+  
+  if (parts.length < 2) {
+    return '';
+  }
+
+  // Parse hours, minutes, and seconds
+  let hours = parseInt(parts[0], 10);
+  let minutes = parseInt(parts[1], 10) || 0;
+  let seconds = parseInt(parts[2], 10) || 0;
+
+  // Handle NaN values
+  if (isNaN(hours)) hours = 0;
+  if (isNaN(minutes)) minutes = 0;
+  if (isNaN(seconds)) seconds = 0;
+
+  // Normalize negative values by converting to 24-hour format
+  if (hours < 0) {
+    hours = 24 + (hours % 24);
+  }
+  if (minutes < 0) {
+    minutes = 60 + (minutes % 60);
+    hours = hours > 0 ? hours - 1 : 23;
+  }
+  if (seconds < 0) {
+    seconds = 60 + (seconds % 60);
+    if (minutes > 0) {
+      minutes = minutes - 1;
+    } else {
+      minutes = 59;
+      hours = hours > 0 ? hours - 1 : 23;
+    }
+  }
+
+  // Normalize overflow values (minutes > 59, seconds > 59)
+  if (seconds >= 60) {
+    minutes += Math.floor(seconds / 60);
+    seconds = seconds % 60;
+  }
+  if (minutes >= 60) {
+    hours += Math.floor(minutes / 60);
+    minutes = minutes % 60;
+  }
+  
+  // Wrap hours to 24-hour format
+  hours = hours % 24;
+  if (hours < 0) {
+    hours = 24 + hours;
+  }
+
+  // Ensure values are within valid ranges
+  hours = Math.max(0, Math.min(23, hours));
+  minutes = Math.max(0, Math.min(59, minutes));
+  seconds = Math.max(0, Math.min(59, seconds));
+
+  // Format with zero-padding
+  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+};
+
+/**
  * Get timezone offset for a given date
  * @param {Date} date - Date to get offset for
  * @returns {number} Timezone offset in hours
@@ -271,7 +342,7 @@ export const parseBirthData = (birthDataString) => {
     const normalized = birthDataString.trim().replace(/\s+/g, ' ');
 
     // Pattern 1: "DD/MM/YYYY, HH:MM, Place"
-    const pattern1 = /^(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4}),\s*(\d{1,2}:\d{2}(?::\d{2})?),\s*(.+)$/;
+    const pattern1 = /^(\d{1,2}[/-]\d{1,2}[/-]\d{4}),\s*(\d{1,2}:\d{2}(?::\d{2})?),\s*(.+)$/;
     const match1 = normalized.match(pattern1);
 
     if (match1) {
@@ -311,13 +382,13 @@ export const parseBirthData = (birthDataString) => {
 
     if (parts.length >= 3) {
       // Try to identify date, time, and place from parts
-      let dateIndex = -1, timeIndex = -1, placeIndex = -1;
+      let dateIndex = -1, timeIndex = -1;
 
       for (let i = 0; i < parts.length; i++) {
         const part = parts[i];
 
         // Check if part looks like a date
-        if (/^\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4}$/.test(part) ||
+        if (/^\d{1,2}[/-]\d{1,2}[/-]\d{4}$/.test(part) ||
             /^\d{4}-\d{1,2}-\d{1,2}$/.test(part) ||
             /^\d{1,2}\s+\w+\s+\d{4}$/.test(part)) {
           dateIndex = i;
@@ -325,10 +396,6 @@ export const parseBirthData = (birthDataString) => {
         // Check if part looks like a time
         else if (/^\d{1,2}:\d{2}(?::\d{2})?(?:\s*(?:AM|PM|am|pm))?$/.test(part)) {
           timeIndex = i;
-        }
-        // Remaining parts are likely place
-        else if (dateIndex === -1 && timeIndex === -1) {
-          placeIndex = i;
         }
       }
 
@@ -526,6 +593,7 @@ const dateUtils = {
   calculateAge,
   formatDate,
   formatTime,
+  formatTimeToHHMMSS,
   getTimezoneOffset,
   localToUTC,
   utcToLocal,

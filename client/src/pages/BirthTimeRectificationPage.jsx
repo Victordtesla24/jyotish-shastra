@@ -17,6 +17,9 @@ import InteractiveLifeEventsQuestionnairePROD from '../components/btr/Interactiv
 // Import contexts
 import { useChart } from '../contexts/ChartContext';
 
+// Import utilities
+import { formatTimeToHHMMSS } from '../utils/dateUtils';
+
 const BirthTimeRectificationPageEnhanced = () => {
   const navigate = useNavigate();
   const { currentChart } = useChart();
@@ -650,14 +653,16 @@ const BirthTimeRectificationPageEnhanced = () => {
                         <div className="bg-white rounded-lg p-4 border-2 border-gray-200">
                           <p className="text-sm text-gray-600 mb-2">Original Birth Time</p>
                           <p className="text-2xl font-bold text-gray-800">
-                            {birthData?.timeOfBirth || 'Not provided'}
+                            {birthData?.timeOfBirth ? formatTimeToHHMMSS(birthData.timeOfBirth) : 'Not provided'}
                           </p>
                         </div>
                         
                         <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-4 border-2 border-green-400">
                           <p className="text-sm text-green-700 mb-2 font-semibold">Rectified Birth Time</p>
                           <p className="text-2xl font-bold text-green-700">
-                            {rectificationData?.rectifiedTime || rectificationData?.analysis?.bestCandidate?.time || 'Not calculated'}
+                            {(rectificationData?.rectifiedTime || rectificationData?.analysis?.bestCandidate?.time) 
+                              ? formatTimeToHHMMSS(rectificationData?.rectifiedTime || rectificationData?.analysis?.bestCandidate?.time)
+                              : 'Not calculated'}
                           </p>
                         </div>
                       </div>
