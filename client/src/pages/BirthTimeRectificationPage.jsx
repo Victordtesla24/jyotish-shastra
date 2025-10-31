@@ -710,7 +710,87 @@ const BirthTimeRectificationPageEnhanced = () => {
                         </p>
                         <Button
                           variant="cosmic"
-                          onClick={() => navigate('/comprehensive-analysis')}
+                          onClick={() => {
+                            try {
+                              // Get rectified time from rectification data
+                              const rectifiedTime = rectificationData?.rectifiedTime || 
+                                                    rectificationData?.analysis?.bestCandidate?.time;
+                              
+                              if (!rectifiedTime || !birthData) {
+                                console.warn('⚠️ Missing rectified time or birth data, proceeding with original data');
+                                navigate('/comprehensive-analysis');
+                                return;
+                              }
+                              
+                              // Format rectified time to HH:MM:SS format
+                              const formattedRectifiedTime = formatTimeToHHMMSS(rectifiedTime);
+                              
+                              // Get current session to preserve coordinates
+                              const currentSession = dataSaver.loadSession();
+                              const coordinates = currentSession?.coordinates || currentSession?.currentSession?.coordinates || {};
+                              
+                              // Create updated birth data with rectified time
+                              // Combine birth data with coordinates to ensure all required fields are present
+                              const updatedBirthData = {
+                                ...birthData,
+                                timeOfBirth: formattedRectifiedTime,
+                                // Ensure coordinates are included from session
+                                latitude: birthData.latitude || coordinates.latitude || null,
+                                longitude: birthData.longitude || coordinates.longitude || null,
+                                timezone: birthData.timezone || coordinates.timezone || 'UTC'
+                              };
+                              
+                              // Validate the updated birth data
+                              const validationResult = dataInterpreter.validateInput(updatedBirthData);
+                              
+                              if (!validationResult?.isValid) {
+                                console.error('❌ Birth data validation failed:', validationResult?.errors);
+                                throw new Error(`Validation failed: ${validationResult?.errors?.join(', ') || 'Invalid birth data'}`);
+                              }
+                              
+                              // Format birth data for API using formatForAPI
+                              const formattedData = dataInterpreter.formatForAPI(validationResult.validatedData);
+                              const apiFormattedData = formattedData.apiRequest || formattedData;
+                              
+                              // Create properly formatted birth data for storage
+                              // This ensures the data structure matches what ComprehensiveAnalysisPage expects
+                              const properlyFormattedBirthData = {
+                                ...updatedBirthData,
+                                // Override with API-formatted fields
+                                ...apiFormattedData,
+                                // Ensure timeOfBirth uses formatted rectified time
+                                timeOfBirth: formattedRectifiedTime
+                              };
+                              
+                              // Save updated birth data with proper formatting
+                              dataSaver.saveSession({
+                                ...currentSession,
+                                birthData: properlyFormattedBirthData,
+                                coordinates: {
+                                  latitude: properlyFormattedBirthData.latitude,
+                                  longitude: properlyFormattedBirthData.longitude,
+                                  timezone: properlyFormattedBirthData.timezone || 'UTC'
+                                },
+                                rectificationData: rectificationData
+                              });
+                              
+                              console.log('✅ Updated birth data with rectified time saved to UIDataSaver:', {
+                                originalTime: birthData.timeOfBirth,
+                                rectifiedTime: formattedRectifiedTime,
+                                hasCoordinates: !!(properlyFormattedBirthData.latitude && properlyFormattedBirthData.longitude),
+                                hasPlaceOfBirth: !!properlyFormattedBirthData.placeOfBirth,
+                                hasTimezone: !!properlyFormattedBirthData.timezone,
+                                dataStructure: Object.keys(properlyFormattedBirthData)
+                              });
+                              
+                            } catch (error) {
+                              console.error('❌ Error updating birth data for comprehensive analysis:', error);
+                              // Still navigate even if save fails - let the API handle validation
+                            }
+                            
+                            // Navigate to comprehensive analysis page
+                            navigate('/comprehensive-analysis');
+                          }}
                           className="w-full"
                         >
                           Generate Full Analysis

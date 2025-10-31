@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ComprehensiveAnalysisDisplay from '../components/reports/ComprehensiveAnalysisDisplay';
 import ResponseDataToUIDisplayAnalyser from '../components/analysis/ResponseDataToUIDisplayAnalyser';
 import UIDataSaver from '../components/forms/UIDataSaver';
+import UIToAPIDataInterpreter from '../components/forms/UIToAPIDataInterpreter';
 
 /**
  * Comprehensive Analysis Page with ErrorBoundary protection
@@ -14,6 +15,9 @@ const ComprehensiveAnalysisPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  
+  // Data interpreter instance for formatting birth data
+  const dataInterpreter = useMemo(() => new UIToAPIDataInterpreter(), []);
 
   const fetchComprehensiveAnalysis = useCallback(async () => {
     try {
@@ -37,25 +41,45 @@ const ComprehensiveAnalysisPage = () => {
       }
 
       // Get birth data for API call
-      const birthData = UIDataSaver.getBirthData();
-      if (!birthData) {
+      const rawBirthData = UIDataSaver.getBirthData();
+      if (!rawBirthData) {
         console.error('❌ [ComprehensiveAnalysisPage] No birth data found, redirecting to home');
           navigate('/');
           return;
         }
 
-      console.log('🔄 [ComprehensiveAnalysisPage] Found birth data, fetching from API...', {
-        name: birthData.name,
-        dateOfBirth: birthData.dateOfBirth
+      console.log('🔄 [ComprehensiveAnalysisPage] Found birth data, formatting for API...', {
+        name: rawBirthData.name,
+        dateOfBirth: rawBirthData.dateOfBirth,
+        timeOfBirth: rawBirthData.timeOfBirth
       });
 
-      // Call comprehensive analysis API (FIXED: Added /v1 version prefix)
+      // CRITICAL FIX: Format birth data to meet API validation requirements
+      // Validate and format birth data before sending to API
+      const validationResult = dataInterpreter.validateInput(rawBirthData);
+      if (!validationResult?.isValid) {
+        console.error('❌ [ComprehensiveAnalysisPage] Birth data validation failed:', validationResult?.errors);
+        throw new Error(`Invalid birth data: ${validationResult?.errors?.join(', ') || 'Validation failed'}`);
+      }
+
+      // Format birth data for API using formatForAPI
+      const formattedData = dataInterpreter.formatForAPI(validationResult.validatedData);
+      const apiRequestData = formattedData.apiRequest || formattedData;
+
+      console.log('✅ [ComprehensiveAnalysisPage] Birth data formatted for API:', {
+        hasDate: !!apiRequestData.dateOfBirth,
+        hasTime: !!apiRequestData.timeOfBirth,
+        hasCoordinates: !!(apiRequestData.latitude && apiRequestData.longitude),
+        hasPlaceOfBirth: !!apiRequestData.placeOfBirth
+      });
+
+      // Call comprehensive analysis API with properly formatted data
       const response = await fetch('/api/v1/analysis/comprehensive', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-        body: JSON.stringify(birthData)
+        body: JSON.stringify(apiRequestData)
         });
 
         if (!response.ok) {
@@ -113,7 +137,7 @@ const ComprehensiveAnalysisPage = () => {
     } finally {
       setLoading(false);
     }
-  }, [navigate]);
+  }, [navigate, dataInterpreter]);
 
   useEffect(() => {
     fetchComprehensiveAnalysis();
