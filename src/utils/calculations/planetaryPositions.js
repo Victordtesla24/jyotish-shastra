@@ -301,6 +301,8 @@ export function calculatePlanetPosition(planetName, julianDay) {
   };
   
   const elementsNext = orbitalElementsNext[planetName.toLowerCase()];
+  let speedLong = 0; // Default speed
+  
   if (elementsNext) {
     // Calculate next position using same method
     const M_next_rad = degreesToRadians(elementsNext.M % 360);
@@ -326,7 +328,7 @@ export function calculatePlanetPosition(planetName, julianDay) {
     longitudeNext = longitudeNext % 360;
     
     // Calculate speed (degrees per day)
-    let speedLong = (longitudeNext - longitude) / deltaDays;
+    speedLong = (longitudeNext - longitude) / deltaDays;
     
     // Handle wrap-around
     if (speedLong > 180 / deltaDays) {
@@ -335,8 +337,18 @@ export function calculatePlanetPosition(planetName, julianDay) {
       speedLong += 360 / deltaDays;
     }
   } else {
-    // Fallback to base speed
-    speedLong = calculatePlanetarySpeed(planetName, julianDay, elements, t);
+    // Fallback to approximate daily speed based on planet
+    const approximateSpeeds = {
+      'sun': 0.9856,
+      'moon': 13.1764,
+      'mercury': 4.0923,
+      'venus': 1.6021,
+      'mars': 0.5240,
+      'jupiter': 0.0831,
+      'saturn': 0.0335,
+      'rahu': -0.0529
+    };
+    speedLong = approximateSpeeds[planetName.toLowerCase()] || 0.5;
   }
   
   const isRetrograde = speedLong < 0;
