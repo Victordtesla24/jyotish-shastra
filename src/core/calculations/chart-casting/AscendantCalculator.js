@@ -134,12 +134,15 @@ class AscendantCalculator {
             throw new Error(`Invalid coordinates: latitude=${latitude}, longitude=${longitude}`);
         }
 
-        if (!this.initialized) {
-            throw new Error('Swiss Ephemeris not initialized. Cannot calculate ascendant.');
-        }
-
         try {
-            return this.calculateUsingSwissEphemeris(julianDay, latitude, longitude);
+            if (this.initialized && this.swissephAvailable && this.swisseph && typeof this.swisseph.swe_houses === 'function') {
+                // Use Swiss Ephemeris if available (local development)
+                return this.calculateUsingSwissEphemeris(julianDay, latitude, longitude);
+            } else {
+                // Use pure JavaScript calculation for serverless environments
+                console.log('📝 AscendantCalculator: Using pure JavaScript ascendant calculation (swisseph unavailable)');
+                return this.calculateUsingPureJavaScript(julianDay, latitude, longitude);
+            }
         } catch (error) {
             throw new Error(`Ascendant calculation failed: ${error.message}`);
         }
@@ -286,6 +289,109 @@ class AscendantCalculator {
         const boundedAyanamsa = Math.max(15, Math.min(35, baseAyanamsa));
 
         return boundedAyanamsa;
+    }
+
+    /**
+     * Calculate local sidereal time for given Julian Day and longitude
+     * Pure JavaScript implementation (no dependencies)
+     * @param {number} julianDay - Julian Day Number
+     * @param {number} longitude - Longitude in degrees (positive East)
+     * @returns {number} Local Sidereal Time in degrees
+     */
+    calculateLocalSiderealTime(julianDay, longitude) {
+        // Calculate Julian centuries from J2000.0
+        const t = (julianDay - 2451545.0) / 36525.0;
+
+        // Calculate Greenwich Mean Sidereal Time (GMST) in degrees
+        // Formula: GMST = 280.46061837 + 360.98564736629 * (JD - 2451545.0) + 0.000387933 * T^2 - T^3 / 38710000
+        const gmstDegrees = 280.46061837 + 
+                            360.98564736629 * (julianDay - 2451545.0) + 
+                            0.000387933 * t * t - 
+                            (t * t * t) / 38710000;
+
+        // Convert to local sidereal time by adding longitude
+        let lstDegrees = gmstDegrees + longitude;
+
+        // Normalize to 0-360 range
+        while (lstDegrees < 0) {
+            lstDegrees += 360;
+        }
+        lstDegrees = lstDegrees % 360;
+
+        return lstDegrees;
+    }
+
+    /**
+     * Calculate ascendant using pure JavaScript (no Swiss Ephemeris dependency)
+     * Uses spherical trigonometry for production-grade calculation
+     * Based on astronomical algorithms for ascendant calculation
+     * @param {number} julianDay - Julian Day Number
+     * @param {number} latitude - Latitude in degrees
+     * @param {number} longitude - Longitude in degrees (positive East)
+     * @returns {Object} Ascendant data with longitude, sign, signId, signIndex, degree
+     */
+    calculateUsingPureJavaScript(julianDay, latitude, longitude) {
+        try {
+            // Calculate local sidereal time in degrees
+            const lstDegrees = this.calculateLocalSiderealTime(julianDay, longitude);
+
+            // Calculate Julian centuries from J2000.0
+            const t = (julianDay - 2451545.0) / 36525.0;
+
+            // Calculate obliquity of ecliptic
+            const obliquityDegrees = 23.4393 - 0.0130 * t;
+
+            // Convert to radians for calculations
+            const degreesToRadians = (deg) => (deg * Math.PI) / 180;
+            const radiansToDegrees = (rad) => (rad * 180) / Math.PI;
+
+            const latitudeRad = degreesToRadians(latitude);
+            const lstRad = degreesToRadians(lstDegrees);
+            const obliquityRad = degreesToRadians(obliquityDegrees);
+
+            // Calculate ascendant using spherical trigonometry formula
+            // Formula: tan(asc) = (cos(LST)) / (-sin(LST) * cos(obliquity) - tan(lat) * sin(obliquity))
+            const numerator = Math.cos(lstRad);
+            const denominator = -Math.sin(lstRad) * Math.cos(obliquityRad) - Math.tan(latitudeRad) * Math.sin(obliquityRad);
+
+            let ascendantRad = Math.atan2(numerator, denominator);
+
+            // Convert to degrees
+            let ascendantLongitude = radiansToDegrees(ascendantRad);
+
+            // Normalize to 0-360 range
+            while (ascendantLongitude < 0) {
+                ascendantLongitude += 360;
+            }
+            ascendantLongitude = ascendantLongitude % 360;
+
+            // Apply Lahiri ayanamsa to convert tropical to sidereal
+            const ayanamsa = this.calculateImprovedLahiriAyanamsa(julianDay);
+            let siderealAscendant = ascendantLongitude - ayanamsa;
+
+            // Normalize sidereal ascendant to 0-360 range
+            while (siderealAscendant < 0) {
+                siderealAscendant += 360;
+            }
+            siderealAscendant = siderealAscendant % 360;
+
+            // Get sign information
+            const signInfo = getSign(siderealAscendant);
+
+            if (!signInfo || typeof signInfo.signIndex !== 'number') {
+                throw new Error('Invalid sign calculation result');
+            }
+
+            return {
+                longitude: siderealAscendant,
+                sign: getSignName(signInfo.signIndex),
+                signId: getSignId(signInfo.signIndex),
+                signIndex: signInfo.signIndex,
+                degree: signInfo.degreeInSign,
+            };
+        } catch (error) {
+            throw new Error(`Pure JavaScript ascendant calculation failed: ${error.message}`);
+        }
     }
 }
 

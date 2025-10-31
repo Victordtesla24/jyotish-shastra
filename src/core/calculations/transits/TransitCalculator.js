@@ -3,6 +3,8 @@
  * Calculates current planetary transits and their effects
  * Integrates with Swiss Ephemeris for precise calculations
  */
+import { calculateJulianDay } from '../../../utils/calculations/julianDay.js';
+
 // Optional swisseph import for serverless compatibility
 let swisseph = null;
 let swissephAvailable = false;
