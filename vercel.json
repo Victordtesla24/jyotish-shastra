@@ -1,5 +1,8 @@
 {
   "version": 2,
+  "buildCommand": "cd client && npm install && npm run build",
+  "installCommand": "npm install && cd client && npm install",
+  "outputDirectory": "client/build",
   "builds": [
     {
       "src": "api/[...path].js",
