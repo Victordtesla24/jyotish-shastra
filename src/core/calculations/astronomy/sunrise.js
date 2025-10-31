@@ -1,4 +1,35 @@
-import swisseph from 'swisseph';
+// Optional swisseph import for serverless compatibility
+let swisseph = null;
+let swissephAvailable = false;
+
+(async () => {
+  try {
+    const swissephModule = await import('swisseph');
+    swisseph = swissephModule.default || swissephModule;
+    swissephAvailable = true;
+  } catch (error) {
+    console.warn('⚠️  sunrise: swisseph not available:', error.message);
+    swissephAvailable = false;
+    swisseph = {
+      swe_set_ephe_path: () => {},
+      swe_julday: () => {
+        throw new Error('Swiss Ephemeris not available');
+      },
+      swe_revjul: () => {
+        throw new Error('Swiss Ephemeris not available');
+      },
+      swe_calc_ut: () => {
+        throw new Error('Swiss Ephemeris not available');
+      },
+      swe_rise_trans: () => {
+        throw new Error('Swiss Ephemeris not available');
+      },
+      SE_SUN: 0,
+      SEFLG_SWIEPH: 2
+    };
+  }
+})();
+
 import path from 'path';
 import fs from 'fs';
 
@@ -6,6 +37,9 @@ import fs from 'fs';
 let initialized = false;
 function initSwissEphemeris() {
   if (initialized) return;
+  if (!swissephAvailable) {
+    throw new Error('Swiss Ephemeris not available - sunrise calculations disabled');
+  }
   const ephePath = path.resolve(process.cwd(), 'ephemeris');
   if (!fs.existsSync(ephePath)) {
     throw new Error(`Ephemeris directory not found: ${ephePath}`);

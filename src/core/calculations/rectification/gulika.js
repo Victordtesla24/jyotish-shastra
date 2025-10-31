@@ -1,5 +1,25 @@
 import { computeSunriseSunset, normalizeDegrees } from '../astronomy/sunrise.js';
-import swisseph from 'swisseph';
+// Optional swisseph import for serverless compatibility
+let swisseph = null;
+let swissephAvailable = false;
+
+(async () => {
+  try {
+    const swissephModule = await import('swisseph');
+    swisseph = swissephModule.default || swissephModule;
+    swissephAvailable = true;
+  } catch (error) {
+    console.warn('⚠️  gulika: swisseph not available:', error.message);
+    swissephAvailable = false;
+    swisseph = {
+      swe_julday: () => {
+        throw new Error('Swiss Ephemeris not available');
+      },
+      SE_GREG_CAL: 1
+    };
+  }
+})();
+
 import AscendantCalculator from '../chart-casting/AscendantCalculator.js';
 
 const DAY_GULIKA_SEGMENT_INDEX = {
@@ -23,11 +43,14 @@ const NIGHT_GULIKA_SEGMENT_INDEX = {
 };
 
 function toJulianDayUT(dateUtc) {
+  if (!swissephAvailable) {
+    throw new Error('Swiss Ephemeris not available - Gulika calculations disabled');
+  }
   const y = dateUtc.getUTCFullYear();
   const m = dateUtc.getUTCMonth() + 1;
   const d = dateUtc.getUTCDate();
   const hour = dateUtc.getUTCHours() + dateUtc.getUTCMinutes() / 60 + dateUtc.getUTCSeconds() / 3600;
-  const gregflag = 1;
+  const gregflag = swisseph.SE_GREG_CAL || 1;
   return swisseph.swe_julday(y, m, d, hour, gregflag);
 }
 

@@ -3,11 +3,31 @@
  * Calculates current planetary transits and their effects
  * Integrates with Swiss Ephemeris for precise calculations
  */
-const swisseph = require('swisseph');
+// Optional swisseph import for serverless compatibility
+let swisseph = null;
+let swissephAvailable = false;
+
+(async () => {
+  try {
+    const swissephModule = await import('swisseph');
+    swisseph = swissephModule.default || swissephModule;
+    swissephAvailable = true;
+  } catch (error) {
+    console.warn('⚠️  TransitCalculator: swisseph not available:', error.message);
+    swissephAvailable = false;
+    swisseph = {
+      swe_calc_ut: () => {
+        throw new Error('Swiss Ephemeris not available');
+      }
+    };
+  }
+})();
 
 class TransitCalculator {
   constructor(natalChart) {
     this.natalChart = natalChart;
+    this.swisseph = swisseph;
+    this.swissephAvailable = swissephAvailable;
     this.initializeTransitData();
   }
 
@@ -75,16 +95,19 @@ class TransitCalculator {
     const day = date.getUTCDate();
     const hour = date.getUTCHours() + date.getUTCMinutes() / 60 + date.getUTCSeconds() / 3600;
 
-    swisseph.swe_set_ephe_path(__dirname + '/../../../ephemeris');
-    const julianDay = swisseph.swe_julday(year, month, day, hour, swisseph.SE_GREG_CAL);
-    swisseph.swe_set_sid_mode(swisseph.SE_SIDM_LAHIRI);
+    if (!this.swissephAvailable) {
+      throw new Error('Swiss Ephemeris not available - transit calculations disabled');
+    }
+    this.swisseph.swe_set_ephe_path(__dirname + '/../../../ephemeris');
+    const julianDay = this.swisseph.swe_julday(year, month, day, hour, this.swisseph.SE_GREG_CAL || 1);
+    this.swisseph.swe_set_sid_mode(this.swisseph.SE_SIDM_LAHIRI || 1);
 
     const planets = ['sun', 'moon', 'mars', 'mercury', 'jupiter', 'venus', 'saturn', 'rahu', 'ketu'];
     const positions = {};
 
     planets.forEach(planet => {
         const planetId = swisseph[`SE_${planet.toUpperCase()}`];
-        const result = swisseph.swe_calc_ut(julianDay.julianDay_UT, planetId, swisseph.SEFLG_SPEED);
+        const result = this.swisseph.swe_calc_ut(julianDay.julianDay_UT, planetId, this.swisseph.SEFLG_SPEED || 2);
         if (result.returnCode === 0) {
             positions[planet] = {
                 longitude: result.longitude,
