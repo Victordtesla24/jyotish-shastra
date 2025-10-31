@@ -1521,15 +1521,8 @@ class TimingPrecisionEnhancer {
       }
     }
 
-    // Fallback to simple calculation if Placidus fails
-    const simpleLongitude = (planetLongitude - ascendantLongitude + 360) % 360;
-    return {
-      house: Math.floor(simpleLongitude / 30) + 1,
-      cuspDistance: simpleLongitude % 30,
-      houseStrength: 0.5,
-      houseCusps: null,
-      ascendant: ascendantData
-    };
+    // If Placidus calculation fails, throw error instead of falling back
+    throw new Error(`Failed to determine house position for planet at longitude ${planetLongitude} using Placidus house system. Ascendant longitude: ${ascendantLongitude}. This indicates a calculation error that requires investigation.`);
   }
 
   /**
@@ -2295,13 +2288,7 @@ class TimingPrecisionEnhancer {
     const houseLordships = [];
 
     if (!birthChart?.ascendant) {
-      // Fallback to generic Aries ascendant if chart not available
-      const defaultLordships = {
-        'Sun': [5], 'Moon': [4], 'Mars': [1, 8], 'Mercury': [3, 6],
-        'Jupiter': [9, 12], 'Venus': [2, 7], 'Saturn': [10, 11],
-        'Rahu': [], 'Ketu': [] // Shadow planets don't rule houses
-      };
-      return defaultLordships[planet] || [];
+      throw new Error('Birth chart with ascendant is required for house lordship calculation. Cannot proceed without chart data.');
     }
 
     // Calculate house cusps from ascendant

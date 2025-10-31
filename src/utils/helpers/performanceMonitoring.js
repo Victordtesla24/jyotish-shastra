@@ -31,7 +31,6 @@ class PerformanceMonitor {
       swissEphemeris: {
         successes: 0,
         failures: 0,
-        fallbackToMoshier: 0,
         averageCalculationTime: 0
       },
       resources: {
@@ -147,7 +146,7 @@ class PerformanceMonitor {
   /**
    * Track Swiss Ephemeris calculation performance
    */
-  trackSwissEphemeris(success, calculationTime, fallbackUsed = false) {
+  trackSwissEphemeris(success, calculationTime) {
     const startTime = Date.now();
 
     if (success) {
@@ -156,13 +155,8 @@ class PerformanceMonitor {
       this.metrics.swissEphemeris.failures++;
       this.metrics.errors.ephemeris.push({
         timestamp: startTime,
-        calculationTime,
-        fallbackUsed
+        calculationTime
       });
-    }
-
-    if (fallbackUsed) {
-      this.metrics.swissEphemeris.fallbackToMoshier++;
     }
 
     // Update average calculation time
@@ -175,7 +169,6 @@ class PerformanceMonitor {
     return {
       calculationTime,
       success,
-      fallbackUsed,
       timestamp: startTime
     };
   }
@@ -203,8 +196,7 @@ class PerformanceMonitor {
       responseTimes: this.calculateResponseTimeStats(),
       swissEphemeris: {
         ...this.metrics.swissEphemeris,
-        successRate: this.calculateEphemerisSuccessRate(),
-        fallbackRate: this.calculateEphemerisFallbackRate()
+        successRate: this.calculateEphemerisSuccessRate()
       },
       resources: {
         activeConnections: this.metrics.resources.activeConnections,
@@ -237,11 +229,12 @@ class PerformanceMonitor {
     }
 
     // Check ephemeris failure rate
-    if (report.swissEphemeris.fallbackRate > this.thresholds.errorRate.maxEphemerisFailureRate * 100) {
+    const ephemerisFailureRate = this.calculateEphemerisFailureRate();
+    if (ephemerisFailureRate > this.thresholds.errorRate.maxEphemerisFailureRate * 100) {
       alerts.push({
         level: 'WARNING',
-        type: 'HIGH_EPHEMERIS_FALLBACK',
-        message: `Swiss Ephemeris fallback rate (${report.swissEphemeris.fallbackRate.toFixed(2)}%) exceeds threshold (${this.thresholds.errorRate.maxEphemerisFailureRate * 100}%)`,
+        type: 'HIGH_EPHEMERIS_FAILURE',
+        message: `Swiss Ephemeris failure rate (${ephemerisFailureRate.toFixed(2)}%) exceeds threshold (${this.thresholds.errorRate.maxEphemerisFailureRate * 100}%)`,
         timestamp: Date.now()
       });
     }
@@ -366,10 +359,11 @@ class PerformanceMonitor {
     return total > 0 ? (this.metrics.swissEphemeris.successes / total) * 100 : 100;
   }
 
-  calculateEphemerisFallbackRate() {
+  calculateEphemerisFailureRate() {
     const total = this.metrics.swissEphemeris.successes + this.metrics.swissEphemeris.failures;
-    return total > 0 ? (this.metrics.swissEphemeris.fallbackToMoshier / total) * 100 : 0;
+    return total > 0 ? (this.metrics.swissEphemeris.failures / total) * 100 : 0;
   }
+
 
   checkThresholds(endpoint, duration, status) {
     // Only log alerts in production to avoid test noise
@@ -470,7 +464,7 @@ class PerformanceMonitor {
     this.metrics = {
       requests: { total: 0, successful: 0, failed: 0, validation_errors: 0, system_errors: 0 },
       responseTimes: { chartGeneration: [], comprehensiveAnalysis: [], dashaAnalysis: [], navamsaAnalysis: [], houseAnalysis: [], validation: [] },
-      swissEphemeris: { successes: 0, failures: 0, fallbackToMoshier: 0, averageCalculationTime: 0 },
+      swissEphemeris: { successes: 0, failures: 0, averageCalculationTime: 0 },
       resources: { memoryUsage: [], cpuUsage: [], activeConnections: 0 },
       errors: { validation: [], system: [], ephemeris: [] }
     };

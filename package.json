@@ -42,9 +42,7 @@
     "moment-timezone": "^0.5.43",
     "mongoose": "^8.16.1",
     "morgan": "^1.10.1",
-    "opencage-api-client": "^1.1.0"
-  },
-  "optionalDependencies": {
+    "opencage-api-client": "^1.1.0",
     "swisseph": "^0.5.17"
   },
   "devDependencies": {

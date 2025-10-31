@@ -1,4 +1,4 @@
-// Optional swisseph import for serverless compatibility
+// Production-grade Swiss Ephemeris import - no fallbacks
 let swisseph = null;
 let swissephAvailable = false;
 
@@ -8,16 +8,8 @@ let swissephAvailable = false;
     swisseph = swissephModule.default || swissephModule;
     swissephAvailable = true;
   } catch (error) {
-    console.warn('⚠️  AscendantCalculator: swisseph not available:', error.message);
     swissephAvailable = false;
-    swisseph = {
-      swe_set_ephe_path: () => {},
-      swe_set_sid_mode: () => {},
-      SE_SIDM_LAHIRI: 1,
-      swe_houses: () => {
-        throw new Error('Swiss Ephemeris not available');
-      }
-    };
+    throw new Error(`Swiss Ephemeris is required for AscendantCalculator but not available: ${error.message}. Please ensure swisseph module is properly installed and ephemeris files are configured.`);
   }
 })();
 
@@ -44,14 +36,12 @@ class AscendantCalculator {
 
         try {
             if (!this.swissephAvailable) {
-                console.warn('⚠️  AscendantCalculator: Swiss Ephemeris not available - calculations disabled');
-                this.initialized = false;
-                return;
+                throw new Error('Swiss Ephemeris is required but not available. Please ensure Swiss Ephemeris is properly installed and configured.');
             }
 
             // CRITICAL FIX: Enhanced Swiss Ephemeris initialization based on research
-            // Use absolute path resolution for better reliability
-            this.ephePath = path.resolve(__dirname, '../../../../ephemeris');
+            // Use absolute path resolution for better reliability in both local and serverless environments
+            this.ephePath = path.resolve(process.cwd(), 'ephemeris');
 
             // Validate ephemeris files exist before initialization
             this.validateEphemerisFiles(this.ephePath);
@@ -75,12 +65,8 @@ class AscendantCalculator {
             this.initialized = true;
 
         } catch (error) {
-            if (!this.swissephAvailable) {
-                console.warn('⚠️  AscendantCalculator: Swiss Ephemeris unavailable:', error.message);
-                this.initialized = false;
-            } else {
-                throw new Error(`Swiss Ephemeris initialization failed: ${error.message}. Please ensure ephemeris files are properly configured.`);
-            }
+            this.initialized = false;
+            throw new Error(`Swiss Ephemeris initialization failed: ${error.message}. Please ensure Swiss Ephemeris is properly installed and ephemeris files are configured.`);
         }
     }
 
@@ -134,15 +120,12 @@ class AscendantCalculator {
             throw new Error(`Invalid coordinates: latitude=${latitude}, longitude=${longitude}`);
         }
 
+        if (!this.initialized || !this.swissephAvailable || !this.swisseph || typeof this.swisseph.swe_houses !== 'function') {
+            throw new Error('Swiss Ephemeris is required for ascendant calculations but is not available or not initialized. Please ensure Swiss Ephemeris is properly installed and configured.');
+        }
+
         try {
-            if (this.initialized && this.swissephAvailable && this.swisseph && typeof this.swisseph.swe_houses === 'function') {
-                // Use Swiss Ephemeris if available (local development)
-                return this.calculateUsingSwissEphemeris(julianDay, latitude, longitude);
-            } else {
-                // Use pure JavaScript calculation for serverless environments
-                console.log('📝 AscendantCalculator: Using pure JavaScript ascendant calculation (swisseph unavailable)');
-                return this.calculateUsingPureJavaScript(julianDay, latitude, longitude);
-            }
+            return this.calculateUsingSwissEphemeris(julianDay, latitude, longitude);
         } catch (error) {
             throw new Error(`Ascendant calculation failed: ${error.message}`);
         }
@@ -259,46 +242,18 @@ class AscendantCalculator {
         }
     }
 
-    /**
-     * Calculate improved Lahiri Ayanamsa manually with more accurate formula
-     * Based on research from Swiss Ephemeris documentation and Vedic astronomy
-     * @param {number} julianDay - Julian day for calculation
-     * @returns {number} Calculated ayanamsa value
-     */
-    calculateImprovedLahiriAyanamsa(julianDay) {
-        // Improved Lahiri Ayanamsa calculation
-        // Reference: Lahiri Committee (1956) and Swiss Ephemeris documentation
-
-        // Base epoch: J1900.0 (JD 2415020.0) = 22°27'38.83"
-        const j1900 = 2415020.0;
-        const epochAyanamsa1900 = 22.4607861; // degrees at J1900.0
-
-        // More accurate rate per year (50.2564" per year)
-        const ratePerYear = 50.2564 / 3600; // arcseconds per year converted to degrees
-
-        // Calculate years since J1900.0
-        const yearsSinceEpoch = (julianDay - j1900) / 365.25;
-
-        // Apply linear precession rate
-        const baseAyanamsa = epochAyanamsa1900 + (yearsSinceEpoch * ratePerYear);
-
-        // For 1985, this should yield approximately 23.6° which is more accurate
-        // than the previous calculation that was giving incorrect values
-
-        // Ensure the result is within reasonable bounds for the era
-        const boundedAyanamsa = Math.max(15, Math.min(35, baseAyanamsa));
-
-        return boundedAyanamsa;
-    }
 
     /**
      * Calculate local sidereal time for given Julian Day and longitude
-     * Pure JavaScript implementation (no dependencies)
+     * Helper function for internal calculations (used with Swiss Ephemeris)
      * @param {number} julianDay - Julian Day Number
      * @param {number} longitude - Longitude in degrees (positive East)
      * @returns {number} Local Sidereal Time in degrees
      */
     calculateLocalSiderealTime(julianDay, longitude) {
+        // This is a helper function used WITH Swiss Ephemeris calculations, not as a fallback
+        // Swiss Ephemeris is required for all ascendant calculations - this is just a mathematical helper
+        
         // Calculate Julian centuries from J2000.0
         const t = (julianDay - 2451545.0) / 36525.0;
 
@@ -321,78 +276,6 @@ class AscendantCalculator {
         return lstDegrees;
     }
 
-    /**
-     * Calculate ascendant using pure JavaScript (no Swiss Ephemeris dependency)
-     * Uses spherical trigonometry for production-grade calculation
-     * Based on astronomical algorithms for ascendant calculation
-     * @param {number} julianDay - Julian Day Number
-     * @param {number} latitude - Latitude in degrees
-     * @param {number} longitude - Longitude in degrees (positive East)
-     * @returns {Object} Ascendant data with longitude, sign, signId, signIndex, degree
-     */
-    calculateUsingPureJavaScript(julianDay, latitude, longitude) {
-        try {
-            // Calculate local sidereal time in degrees
-            const lstDegrees = this.calculateLocalSiderealTime(julianDay, longitude);
-
-            // Calculate Julian centuries from J2000.0
-            const t = (julianDay - 2451545.0) / 36525.0;
-
-            // Calculate obliquity of ecliptic
-            const obliquityDegrees = 23.4393 - 0.0130 * t;
-
-            // Convert to radians for calculations
-            const degreesToRadians = (deg) => (deg * Math.PI) / 180;
-            const radiansToDegrees = (rad) => (rad * 180) / Math.PI;
-
-            const latitudeRad = degreesToRadians(latitude);
-            const lstRad = degreesToRadians(lstDegrees);
-            const obliquityRad = degreesToRadians(obliquityDegrees);
-
-            // Calculate ascendant using spherical trigonometry formula
-            // Formula: tan(asc) = (cos(LST)) / (-sin(LST) * cos(obliquity) - tan(lat) * sin(obliquity))
-            const numerator = Math.cos(lstRad);
-            const denominator = -Math.sin(lstRad) * Math.cos(obliquityRad) - Math.tan(latitudeRad) * Math.sin(obliquityRad);
-
-            let ascendantRad = Math.atan2(numerator, denominator);
-
-            // Convert to degrees
-            let ascendantLongitude = radiansToDegrees(ascendantRad);
-
-            // Normalize to 0-360 range
-            while (ascendantLongitude < 0) {
-                ascendantLongitude += 360;
-            }
-            ascendantLongitude = ascendantLongitude % 360;
-
-            // Apply Lahiri ayanamsa to convert tropical to sidereal
-            const ayanamsa = this.calculateImprovedLahiriAyanamsa(julianDay);
-            let siderealAscendant = ascendantLongitude - ayanamsa;
-
-            // Normalize sidereal ascendant to 0-360 range
-            while (siderealAscendant < 0) {
-                siderealAscendant += 360;
-            }
-            siderealAscendant = siderealAscendant % 360;
-
-            // Get sign information
-            const signInfo = getSign(siderealAscendant);
-
-            if (!signInfo || typeof signInfo.signIndex !== 'number') {
-                throw new Error('Invalid sign calculation result');
-            }
-
-            return {
-                longitude: siderealAscendant,
-                sign: getSignName(signInfo.signIndex),
-                signId: getSignId(signInfo.signIndex),
-                signIndex: signInfo.signIndex,
-                degree: signInfo.degreeInSign,
-            };
-        } catch (error) {
-            throw new Error(`Pure JavaScript ascendant calculation failed: ${error.message}`);
-        }
-    }
 }
 
 export default AscendantCalculator;

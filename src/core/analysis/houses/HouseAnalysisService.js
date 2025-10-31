@@ -200,7 +200,7 @@ class HouseAnalysisService {
         return; // Skip if no name
       }
 
-      // Determine house number - prefer explicit house property, fallback to longitude calculation
+      // Determine house number - prefer explicit house property, otherwise calculate from longitude
       let houseNumber;
       if (planetHouse && planetHouse >= 1 && planetHouse <= 12) {
         // Use explicit house number if provided

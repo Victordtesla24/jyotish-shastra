@@ -1,7 +1,6 @@
 import { computeSunriseSunset, normalizeDegrees } from '../astronomy/sunrise.js';
-import { calculateJulianDay } from '../../../utils/calculations/julianDay.js';
 
-// Optional swisseph import for serverless compatibility
+// Production-grade Swiss Ephemeris import - no fallbacks
 let swisseph = null;
 let swissephAvailable = false;
 
@@ -11,14 +10,8 @@ let swissephAvailable = false;
     swisseph = swissephModule.default || swissephModule;
     swissephAvailable = true;
   } catch (error) {
-    console.warn('⚠️  gulika: swisseph not available:', error.message);
     swissephAvailable = false;
-    swisseph = {
-      swe_julday: () => {
-        throw new Error('Swiss Ephemeris not available');
-      },
-      SE_GREG_CAL: 1
-    };
+    throw new Error(`Swiss Ephemeris is required for gulika calculations but not available: ${error.message}. Please ensure swisseph module is properly installed and ephemeris files are configured.`);
   }
 })();
 
@@ -51,15 +44,12 @@ function toJulianDayUT(dateUtc) {
   const hour = dateUtc.getUTCHours() + dateUtc.getUTCMinutes() / 60 + dateUtc.getUTCSeconds() / 3600;
   const gregflag = swisseph?.SE_GREG_CAL || 1;
   
-  if (swissephAvailable && swisseph && typeof swisseph.swe_julday === 'function') {
-    // Use swisseph if available (local development)
-    const result = swisseph.swe_julday(y, m, d, hour, gregflag);
-    return typeof result === 'object' && result.julianDay ? result.julianDay : result;
-  } else {
-    // Use pure JavaScript calculation for serverless environments
-    console.log('📝 gulika: Using pure JavaScript Julian Day calculation (swisseph unavailable)');
-    return calculateJulianDay(y, m, d, hour, gregflag);
+  if (!swissephAvailable || !swisseph || typeof swisseph.swe_julday !== 'function') {
+    throw new Error('Swiss Ephemeris is required for Julian Day calculations but is not available. Please ensure Swiss Ephemeris is properly installed and configured.');
   }
+
+  const result = swisseph.swe_julday(y, m, d, hour, gregflag);
+  return typeof result === 'object' && result.julianDay ? result.julianDay : result;
 }
 
 export async function computeGulikaLongitude({

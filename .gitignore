@@ -59,7 +59,7 @@ coverage/
 ehthumbs.db
 Thumbs.db
 coverage/
-ephemeris/
+# ephemeris/  # Allow ephemeris files for production deployment
 
 # Windows
 Thumbs.db

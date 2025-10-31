@@ -3,6 +3,14 @@
  * Contains constants and settings for Vedic astrology calculations
  */
 
+import path from 'path';
+
+// Resolve ephemeris path correctly for both local and serverless environments
+function getEphemerisPath() {
+  // For serverless (Vercel) and local, use process.cwd()
+  return path.resolve(process.cwd(), 'ephemeris');
+}
+
 export default {
   // Zodiac Signs (Rashis)
   ZODIAC_SIGNS: {
@@ -86,7 +94,7 @@ export default {
   // Calculation Settings
   CALCULATION_SETTINGS: {
     DEFAULT_AYANAMSA: 23.85, // Lahiri Ayanamsa
-    EPHEMERIS_PATH: './ephemeris',
+    EPHEMERIS_PATH: getEphemerisPath(),
     PRECISION: 6, // Decimal places for calculations
     TIME_ZONE_DEFAULT: 'UTC'
   },

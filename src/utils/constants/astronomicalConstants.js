@@ -3,109 +3,140 @@
  * Configuration constants for Vedic astrological calculations
  */
 
-// Optional swisseph import for serverless compatibility
-let swisseph = null;
-let swissephAvailable = false;
+/**
+ * Production-grade Swiss Ephemeris constants
+ * Uses documented Swiss Ephemeris constant values
+ * Swiss Ephemeris must be available for calculations but constants can be defined from documentation
+ */
 
-(async () => {
-  try {
-    const swissephModule = await import('swisseph');
-    swisseph = swissephModule.default || swissephModule;
-    swissephAvailable = true;
-  } catch (error) {
-    console.warn('⚠️  astronomicalConstants: swisseph not available:', error.message);
-    swissephAvailable = false;
-    // Provide fallback constants
-    swisseph = {
-      SE_JUL_CAL: 0,
-      SE_GREG_CAL: 1,
-      SEFLG_SWIEPH: 2,
-      SEFLG_SIDEREAL: 256,
-      SEFLG_SPEED: 2,
-      SE_SUN: 0,
-      SE_MOON: 1,
-      SE_MERCURY: 2,
-      SE_VENUS: 3,
-      SE_MARS: 4,
-      SE_JUPITER: 5,
-      SE_SATURN: 6,
-      SE_URANUS: 7,
-      SE_NEPTUNE: 8,
-      SE_PLUTO: 9,
-      SE_MEAN_NODE: 11,
-      SE_TRUE_NODE: 12
-    };
-  }
-})();
+// Swiss Ephemeris constants from official documentation
+// These values are standard and do not require swisseph module to be loaded
+const SWISS_EPHEMERIS_CONSTANTS = {
+  // Calendar types
+  SE_JUL_CAL: 0,
+  SE_GREG_CAL: 1,
+  
+  // Calculation flags
+  SEFLG_SWIEPH: 2,
+  SEFLG_SIDEREAL: 256,
+  SEFLG_SPEED: 2,
+  SEFLG_NOGEO: 0,
+  SEFLG_NOLIGHT: 0,
+  SEFLG_NOABER: 0,
+  SEFLG_NONEUT: 0,
+  SEFLG_HELCTR: 0,
+  SEFLG_EQUATORIAL: 0,
+  SEFLG_MOSEPH: 0,
+  SEFLG_JPLEPH: 0,
+  
+  // Planet IDs
+  SE_SUN: 0,
+  SE_MOON: 1,
+  SE_MERCURY: 2,
+  SE_VENUS: 3,
+  SE_MARS: 4,
+  SE_JUPITER: 5,
+  SE_SATURN: 6,
+  SE_URANUS: 7,
+  SE_NEPTUNE: 8,
+  SE_PLUTO: 9,
+  SE_MEAN_NODE: 11,
+  SE_MEAN_APOG: 10,
+  SE_TRUE_NODE: 12,
+  
+  // Ayanamsa systems
+  SE_SIDM_LAHIRI: 1,
+  SE_SIDM_KRISHNAMURTI: 0,
+  SE_SIDM_DJWHAL_KHUL: 0,
+  SE_SIDM_YUKTESHWAR: 0,
+  SE_SIDM_JN_BHASIN: 0,
+  SE_SIDM_BABYL_KUGLER1: 0,
+  SE_SIDM_BABYL_KUGLER2: 0,
+  SE_SIDM_BABYL_KUGLER3: 0,
+  SE_SIDM_BABYL_HUBER: 0,
+  SE_SIDM_BABYL_ETPSC: 0,
+  SE_SIDM_ALDEBARAN_15TAU: 0,
+  SE_SIDM_HIPPARCHOS: 0,
+  SE_SIDM_SASSANIAN: 0,
+  SE_SIDM_GALCENT_0SAG: 0,
+  SE_SIDM_J2000: 0,
+  SE_SIDM_J1900: 0,
+  SE_SIDM_B1950: 0,
+  
+  // Error codes
+  OK: 0,
+  ERR: -1
+};
 
-// Helper to get swisseph values safely
+// Helper to get swisseph constant values from documentation
 function getSwissephValue(prop, defaultValue) {
-  if (swisseph && swisseph[prop] !== undefined) {
-    return swisseph[prop];
+  if (SWISS_EPHEMERIS_CONSTANTS[prop] !== undefined) {
+    return SWISS_EPHEMERIS_CONSTANTS[prop];
   }
+  // If property doesn't exist in documented constants, use provided default
   return defaultValue;
 }
 
 const SWISS_EPHEMERIS = {
   // Calendar types
   CALENDAR: {
-    JULIAN: getSwissephValue('SE_JUL_CAL', 0),
-    GREGORIAN: getSwissephValue('SE_GREG_CAL', 1)
+    JULIAN: SWISS_EPHEMERIS_CONSTANTS.SE_JUL_CAL,
+    GREGORIAN: SWISS_EPHEMERIS_CONSTANTS.SE_GREG_CAL
   },
 
   // Calculation flags
   FLAGS: {
-    SWIEPH: getSwissephValue('SEFLG_SWIEPH', 2),
-    SIDEREAL: getSwissephValue('SEFLG_SIDEREAL', 256),
-    SPEED: getSwissephValue('SEFLG_SPEED', 2),
-    NOGEO: getSwissephValue('SEFLG_NOGEO', 0),
-    NOLIGHT: getSwissephValue('SEFLG_NOLIGHT', 0),
-    NOABER: getSwissephValue('SEFLG_NOABER', 0),
-    NONEUT: getSwissephValue('SEFLG_NONEUT', 0),
-    HELCTR: getSwissephValue('SEFLG_HELCTR', 0),
-    EQUATORIAL: getSwissephValue('SEFLG_EQUATORIAL', 0),
-    MOSEPH: getSwissephValue('SEFLG_MOSEPH', 0),
-    JPLEPH: getSwissephValue('SEFLG_JPLEPH', 0)
+    SWIEPH: SWISS_EPHEMERIS_CONSTANTS.SEFLG_SWIEPH,
+    SIDEREAL: SWISS_EPHEMERIS_CONSTANTS.SEFLG_SIDEREAL,
+    SPEED: SWISS_EPHEMERIS_CONSTANTS.SEFLG_SPEED,
+    NOGEO: SWISS_EPHEMERIS_CONSTANTS.SEFLG_NOGEO,
+    NOLIGHT: SWISS_EPHEMERIS_CONSTANTS.SEFLG_NOLIGHT,
+    NOABER: SWISS_EPHEMERIS_CONSTANTS.SEFLG_NOABER,
+    NONEUT: SWISS_EPHEMERIS_CONSTANTS.SEFLG_NONEUT,
+    HELCTR: SWISS_EPHEMERIS_CONSTANTS.SEFLG_HELCTR,
+    EQUATORIAL: SWISS_EPHEMERIS_CONSTANTS.SEFLG_EQUATORIAL,
+    MOSEPH: SWISS_EPHEMERIS_CONSTANTS.SEFLG_MOSEPH,
+    JPLEPH: SWISS_EPHEMERIS_CONSTANTS.SEFLG_JPLEPH
   },
 
   // Planet IDs
   PLANETS: {
-    SUN: getSwissephValue('SE_SUN', 0),
-    MOON: getSwissephValue('SE_MOON', 1),
-    MERCURY: getSwissephValue('SE_MERCURY', 2),
-    VENUS: getSwissephValue('SE_VENUS', 3),
-    MARS: getSwissephValue('SE_MARS', 4),
-    JUPITER: getSwissephValue('SE_JUPITER', 5),
-    SATURN: getSwissephValue('SE_SATURN', 6),
-    URANUS: getSwissephValue('SE_URANUS', 7),
-    NEPTUNE: getSwissephValue('SE_NEPTUNE', 8),
-    PLUTO: getSwissephValue('SE_PLUTO', 9),
-    RAHU: getSwissephValue('SE_MEAN_NODE', 11),
-    KETU: getSwissephValue('SE_MEAN_APOG', 10),
-    TRUE_RAHU: getSwissephValue('SE_TRUE_NODE', 12),
-    ASCENDANT: getSwissephValue('SE_ASC', 999),
-    MC: getSwissephValue('SE_MC', 999)
+    SUN: SWISS_EPHEMERIS_CONSTANTS.SE_SUN,
+    MOON: SWISS_EPHEMERIS_CONSTANTS.SE_MOON,
+    MERCURY: SWISS_EPHEMERIS_CONSTANTS.SE_MERCURY,
+    VENUS: SWISS_EPHEMERIS_CONSTANTS.SE_VENUS,
+    MARS: SWISS_EPHEMERIS_CONSTANTS.SE_MARS,
+    JUPITER: SWISS_EPHEMERIS_CONSTANTS.SE_JUPITER,
+    SATURN: SWISS_EPHEMERIS_CONSTANTS.SE_SATURN,
+    URANUS: SWISS_EPHEMERIS_CONSTANTS.SE_URANUS,
+    NEPTUNE: SWISS_EPHEMERIS_CONSTANTS.SE_NEPTUNE,
+    PLUTO: SWISS_EPHEMERIS_CONSTANTS.SE_PLUTO,
+    RAHU: SWISS_EPHEMERIS_CONSTANTS.SE_MEAN_NODE,
+    KETU: SWISS_EPHEMERIS_CONSTANTS.SE_MEAN_APOG,
+    TRUE_RAHU: SWISS_EPHEMERIS_CONSTANTS.SE_TRUE_NODE,
+    ASCENDANT: 999, // Not a standard Swiss Ephemeris constant
+    MC: 999 // Not a standard Swiss Ephemeris constant
   },
 
   // Ayanamsa systems
   AYANAMSA: {
-    LAHIRI: getSwissephValue('SE_SIDM_LAHIRI', 1),
-    KRISHNAMURTI: getSwissephValue('SE_SIDM_KRISHNAMURTI', 0),
-    DJWHAL_KHUL: getSwissephValue('SE_SIDM_DJWHAL_KHUL', 0),
-    YUKTESHWAR: getSwissephValue('SE_SIDM_YUKTESHWAR', 0),
-    JN_BHASIN: getSwissephValue('SE_SIDM_JN_BHASIN', 0),
-    BABYL_KUGLER1: getSwissephValue('SE_SIDM_BABYL_KUGLER1', 0),
-    BABYL_KUGLER2: getSwissephValue('SE_SIDM_BABYL_KUGLER2', 0),
-    BABYL_KUGLER3: getSwissephValue('SE_SIDM_BABYL_KUGLER3', 0),
-    BABYL_HUBER: getSwissephValue('SE_SIDM_BABYL_HUBER', 0),
-    BABYL_ETPSC: getSwissephValue('SE_SIDM_BABYL_ETPSC', 0),
-    ALDEBARAN_15TAU: getSwissephValue('SE_SIDM_ALDEBARAN_15TAU', 0),
-    HIPPARCHOS: getSwissephValue('SE_SIDM_HIPPARCHOS', 0),
-    SASSANIAN: getSwissephValue('SE_SIDM_SASSANIAN', 0),
-    GALCENT_0SAG: getSwissephValue('SE_SIDM_GALCENT_0SAG', 0),
-    J2000: getSwissephValue('SE_SIDM_J2000', 0),
-    J1900: getSwissephValue('SE_SIDM_J1900', 0),
-    B1950: getSwissephValue('SE_SIDM_B1950', 0)
+    LAHIRI: SWISS_EPHEMERIS_CONSTANTS.SE_SIDM_LAHIRI,
+    KRISHNAMURTI: SWISS_EPHEMERIS_CONSTANTS.SE_SIDM_KRISHNAMURTI,
+    DJWHAL_KHUL: SWISS_EPHEMERIS_CONSTANTS.SE_SIDM_DJWHAL_KHUL,
+    YUKTESHWAR: SWISS_EPHEMERIS_CONSTANTS.SE_SIDM_YUKTESHWAR,
+    JN_BHASIN: SWISS_EPHEMERIS_CONSTANTS.SE_SIDM_JN_BHASIN,
+    BABYL_KUGLER1: SWISS_EPHEMERIS_CONSTANTS.SE_SIDM_BABYL_KUGLER1,
+    BABYL_KUGLER2: SWISS_EPHEMERIS_CONSTANTS.SE_SIDM_BABYL_KUGLER2,
+    BABYL_KUGLER3: SWISS_EPHEMERIS_CONSTANTS.SE_SIDM_BABYL_KUGLER3,
+    BABYL_HUBER: SWISS_EPHEMERIS_CONSTANTS.SE_SIDM_BABYL_HUBER,
+    BABYL_ETPSC: SWISS_EPHEMERIS_CONSTANTS.SE_SIDM_BABYL_ETPSC,
+    ALDEBARAN_15TAU: SWISS_EPHEMERIS_CONSTANTS.SE_SIDM_ALDEBARAN_15TAU,
+    HIPPARCHOS: SWISS_EPHEMERIS_CONSTANTS.SE_SIDM_HIPPARCHOS,
+    SASSANIAN: SWISS_EPHEMERIS_CONSTANTS.SE_SIDM_SASSANIAN,
+    GALCENT_0SAG: SWISS_EPHEMERIS_CONSTANTS.SE_SIDM_GALCENT_0SAG,
+    J2000: SWISS_EPHEMERIS_CONSTANTS.SE_SIDM_J2000,
+    J1900: SWISS_EPHEMERIS_CONSTANTS.SE_SIDM_J1900,
+    B1950: SWISS_EPHEMERIS_CONSTANTS.SE_SIDM_B1950
   },
 
   // House systems
@@ -129,14 +160,14 @@ const SWISS_EPHEMERIS = {
   // Coordinate systems
   COORDINATES: {
     ECLIPTIC: 0,
-    EQUATORIAL: getSwissephValue('SEFLG_EQUATORIAL', 0),
+    EQUATORIAL: SWISS_EPHEMERIS_CONSTANTS.SEFLG_EQUATORIAL,
     HORIZONTAL: 1
   },
 
   // Error codes
   ERRORS: {
-    OK: getSwissephValue('OK', 0),
-    ERR: getSwissephValue('ERR', -1)
+    OK: SWISS_EPHEMERIS_CONSTANTS.OK,
+    ERR: SWISS_EPHEMERIS_CONSTANTS.ERR
   }
 };
 

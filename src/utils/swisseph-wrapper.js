@@ -1,25 +1,21 @@
 /**
  * Swiss Ephemeris Wrapper
- * Provides optional swisseph import with fallback for serverless environments
- * where native dependencies may not be available
+ * Production-grade Swiss Ephemeris initialization
+ * Requires Swiss Ephemeris to be available - no fallbacks
  */
 
 let swisseph = null;
 let swissephAvailable = false;
 
-// Try to import swisseph - handle gracefully if unavailable
-try {
-  // For ES modules, use dynamic import pattern
-  // We'll initialize this on first use
-} catch (error) {
-  // Will be handled during initialization
-}
-
 /**
  * Initialize swisseph module
+ * Throws error if Swiss Ephemeris is unavailable
  */
 async function initSwisseph() {
   if (swisseph !== null) {
+    if (!swissephAvailable) {
+      throw new Error('Swiss Ephemeris initialization failed. Swiss Ephemeris is required for all calculations.');
+    }
     return { swisseph, available: swissephAvailable };
   }
   
@@ -27,25 +23,10 @@ async function initSwisseph() {
     const swissephModule = await import('swisseph');
     swisseph = swissephModule.default || swissephModule;
     swissephAvailable = true;
+    console.log('✅ Swiss Ephemeris initialized successfully');
   } catch (error) {
-    console.warn('⚠️  swisseph module not available:', error.message);
-    console.warn('📝 Chart calculations may be limited without Swiss Ephemeris');
     swissephAvailable = false;
-    
-    // Create minimal mock
-    swisseph = {
-      swe_set_ephe_path: () => {},
-      swe_set_sid_mode: () => {},
-      SEFLG_SIDEREAL: 256,
-      SEFLG_SPEED: 2,
-      SE_SIDM_LAHIRI: 1,
-      swe_calc_ut: () => {
-        throw new Error('Swiss Ephemeris not available in this environment');
-      },
-      swe_julday: () => {
-        throw new Error('Swiss Ephemeris not available in this environment');
-      }
-    };
+    throw new Error(`Swiss Ephemeris is required but not available: ${error.message}. Please ensure swisseph module is properly installed and ephemeris files are configured.`);
   }
   
   return { swisseph, available: swissephAvailable };
@@ -66,9 +47,13 @@ export async function getSwisseph() {
 
 /**
  * Check if swisseph is available
+ * Throws error if not available (no graceful fallback)
  */
 export function isSwissephAvailable() {
-  return swissephAvailable;
+  if (swisseph === null || !swissephAvailable) {
+    throw new Error('Swiss Ephemeris is not available. Swiss Ephemeris is required for all calculations.');
+  }
+  return true;
 }
 
 // Default export - provides a synchronous interface that throws if unavailable

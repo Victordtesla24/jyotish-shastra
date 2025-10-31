@@ -1,7 +1,5 @@
-import { calculateJulianDay, julianDayToDate } from '../../../utils/calculations/julianDay.js';
-import { calculatePlanetPosition } from '../../../utils/calculations/planetaryPositions.js';
 
-// Optional swisseph import for serverless compatibility
+// Production-grade Swiss Ephemeris import - no fallbacks
 let swisseph = null;
 let swissephAvailable = false;
 
@@ -11,25 +9,8 @@ let swissephAvailable = false;
     swisseph = swissephModule.default || swissephModule;
     swissephAvailable = true;
   } catch (error) {
-    console.warn('⚠️  sunrise: swisseph not available:', error.message);
     swissephAvailable = false;
-    swisseph = {
-      swe_set_ephe_path: () => {},
-      swe_julday: () => {
-        throw new Error('Swiss Ephemeris not available');
-      },
-      swe_revjul: () => {
-        throw new Error('Swiss Ephemeris not available');
-      },
-      swe_calc_ut: () => {
-        throw new Error('Swiss Ephemeris not available');
-      },
-      swe_rise_trans: () => {
-        throw new Error('Swiss Ephemeris not available');
-      },
-      SE_SUN: 0,
-      SEFLG_SWIEPH: 2
-    };
+    throw new Error(`Swiss Ephemeris is required for sunrise calculations but not available: ${error.message}. Please ensure swisseph module is properly installed and ephemeris files are configured.`);
   }
 })();
 
@@ -52,37 +33,30 @@ function initSwissEphemeris() {
 }
 
 function toJulianDayUT(dateUtc) {
-  // Convert JS Date (UTC) to Julian Day (UT)
+  if (!swissephAvailable || !swisseph || typeof swisseph.swe_julday !== 'function') {
+    throw new Error('Swiss Ephemeris is required for Julian Day calculations but is not available. Please ensure Swiss Ephemeris is properly installed and configured.');
+  }
+
   const year = dateUtc.getUTCFullYear();
   const month = dateUtc.getUTCMonth() + 1;
   const day = dateUtc.getUTCDate();
   const hour = dateUtc.getUTCHours() + dateUtc.getUTCMinutes() / 60 + dateUtc.getUTCSeconds() / 3600;
   
-  if (swissephAvailable && swisseph && typeof swisseph.swe_julday === 'function') {
-    // Use swisseph if available (local development)
-    const result = swisseph.swe_julday(year, month, day, hour, 1);
-    return typeof result === 'object' && result.julianDay ? result.julianDay : result;
-  } else {
-    // Use pure JavaScript calculation for serverless environments
-    console.log('📝 sunrise: Using pure JavaScript Julian Day calculation (swisseph unavailable)');
-    return calculateJulianDay(year, month, day, hour, 1);
-  }
+  const result = swisseph.swe_julday(year, month, day, hour, 1);
+  return typeof result === 'object' && result.julianDay ? result.julianDay : result;
 }
 
 function fromJulianDayUT(jd) {
-  if (swissephAvailable && swisseph && typeof swisseph.swe_revjul === 'function') {
-    // Use swisseph if available (local development)
-    const gregflag = 1;
-    const { year, month, day, hour } = swisseph.swe_revjul(jd, gregflag);
-    const h = Math.floor(hour);
-    const m = Math.floor((hour - h) * 60);
-    const s = Math.floor(((hour - h) * 60 - m) * 60);
-    return new Date(Date.UTC(year, month - 1, day, h, m, s));
-  } else {
-    // Use pure JavaScript conversion for serverless environments
-    console.log('📝 sunrise: Using pure JavaScript Julian Day to Date conversion (swisseph unavailable)');
-    return julianDayToDate(jd);
+  if (!swissephAvailable || !swisseph || typeof swisseph.swe_revjul !== 'function') {
+    throw new Error('Swiss Ephemeris is required for Julian Day to Date conversion but is not available. Please ensure Swiss Ephemeris is properly installed and configured.');
   }
+
+  const gregflag = 1;
+  const { year, month, day, hour } = swisseph.swe_revjul(jd, gregflag);
+  const h = Math.floor(hour);
+  const m = Math.floor((hour - h) * 60);
+  const s = Math.floor(((hour - h) * 60 - m) * 60);
+  return new Date(Date.UTC(year, month - 1, day, h, m, s));
 }
 
 function parseTimezoneOffsetHours(timezone) {
@@ -99,62 +73,6 @@ function parseTimezoneOffsetHours(timezone) {
 // Note: Swiss Ephemeris in Node.js works synchronously, not with callbacks
 // The issue with result.data undefined is likely due to missing ephemeris data or incorrect parameters
 
-/**
- * Calculate sunrise and sunset using pure JavaScript (no Swiss Ephemeris)
- * Based on Meeus Astronomical Algorithms
- * @param {number} julianDay - Julian Day Number
- * @param {number} latitude - Latitude in degrees
- * @param {number} longitude - Longitude in degrees
- * @returns {Object} Object with sunriseUtc and sunsetUtc as Julian Day numbers
- */
-function calculateSunriseSunsetPureJS(julianDay, latitude, longitude) {
-  // Calculate Julian Day at noon
-  const jdNoon = Math.floor(julianDay) + 0.5;
-  const n = jdNoon - 2451545.0 + 0.0008;
-  
-  // Calculate approximate local solar time
-  const jStar = n - longitude / 360;
-  
-  // Calculate mean solar noon
-  const M = (357.5291 + 0.98560028 * jStar) % 360;
-  const C = 1.9148 * Math.sin(degreesToRadians(M)) +
-            0.02 * Math.sin(degreesToRadians(2 * M)) +
-            0.0003 * Math.sin(degreesToRadians(3 * M));
-  const lambda = (M + 102.9372 + C + 180) % 360;
-  
-  // Calculate solar transit (noon)
-  const jTransit = 2451545.0 + jStar + 0.0053 * Math.sin(degreesToRadians(M)) - 
-                   0.0069 * Math.sin(degreesToRadians(2 * lambda));
-  
-  // Calculate declination of sun
-  const declination = Math.asin(Math.sin(degreesToRadians(23.44)) * 
-                                Math.sin(degreesToRadians(lambda)));
-  
-  // Calculate hour angle
-  const latRad = degreesToRadians(latitude);
-  const hourAngle = Math.acos(
-    (Math.sin(degreesToRadians(-0.833)) - Math.sin(latRad) * Math.sin(declination)) /
-    (Math.cos(latRad) * Math.cos(declination))
-  );
-  
-  // Calculate sunrise and sunset in Julian Days
-  const sunriseJD = jTransit - (radiansToDegrees(hourAngle) / 360);
-  const sunsetJD = jTransit + (radiansToDegrees(hourAngle) / 360);
-  
-  return {
-    sunriseJD,
-    sunsetJD,
-    transitJD: jTransit
-  };
-}
-
-function degreesToRadians(degrees) {
-  return degrees * Math.PI / 180;
-}
-
-function radiansToDegrees(radians) {
-  return radians * 180 / Math.PI;
-}
 
 // Production grade error handling - no fallback calculations
 function throwSunriseCalculationError(error) {
@@ -180,9 +98,12 @@ export async function computeSunriseSunset(dateLocal, latitude, longitude, timez
   try {
     const jd = toJulianDayUT(dateLocal);
     
-    // Use Swiss Ephemeris if available, otherwise use pure JavaScript calculations
-    if (swissephAvailable && swisseph) {
-      initSwissEphemeris();
+    // Swiss Ephemeris is required for sunrise/sunset calculations
+    if (!swissephAvailable || !swisseph) {
+      throw new Error('Swiss Ephemeris is required for sunrise/sunset calculations but is not available. Please ensure Swiss Ephemeris is properly installed and configured.');
+    }
+    
+    initSwissEphemeris();
       
       // Calculate sunrise and sunset using Swiss Ephemeris swe_rise_trans
       const geopos = [longitude, latitude, 0]; // [longitude, latitude, altitude in meters]
@@ -238,22 +159,6 @@ export async function computeSunriseSunset(dateLocal, latitude, longitude, timez
       const sunsetLocal = new Date(sunsetUtc.getTime() + tzOffsetHours * 3600 * 1000);
 
       return { sunriseLocal, sunsetLocal, tzOffsetHours };
-    } else {
-      // Use pure JavaScript sunrise/sunset calculation for serverless environment
-      console.log('📝 sunrise: Using pure JavaScript sunrise/sunset calculation (swisseph unavailable)');
-      
-      const sunriseSunset = calculateSunriseSunsetPureJS(jd, latitude, longitude);
-      
-      const sunriseUtc = julianDayToDate(sunriseSunset.sunriseJD);
-      const sunsetUtc = julianDayToDate(sunriseSunset.sunsetJD);
-
-      // Convert to local timezone
-      const tzOffsetHours = parseTimezoneOffsetHours(timezone);
-      const sunriseLocal = new Date(sunriseUtc.getTime() + tzOffsetHours * 3600 * 1000);
-      const sunsetLocal = new Date(sunsetUtc.getTime() + tzOffsetHours * 3600 * 1000);
-
-      return { sunriseLocal, sunsetLocal, tzOffsetHours };
-    }
   } catch (error) {
     // Production grade error handling
     throwSunriseCalculationError(error);
