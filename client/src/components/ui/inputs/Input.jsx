@@ -1,7 +1,7 @@
 import React, { forwardRef, useState } from 'react';
 import { cva } from 'class-variance-authority';
 import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '../../../lib/utils.js';
+import { cn } from '../../../lib/utils';
 
 const inputVariants = cva(
   'w-full rounded-xl border bg-vedic-surface text-vedic-text transition-all duration-300 placeholder:text-vedic-text-muted focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',

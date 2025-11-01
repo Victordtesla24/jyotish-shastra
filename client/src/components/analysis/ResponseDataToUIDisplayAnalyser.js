@@ -517,7 +517,7 @@ const ResponseDataToUIDisplayAnalyser = {
 
       // Fetch comprehensive analysis from API
       // Use apiConfig utility to get full API URL
-      const { getApiUrl } = await import('../../utils/apiConfig.js');
+      const { getApiUrl } = await import('../../utils/apiConfig');
       const response = await fetch(getApiUrl('/api/v1/analysis/comprehensive'), {
         method: 'POST',
         headers: {
@@ -754,7 +754,7 @@ const ResponseDataToUIDisplayAnalyser = {
       }
 
       // Use apiConfig utility to get full API URL
-      const { getApiUrl } = await import('../../utils/apiConfig.js');
+      const { getApiUrl } = await import('../../utils/apiConfig');
       const fullEndpoint = getApiUrl(endpoint);
 
       const response = await fetch(fullEndpoint, {

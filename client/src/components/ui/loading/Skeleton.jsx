@@ -1,7 +1,7 @@
 "use client";
 import React from 'react';
 import { motion } from 'framer-motion';
-import { cn } from '../../../lib/utils.js';
+import { cn } from '../../../lib/utils';
 
 const Skeleton = ({
   className,

@@ -2,7 +2,7 @@
 import React, { forwardRef } from 'react';
 import { motion } from 'framer-motion';
 import { cva } from 'class-variance-authority';
-import { cn } from '../../../lib/utils.js';
+import { cn } from '../../../lib/utils';
 
 const cardVariants = cva(
   [
