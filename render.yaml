@@ -17,7 +17,7 @@ services:
         fromEnvVar: PORT  # Render assigns this dynamically
 
   # Frontend Static Site
-  - type: static
+  - type: static_site
     name: jjyotish-shastra-frontend
     buildCommand: cd client && npm install && npm run build
     staticPublishPath: client/build
