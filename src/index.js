@@ -121,6 +121,66 @@ if (isDevelopment) {
   }
 }
 
+// Root endpoint - API documentation
+app.get('/', (req, res) => {
+  const protocol = req.protocol;
+  const host = req.get('host');
+  const baseUrl = `${protocol}://${host}`;
+  
+  res.status(200).json({
+    message: 'Jyotish Shastra Backend API',
+    version: '1.0.0',
+    status: 'active',
+    description: 'Vedic Astrology Chart Generation and Analysis API',
+    documentation: {
+      endpoints: {
+        health: {
+          url: '/health',
+          method: 'GET',
+          description: 'Server health check'
+        },
+        detailed_health: {
+          url: '/api/v1/health',
+          method: 'GET',
+          description: 'Detailed health information with service status'
+        },
+        chart_generation: {
+          url: '/api/v1/chart/generate',
+          method: 'POST',
+          description: 'Generate Vedic birth chart',
+          example: {
+            name: 'John Doe',
+            dateOfBirth: '1990-01-01',
+            timeOfBirth: '12:00',
+            placeOfBirth: 'Mumbai, Maharashtra, India',
+            latitude: 19.076,
+            longitude: 72.8777,
+            timezone: 'Asia/Kolkata'
+          }
+        },
+        comprehensive_analysis: {
+          url: '/api/v1/analysis/comprehensive',
+          method: 'POST',
+          description: 'Comprehensive astrological analysis'
+        },
+        geocoding: {
+          url: '/api/v1/geocoding/location',
+          method: 'POST',
+          description: 'Convert location to coordinates'
+        }
+      }
+    },
+    links: {
+      health: `${baseUrl}/health`,
+      api_health: `${baseUrl}/api/v1/health`,
+      repository: 'https://github.com/Victordtesla24/jyotish-shastra'
+    },
+    environment: process.env.NODE_ENV || 'development',
+    platform: isRender ? 'render' : 'local',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({
@@ -180,10 +240,30 @@ app.use('/api/*', (req, res) => {
     message: `Cannot ${req.method} ${req.originalUrl}`,
     available_endpoints: {
       health: 'GET /health',
+      api_health: 'GET /api/v1/health',
       chart: 'POST /api/v1/chart/generate',
       analysis: 'POST /api/v1/analysis/comprehensive',
       geocoding: 'POST /api/v1/geocoding/location',
     },
+    suggestion: 'Visit the root endpoint (/) for complete API documentation'
+  });
+});
+
+// Catch-all route handler for undefined non-API routes
+app.use('*', (req, res) => {
+  res.status(404).json({
+    error: 'Route not found',
+    message: `Cannot ${req.method} ${req.originalUrl}`,
+    available_routes: {
+      root: 'GET /',
+      health: 'GET /health',
+      api_health: 'GET /api/v1/health',
+      chart: 'POST /api/v1/chart/generate',
+      analysis: 'POST /api/v1/analysis/comprehensive',
+      geocoding: 'POST /api/v1/geocoding/location'
+    },
+    suggestion: 'Visit the root endpoint (/) for complete API documentation',
+    timestamp: new Date().toISOString()
   });
 });
 
