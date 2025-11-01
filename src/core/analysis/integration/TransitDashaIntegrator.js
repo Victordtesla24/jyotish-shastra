@@ -4,7 +4,7 @@
  * Implements classical principles for transit-dasha integration
  */
 
-const TransitCalculator = require('../../calculations/transits/TransitCalculator');
+const TransitCalculator = require('../../core/calculations/transits/TransitCalculator.js');
 const SadeSatiCalculator = require('../../calculations/transits/SadeSatiCalculator');
 
 class TransitDashaIntegrator {

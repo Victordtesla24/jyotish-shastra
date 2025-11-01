@@ -19,9 +19,11 @@
     "test:visual": "node scripts/visual-comparison.js",
     "lint:chart": "eslint src/components/VedicChartDisplay.jsx",
     "format:chart": "prettier --write src/components/VedicChartDisplay.jsx",
-    "vercel-build": "cd client && npm install && npm run build",
-    "deploy:vercel": "node scripts/deploy-vercel.js",
-    "postinstall": "node -e \"try { require('swisseph') } catch(e) { console.log('Swisseph: optional module, skipping build') }\"",
+    "copy-wasm": "node scripts/copy-wasm-assets.js",
+    "build:render": "npm run copy-wasm",
+    "prebuild": "npm run copy-wasm",
+    "deploy:render": "render services deploy",
+    "postinstall": "node -e \"try { require('sweph-wasm') } catch(e) { console.log('Sweph-WASM: optional module during build, will fail gracefully at runtime if unavailable') }\"",
     "test:summary": "node scripts/test-summary.js",
     "test:summary-full": "node scripts/test-summary.js && open user-docs",
     "test:comprehensive": "node scripts/comprehensive-test-summary.js",
@@ -43,7 +45,7 @@
     "mongoose": "^8.16.1",
     "morgan": "^1.10.1",
     "opencage-api-client": "^1.1.0",
-    "swisseph": "^0.5.17"
+    "sweph-wasm": "^2.6.9"
   },
   "devDependencies": {
     "@babel/plugin-syntax-import-meta": "^7.10.4",
@@ -63,7 +65,6 @@
     "jest-transform-css": "^6.0.3",
     "lint-staged": "^15.2.0",
     "prettier": "^3.1.0",
-    
     "supertest": "^7.1.4"
   },
   "husky": {
@@ -76,6 +77,9 @@
       "eslint --fix",
       "prettier --write"
     ]
+  },
+  "engines": {
+    "node": ">=18.0.0"
   },
   "browserslist": {
     "production": [

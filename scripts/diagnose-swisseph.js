@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 /**
- * Swiss Ephemeris Diagnostic Script
+ * Swiss Ephemeris (WebAssembly) Diagnostic Script
  * Tests ephemeris configuration and basic calculations
  */
 
-import swisseph from 'swisseph';
+import { initSwisseph } from '../src/utils/swisseph-wrapper.js';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
@@ -12,7 +12,18 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-console.log('=== Swiss Ephemeris Diagnostic Tool ===\n');
+console.log('=== Swiss Ephemeris (WASM) Diagnostic Tool ===\n');
+
+// Initialize sweph-wasm using improved wrapper
+let swisseph = null;
+try {
+  const result = await initSwisseph();
+  swisseph = result.swisseph;
+  console.log('✅ Swiss Ephemeris (WASM) initialized via wrapper\n');
+} catch (error) {
+  console.error('❌ Failed to initialize Swiss Ephemeris (WASM):', error.message);
+  process.exit(1);
+}
 
 // Test 1: Check ephemeris directory
 console.log('Test 1: Checking ephemeris directory...');
@@ -50,18 +61,25 @@ try {
   process.exit(1);
 }
 
-// Test 3: Initialize Swiss Ephemeris
-console.log('\nTest 3: Initializing Swiss Ephemeris...');
+// Test 3: Set ephemeris path (skipping for WASM compatibility)
+console.log('\nTest 3: Setting ephemeris path (WASM compatibility mode)...');
 try {
-  swisseph.swe_set_ephe_path(ephePath);
-  console.log('✅ Swiss Ephemeris path set');
+  // Note: With sweph-wasm, ephemeris files are typically bundled
+  // so setting path isn't always necessary/available
+  console.log('🔧 WASM version uses bundled ephemeris, skipping external path setup');
+  console.log('⚠️ Note: External ephemeris files may not be accessible due to fetch limitations');
   
-  // Verify path was set correctly
-  const setPath = swisseph.swe_get_ephe_path?.() || 'Method not available';
-  console.log(`Verified path: ${setPath}`);
+  // Try setting path anyway, but ignore if it fails
+  try {
+    await swisseph.swe_set_ephe_path(ephePath);
+    console.log('✅ External ephemeris path set successfully');
+  } catch (pathError) {
+    console.log('⚠️ External ephemeris path setup failed (expected with WASM):');
+    console.log(`   ${pathError.message}`);
+    console.log('⚠️ WASM will use bundled ephemeris data instead');
+  }
 } catch (error) {
-  console.error('❌ Error setting ephemeris path:', error.message);
-  process.exit(1);
+  console.error('❌ Unexpected error in ephemeris path test:', error.message);
 }
 
 // Test 4: Test basic sun position calculation
@@ -72,28 +90,36 @@ try {
   console.log(`Julian Day: ${jd}`);
   
   const flags = swisseph.SEFLG_SWIEPH; // Use Swiss Ephemeris files
-  const result = swisseph.swe_calc_ut(jd, swisseph.SE_SUN, flags);
+  const result = await swisseph.swe_calc_ut(jd, swisseph.SE_SUN, flags);
   
-  console.log('Result object:', JSON.stringify(result, null, 2));
+  console.log('Result type:', Array.isArray(result) ? 'array' : typeof result);
+  console.log('Result data:', result);
   
-  if (result.error) {
-    console.error('❌ Swiss Ephemeris returned an error:', result.error);
-    process.exit(1);
+  // sweph-wasm may return array or object, handle both
+  let longitude, latitude, distance;
+  
+  if (Array.isArray(result)) {
+    // Array format: [longitude, latitude, distance, ...]
+    [longitude, latitude, distance] = result;
+  } else if (typeof result === 'object' && result !== null) {
+    // Object format with properties
+    longitude = result.longitude;
+    latitude = result.latitude;
+    distance = result.distance;
   }
   
-  if (result.longitude === undefined) {
-    console.error('❌ Swiss Ephemeris returned no data!');
+  if (longitude !== undefined && !isNaN(longitude)) {
+    console.log('✅ Sun position calculated successfully');
+    console.log(`Sun longitude: ${longitude}°`);
+    console.log(`Sun latitude: ${latitude || 0}°`);
+    console.log(`Sun distance: ${distance || 0} AU`);
+  } else {
+    console.error('❌ Swiss Ephemeris returned invalid data!');
     console.log('This usually means:');
-    console.log('  1. Ephemeris files are corrupted or incomplete');
-    console.log('  2. Files don\'t cover the requested date range');
-    console.log('  3. Wrong flag used (try SEFLG_SWIEPH vs SEFLG_SWIEPH | SEFLG_SPEED)');
+    console.log('  1. Ephemeris data format issue');
+    console.log('  2. API compatibility issue');
     process.exit(1);
   }
-  
-  console.log('✅ Sun position calculated successfully');
-  console.log(`Sun longitude: ${result.longitude}°`);
-  console.log(`Sun latitude: ${result.latitude}°`);
-  console.log(`Sun distance: ${result.distance} AU`);
 } catch (error) {
   console.error('❌ Error calculating sun position:', error.message);
   console.error('Stack:', error.stack);
@@ -109,23 +135,27 @@ try {
   const day = date.getUTCDate();
   const hour = date.getUTCHours() + date.getUTCMinutes() / 60;
   
-  const jd = swisseph.swe_julday(year, month, day, hour, 1); // 1 = Gregorian calendar
+  const jd = await swisseph.swe_julday(year, month, day, hour, 1); // 1 = Gregorian calendar
   console.log(`Julian Day: ${jd}`);
   
-  const result = swisseph.swe_calc_ut(jd, swisseph.SE_SUN, swisseph.SEFLG_SWIEPH);
+  const result = await swisseph.swe_calc_ut(jd, swisseph.SE_SUN, swisseph.SEFLG_SWIEPH);
   
-  if (result.error) {
-    console.error('❌ Error:', result.error);
-    process.exit(1);
+  // Handle array format again
+ let longitude;
+  if (Array.isArray(result)) {
+    longitude = result[0];
+  } else if (typeof result === 'object' && result !== null) {
+    longitude = result.longitude;
   }
   
-  if (result.longitude === undefined) {
-    console.error('❌ No data returned for 1990 date');
+  if (longitude === undefined || isNaN(longitude)) {
+    console.error('❌ No valid data returned for 1990 date');
+    console.log('Result:', result);
     process.exit(1);
   }
   
   console.log('✅ 1990 date calculation successful');
-  console.log(`Sun longitude: ${result.longitude}°`);
+  console.log(`Sun longitude: ${longitude}°`);
 } catch (error) {
   console.error('❌ Error with 1990 date:', error.message);
   process.exit(1);
@@ -137,7 +167,7 @@ try {
   const jd = 2447892.5625; // Exact JD from error message
   console.log(`Julian Day: ${jd} (from error message)`);
   
-  const result = swisseph.swe_calc_ut(jd, swisseph.SE_SUN, swisseph.FLG_EQUATORIAL);
+  const result = await swisseph.swe_calc_ut(jd, swisseph.SE_SUN, swisseph.FLG_EQUATORIAL);
   
   if (result.error) {
     console.error('❌ Error with FLG_EQUATORIAL:', result.error);

@@ -1,15 +1,16 @@
 /**
- * Debug Swiss Ephemeris initialization and basic functionality
+ * Debug Swiss Ephemeris (WebAssembly) initialization and basic functionality
  */
-import swisseph from 'swisseph';
+import { setupSwissephWithEphemeris } from '../src/utils/swisseph-wrapper.js';
 import path from 'path';
 import fs from 'fs';
 
 async function debugSwisseph() {
-  console.log('🔍 Debugging Swiss Ephemeris');
+  console.log('🔍 Debugging Swiss Ephemeris (WASM)');
   
   try {
-    // Check ephemeris path
+    // Initialize sweph-wasm using improved wrapper with ephemeris setup
+    console.log('Initializing Swiss Ephemeris (WASM) with ephemeris setup...');
     const ephePath = path.resolve(process.cwd(), 'ephemeris');
     console.log('Ephemeris path:', ephePath);
     console.log('Ephemeris exists:', fs.existsSync(ephePath));
@@ -19,9 +20,8 @@ async function debugSwisseph() {
       console.log('Ephemeris files:', files);
     }
     
-    // Initialize Swiss Ephemeris
-    console.log('Initializing Swiss Ephemeris...');
-    swisseph.swe_set_ephe_path(ephePath);
+    const { swisseph } = await setupSwissephWithEphemeris(ephePath);
+    console.log('✅ Swiss Ephemeris initialized with ephemeris via wrapper');
     
     // Test basic calculation - get Sun position
     console.log('Testing Sun position calculation...');
@@ -33,20 +33,24 @@ async function debugSwisseph() {
     
     console.log('Testing date:', { year, month, day, hour });
     
-    const jd = swisseph.swe_julday(year, month, day, hour, 1);
+    const jd = await swisseph.swe_julday(year, month, day, hour, 1);
     console.log('Julian Day:', jd);
     
     // Get Sun position
-    const flags = swisseph.SEFLG_SWIEPH;
-    const result = swisseph.swe_calc_ut(jd, swisseph.SE_SUN, flags);
+    const flags = 2; // SEFLG_SWIEPH = 2
+    const result = await swisseph.swe_calc_ut(jd, 0, flags); // 0 = SE_SUN
     
     console.log('Calculation result:', result);
     
-    if (result && result.rflag === 0) {
+    if (Array.isArray(result) && result.length >= 6) {
+      const [longitude, latitude, distance, speedLon, speedLat, speedDist] = result;
       console.log('✅ Sun position calculation successful');
-      console.log('Sun longitude:', result.longitude, 'degrees');
+      console.log('Sun longitude:', longitude, 'degrees');
+      console.log('Sun latitude:', latitude, 'degrees');
+      console.log('Sun distance:', distance, 'AU');
+      console.log('Sun speeds:', { speedLon, speedLat, speedDist });
     } else {
-      console.log('❌ Sun position calculation failed, rflag:', result?.rflag);
+      console.log('❌ Sun position calculation failed, result format:', typeof result, result);
     }
     
     // Test sunrise
@@ -54,12 +58,12 @@ async function debugSwisseph() {
     const geopos = [74.5411575, 32.4935378, 0]; // lon, lat, altitude
     const jdNoon = jd; // Use noon as reference
     
-    const riseResult = swisseph.swe_rise_trans(
+    const riseResult = await swisseph.swe_rise_trans(
       jdNoon,
-      swisseph.SE_SUN,
+      0, // SE_SUN
       '',
-      swisseph.SEFLG_SWIEPH,
-      swisseph.SE_CALC_RISE,
+      2, // SEFLG_SWIEPH
+      1, // SE_CALC_RISE = 1
       geopos,
       0, // pressure
       0  // temperature
@@ -67,9 +71,16 @@ async function debugSwisseph() {
     
     console.log('Sunrise result:', riseResult);
     
-    if (riseResult && riseResult.tret) {
+    if (typeof riseResult === 'number' && !isNaN(riseResult)) {
       console.log('✅ Sunrise calculation successful');
-      console.log('Sunrise JD:', riseResult.tret);
+      console.log('Sunrise JD:', riseResult);
+      
+      // Convert JD to readable time
+      const sunriseDate = new Date();
+      // Convert JD to Unix timestamp (approximate)
+      const unixTime = (riseResult - 2440587.5) * 86400000;
+      sunriseDate.setTime(unixTime);
+      console.log('Sunrise time:', sunriseDate.toISOString());
     } else {
       console.log('❌ Sunrise calculation failed');
       console.log('Result:', riseResult);

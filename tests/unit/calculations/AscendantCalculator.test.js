@@ -1,6 +1,16 @@
 import AscendantCalculator from '../../../src/core/calculations/chart-casting/AscendantCalculator.js';
 import { testCases } from '../../test-data/sample-chart-data.js';
-const swisseph = require('swisseph');
+
+// Initialize sweph-wasm for tests
+let swisseph = null;
+(async () => {
+  try {
+    const SwissEPH = await import('sweph-wasm');
+    swisseph = await SwissEPH.default.init();
+  } catch (error) {
+    console.warn('Sweph-WASM not available for tests:', error.message);
+  }
+})();
 
 describe('AscendantCalculator', () => {
     let calculator;
@@ -9,35 +19,35 @@ describe('AscendantCalculator', () => {
         calculator = new AscendantCalculator();
     });
 
-    test('should return the correct ascendant sign for a known birth data', () => {
+    test('should return the correct ascendant sign for a known birth data', async () => {
         const testData = testCases[0].birthData;
         const moment = require('moment-timezone');
         const birthDateTime = moment.tz(`${testData.dateOfBirth} ${testData.timeOfBirth}`, testData.placeOfBirth.timezone).utc();
         const julianDay = swisseph.swe_julday(birthDateTime.year(), birthDateTime.month() + 1, birthDateTime.date(), birthDateTime.hour() + birthDateTime.minute() / 60, swisseph.SE_GREG_CAL);
 
-        const ascendantData = calculator.calculate(julianDay, testData.placeOfBirth.latitude, testData.placeOfBirth.longitude);
+        const ascendantData = await calculator.calculate(julianDay, testData.placeOfBirth.latitude, testData.placeOfBirth.longitude);
         expect(ascendantData.sign).toBe('Virgo'); // Actual calculated ascendant for this data
     });
 
-    test('should handle timezones correctly', () => {
+    test('should handle timezones correctly', async () => {
         const testDataNYC = testCases[5].birthData;
         const [yearNYC, monthNYC, dayNYC] = testDataNYC.dateOfBirth.split('-').map(Number);
         const [hourNYC, minuteNYC] = testDataNYC.timeOfBirth.split(':').map(Number);
         const julianDayNYC = swisseph.swe_julday(yearNYC, monthNYC, dayNYC, hourNYC + minuteNYC / 60, swisseph.SE_GREG_CAL);
 
-        const ascendantNYC = calculator.calculate(julianDayNYC, testDataNYC.placeOfBirth.latitude, testDataNYC.placeOfBirth.longitude);
+        const ascendantNYC = await calculator.calculate(julianDayNYC, testDataNYC.placeOfBirth.latitude, testDataNYC.placeOfBirth.longitude);
 
         const birthDataTokyo = {
             ...testDataNYC,
         };
 
-        const ascendantTokyo = calculator.calculate(julianDayNYC, birthDataTokyo.placeOfBirth.latitude, birthDataTokyo.placeOfBirth.longitude);
+        const ascendantTokyo = await calculator.calculate(julianDayNYC, birthDataTokyo.placeOfBirth.latitude, birthDataTokyo.placeOfBirth.longitude);
 
         expect(ascendantNYC).toBeDefined();
         expect(ascendantTokyo).toBeDefined();
     });
 
-    test('should handle daylight saving time correctly', () => {
+    test('should handle daylight saving time correctly', async () => {
         const testData = testCases[0].birthData;
 
         const [yearStd, monthStd, dayStd] = '1985-02-24'.split('-').map(Number);
@@ -48,13 +58,13 @@ describe('AscendantCalculator', () => {
         const [hourDst, minuteDst] = testData.timeOfBirth.split(':').map(Number);
         const julianDayDst = swisseph.swe_julday(yearDst, monthDst, dayDst, hourDst + minuteDst / 60, swisseph.SE_GREG_CAL);
 
-        const ascendantStandard = calculator.calculate(julianDayStd, testData.placeOfBirth.latitude, testData.placeOfBirth.longitude);
-        const ascendantDST = calculator.calculate(julianDayDst, testData.placeOfBirth.latitude, testData.placeOfBirth.longitude);
+        const ascendantStandard = await calculator.calculate(julianDayStd, testData.placeOfBirth.latitude, testData.placeOfBirth.longitude);
+        const ascendantDST = await calculator.calculate(julianDayDst, testData.placeOfBirth.latitude, testData.placeOfBirth.longitude);
 
         expect(ascendantDST.longitude).not.toBe(ascendantStandard.longitude);
     });
 
-    test('should calculate consistent ascendant for Delhi birth data', () => {
+    test('should calculate consistent ascendant for Delhi birth data', async () => {
         const testData = testCases[1].birthData; // Delhi Birth - 1985-07-22 06:45:00
         const moment = require('moment-timezone');
 
@@ -69,7 +79,7 @@ describe('AscendantCalculator', () => {
             swisseph.SE_GREG_CAL
         );
 
-        const ascendantData = calculator.calculate(julianDay, testData.placeOfBirth.latitude, testData.placeOfBirth.longitude);
+        const ascendantData = await calculator.calculate(julianDay, testData.placeOfBirth.latitude, testData.placeOfBirth.longitude);
 
         // Verify the calculation returns a consistent result
         expect(ascendantData).toBeDefined();
@@ -87,7 +97,7 @@ describe('AscendantCalculator', () => {
         expect(ascendantData.degree).toBeLessThan(30);
 
         // Test that multiple calls return the same result (consistency check)
-        const ascendantData2 = calculator.calculate(julianDay, testData.placeOfBirth.latitude, testData.placeOfBirth.longitude);
+        const ascendantData2 = await calculator.calculate(julianDay, testData.placeOfBirth.latitude, testData.placeOfBirth.longitude);
         expect(ascendantData2.longitude).toBe(ascendantData.longitude);
         expect(ascendantData2.sign).toBe(ascendantData.sign);
     });

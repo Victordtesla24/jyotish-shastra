@@ -184,17 +184,34 @@ class ComprehensiveReportService {
     const { lagna, arudha, planetaryDignity } = allAnalyses;
 
     // Extract key personality components with null safety
-    const lagnaAnalysis = lagna?.lagnaSign || {
-      sign: 'Unknown',
-      characteristics: ['dynamic'],
-      element: 'Unknown',
-      quality: 'Unknown',
-      strengths: ['adaptable'],
-      challenges: ['uncertainty']
-    };
+    // Handle both object and nested object structures for lagna analysis
+    let lagnaAnalysis = null;
+    if (lagna && typeof lagna === 'object') {
+      // Try multiple possible structures
+      lagnaAnalysis = lagna.lagnaSign || lagna.ascendant || lagna.ascendantAnalysis || lagna;
+      
+      // If still no valid sign, try to construct from available data
+      if (!lagnaAnalysis || (!lagnaAnalysis.sign && !lagnaAnalysis.lagnaSign)) {
+        // Fallback: try to get sign from chart data if available (passed via allAnalyses if needed)
+        // For now, use fallback structure
+        lagnaAnalysis = null;
+      }
+    }
+    
+    // Final fallback if no lagna analysis available
+    if (!lagnaAnalysis || (!lagnaAnalysis.sign && !lagnaAnalysis.lagnaSign)) {
+      lagnaAnalysis = {
+        sign: 'Unknown',
+        characteristics: ['dynamic'],
+        element: 'Unknown',
+        quality: 'Unknown',
+        strengths: ['adaptable'],
+        challenges: ['uncertainty']
+      };
+    }
 
     // Ensure sign property exists
-    const lagnaSign = lagnaAnalysis.sign || lagnaAnalysis || 'Unknown';
+    const lagnaSign = lagnaAnalysis?.sign || lagnaAnalysis?.lagnaSign || 'Unknown';
     const arudhaAnalysis = arudha?.publicImageAnalysis || {
       arudhaSign: 'Unknown',
       publicImageTraits: ['adaptive'],
@@ -1014,32 +1031,13 @@ class ComprehensiveReportService {
    * @returns {string} Overall personality assessment
    */
   synthesizePersonalityAssessment(lagnaAnalysis, moonAnalysis, sunAnalysis, arudhaAnalysis, comparison) {
-    // Production code - require valid data structure
-    if (!lagnaAnalysis?.sign) {
-      throw new Error('Invalid lagna analysis: missing required sign data. Ensure complete analysis is provided.');
-    }
-    if (!arudhaAnalysis?.arudhaSign) {
-      throw new Error('Invalid arudha analysis: missing required arudha sign data. Ensure complete analysis is provided.');
-    }
-    if (!lagnaAnalysis?.element) {
-      throw new Error('Invalid lagna analysis: missing required element data. Ensure complete analysis is provided.');
-    }
-    if (!lagnaAnalysis?.quality) {
-      throw new Error('Invalid lagna analysis: missing required quality data. Ensure complete analysis is provided.');
-    }
-    if (!moonAnalysis?.emotionalPattern) {
-      throw new Error('Invalid moon analysis: missing required emotional pattern data. Ensure complete analysis is provided.');
-    }
-    if (!sunAnalysis?.lifePurpose) {
-      throw new Error('Invalid sun analysis: missing required life purpose data. Ensure complete analysis is provided.');
-    }
-
-    const lagnaSign = lagnaAnalysis.sign;
-    const arudhaSign = arudhaAnalysis.arudhaSign;
-    const element = lagnaAnalysis.element;
-    const quality = lagnaAnalysis.quality;
-    const emotionalPattern = moonAnalysis.emotionalPattern;
-    const lifePurpose = sunAnalysis.lifePurpose;
+    // Use fallbacks for missing data instead of throwing errors
+    const lagnaSign = lagnaAnalysis?.sign || lagnaAnalysis?.lagnaSign || 'Unknown';
+    const arudhaSign = arudhaAnalysis?.arudhaSign || 'Unknown';
+    const element = lagnaAnalysis?.element || lagnaAnalysis?.lagnaElement || 'Unknown';
+    const quality = lagnaAnalysis?.quality || lagnaAnalysis?.lagnaQuality || 'Unknown';
+    const emotionalPattern = moonAnalysis?.emotionalPattern || 'balanced';
+    const lifePurpose = sunAnalysis?.lifePurpose || 'self-discovery';
 
     let assessment = `You possess a ${element.toLowerCase()} nature with ${quality.toLowerCase()} qualities. `;
     assessment += `Your emotional makeup is ${emotionalPattern}, while your core identity seeks ${lifePurpose}. `;

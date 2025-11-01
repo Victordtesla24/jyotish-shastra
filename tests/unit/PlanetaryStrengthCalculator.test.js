@@ -351,7 +351,75 @@ describe('PlanetaryStrengthCalculator', () => {
   });
 
   describe('Shad Bala Total', () => {
-    test.todo('should return the correct total Shad Bala and compare with required minimum');
+    test('should return the correct total Shad Bala and compare with required minimum', () => {
+      // Test with Jupiter (exalted planet should have high strength)
+      const jupiterShadBala = calculator.calculateShadBala('Jupiter');
+      
+      // Verify total is calculated correctly (sum of all components)
+      expect(jupiterShadBala.total).toBeGreaterThanOrEqual(0);
+      expect(typeof jupiterShadBala.total).toBe('number');
+      
+      // Verify all components are included
+      expect(jupiterShadBala.components).toBeDefined();
+      expect(jupiterShadBala.components.sthanaBala).toBeDefined();
+      expect(jupiterShadBala.components.digBala).toBeDefined();
+      expect(jupiterShadBala.components.kalaBala).toBeDefined();
+      expect(jupiterShadBala.components.chestaBala).toBeDefined();
+      expect(jupiterShadBala.components.naisargikaBala).toBeDefined();
+      expect(jupiterShadBala.components.drikBala).toBeDefined();
+      
+      // Verify required minimum is provided
+      expect(jupiterShadBala.required).toBeDefined();
+      expect(typeof jupiterShadBala.required).toBe('number');
+      expect(jupiterShadBala.required).toBeGreaterThan(0);
+      
+      // Verify Jupiter's required minimum (390)
+      expect(jupiterShadBala.required).toBe(390);
+      
+      // Test total matches sum of components
+      // Handle different return types: drikBala and chestaBala may return objects or numbers
+      const sthanaBalaTotal = typeof jupiterShadBala.components.sthanaBala === 'object' && jupiterShadBala.components.sthanaBala.total !== undefined 
+        ? jupiterShadBala.components.sthanaBala.total 
+        : (typeof jupiterShadBala.components.sthanaBala === 'number' ? jupiterShadBala.components.sthanaBala : 0);
+      const digBalaValue = typeof jupiterShadBala.components.digBala === 'number' ? jupiterShadBala.components.digBala : 0;
+      const kalaBalaTotal = typeof jupiterShadBala.components.kalaBala === 'object' && jupiterShadBala.components.kalaBala.total !== undefined 
+        ? jupiterShadBala.components.kalaBala.total 
+        : (typeof jupiterShadBala.components.kalaBala === 'number' ? jupiterShadBala.components.kalaBala : 0);
+      const chestaBalaValue = typeof jupiterShadBala.components.chestaBala === 'number' ? jupiterShadBala.components.chestaBala : 0;
+      const naisargikaBalaValue = typeof jupiterShadBala.components.naisargikaBala === 'number' ? jupiterShadBala.components.naisargikaBala : 0;
+      const drikBalaTotal = typeof jupiterShadBala.components.drikBala === 'object' && jupiterShadBala.components.drikBala !== null && jupiterShadBala.components.drikBala.total !== undefined 
+        ? jupiterShadBala.components.drikBala.total 
+        : (typeof jupiterShadBala.components.drikBala === 'number' ? jupiterShadBala.components.drikBala : 0);
+      
+      const calculatedTotal = 
+        sthanaBalaTotal +
+        digBalaValue +
+        kalaBalaTotal +
+        chestaBalaValue +
+        naisargikaBalaValue +
+        drikBalaTotal;
+      
+      expect(jupiterShadBala.total).toBeCloseTo(calculatedTotal, 1);
+      
+      // Test with Sun (required: 390)
+      const sunShadBala = calculator.calculateShadBala('Sun');
+      expect(sunShadBala.required).toBe(390);
+      expect(sunShadBala.total).toBeGreaterThanOrEqual(0);
+      
+      // Test with Moon (required: 360)
+      const moonShadBala = calculator.calculateShadBala('Moon');
+      expect(moonShadBala.required).toBe(360);
+      expect(moonShadBala.total).toBeGreaterThanOrEqual(0);
+      
+      // Test with Mercury (required: 420 - highest)
+      const mercuryShadBala = calculator.calculateShadBala('Mercury');
+      expect(mercuryShadBala.required).toBe(420);
+      expect(mercuryShadBala.total).toBeGreaterThanOrEqual(0);
+      
+      // Test comparison logic: total vs required
+      const isJupiterStrong = jupiterShadBala.total >= jupiterShadBala.required;
+      expect(typeof isJupiterStrong).toBe('boolean');
+    });
   });
 
   describe('Vargottama Status', () => {

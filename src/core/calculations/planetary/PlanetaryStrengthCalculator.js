@@ -29,7 +29,17 @@ class PlanetaryStrengthCalculator {
     const naisargikaBala = this.getNaisargikaBala(planet.name);
     const drikBala = this.getDrikBala(planet.name);
 
-    const total = sthanaBala.total + digBala + kalaBala.total + chestaBala + naisargikaBala + drikBala;
+    // Ensure all values are numbers - drikBala returns an object with total property
+    const drikBalaTotal = typeof drikBala === 'object' && drikBala !== null && drikBala.total !== undefined ? Number(drikBala.total) : (typeof drikBala === 'number' ? drikBala : 0);
+    const chestaBalaTotal = typeof chestaBala === 'number' ? chestaBala : 0;
+    
+    // Convert all values to numbers to prevent string concatenation
+    const sthanaBalaNum = Number(sthanaBala.total) || 0;
+    const digBalaNum = Number(digBala) || 0;
+    const kalaBalaNum = Number(kalaBala.total) || 0;
+    const naisargikaBalaNum = Number(naisargikaBala) || 0;
+    
+    const total = sthanaBalaNum + digBalaNum + kalaBalaNum + chestaBalaTotal + naisargikaBalaNum + drikBalaTotal;
 
     return {
       components: {

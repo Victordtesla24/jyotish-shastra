@@ -1,17 +1,18 @@
 #!/usr/bin/env node
 /**
- * Test Swiss Ephemeris sunrise calculation
+ * Test Swiss Ephemeris (WebAssembly) sunrise calculation
  * This tests the exact function failing in BTR service
  */
 
-import swisseph from 'swisseph';
+import SwissEPH from 'sweph-wasm';
 import path from 'path';
 
-console.log('=== Testing Sunrise Calculation ===\n');
+console.log('=== Testing Sunrise Calculation (WASM) ===\n');
 
-// Initialize Swiss Ephemeris
+// Initialize Swiss Ephemeris (WebAssembly)
+const swisseph = await SwissEPH.init();
 const ephePath = path.resolve(process.cwd(), 'ephemeris');
-swisseph.swe_set_ephe_path(ephePath);
+await swisseph.swe_set_ephe_path(ephePath);
 console.log(`Ephemeris path: ${ephePath}\n`);
 
 // Test parameters (from BTR error)
@@ -26,19 +27,19 @@ console.log(`  Latitude: ${latitude}`);
 console.log(`  Longitude: ${longitude}`);
 console.log(`  Timezone: ${timezone}\n`);
 
-// Calculate Julian Day
+// Calculate Julian Day (async with sweph-wasm)
 const year = testDate.getUTCFullYear();
 const month = testDate.getUTCMonth() + 1;
 const day = testDate.getUTCDate();
 const hour = testDate.getUTCHours() + testDate.getUTCMinutes() / 60;
-const jd = swisseph.swe_julday(year, month, day, hour, 1);
+const jd = await swisseph.swe_julday(year, month, day, hour, 1);
 
 console.log(`Julian Day: ${jd}\n`);
 
 // Test 1: swe_calc_ut (basic sun position)
 console.log('Test 1: Basic sun position with swe_calc_ut...');
 try {
-  const result = swisseph.swe_calc_ut(jd, swisseph.SE_SUN, swisseph.SEFLG_SWIEPH);
+  const result = await swisseph.swe_calc_ut(jd, swisseph.SE_SUN, swisseph.SEFLG_SWIEPH);
   
   if (result.error) {
     console.error('❌ Error:', result.error);
@@ -65,7 +66,7 @@ try {
   console.log(`    attemp: ${attemp}°C`);
   console.log(`    rsmi: 1 (rise)\n`);
   
-  const sunriseResult = swisseph.swe_rise_trans(
+  const sunriseResult = await swisseph.swe_rise_trans(
     jd - 1, // Start search from previous day
     swisseph.SE_SUN,
     '',
@@ -93,7 +94,7 @@ try {
   console.log(`  Transit time (JD): ${sunriseResult.transitTime}`);
   
   // Convert to readable time
-  const { year: y, month: m, day: d, hour: h } = swisseph.swe_revjul(sunriseResult.transitTime, 1);
+  const { year: y, month: m, day: d, hour: h } = await swisseph.swe_revjul(sunriseResult.transitTime, 1);
   const hr = Math.floor(h);
   const min = Math.floor((h - hr) * 60);
   console.log(`  Sunrise UTC: ${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')} ${String(hr).padStart(2, '0')}:${String(min).padStart(2, '0')}\n`);
@@ -111,7 +112,7 @@ try {
   const atpress = 1013.25;
   const attemp = 15;
   
-  const sunsetResult = swisseph.swe_rise_trans(
+  const sunsetResult = await swisseph.swe_rise_trans(
     jd,
     swisseph.SE_SUN,
     '',

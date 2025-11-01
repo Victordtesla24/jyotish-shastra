@@ -7,6 +7,7 @@ export default function validation(schema) {
       // Transform Joi errors into user-friendly format
       const errors = error.details.map(detail => ({
         field: detail.path?.join('.') || 'unknown',
+        path: detail.path || [],
         message: detail.message,
         value: detail.context?.value
       }));

@@ -74,7 +74,8 @@ const ComprehensiveAnalysisPage = () => {
       });
 
       // Call comprehensive analysis API with properly formatted data
-      const response = await fetch('/api/v1/analysis/comprehensive', {
+      const { getApiUrl } = await import('../utils/apiConfig');
+      const response = await fetch(getApiUrl('/api/v1/analysis/comprehensive'), {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

@@ -4,14 +4,14 @@
  * "Birth Data Collection and Chart Casting"
  */
 
-// Optional swisseph import for serverless compatibility (not currently used but imported)
+// Optional sweph-wasm import for serverless compatibility (not currently used but imported)
 let swisseph = null;
 (async () => {
   try {
-    const swissephModule = await import('swisseph');
-    swisseph = swissephModule.default || swissephModule;
+    const SwissEPH = await import('sweph-wasm');
+    swisseph = await SwissEPH.default.init();
   } catch (error) {
-    // Swisseph not available - service doesn't require it currently
+    // Sweph-WASM not available - service doesn't require it currently
   }
 })();
 

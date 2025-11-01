@@ -1,19 +1,41 @@
 import { computeSunriseSunset, normalizeDegrees } from '../astronomy/sunrise.js';
 
 // Production-grade Swiss Ephemeris import - no fallbacks
+// Lazy initialization to avoid serverless function timeouts
 let swisseph = null;
 let swissephAvailable = false;
+let swissephInitPromise = null;
 
-(async () => {
-  try {
-    const swissephModule = await import('swisseph');
-    swisseph = swissephModule.default || swissephModule;
-    swissephAvailable = true;
-  } catch (error) {
-    swissephAvailable = false;
-    throw new Error(`Swiss Ephemeris is required for gulika calculations but not available: ${error.message}. Please ensure swisseph module is properly installed and ephemeris files are configured.`);
+async function ensureSwissephLoaded() {
+  if (swisseph !== null) {
+    return { swisseph, available: swissephAvailable };
   }
-})();
+  
+  if (swissephInitPromise) {
+    return swissephInitPromise;
+  }
+  
+  swissephInitPromise = (async () => {
+    try {
+      const SwissEPH = await import('sweph-wasm');
+      const { getWasmPath } = await import('../../../utils/wasm-loader.js');
+      
+      // Get explicit WASM file path for Node.js environments
+      const wasmPath = getWasmPath();
+      
+      // Initialize sweph-wasm with explicit WASM path if available
+      // This ensures proper WASM file loading in Node.js environments
+      swisseph = await SwissEPH.default.init(wasmPath || undefined);
+      swissephAvailable = true;
+      return { swisseph, available: swissephAvailable };
+    } catch (error) {
+      swissephAvailable = false;
+      throw new Error(`Swiss Ephemeris is required for gulika calculations but not available: ${error.message}. Please ensure sweph-wasm module is properly installed.`);
+    }
+  })();
+  
+  return swissephInitPromise;
+}
 
 import AscendantCalculator from '../chart-casting/AscendantCalculator.js';
 
@@ -37,18 +59,20 @@ const NIGHT_GULIKA_SEGMENT_INDEX = {
   6: 3  // Saturday night
 };
 
-function toJulianDayUT(dateUtc) {
+async function toJulianDayUT(dateUtc) {
+  const { swisseph: localSwisseph } = await ensureSwissephLoaded();
+  
   const y = dateUtc.getUTCFullYear();
   const m = dateUtc.getUTCMonth() + 1;
   const d = dateUtc.getUTCDate();
   const hour = dateUtc.getUTCHours() + dateUtc.getUTCMinutes() / 60 + dateUtc.getUTCSeconds() / 3600;
-  const gregflag = swisseph?.SE_GREG_CAL || 1;
+  const gregflag = localSwisseph?.SE_GREG_CAL || 1;
   
-  if (!swissephAvailable || !swisseph || typeof swisseph.swe_julday !== 'function') {
+  if (!localSwisseph || typeof localSwisseph.swe_julday !== 'function') {
     throw new Error('Swiss Ephemeris is required for Julian Day calculations but is not available. Please ensure Swiss Ephemeris is properly installed and configured.');
   }
 
-  const result = swisseph.swe_julday(y, m, d, hour, gregflag);
+  const result = await localSwisseph.swe_julday(y, m, d, hour, gregflag);
   return typeof result === 'object' && result.julianDay ? result.julianDay : result;
 }
 
@@ -116,11 +140,11 @@ export async function computeGulikaLongitude({
 
   // Convert local Gulika time to UTC
   const gulikaUtc = new Date(gulikaLocal.getTime() - tzOffsetHours * 3600 * 1000);
-  const jdUt = toJulianDayUT(gulikaUtc);
+  const jdUt = await toJulianDayUT(gulikaUtc);
 
   // Compute ascendant at Gulika time; use as Gulika longitude
   const ascCalc = new AscendantCalculator('LAHIRI');
-  const asc = ascCalc.calculate(jdUt, latitude, longitude);
+  const asc = await ascCalc.calculate(jdUt, latitude, longitude);
   return {
     longitude: normalizeDegrees(asc.longitude),
     sign: asc.sign,

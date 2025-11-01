@@ -391,7 +391,9 @@ const analysisRequiredSchema = Joi.object({
   if (!hasTopLevelCoordinates && !hasNestedCoordinates && !hasPlaceString) {
     return helpers.error('custom.multifield', {
       errors: [
-        { field: 'location', message: 'Location is required - provide coordinates or place name' }
+        { field: 'latitude', message: 'Latitude is required when place information is not provided' },
+        { field: 'longitude', message: 'Longitude is required when place information is not provided' },
+        { field: 'timezone', message: 'Timezone is required for accurate calculations' }
       ]
     });
   }
@@ -466,6 +468,7 @@ function validateBirthData(data) {
       isValid: false,
       errors: error.details.map(detail => ({
         field: detail.path.join('.'),
+        path: detail.path || [],
         message: detail.message,
         value: detail.context?.value
       })),
@@ -550,6 +553,7 @@ function validateChartUpdate(data) {
       isValid: false,
       errors: error.details.map(detail => ({
         field: detail.path.join('.'),
+        path: detail.path || [],
         message: detail.message,
         value: detail.context?.value
       })),
@@ -581,6 +585,7 @@ function validateBulkCharts(data) {
       isValid: false,
       errors: error.details.map(detail => ({
         field: detail.path.join('.'),
+        path: detail.path || [],
         message: detail.message,
         value: detail.context?.value
       })),
@@ -612,6 +617,7 @@ function validateChartComparison(data) {
       isValid: false,
       errors: error.details.map(detail => ({
         field: detail.path.join('.'),
+        path: detail.path || [],
         message: detail.message,
         value: detail.context?.value
       })),
@@ -643,6 +649,7 @@ function validateRectification(data) {
       isValid: false,
       errors: error.details.map(detail => ({
         field: detail.path.join('.'),
+        path: detail.path || [],
         message: detail.message,
         value: detail.context?.value
       })),

@@ -4,41 +4,29 @@
  * Enhanced with geocoding integration and comprehensive analysis
  */
 
-// Optional swisseph import - handled dynamically for serverless compatibility
-let swisseph = null;
-let swissephAvailable = false;
-let swissephInitializing = false;
-let swissephInitPromise = null;
+// Swiss Ephemeris (WebAssembly) - use improved wrapper with multi-strategy initialization
+import { setupSwissephWithEphemeris, getSwisseph } from '../../utils/swisseph-wrapper.js';
 
-/**
- * Initialize swisseph module (handles serverless environments gracefully)
- */
-async function initializeSwisseph() {
-  if (swisseph !== null || swissephInitializing) {
-    return swissephInitPromise || Promise.resolve();
-  }
-  
-  swissephInitializing = true;
-  
-  swissephInitPromise = (async () => {
-    try {
-      const swissephModule = await import('swisseph');
-      swisseph = swissephModule.default || swissephModule;
-      swissephAvailable = true;
-      console.log('✅ Swiss Ephemeris initialized successfully');
-    } catch (error) {
-      swissephAvailable = false;
-      swissephInitializing = false;
-      throw new Error(`Swiss Ephemeris is required but not available: ${error.message}. Please ensure swisseph module is properly installed and ephemeris files are configured.`);
-    }
-    swissephInitializing = false;
-  })();
-  
-  return swissephInitPromise;
-}
+// Swiss Ephemeris constants (these may not be available as properties in sweph-wasm)
+const SE_EPHEM_FLAG = 0;  // Default to Swiss Ephemeris
+const SEFLG_SIDEREAL = 1 << 1;  // Use sidereal calculations
+const SEFLG_SPEED = 1 << 2;     // Return speed values
+const SEFLG_SWIEPH = 1 << 5;     // Use Swiss Ephemeris
+const SE_GREG_CAL = 1;           // Gregorian calendar
+const SE_SIDM_LAHIRI = 1;        // Lahiri ayanamsa
 
-// Start initialization immediately
-initializeSwisseph();
+// Planet constants for sweph-wasm
+const SE_SUN = 0;
+const SE_MOON = 1;
+const SE_MARS = 2;
+const SE_MERCURY = 3;
+const SE_JUPITER = 4;
+const SE_VENUS = 5;
+const SE_SATURN = 6;
+const SE_MEAN_NODE = 10;         // Mean Node (Rahu)
+
+// Lazy initialization - only start when actually needed
+// Do NOT initialize at module load to avoid serverless function timeouts
 
 import { v4 as uuidv4 } from 'uuid';
 import moment from 'moment-timezone';
@@ -60,46 +48,45 @@ import AscendantCalculator from '../../core/calculations/chart-casting/Ascendant
 class ChartGenerationService {
   constructor(geocodingService) {
     this.geocodingService = geocodingService || new GeocodingService();
-    // Store reference - will be updated when initialization completes
-    this.swisseph = swisseph;
-    this.swissephAvailable = swissephAvailable;
+    // Initialize swisseph references - will be updated when initialization completes
+    this.swisseph = null;
+    this.swissephAvailable = false;
   }
 
   /**
    * Ensure swisseph is initialized before use
    */
   async ensureSwissephInitialized() {
-    if (swisseph === null && swissephInitializing) {
-      await swissephInitPromise;
+    try {
+      // Use the improved wrapper to get Swiss Ephemeris
+      this.swisseph = await getSwisseph();
+      this.swissephAvailable = true;
+    } catch (error) {
+      this.swissephAvailable = false;
+      throw error;
     }
-    if (swisseph === null) {
-      await initializeSwisseph();
-    }
-    this.swisseph = swisseph;
-    this.swissephAvailable = swissephAvailable;
   }
 
   /**
    * Initialize Swiss Ephemeris with required settings
    */
   async initializeSwissEphemeris() {
-    // Ensure swisseph is initialized
-    await this.ensureSwissephInitialized();
-    
-    if (!this.swissephAvailable || !this.swisseph) {
-      throw new Error('Swiss Ephemeris is required for chart generation but is not available. Please ensure Swiss Ephemeris is properly installed and configured.');
-    }
-    
     try {
-      // Set ephemeris path
-      this.swisseph.swe_set_ephe_path(astroConfig.CALCULATION_SETTINGS.EPHEMERIS_PATH);
-
+      console.log('🔧 Initializing Swiss Ephemeris with ephemeris setup...');
+      
+      // Use the improved helper function for comprehensive initialization
+      const { swisseph } = await setupSwissephWithEphemeris(astroConfig.CALCULATION_SETTINGS.EPHEMERIS_PATH);
+      
+      this.swisseph = swisseph;
+      this.swissephAvailable = true;
+      
       // Set calculation flags for Vedic astrology
-      this.calcFlags = this.swisseph.SEFLG_SIDEREAL | this.swisseph.SEFLG_SPEED;
-
-      // Set Lahiri Ayanamsa for Vedic calculations
-      this.swisseph.swe_set_sid_mode(this.swisseph.SE_SIDM_LAHIRI);
+      this.calcFlags = SEFLG_SIDEREAL | SEFLG_SPEED;
+      
+      console.log('✅ Swiss Ephemeris initialized successfully');
+      
     } catch (error) {
+      this.swissephAvailable = false;
       throw new Error(`Failed to initialize Swiss Ephemeris: ${error.message}. Please ensure Swiss Ephemeris is properly installed and configured.`);
     }
   }
@@ -298,7 +285,7 @@ class ChartGenerationService {
       }
 
       // Convert birth data to Julian Day Number
-      const jd = this.calculateJulianDay(dateOfBirth, timeOfBirth, timeZone);
+      const jd = await this.calculateJulianDay(dateOfBirth, timeOfBirth, timeZone);
 
       // Calculate Ascendant
       const ascendant = await this.calculateAscendant(jd, { latitude, longitude });
@@ -307,7 +294,7 @@ class ChartGenerationService {
       const planetaryPositions = await this.getPlanetaryPositions(jd);
 
       // Calculate house positions
-      const housePositions = this.calculateHousePositions(ascendant, jd, latitude, longitude);
+      const housePositions = await this.calculateHousePositions(ascendant, jd, latitude, longitude);
 
       // Calculate Nakshatra
       const nakshatra = this.calculateNakshatra(planetaryPositions.moon);
@@ -418,7 +405,7 @@ class ChartGenerationService {
 
       // CRITICAL FIX: Pass all required parameters to calculateHousePositions
       // Extract jd, latitude, longitude from rasiChart which has all the data
-      const navamsaHouses = this.calculateHousePositions(
+      const navamsaHouses = await this.calculateHousePositions(
         navamsaAscendant,
         rasiChart.jd,
         rasiChart.birthData.latitude,
@@ -446,7 +433,26 @@ class ChartGenerationService {
   async calculateAscendant(jd, placeOfBirth) {
     try {
       const ascendantCalculator = new AscendantCalculator();
-      const ascendantData = ascendantCalculator.calculate(jd, placeOfBirth.latitude, placeOfBirth.longitude);
+      // Convert Julian Day to date components using Swiss Ephemeris
+      const result = await this.swisseph.swe_revjul(jd, SE_GREG_CAL);
+      
+      // Handle both array and object return formats from sweph-wasm
+      let year, month, day, hour, minutes;
+      if (Array.isArray(result) && result.length >= 6) {
+        // Array format: [year, month, day, hour, minute, second]
+        [year, month, day, hour, minutes] = result;
+      } else if (result && typeof result === 'object') {
+        // Object format
+        year = result.year;
+        month = result.month;
+        day = result.day;
+        hour = result.hour;
+        minutes = result.minute;
+      } else {
+        throw new Error('Invalid Julian Day conversion result from Swiss Ephemeris');
+      }
+      
+      const ascendantData = await ascendantCalculator.calculateAscendantAndHouses(year, month, day, hour, minutes, placeOfBirth.latitude, placeOfBirth.longitude);
       return ascendantData;
     } catch (error) {
       throw new Error(`Failed to calculate Ascendant: ${error.message}`);
@@ -468,50 +474,94 @@ class ChartGenerationService {
       }
       
       const planetIds = {
-        sun: this.swisseph.SE_SUN,
-        moon: this.swisseph.SE_MOON,
-        mars: this.swisseph.SE_MARS,
-        mercury: this.swisseph.SE_MERCURY,
-        jupiter: this.swisseph.SE_JUPITER,
-        venus: this.swisseph.SE_VENUS,
-        saturn: this.swisseph.SE_SATURN,
-        rahu: this.swisseph.SE_MEAN_NODE // Mean Node (Rahu)
+        sun: SE_SUN,
+        moon: SE_MOON,
+        mars: SE_MARS,
+        mercury: SE_MERCURY,
+        jupiter: SE_JUPITER,
+        venus: SE_VENUS,
+        saturn: SE_SATURN,
+        rahu: SE_MEAN_NODE // Mean Node (Rahu)
       };
 
       for (const [planetName, planetId] of Object.entries(planetIds)) {
-        const result = this.swisseph.swe_calc_ut(jd, planetId, this.calcFlags);
+        const result = await this.swisseph.swe_calc_ut(jd, planetId, this.calcFlags);
 
-        if (result.error) {
-          throw new Error(`Error calculating ${planetName}: ${result.error}`);
+        // Handle both array and object result formats from sweph-wasm
+        if (Array.isArray(result) && result.length >= 4) {
+          // Array format: [longitude, latitude, distance, speed, ...]
+          const longitude = result[0];
+          const latitude = result[1];
+          const distance = result[2];
+          const speed = result[3];
+          
+          // Normalize longitude to 0-360 range
+          const normalizedLongitude = ((longitude % 360) + 360) % 360;
+          const sign = this.degreeToSign(normalizedLongitude);
+
+          planets[planetName] = {
+            longitude: normalizedLongitude,
+            degree: normalizedLongitude % 30,
+            sign: sign.name,
+            signId: sign.id,
+            latitude: latitude,
+            distance: distance || 1,
+            speed: speed || 0,
+            isRetrograde: (speed || 0) < 0,
+            isCombust: false, // Will calculate later
+            dignity: this.calculatePlanetaryDignity(planetName, sign.id)
+          };
+        } else if (result && result.rcode === 0) {
+          // Object format with data property
+          const longitude = result.data?.[0] || 0;
+          const latitude = result.data?.[1] || 0;
+          const distance = result.data?.[2] || 1;
+          const speed = result.data?.[3] || 0;
+          
+          // Normalize longitude to 0-360 range
+          const normalizedLongitude = ((longitude % 360) + 360) % 360;
+          const sign = this.degreeToSign(normalizedLongitude);
+
+          planets[planetName] = {
+            longitude: normalizedLongitude,
+            degree: normalizedLongitude % 30,
+            sign: sign.name,
+            signId: sign.id,
+            latitude: latitude,
+            distance: distance || 1,
+            speed: speed || 0,
+            isRetrograde: (speed || 0) < 0,
+            isCombust: false, // Will calculate later
+            dignity: this.calculatePlanetaryDignity(planetName, sign.id)
+          };
+        } else {
+          throw new Error(`Error calculating ${planetName}: Failed to calculate planetary position (rcode=${result?.rcode || 'unknown'})`);
         }
 
-        const longitude = result.longitude;
-        const sign = this.degreeToSign(longitude);
-
-        planets[planetName] = {
-          longitude,
-          degree: longitude % 30,
-          sign: sign.name,
-          signId: sign.id,
-          speed: result.speedLong,
-          isRetrograde: result.speedLong < 0,
-          isCombust: this.isPlanetCombust(planetName, planets.sun, longitude),
-          dignity: this.calculatePlanetaryDignity(planetName, sign.id)
-        };
+        // Calculate combustion for each planet
+        if (planetName !== 'sun' && planets.sun && planets[planetName]) {
+          planets[planetName].isCombust = this.isPlanetCombust(planetName, planets.sun, planets[planetName].longitude);
+        }
       }
 
       // Calculate Ketu position (opposite to Rahu)
       if (planets.rahu) {
-        const ketuLongitude = (planets.rahu.longitude + 180) % 360;
+        const rahuLongitude = planets.rahu.longitude;
+        const ketuLongitude = (rahuLongitude + 180) % 360;
         const ketuSign = this.degreeToSign(ketuLongitude);
 
+        // Normalize to 0-360 range
+        const normalizedKetuLongitude = ((ketuLongitude % 360) + 360) % 360;
+
         planets.ketu = {
-          longitude: ketuLongitude,
-          degree: ketuLongitude % 30,
+          longitude: normalizedKetuLongitude,
+          degree: normalizedKetuLongitude % 30,
           sign: ketuSign.name,
           signId: ketuSign.id,
-          speed: planets.rahu.speed,
-          isRetrograde: planets.rahu.isRetrograde,
+          latitude: planets.rahu.latitude || 0,
+          distance: planets.rahu.distance || 1,
+          speed: -(planets.rahu.speed || 0), // Ketu moves opposite to Rahu
+          isRetrograde: !(planets.rahu.isRetrograde || false), // Retrograde logic is opposite
           dignity: 'neutral' // Ketu doesn't have traditional dignity
         };
       }
@@ -530,7 +580,7 @@ class ChartGenerationService {
    * @param {number} longitude - Longitude
    * @returns {Array} House positions
    */
-  calculateHousePositions(ascendant, jd, latitude, longitude) {
+  async calculateHousePositions(ascendant, jd, latitude, longitude) {
     if (!jd || !latitude || !longitude) {
       throw new Error('Julian day, latitude, and longitude are required for house position calculation');
     }
@@ -545,29 +595,46 @@ class ChartGenerationService {
         throw new Error('Swiss Ephemeris is required for house position calculations but is not available. Please ensure Swiss Ephemeris is properly installed and configured.');
       }
       
-      const adjustedLatitude = Math.max(-89.999999, Math.min(89.999999, latitude));
-      const houses = this.swisseph.swe_houses(jd, adjustedLatitude, longitude, 'P');
+      const adjustedLatitude = Math.max(-90, Math.min(90, latitude));
+      const houses = await this.swisseph.swe_houses(jd, adjustedLatitude, longitude, 'P');
 
-        if (!houses || !houses.house || houses.house.length < 12) {
-          throw new Error('Swiss Ephemeris returned invalid house data');
-        }
+      // Handle both array and object return formats from sweph-wasm
+      let houseArray;
+      if (Array.isArray(houses) && houses.length >= 12) {
+        // Array format: [house1, house2, ..., house12, ascendant, mc, ...]
+        houseArray = houses.slice(0, 12); // Take first 12 elements for houses
+      } else if (houses && houses.house && Array.isArray(houses.house) && houses.house.length >= 12) {
+        // Object format with house array
+        houseArray = houses.house;
+      } else {
+        throw new Error('Swiss Ephemeris returned invalid house data format');
+      }
 
-        const housePositions = [];
-        for (let i = 0; i < 12; i++) {
-          const houseDegree = houses.house[i];
-          if (houseDegree === undefined || isNaN(houseDegree)) {
-            throw new Error(`Invalid house cusp for house ${i+1}`);
-          }
-          const sign = this.degreeToSign(houseDegree);
-          housePositions.push({
-            houseNumber: i + 1,
-            degree: houseDegree,
-            sign: sign.name,
-            signId: sign.id,
-            longitude: houseDegree
-          });
+      // Validate house data
+      if (houseArray.length < 12) {
+        throw new Error('Swiss Ephemeris returned insufficient house data (need 12 houses)');
+      }
+
+      const housePositions = [];
+      for (let i = 0; i < 12; i++) {
+        const houseDegree = houseArray[i];
+        if (houseDegree === undefined || isNaN(houseDegree)) {
+          throw new Error(`Invalid house cusp for house ${i+1}: ${houseDegree}`);
         }
-        return housePositions;
+        
+        // Normalize degrees to 0-360 range
+        const normalizedDegree = ((houseDegree % 360) + 360) % 360;
+        const sign = this.degreeToSign(normalizedDegree);
+        
+        housePositions.push({
+          houseNumber: i + 1,
+          degree: normalizedDegree,
+          sign: sign.name,
+          signId: sign.id,
+          longitude: normalizedDegree
+        });
+      }
+      return housePositions;
     } catch (error) {
       throw new Error(`House position calculation failed: ${error.message}`);
     }
@@ -1047,9 +1114,9 @@ class ChartGenerationService {
    * @param {string} dateOfBirth - Date in YYYY-MM-DD format.
    * @param {string} timeOfBirth - Time in HH:MM or HH:MM:SS format.
    * @param {string} timeZone - Time zone identifier (IANA name or UTC offset).
-   * @returns {number} Julian Day Number.
+   * @returns {Promise<number>} Julian Day Number.
    */
-  calculateJulianDay(dateOfBirth, timeOfBirth, timeZone) {
+  async calculateJulianDay(dateOfBirth, timeOfBirth, timeZone) {
     try {
       if (!dateOfBirth || !timeOfBirth) {
         throw new Error('Date and time of birth are required for Julian Day calculation');
@@ -1071,7 +1138,7 @@ class ChartGenerationService {
         throw new Error('Swiss Ephemeris is required for Julian Day calculations but is not available. Please ensure Swiss Ephemeris is properly installed and configured.');
       }
 
-      const result = this.swisseph.swe_julday(year, month, day, hour, this.swisseph.SE_GREG_CAL || 1);
+      const result = await this.swisseph.swe_julday(year, month, day, hour, this.swisseph.SE_GREG_CAL || 1);
       return typeof result === 'object' && result.julianDay ? result.julianDay : result;
     } catch (error) {
       throw new Error(`Failed to calculate Julian Day: ${error.message}`);

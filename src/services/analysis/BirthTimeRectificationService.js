@@ -550,13 +550,19 @@ class BirthTimeRectificationService {
     const [hours, minutes] = timeOfBirth.split(':').map(Number);
     const baseMinutes = hours * 60 + minutes;
     
-    // PERFORMANCE OPTIMIZATION: Generate candidates from -60 to +60 minutes in 10-minute intervals
-    // This reduces candidates from 49 to 13 (87% reduction in calculations)
-    // For higher precision, use wider intervals initially, then refine best candidates
-    for (let offset = -60; offset <= 60; offset += 10) {
+    // Generate candidates from -120 to +120 minutes (±2 hours) in 5-minute intervals
+    // This produces 49 candidates total: ±2 hours = ±120 minutes = 240 minutes / 5 = 48 intervals + 1 base = 49
+    for (let offset = -120; offset <= 120; offset += 5) {
       const candidateMinutes = baseMinutes + offset;
-      const candidateHours = Math.floor(candidateMinutes / 60) % 24;
-      const candidateMins = candidateMinutes % 60;
+      let candidateHours = Math.floor(candidateMinutes / 60);
+      const candidateMins = ((candidateMinutes % 60) + 60) % 60;
+      
+      // Handle negative hours properly (day before)
+      if (candidateMinutes < 0) {
+        candidateHours = (candidateHours % 24 + 24) % 24;
+      } else {
+        candidateHours = candidateHours % 24;
+      }
       
       candidates.push({
         time: `${candidateHours.toString().padStart(2, '0')}:${candidateMins.toString().padStart(2, '0')}`,
@@ -566,7 +572,7 @@ class BirthTimeRectificationService {
       });
     }
 
-    analysis.analysisLog.push(`Generated ${candidates.length} time candidates for analysis (optimized range: ±60 min, 10-min intervals)`);
+    analysis.analysisLog.push(`Generated ${candidates.length} time candidates for analysis (range: ±2 hours, 5-min intervals)`);
     return candidates;
   }
 
@@ -868,11 +874,13 @@ class BirthTimeRectificationService {
       const longitude = birthData.longitude || birthData.placeOfBirth?.longitude;
       const timezone = birthData.timezone || birthData.placeOfBirth?.timezone;
 
-      const { sunriseLocal } = await computeSunriseSunset(birthLocal, latitude, longitude, timezone);
+      const sunriseResult = await computeSunriseSunset(birthLocal, latitude, longitude, timezone);
       
-      if (!sunriseLocal) {
-        throw new Error(`Sunrise calculation failed for coordinates ${latitude}, ${longitude} and date ${dateStr}. Cannot perform Praanapada calculation without valid sunrise time.`);
+      if (!sunriseResult || !sunriseResult.sunriseLocal) {
+        throw new Error(`Sunrise calculation failed for coordinates ${latitude}, ${longitude} and date ${dateStr}. Cannot perform Praanapada calculation without valid sunrise time. Result: ${JSON.stringify(sunriseResult)}`);
       }
+      
+      const { sunriseLocal } = sunriseResult;
 
       const pr = computePraanapadaLongitude({
         sunLongitudeDeg: sunPosition.longitude,

@@ -516,7 +516,9 @@ const ResponseDataToUIDisplayAnalyser = {
       console.log('🔄 [ResponseDataToUIDisplayAnalyser] No cached data found, fetching from API...');
 
       // Fetch comprehensive analysis from API
-      const response = await fetch('/api/v1/analysis/comprehensive', {
+      // Use apiConfig utility to get full API URL
+      const { getApiUrl } = await import('../utils/apiConfig');
+      const response = await fetch(getApiUrl('/api/v1/analysis/comprehensive'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -751,7 +753,11 @@ const ResponseDataToUIDisplayAnalyser = {
         throw new Error(`No endpoint defined for ${analysisType}`);
       }
 
-      const response = await fetch(endpoint, {
+      // Use apiConfig utility to get full API URL
+      const { getApiUrl } = await import('../utils/apiConfig');
+      const fullEndpoint = getApiUrl(endpoint);
+
+      const response = await fetch(fullEndpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(birthData)
