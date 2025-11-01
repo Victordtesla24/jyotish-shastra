@@ -4,6 +4,7 @@ import BirthDataForm from '../components/forms/BirthDataForm';
 import { Card } from '../components/ui';
 import { useChart } from '../contexts/ChartContext';
 import UIDataSaver from '../components/forms/UIDataSaver';
+import { getApiUrl } from '../utils/apiConfig';
 
 const HomePage = () => {
   const navigate = useNavigate();
