@@ -15,7 +15,7 @@ services:
         sync: false  # Set after frontend deployment
 
   # Frontend Static Site
-  - type: static_site
+  - type: static
     name: jjyotish-shastra-frontend
     buildCommand: cd client && npm install && npm run build
     publishPath: client/build
