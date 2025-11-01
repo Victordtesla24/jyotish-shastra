@@ -874,7 +874,15 @@ class BirthTimeRectificationService {
       const longitude = birthData.longitude || birthData.placeOfBirth?.longitude;
       const timezone = birthData.timezone || birthData.placeOfBirth?.timezone;
 
-      const sunriseResult = await computeSunriseSunset(birthLocal, latitude, longitude, timezone);
+      // Fix: Pass individual date components instead of Date object
+      const sunriseResult = await computeSunriseSunset(
+        birthLocal.getFullYear(), 
+        birthLocal.getMonth() + 1, // JavaScript months are 0-based, need 1-based
+        birthLocal.getDate(), 
+        latitude, 
+        longitude, 
+        timezone
+      );
       
       if (!sunriseResult || !sunriseResult.sunriseLocal) {
         throw new Error(`Sunrise calculation failed for coordinates ${latitude}, ${longitude} and date ${dateStr}. Cannot perform Praanapada calculation without valid sunrise time. Result: ${JSON.stringify(sunriseResult)}`);

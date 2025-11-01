@@ -163,9 +163,9 @@ class ChartGenerationService {
         housesCount: rasiChart.housePositions?.length || 0
       });
 
-      // Generate Navamsa chart
+      // Generate Navamsa chart (pass rasiChart to avoid regeneration and potential errors)
       console.log('🔍 Step 4: Generating Navamsa chart...');
-      const navamsaChart = await this.generateNavamsaChart(geocodedData);
+      const navamsaChart = await this.generateNavamsaChart(geocodedData, rasiChart);
       console.log('✅ Navamsa chart generated:', {
         ascendant: navamsaChart.ascendant,
         planetsCount: Object.keys(navamsaChart.planetaryPositions || {}).length
@@ -337,6 +337,7 @@ class ChartGenerationService {
       }));
 
       return {
+        id: uuidv4(), // CRITICAL FIX: Generate unique ID for chart
         ascendant,
         planets: planetsArray,
         planetaryPositions,
@@ -354,15 +355,57 @@ class ChartGenerationService {
   /**
    * Generate Navamsa (D9) chart
    * @param {Object} birthData - Birth details
+   * @param {Object} rasiChart - Pre-generated Rasi chart (optional optimization)
    * @returns {Object} Navamsa chart data
    */
-  async generateNavamsaChart(birthData) {
+  async generateNavamsaChart(birthData, rasiChart = null) {
     try {
       // Ensure Swiss Ephemeris is initialized before any calculations
       await this.ensureSwissephInitialized();
       await this.initializeSwissEphemeris();
       
-      const rasiChart = await this.generateRasiChart(birthData);
+      // Generate Rasi chart if not provided (optimization for reuse)
+      if (!rasiChart) {
+        console.log('🔍 Generating new Rasi chart for Navamsa calculation...');
+        rasiChart = await this.generateRasiChart(birthData);
+      }
+      
+      // CRITICAL FIX: Comprehensive rasiChart validation with detailed logging
+      if (!rasiChart || typeof rasiChart !== 'object') {
+        const errorMsg = 'Failed to generate Rasi chart - rasiChart is null or invalid';
+        console.error('❌ NAVAMSA ERROR:', errorMsg, { rasiChartType: typeof rasiChart });
+        throw new Error(errorMsg);
+      }
+      
+      if (!rasiChart.id) {
+        const errorMsg = 'Failed to generate Rasi chart - rasiChart.id is missing';
+        console.error('❌ NAVAMSA ERROR:', errorMsg, { rasiChartKeys: Object.keys(rasiChart) });
+        throw new Error(errorMsg);
+      }
+      
+      if (!rasiChart.jd) {
+        const errorMsg = 'Failed to generate Rasi chart - Julian Day (jd) is missing';
+        console.error('❌ NAVAMSA ERROR:', errorMsg, { rasiChartProps: Object.getOwnPropertyNames(rasiChart) });
+        throw new Error(errorMsg);
+      }
+      
+      if (!rasiChart.birthData || !rasiChart.birthData.latitude || !rasiChart.birthData.longitude) {
+        const errorMsg = 'Failed to generate Rasi chart - birth data coordinates are missing';
+        console.error('❌ NAVAMSA ERROR:', errorMsg, { 
+          hasBirthData: !!rasiChart.birthData,
+          birthDataProps: rasiChart.birthData ? Object.keys(rasiChart.birthData) : [],
+          latitude: rasiChart.birthData?.latitude,
+          longitude: rasiChart.birthData?.longitude
+        });
+        throw new Error(errorMsg);
+      }
+      
+      console.log('✅ Rasi chart validation passed for Navamsa calculation:', { 
+        chartId: rasiChart.id.substring(0, 8) + '...',
+        hasJulianDay: !!rasiChart.jd,
+        hasCoordinates: !!(rasiChart.birthData.latitude && rasiChart.birthData.longitude)
+      });
+      
       const navamsaPositions = {};
       const planets = []; // Add planets array for compatibility
 
@@ -493,10 +536,24 @@ class ChartGenerationService {
         year = result.year;
         month = result.month;
         day = result.day;
-        hour = result.hour;
-        minutes = result.minute;
+        
+        // CRITICAL FIX: Handle hour/minute extraction correctly
+        // sweph-wasm returns hour as decimal (e.g., 21.5 = 21:30)
+        if (typeof result.hour === 'number') {
+          const decimalHour = result.hour;
+          hour = Math.floor(decimalHour);
+          minutes = Math.round((decimalHour - hour) * 60);
+        } else {
+          hour = result.hour || 0;
+          minutes = result.minute || 0;
+        }
       } else {
         throw new Error('Invalid Julian Day conversion result from Swiss Ephemeris');
+      }
+      
+      // CRITICAL VALIDATION: Ensure all date components are valid numbers
+      if (!year || !month || !day || hour === undefined || minutes === undefined) {
+        throw new Error(`Invalid date components extracted: year=${year}, month=${month}, day=${day}, hour=${hour}, minutes=${minutes}`);
       }
       
       // PRODUCTION: Log extracted date components
@@ -539,9 +596,22 @@ class ChartGenerationService {
         });
       }
 
+      // CRITICAL FIX: Ensure sign is always populated, calculate from longitude if needed
+      const signFromLongitude = this.degreeToSign(ascendant.longitude);
+      const finalSign = ascendant.signName || ascendant.sign || signFromLongitude.name;
+      const finalSignId = ascendant.signId || signFromLongitude.id;
+      
+      // CRITICAL FIX: Ensure degree is always calculated and included
+      const degreeInSign = ascendant.longitude % 30;
+      const degree = ascendant.degree || degreeInSign;
+
       return {
         ...ascendant,
-        sign: ascendant.signName || ascendant.sign, // Map signName to sign for compatibility
+        degree: degree, // Explicitly include degree property
+        degreeInSign: degreeInSign, // Include degree within sign
+        sign: finalSign,
+        signId: finalSignId,
+        signName: finalSign, // Provide both for compatibility
       };
     } catch (error) {
       console.error('❌ Ascendant calculation failed:', {

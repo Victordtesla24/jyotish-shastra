@@ -99,7 +99,9 @@ export async function computeGulikaLongitude({
 
   console.log(`🔍 GULIKA About to call computeSunriseSunset with: birthDateLocal=${birthDateLocal.toISOString()}, lat=${latitude}, lng=${longitude}, tz="${timezone}"`);
   const { sunriseLocal, sunsetLocal, tzOffsetHours } = await computeSunriseSunset(
-    birthDateLocal,
+    birthDateLocal.getFullYear(),
+    birthDateLocal.getMonth() + 1, // JavaScript months are 0-based, need 1-based
+    birthDateLocal.getDate(),
     latitude,
     longitude,
     timezone,
@@ -129,7 +131,15 @@ export async function computeGulikaLongitude({
     if (isNaN(nextDay.getTime()) || !(nextDay instanceof Date)) {
       throw new Error(`Failed to create next day date for night Gulika calculation from sunrise: ${sunriseLocal}`);
     }
-    const { sunriseLocal: nextSunriseLocal } = await computeSunriseSunset(nextDay, latitude, longitude, timezone, sunriseOptions || {});
+    const { sunriseLocal: nextSunriseLocal } = await computeSunriseSunset(
+        nextDay.getFullYear(),
+        nextDay.getMonth() + 1, // JavaScript months are 0-based, need 1-based
+        nextDay.getDate(),
+        latitude,
+        longitude,
+        timezone,
+        sunriseOptions || {}
+      );
     durationMs = nextSunriseLocal.getTime() - sunsetLocal.getTime();
     startLocal = sunsetLocal;
     segmentIndex = NIGHT_GULIKA_SEGMENT_INDEX[weekday];

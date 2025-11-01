@@ -434,13 +434,29 @@ class ChartController {
   async analyzeHouse(req, res) {
     try {
       const { houseNumber } = req.params;
-      const chartData = req.body.chart;
+      // Accept both birth data and pre-generated chart data for consistency with other endpoints
+      const birthData = req.body;
+      let chartData;
 
-      if (!chartData) {
-        return res.status(400).json({
-          success: false,
-          message: 'Chart data is required'
-        });
+      if (birthData.chart) {
+        // If chart data is provided, use it directly
+        chartData = birthData.chart;
+      } else {
+        // If birth data is provided, generate chart first (like other analysis endpoints)
+        // Validate birth data using flexible schema
+        const validationResult = validateChartRequest(birthData);
+        if (!validationResult.isValid) {
+          return res.status(400).json({
+            success: false,
+            error: 'Validation failed',
+            errors: validationResult.errors,
+            suggestions: this.generateValidationSuggestions(validationResult.errors),
+            helpText: 'House analysis requires date, time, and location information. Name is optional.'
+          });
+        }
+
+        // Generate chart for house analysis
+        chartData = await this.chartService.generateComprehensiveChart(validationResult.data);
       }
 
       const houseNumberInt = parseInt(houseNumber);

@@ -88,12 +88,12 @@ curl -X GET "http://localhost:3001/api/v1/geocoding/validate?latitude=32.4935378
 
 ### 6. Generate Basic Chart
 ```bash
-curl -X POST http://localhost:3001/api/v1/chart/generate \
+curl -X POST https://jjyotish-shastra-backend.onrender.com/api/v1/chart/generate \
   -H "Content-Type: application/json" \
   -d '{
       "name": "Farhan",
       "dateOfBirth": "1997-12-18",
-      "timeOfBirth": "00:00",
+      "timeOfBirth": "02:30",
       "latitude": 32.4935378,
       "longitude": 74.5411575,
       "timezone": "Asia/Karachi",
@@ -372,7 +372,7 @@ curl -X GET http://localhost:3001/api/v1/analysis/progress/{analysisId} | jq . >
 
 ### 26. Log Client Error
 ```bash
-curl -X POST http://localhost:3001/log-client-error \
+curl -X POST http://localhost:3001/api/log-client-error \
   -H "Content-Type: application/json" \
   -d '{
       "timestamp": "'$(date -Iseconds)'",
