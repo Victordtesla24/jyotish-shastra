@@ -457,7 +457,12 @@ class ChartGenerationService {
       // CRITICAL FIX: Extract just the ascendant object from the full result
       // AscendantCalculator returns {ascendant: {...}, houses: {...}, metadata: {...}}
       // But downstream code expects just the ascendant object with longitude, sign, etc.
-      return ascendantData.ascendant;
+      // AscendantCalculator returns signName but downstream code expects sign property
+      const ascendant = ascendantData.ascendant;
+      return {
+        ...ascendant,
+        sign: ascendant.signName || ascendant.sign, // Map signName to sign for compatibility
+      };
     } catch (error) {
       throw new Error(`Failed to calculate Ascendant: ${error.message}`);
     }
@@ -578,6 +583,7 @@ class ChartGenerationService {
 
   /**
    * Calculate house positions based on Ascendant
+   * ENHANCED: Robust handling of multiple Swiss Ephemeris WASM return formats
    * @param {Object} ascendant - Ascendant data
    * @param {number} jd - Julian Day Number
    * @param {number} latitude - Latitude
@@ -602,28 +608,96 @@ class ChartGenerationService {
       const adjustedLatitude = Math.max(-90, Math.min(90, latitude));
       const houses = await this.swisseph.swe_houses(jd, adjustedLatitude, longitude, 'P');
 
-      // Handle both array and object return formats from sweph-wasm
+      // COMPREHENSIVE FIX: Handle ALL possible Swiss Ephemeris WASM return formats
+      // Log the actual structure for debugging in production
+      console.log('🔍 Swiss Ephemeris house data structure:', {
+        isArray: Array.isArray(houses),
+        isObject: typeof houses === 'object',
+        hasHouseProperty: houses && 'house' in houses,
+        hasCuspsProperty: houses && 'cusps' in houses,
+        hasDataProperty: houses && 'data' in houses,
+        length: Array.isArray(houses) ? houses.length : 'N/A',
+        keys: houses && typeof houses === 'object' ? Object.keys(houses) : 'N/A'
+      });
+
       let houseArray;
+      
+      // Format 1: Direct array [house1, house2, ..., house12, asc, mc, ...]
       if (Array.isArray(houses) && houses.length >= 12) {
-        // Array format: [house1, house2, ..., house12, ascendant, mc, ...]
-        houseArray = houses.slice(0, 12); // Take first 12 elements for houses
-      } else if (houses && houses.house && Array.isArray(houses.house) && houses.house.length >= 12) {
-        // Object format with house array
+        console.log('✅ Using Format 1: Direct array');
+        houseArray = houses.slice(0, 12);
+      } 
+      // Format 2: Object with 'house' property {house: [house1, house2, ...], ascendant: ..., mc: ...}
+      else if (houses && houses.house && Array.isArray(houses.house) && houses.house.length >= 12) {
+        console.log('✅ Using Format 2: Object with house array');
         houseArray = houses.house;
-      } else {
-        throw new Error('Swiss Ephemeris returned invalid house data format');
+      }
+      // Format 3: Object with 'cusps' property (alternative WASM format)
+      else if (houses && houses.cusps && Array.isArray(houses.cusps) && houses.cusps.length >= 12) {
+        console.log('✅ Using Format 3: Object with cusps array');
+        houseArray = houses.cusps;
+      }
+      // Format 4: Object with 'data' property containing houses
+      else if (houses && houses.data && Array.isArray(houses.data) && houses.data.length >= 12) {
+        console.log('✅ Using Format 4: Object with data array');
+        houseArray = houses.data;
+      }
+      // Format 5: Object with numbered properties (0-11 or 1-12)
+      else if (houses && typeof houses === 'object' && !Array.isArray(houses)) {
+        console.log('🔍 Checking Format 5: Object with numbered properties');
+        // Try 0-indexed
+        const zeroIndexed = [];
+        for (let i = 0; i < 12; i++) {
+          if (typeof houses[i] === 'number') {
+            zeroIndexed.push(houses[i]);
+          }
+        }
+        if (zeroIndexed.length === 12) {
+          console.log('✅ Using Format 5a: Zero-indexed object properties');
+          houseArray = zeroIndexed;
+        } else {
+          // Try 1-indexed
+          const oneIndexed = [];
+          for (let i = 1; i <= 12; i++) {
+            if (typeof houses[i] === 'number') {
+              oneIndexed.push(houses[i]);
+            }
+          }
+          if (oneIndexed.length === 12) {
+            console.log('✅ Using Format 5b: One-indexed object properties');
+            houseArray = oneIndexed;
+          }
+        }
+      }
+      
+      // If no format matched, provide detailed error with actual data
+      if (!houseArray) {
+        console.error('❌ Failed to parse house data. Actual structure:', JSON.stringify(houses, null, 2));
+        throw new Error(`Swiss Ephemeris returned unrecognized house data format. Structure: ${JSON.stringify({
+          type: typeof houses,
+          isArray: Array.isArray(houses),
+          keys: houses && typeof houses === 'object' ? Object.keys(houses).slice(0, 5) : [],
+          sample: Array.isArray(houses) ? houses.slice(0, 3) : null
+        })}`);
       }
 
       // Validate house data
-      if (houseArray.length < 12) {
-        throw new Error('Swiss Ephemeris returned insufficient house data (need 12 houses)');
+      if (!houseArray || houseArray.length < 12) {
+        throw new Error(`Swiss Ephemeris returned insufficient house data (got ${houseArray?.length || 0}, need 12 houses)`);
       }
 
+      // Build house positions with enhanced validation
       const housePositions = [];
       for (let i = 0; i < 12; i++) {
         const houseDegree = houseArray[i];
-        if (houseDegree === undefined || isNaN(houseDegree)) {
-          throw new Error(`Invalid house cusp for house ${i+1}: ${houseDegree}`);
+        
+        // Enhanced validation with better error messages
+        if (houseDegree === undefined || houseDegree === null) {
+          throw new Error(`House cusp ${i+1} is undefined or null. House array: ${JSON.stringify(houseArray)}`);
+        }
+        
+        if (isNaN(houseDegree) || typeof houseDegree !== 'number') {
+          throw new Error(`House cusp ${i+1} is not a valid number: ${houseDegree} (type: ${typeof houseDegree})`);
         }
         
         // Normalize degrees to 0-360 range
@@ -638,8 +712,12 @@ class ChartGenerationService {
           longitude: normalizedDegree
         });
       }
+      
+      console.log('✅ Successfully calculated all 12 house positions');
       return housePositions;
+      
     } catch (error) {
+      console.error('❌ House calculation error:', error);
       throw new Error(`House position calculation failed: ${error.message}`);
     }
   }
