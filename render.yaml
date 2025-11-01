@@ -9,8 +9,10 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
-      # GEOCODING_API_KEY - Set manually in dashboard from .env
-      # FRONTEND_URL - Set after frontend deployment
+      - key: GEOCODING_API_KEY
+        sync: false  # Will prompt for value during deployment
+      - key: FRONTEND_URL
+        sync: false  # Set after frontend deployment
       # PORT - Automatically assigned by Render
 
   # Frontend Static Site
@@ -19,6 +21,7 @@ services:
     buildCommand: cd client && npm install && npm run build
     publishPath: client/build
     envVars:
-      # REACT_APP_API_URL - Set after backend deployment (e.g., https://jjyotish-shastra-backend.onrender.com/api)
+      - key: REACT_APP_API_URL
+        sync: false  # Set after backend deployment (e.g., https://jjyotish-shastra-backend.onrender.com/api)
       - key: GENERATE_SOURCEMAP
         value: false
