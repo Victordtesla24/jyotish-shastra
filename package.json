@@ -45,7 +45,8 @@
     "mongoose": "^8.16.1",
     "morgan": "^1.10.1",
     "opencage-api-client": "^1.1.0",
-    "sweph-wasm": "^2.6.9"
+    "sweph-wasm": "^2.6.9",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@babel/plugin-syntax-import-meta": "^7.10.4",
