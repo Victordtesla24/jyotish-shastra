@@ -148,7 +148,7 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+# lib/  # COMMENTED OUT - Was excluding client/src/lib/ needed for React utils
 lib64/
 parts/
 sdist/
