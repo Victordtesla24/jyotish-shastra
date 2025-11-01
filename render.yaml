@@ -2,27 +2,23 @@ services:
   # Backend Web Service
   - type: web
     name: jjyotish-shastra-backend
-    runtime: node
+    env: node
     plan: free
     buildCommand: npm install && npm run copy-wasm
     startCommand: node src/index.js
     envVars:
       - key: NODE_ENV
         value: production
-      - key: GEOCODING_API_KEY
-        sync: false  # Set manually in dashboard from .env
-      - key: FRONTEND_URL
-        sync: false  # Set after frontend deployment
-      # PORT is automatically assigned by Render, no need to set it
+      # GEOCODING_API_KEY - Set manually in dashboard from .env
+      # FRONTEND_URL - Set after frontend deployment
+      # PORT - Automatically assigned by Render
 
   # Frontend Static Site
   - type: static_site
     name: jjyotish-shastra-frontend
     buildCommand: cd client && npm install && npm run build
-    staticPublishPath: client/build
+    publishPath: client/build
     envVars:
-      - key: REACT_APP_API_URL
-        sync: false  # Set after backend deployment (e.g., https://jjyotish-shastra-backend.onrender.com/api)
+      # REACT_APP_API_URL - Set after backend deployment (e.g., https://jjyotish-shastra-backend.onrender.com/api)
       - key: GENERATE_SOURCEMAP
         value: false
-
