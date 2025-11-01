@@ -13,8 +13,7 @@ services:
         sync: false  # Set manually in dashboard from .env
       - key: FRONTEND_URL
         sync: false  # Set after frontend deployment
-      - key: PORT
-        fromEnvVar: PORT  # Render assigns this dynamically
+      # PORT is automatically assigned by Render, no need to set it
 
   # Frontend Static Site
   - type: static_site
