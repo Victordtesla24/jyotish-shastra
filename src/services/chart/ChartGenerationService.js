@@ -453,7 +453,11 @@ class ChartGenerationService {
       }
       
       const ascendantData = await ascendantCalculator.calculateAscendantAndHouses(year, month, day, hour, minutes, placeOfBirth.latitude, placeOfBirth.longitude);
-      return ascendantData;
+      
+      // CRITICAL FIX: Extract just the ascendant object from the full result
+      // AscendantCalculator returns {ascendant: {...}, houses: {...}, metadata: {...}}
+      // But downstream code expects just the ascendant object with longitude, sign, etc.
+      return ascendantData.ascendant;
     } catch (error) {
       throw new Error(`Failed to calculate Ascendant: ${error.message}`);
     }
