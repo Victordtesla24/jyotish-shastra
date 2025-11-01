@@ -62,6 +62,7 @@ const corsOptions = {
   origin: isProduction
     ? [
         process.env.FRONTEND_URL,
+        'https://jjyotish-shastra-frontend.onrender.com',
         process.env.RENDER_EXTERNAL_URL ? `https://${process.env.RENDER_EXTERNAL_URL}` : null,
       ].filter(Boolean)
     : [
@@ -78,6 +79,11 @@ const corsOptions = {
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   optionsSuccessStatus: 200,
 };
+
+// Log CORS origins in production for debugging
+if (isProduction) {
+  console.log('🔒 CORS enabled for origins:', corsOptions.origin);
+}
 
 app.use(cors(corsOptions));
 
