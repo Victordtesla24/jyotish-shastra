@@ -13,7 +13,6 @@ services:
         sync: false  # Will prompt for value during deployment
       - key: FRONTEND_URL
         sync: false  # Set after frontend deployment
-      # PORT - Automatically assigned by Render
 
   # Frontend Static Site
   - type: static_site
@@ -24,4 +23,4 @@ services:
       - key: REACT_APP_API_URL
         sync: false  # Set after backend deployment (e.g., https://jjyotish-shastra-backend.onrender.com/api)
       - key: GENERATE_SOURCEMAP
-        value: false
+        value: "false"
