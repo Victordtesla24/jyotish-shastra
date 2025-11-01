@@ -58,11 +58,39 @@ class ChartGenerationService {
    */
   async ensureSwissephInitialized() {
     try {
+      console.log('🔧 Ensuring Swiss Ephemeris initialization...');
+      
       // Use the improved wrapper to get Swiss Ephemeris
       this.swisseph = await getSwisseph();
+      
+      // CRITICAL: Validate all required methods are available
+      const requiredMethods = ['swe_julday', 'swe_revjul', 'swe_calc_ut', 'swe_houses'];
+      const missingMethods = requiredMethods.filter(method => 
+        typeof this.swisseph[method] !== 'function'
+      );
+      
+      if (missingMethods.length > 0) {
+        throw new Error(`Swiss Ephemeris missing required methods: ${missingMethods.join(', ')}`);
+      }
+      
+      // PRODUCTION: Log available Swiss Ephemeris methods
+      if (process.env.NODE_ENV === 'production') {
+        console.log('📊 Swiss Ephemeris methods validated:', {
+          swe_julday: typeof this.swisseph.swe_julday,
+          swe_revjul: typeof this.swisseph.swe_revjul,
+          swe_calc_ut: typeof this.swisseph.swe_calc_ut,
+          swe_houses: typeof this.swisseph.swe_houses
+        });
+      }
+      
       this.swissephAvailable = true;
+      console.log('✅ Swiss Ephemeris initialized with all required methods');
     } catch (error) {
       this.swissephAvailable = false;
+      console.error('❌ Swiss Ephemeris initialization failed:', {
+        error: error.message,
+        stack: error.stack
+      });
       throw error;
     }
   }
@@ -432,9 +460,28 @@ class ChartGenerationService {
    */
   async calculateAscendant(jd, placeOfBirth) {
     try {
+      // PRODUCTION: Log input parameters for debugging
+      if (process.env.NODE_ENV === 'production') {
+        console.log('🔧 Calculating Ascendant with inputs:', {
+          jd,
+          latitude: placeOfBirth.latitude,
+          longitude: placeOfBirth.longitude
+        });
+      }
+
       const ascendantCalculator = new AscendantCalculator();
       // Convert Julian Day to date components using Swiss Ephemeris
       const result = await this.swisseph.swe_revjul(jd, SE_GREG_CAL);
+      
+      // PRODUCTION: Log swe_revjul result structure
+      if (process.env.NODE_ENV === 'production') {
+        console.log('📊 Swiss Ephemeris swe_revjul result:', {
+          isArray: Array.isArray(result),
+          length: Array.isArray(result) ? result.length : 'N/A',
+          isObject: typeof result === 'object',
+          keys: result && typeof result === 'object' ? Object.keys(result) : []
+        });
+      }
       
       // Handle both array and object return formats from sweph-wasm
       let year, month, day, hour, minutes;
@@ -452,18 +499,55 @@ class ChartGenerationService {
         throw new Error('Invalid Julian Day conversion result from Swiss Ephemeris');
       }
       
+      // PRODUCTION: Log extracted date components
+      if (process.env.NODE_ENV === 'production') {
+        console.log('📅 Extracted date components:', { year, month, day, hour, minutes });
+      }
+
       const ascendantData = await ascendantCalculator.calculateAscendantAndHouses(year, month, day, hour, minutes, placeOfBirth.latitude, placeOfBirth.longitude);
+      
+      // PRODUCTION: Log AscendantCalculator response structure
+      if (process.env.NODE_ENV === 'production') {
+        console.log('📊 AscendantCalculator response structure:', {
+          hasAscendant: !!ascendantData.ascendant,
+          ascendantKeys: ascendantData.ascendant ? Object.keys(ascendantData.ascendant) : [],
+          hasLongitude: ascendantData.ascendant ? typeof ascendantData.ascendant.longitude === 'number' : false,
+          longitudeValue: ascendantData.ascendant?.longitude
+        });
+      }
       
       // CRITICAL FIX: Extract just the ascendant object from the full result
       // AscendantCalculator returns {ascendant: {...}, houses: {...}, metadata: {...}}
       // But downstream code expects just the ascendant object with longitude, sign, etc.
-      // AscendantCalculator returns signName but downstream code expects sign property
       const ascendant = ascendantData.ascendant;
+      
+      // CRITICAL VALIDATION: Ensure ascendant has required longitude property
+      if (!ascendant || typeof ascendant.longitude !== 'number') {
+        console.error('❌ Invalid ascendant data:', {
+          hasAscendant: !!ascendant,
+          ascendantStructure: ascendant ? JSON.stringify(ascendant) : 'null',
+          fullResponse: JSON.stringify(ascendantData)
+        });
+        throw new Error(`Invalid ascendant data structure - missing longitude: ${JSON.stringify(ascendant)}`);
+      }
+
+      // PRODUCTION: Log successful ascendant calculation
+      if (process.env.NODE_ENV === 'production') {
+        console.log('✅ Ascendant calculated successfully:', {
+          longitude: ascendant.longitude,
+          sign: ascendant.signName || ascendant.sign
+        });
+      }
+
       return {
         ...ascendant,
         sign: ascendant.signName || ascendant.sign, // Map signName to sign for compatibility
       };
     } catch (error) {
+      console.error('❌ Ascendant calculation failed:', {
+        errorMessage: error.message,
+        errorStack: error.stack
+      });
       throw new Error(`Failed to calculate Ascendant: ${error.message}`);
     }
   }
