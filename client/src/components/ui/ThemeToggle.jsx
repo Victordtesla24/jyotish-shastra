@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useTheme } from '../../contexts/ThemeContext';
-import { SunIcon, MoonIcon, StarIcon } from './VedicIcons';
+import { useTheme } from '../../contexts/ThemeContext.js';
+import { SunIcon, MoonIcon, StarIcon } from './VedicIcons.js';
 
 const ThemeToggle = ({ className = '', size = 'md' }) => {
   const { theme, toggleTheme, isDark } = useTheme();

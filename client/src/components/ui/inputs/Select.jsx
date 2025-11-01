@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactSelect from 'react-select';
 import { motion } from 'framer-motion';
-import { cn } from '../index';
+import { cn } from '../index.js';
 
 const Select = ({
   label,

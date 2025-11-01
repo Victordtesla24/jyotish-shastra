@@ -4,9 +4,9 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import geocodingService from '../../services/geocodingService';
-import UIDataSaver from './UIDataSaver';
-import UIToAPIDataInterpreter from './UIToAPIDataInterpreter';
+import geocodingService from '../../services/geocodingService.js';
+import UIDataSaver from './UIDataSaver.js';
+import UIToAPIDataInterpreter from './UIToAPIDataInterpreter.js';
 import './BirthDataForm.css';
 
 const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {

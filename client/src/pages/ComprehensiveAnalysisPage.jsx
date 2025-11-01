@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ComprehensiveAnalysisDisplay from '../components/reports/ComprehensiveAnalysisDisplay';
-import ResponseDataToUIDisplayAnalyser from '../components/analysis/ResponseDataToUIDisplayAnalyser';
-import UIDataSaver from '../components/forms/UIDataSaver';
-import UIToAPIDataInterpreter from '../components/forms/UIToAPIDataInterpreter';
+import ComprehensiveAnalysisDisplay from '../components/reports/ComprehensiveAnalysisDisplay.js';
+import ResponseDataToUIDisplayAnalyser from '../components/analysis/ResponseDataToUIDisplayAnalyser.js';
+import UIDataSaver from '../components/forms/UIDataSaver.js';
+import UIToAPIDataInterpreter from '../components/forms/UIToAPIDataInterpreter.js';
 
 /**
  * Comprehensive Analysis Page with ErrorBoundary protection

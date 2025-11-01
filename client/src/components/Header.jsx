@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import ThemeToggle from './ui/ThemeToggle';
+import ThemeToggle from './ui/ThemeToggle.jsx';
 
 const Header = () => {
   const navigate = useNavigate();

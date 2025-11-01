@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import VedicLoadingSpinner from './loading/VedicLoadingSpinner';
-import ErrorMessage from './ErrorMessage';
+import VedicLoadingSpinner from './loading/VedicLoadingSpinner.jsx';
+import ErrorMessage from './ErrorMessage.jsx';
 
 /**
  * Vedic Design System Showcase Component

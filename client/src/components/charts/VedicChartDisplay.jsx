@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import VedicLoadingSpinner from '../ui/loading/VedicLoadingSpinner';
+import VedicLoadingSpinner from '../ui/loading/VedicLoadingSpinner.jsx';
 
 /**
  * Enhanced Vedic Chart Display - Cultural Design System Integration

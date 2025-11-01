@@ -1,10 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import BirthDataForm from '../components/forms/BirthDataForm';
+import BirthDataForm from '../components/forms/BirthDataForm.js';
 import { Card } from '../components/ui';
-import { useChart } from '../contexts/ChartContext';
-import UIDataSaver from '../components/forms/UIDataSaver';
-import { getApiUrl } from '../utils/apiConfig';
+import { useChart } from '../contexts/ChartContext.js';
+import UIDataSaver from '../components/forms/UIDataSaver.js';
+import { getApiUrl } from '../utils/apiConfig.js';
 
 const HomePage = () => {
   const navigate = useNavigate();

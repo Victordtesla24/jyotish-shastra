@@ -1,26 +1,26 @@
 import React, { useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { ThemeProvider } from './contexts/ThemeContext';
-import { ChartProvider } from './contexts/ChartContext';
-import { AnalysisProvider } from './contexts/AnalysisContext';
-import usePWA from './hooks/usePWA';
-import Header from './components/Header';
-import Footer from './components/Footer';
+import { ThemeProvider } from './contexts/ThemeContext.js';
+import { ChartProvider } from './contexts/ChartContext.js';
+import { AnalysisProvider } from './contexts/AnalysisContext.js';
+import usePWA from './hooks/usePWA.js';
+import Header from './components/Header.jsx';
+import Footer from './components/Footer.jsx';
 import { Button } from './components/ui';
-import { initializeErrorHandling } from './utils/apiErrorHandler';
+import { initializeErrorHandling } from './utils/apiErrorHandler.js';
 import './styles/vedic-design-system.css';
 
 // Import pages directly instead of lazy loading to fix mounting issues
-import HomePage from './pages/HomePage';
-import ChartPage from './pages/ChartPage';
-import AnalysisPage from './pages/AnalysisPage';
-import ComprehensiveAnalysisPage from './pages/ComprehensiveAnalysisPage';
-import BirthTimeRectificationPage from './pages/BirthTimeRectificationPage';
-import ReportPage from './pages/ReportPage';
+import HomePage from './pages/HomePage.jsx';
+import ChartPage from './pages/ChartPage.jsx';
+import AnalysisPage from './pages/AnalysisPage.jsx';
+import ComprehensiveAnalysisPage from './pages/ComprehensiveAnalysisPage.jsx';
+import BirthTimeRectificationPage from './pages/BirthTimeRectificationPage.jsx';
+import ReportPage from './pages/ReportPage.jsx';
 
 // Details pages
-import MeshaPage from './pages/vedic-details/MeshaPage';
+import MeshaPage from './pages/vedic-details/MeshaPage.jsx';
 
 const queryClient = new QueryClient({
   defaultOptions: {

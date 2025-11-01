@@ -8,17 +8,17 @@ import '../styles/vedic-design-system.css';
 
 // Import UI components
 import { Button, Card, Alert, LoadingSpinner } from '../components/ui';
-import BirthDataForm from '../components/forms/BirthDataForm';
-import UIDataSaver from '../components/forms/UIDataSaver';
-import UIToAPIDataInterpreter from '../components/forms/UIToAPIDataInterpreter';
-import BPHSInfographicPROD from '../components/btr/BPHSInfographic';
-import InteractiveLifeEventsQuestionnairePROD from '../components/btr/InteractiveLifeEventsQuestionnaire';
+import BirthDataForm from '../components/forms/BirthDataForm.js';
+import UIDataSaver from '../components/forms/UIDataSaver.js';
+import UIToAPIDataInterpreter from '../components/forms/UIToAPIDataInterpreter.js';
+import BPHSInfographicPROD from '../components/btr/BPHSInfographic.jsx';
+import InteractiveLifeEventsQuestionnairePROD from '../components/btr/InteractiveLifeEventsQuestionnaire.jsx';
 
 // Import contexts
-import { useChart } from '../contexts/ChartContext';
+import { useChart } from '../contexts/ChartContext.js';
 
 // Import utilities
-import { formatTimeToHHMMSS } from '../utils/dateUtils';
+import { formatTimeToHHMMSS } from '../utils/dateUtils.js';
 
 const BirthTimeRectificationPageEnhanced = () => {
   const navigate = useNavigate();

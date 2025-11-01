@@ -22,9 +22,12 @@
   },
   "scripts": {
     "start": "craco start",
+    "prebuild": "node ../scripts/verify-imports.cjs",
     "build": "NODE_ENV=production GENERATE_SOURCEMAP=false craco build",
     "test": "craco test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "verify-imports": "node ../scripts/verify-imports.cjs",
+    "fix-imports": "node ../scripts/fix-imports.cjs"
   },
   "eslintConfig": {
     "extends": [

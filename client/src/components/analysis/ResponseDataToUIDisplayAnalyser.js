@@ -3,7 +3,7 @@
  * Handles data loading, caching, and transformation for UI display
  */
 
-import UIDataSaver from '../forms/UIDataSaver';
+import UIDataSaver from '../forms/UIDataSaver.js';
 
 const ResponseDataToUIDisplayAnalyser = {
   /**

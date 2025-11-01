@@ -9,18 +9,18 @@ import { VedicLoadingSpinner, ErrorMessage } from '../components/ui';
 // Note: Progressive loading with skeleton states implemented for better UX
 
 // Import chart visualization components
-import VedicChartDisplay from '../components/charts/VedicChartDisplay';
+import VedicChartDisplay from '../components/charts/VedicChartDisplay.jsx';
 
 // Import birth time rectification component
-import BirthTimeRectification from '../components/BirthTimeRectification';
+import BirthTimeRectification from '../components/BirthTimeRectification.jsx';
 
 // Import contexts
-import { useChart } from '../contexts/ChartContext';
-import { useAnalysis } from '../contexts/AnalysisContext';
+import { useChart } from '../contexts/ChartContext.js';
+import { useAnalysis } from '../contexts/AnalysisContext.js';
 
 // Import singleton data flow components
-import UIDataSaver from '../components/forms/UIDataSaver';
-import ResponseDataToUIDisplayAnalyser from '../components/analysis/ResponseDataToUIDisplayAnalyser';
+import UIDataSaver from '../components/forms/UIDataSaver.js';
+import ResponseDataToUIDisplayAnalyser from '../components/analysis/ResponseDataToUIDisplayAnalyser.js';
 
 // ===== REUSABLE SUMMARY DISPLAY COMPONENT (ENHANCED) =====
 

@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { useAnalysis } from '../../contexts/AnalysisContext';
-import ResponseDataToUIDisplayAnalyser from '../analysis/ResponseDataToUIDisplayAnalyser';
+import { useAnalysis } from '../../contexts/AnalysisContext.js';
+import ResponseDataToUIDisplayAnalyser from '../analysis/ResponseDataToUIDisplayAnalyser.js';
 
 /**
  * Comprehensive Analysis Display Component

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useReactToPrint } from 'react-to-print';
 import { Button, Card, VedicLoadingSpinner } from '../components/ui';
-import ComprehensiveAnalysisDisplay from '../components/reports/ComprehensiveAnalysisDisplay';
+import ComprehensiveAnalysisDisplay from '../components/reports/ComprehensiveAnalysisDisplay.js';
 
 const ReportPage = () => {
   const navigate = useNavigate();
