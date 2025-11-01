@@ -2,7 +2,7 @@ services:
   # Backend Web Service
   - type: web
     name: jjyotish-shastra-backend
-    env: node
+    runtime: node
     plan: free
     buildCommand: npm install && npm run copy-wasm
     startCommand: node src/index.js
@@ -15,10 +15,11 @@ services:
         sync: false  # Set after frontend deployment
 
   # Frontend Static Site
-  - type: static
+  - type: web
     name: jjyotish-shastra-frontend
+    runtime: static
     buildCommand: cd client && npm install && npm run build
-    publishPath: client/build
+    staticPublishPath: client/build
     envVars:
       - key: REACT_APP_API_URL
         sync: false  # Set after backend deployment (e.g., https://jjyotish-shastra-backend.onrender.com/api)
