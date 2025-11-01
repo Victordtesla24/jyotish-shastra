@@ -47,6 +47,39 @@ module.exports = {
         return true;
       });
       
+      // Configure webpack resolve for proper module resolution
+      if (!webpackConfig.resolve) {
+        webpackConfig.resolve = {};
+      }
+      
+      // Ensure proper file extensions are resolved
+      if (!webpackConfig.resolve.extensions) {
+        webpackConfig.resolve.extensions = [];
+      }
+      
+      // Add extensions if not already present (ensuring .js is included)
+      const requiredExtensions = ['.js', '.jsx', '.json'];
+      requiredExtensions.forEach(ext => {
+        if (!webpackConfig.resolve.extensions.includes(ext)) {
+          webpackConfig.resolve.extensions.unshift(ext);
+        }
+      });
+      
+      // Disable fullySpecified to allow imports without .js extension
+      webpackConfig.resolve.fullySpecified = false;
+      
+      // Ensure modules array includes proper resolution paths
+      if (!webpackConfig.resolve.modules) {
+        webpackConfig.resolve.modules = ['node_modules'];
+      }
+      
+      // Add src directory to modules for absolute imports (if needed)
+      const path = require('path');
+      const srcPath = path.resolve(__dirname, 'src');
+      if (!webpackConfig.resolve.modules.includes(srcPath)) {
+        webpackConfig.resolve.modules.push(srcPath);
+      }
+      
       return webpackConfig;
     },
   },
