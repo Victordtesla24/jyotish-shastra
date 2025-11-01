@@ -22,6 +22,6 @@ services:
     staticPublishPath: client/build
     envVars:
       - key: REACT_APP_API_URL
-        sync: false  # Set after backend deployment (e.g., https://jjyotish-shastra-backend.onrender.com/api)
+        value: https://jjyotish-shastra-backend.onrender.com
       - key: GENERATE_SOURCEMAP
         value: "false"

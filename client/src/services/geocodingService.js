@@ -3,7 +3,9 @@
  * Uses backend API exclusively - no fallback mechanisms
  */
 
-const BACKEND_GEOCODING_URL = '/api/v1/geocoding/location';
+import { getApiUrl } from '../utils/apiConfig.js';
+
+const BACKEND_GEOCODING_ENDPOINT = '/api/v1/geocoding/location';
 
 class GeocodingService {
   /**
@@ -39,7 +41,10 @@ class GeocodingService {
    */
   async geocodeWithBackend(location) {
     try {
-      const response = await fetch(BACKEND_GEOCODING_URL, {
+      const apiUrl = getApiUrl(BACKEND_GEOCODING_ENDPOINT);
+      console.log('🌍 Geocoding API URL:', apiUrl);
+      
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ placeOfBirth: location })
