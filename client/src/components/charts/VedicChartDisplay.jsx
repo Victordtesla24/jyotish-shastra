@@ -163,11 +163,49 @@ function processChartData(chartData) {
     ascendantDegree: chartData.ascendant?.degree,
     ascendantLongitude: chartData.ascendant?.longitude,
     hasPlanets: !!chartData.planets || !!chartData.planetaryPositions,
-    planetCount: chartData.planets?.length || Object.keys(chartData.planetaryPositions || {}).length
+    planetCount: chartData.planets?.length || Object.keys(chartData.planetaryPositions || {}).length,
+    hasHousePositions: !!chartData.housePositions && Array.isArray(chartData.housePositions)
   });
 
   // Handle direct chart data structure (chartData is rasiChart or navamsaChart directly)
   const chart = chartData;
+
+  // Extract housePositions from chartData - CRITICAL for accurate rasi number display
+  const housePositions = chart.housePositions || null;
+  
+  // Validate housePositions array structure
+  if (!housePositions || !Array.isArray(housePositions)) {
+    console.warn('⚠️ VedicChartDisplay: housePositions not found or invalid. Expected array from API.');
+  }
+  
+  // Create mapping from house number to rasi sign for quick lookup
+  const houseToRasiMap = {};
+  if (housePositions && Array.isArray(housePositions) && housePositions.length > 0) {
+    housePositions.forEach(house => {
+      // Validate house structure
+      if (!house || typeof house !== 'object') {
+        console.warn('⚠️ VedicChartDisplay: Invalid house object in housePositions array:', house);
+        return;
+      }
+      
+      const houseNumber = house.houseNumber || house.house;
+      if (houseNumber >= 1 && houseNumber <= 12 && house.sign) {
+        houseToRasiMap[houseNumber] = {
+          sign: house.sign,
+          signId: house.signId,
+          longitude: house.longitude || house.degree,
+          degree: house.degree || (house.longitude ? house.longitude % 30 : null)
+        };
+      } else {
+        console.warn(`⚠️ VedicChartDisplay: Invalid house data - houseNumber: ${houseNumber}, sign: ${house.sign}`);
+      }
+    });
+    
+    // Validate that we have all 12 houses
+    if (Object.keys(houseToRasiMap).length < 12) {
+      console.warn(`⚠️ VedicChartDisplay: Only ${Object.keys(houseToRasiMap).length} houses found in houseToRasiMap. Expected 12.`);
+    }
+  }
 
   // Use planetaryPositions if available (from API), otherwise use planets array
   let planetsData = [];
@@ -198,9 +236,65 @@ function processChartData(chartData) {
       throw new Error(`Invalid longitude for planet ${planet.name || 'unknown'}: ${planet.longitude}. Expected a valid number from API.`);
     }
     
-    const house = calculateHouseFromLongitude(planet.longitude, chart.ascendant.longitude);
-    const degrees = planet.degree !== undefined ? Math.floor(planet.degree) : Math.floor(planet.longitude % 30);
-    const minutes = planet.degree !== undefined ?
+    // Prefer API-provided house number if available, otherwise calculate from longitude
+    let house = planet.house;
+    
+    // Validate house number from API
+    if (!house || house < 1 || house > 12 || !Number.isInteger(house)) {
+      // Calculate house from planet longitude relative to ascendant
+      try {
+        house = calculateHouseFromLongitude(planet.longitude, chart.ascendant.longitude);
+      } catch (calcError) {
+        console.warn(`⚠️ Failed to calculate house for planet ${planet.name}:`, calcError.message);
+        house = null;
+      }
+    }
+    
+    // Validate calculated house
+    if (!house || house < 1 || house > 12) {
+      console.warn(`⚠️ Invalid house ${house} for planet ${planet.name}. Longitude: ${planet.longitude}, Ascendant: ${chart.ascendant.longitude}`);
+      // Don't default to house 1 - throw error instead for production
+      throw new Error(`Invalid house assignment for planet ${planet.name || 'unknown'}: house=${house}, longitude=${planet.longitude}`);
+    }
+    
+    // Validate house against housePositions if available
+    if (houseToRasiMap && houseToRasiMap[house]) {
+      // Calculate planet's sign from longitude
+      const normalizedLongitude = ((planet.longitude % 360) + 360) % 360;
+      const planetSignId = Math.floor(normalizedLongitude / 30) + 1;
+      const expectedSignId = houseToRasiMap[house].signId;
+      
+      // Check if planet sign matches house sign (allow for boundary cases ±1 for edge cases)
+      const planetSignNumber = ((planetSignId - 1) % 12) + 1;
+      const expectedSignNumber = ((expectedSignId - 1) % 12) + 1;
+      
+      // Calculate circular difference (handles wrap-around)
+      let diff = Math.abs(planetSignNumber - expectedSignNumber);
+      if (diff > 6) {
+        diff = 12 - diff; // Handle circular wrap-around
+      }
+      
+      if (diff > 1) {
+        console.warn(`⚠️ Planet ${planet.name} in house ${house} may have incorrect assignment. Planet sign ID: ${planetSignNumber} (sign: ${ZODIAC_SIGNS[planetSignNumber]?.name}), House sign ID: ${expectedSignNumber} (sign: ${houseToRasiMap[house].sign})`);
+      }
+    }
+    
+    // Calculate degree within sign (0-29 degrees)
+    // Use planet.degree if available (already calculated), otherwise calculate from longitude
+    let degrees;
+    if (planet.degree !== undefined && planet.degree !== null) {
+      // planet.degree is the degree within the sign (0-29.99)
+      degrees = Math.floor(planet.degree);
+    } else if (typeof planet.longitude === 'number' && !isNaN(planet.longitude)) {
+      // Calculate degree from longitude: longitude % 30 gives degrees within sign
+      const longitudeMod30 = planet.longitude % 30;
+      degrees = Math.floor(longitudeMod30);
+    } else {
+      throw new Error(`Invalid degree/longitude for planet ${planet.name || 'unknown'}: degree=${planet.degree}, longitude=${planet.longitude}`);
+    }
+    
+    // Calculate minutes for reference (not displayed in formatPlanetText)
+    const minutes = planet.degree !== undefined && planet.degree !== null ?
       Math.floor((planet.degree - Math.floor(planet.degree)) * 60) :
       Math.floor(((planet.longitude % 30) - degrees) * 60);
 
@@ -213,10 +307,14 @@ function processChartData(chartData) {
     const dignity = planet.dignity || 'neutral';
     const dignityInfo = DIGNITY_SYMBOLS[dignity] || DIGNITY_SYMBOLS.neutral;
 
+    // Get planet code from PLANET_CODES mapping (e.g., "Su", "Mo", "Ma")
+    const planetCode = PLANET_CODES[planet.name] || 
+      (planet.name ? planet.name.substring(0, 2).charAt(0).toUpperCase() + planet.name.substring(1, 2).toLowerCase() : '??');
+    
     return {
       name: planet.name,
       sanskritName: SANSKRIT_PLANET_NAMES[planet.name] || planet.name,
-      code: PLANET_CODES[planet.name] || planet.name.substring(0, 2),
+      code: planetCode,
       house: house,
       degrees: degrees,
       minutes: minutes,
@@ -263,7 +361,7 @@ function processChartData(chartData) {
     };
   }
 
-  return { planets, ascendant };
+  return { planets, ascendant, housePositions, houseToRasiMap };
 }
 
 /**
@@ -448,10 +546,10 @@ export default function VedicChartDisplay({
     try {
       setLoading(true);
 
-      const { planets, ascendant } = processChartData(chartData);
+      const { planets, ascendant, housePositions, houseToRasiMap } = processChartData(chartData);
       const houseGroups = groupPlanetsByHouse(planets, ascendant);
 
-      setProcessedData({ planets, ascendant, houseGroups });
+      setProcessedData({ planets, ascendant, houseGroups, housePositions, houseToRasiMap });
       setError(null);
       setLoading(false);
     } catch (err) {
@@ -499,7 +597,7 @@ export default function VedicChartDisplay({
     );
   }
 
-  const { houseGroups, ascendant } = processedData;
+  const { houseGroups, ascendant, houseToRasiMap } = processedData;
 
   return (
     <div
@@ -582,15 +680,48 @@ export default function VedicChartDisplay({
           </g>
 
           {/* Rasi Numbers - positioned at diamond intersections (blue circle locations) */}
-          {Object.entries(RASI_NUMBER_POSITIONS).map(([houseNum, rasiPosition]) => {
-            // Get ascendant Rasi from API data
-            const ascendantRasi = ascendant ? getRasiNumberFromSign(ascendant.sign) : 1;
-            // Calculate which Rasi occupies this house position
-            const rasiNumber = calculateRasiForHouse(parseInt(houseNum), ascendantRasi);
+          {Object.entries(RASI_NUMBER_POSITIONS).map(([positionKey, rasiPosition]) => {
+            // RASI_NUMBER_POSITIONS keys correspond to house numbers in North Indian diamond layout
+            // Position 1 = house 1 (top center), Position 2 = house 2 (top right), etc.
+            const houseNumber = parseInt(positionKey);
+            
+            if (houseNumber < 1 || houseNumber > 12) {
+              console.warn(`⚠️ Invalid house number in RASI_NUMBER_POSITIONS: ${houseNumber}`);
+              return null;
+            }
+            
+            let rasiNumber;
+            
+            // CRITICAL: Use houseToRasiMap from API housePositions - this is the authoritative source
+            if (houseToRasiMap && houseToRasiMap[houseNumber]) {
+              // Get rasi number from actual sign in housePositions from API
+              const houseSign = houseToRasiMap[houseNumber].sign;
+              try {
+                rasiNumber = getRasiNumberFromSign(houseSign);
+              } catch (error) {
+                console.error(`❌ Error getting rasi number for house ${houseNumber} with sign ${houseSign}:`, error);
+                // Fallback to calculation if sign lookup fails
+                if (ascendant) {
+                  const ascendantRasi = getRasiNumberFromSign(ascendant.sign);
+                  rasiNumber = calculateRasiForHouse(houseNumber, ascendantRasi);
+                } else {
+                  rasiNumber = houseNumber; // Last resort
+                }
+              }
+            } else if (ascendant) {
+              // Fallback to formula-based calculation only if housePositions not available
+              console.warn(`⚠️ houseToRasiMap missing for house ${houseNumber}, using formula calculation`);
+              const ascendantRasi = getRasiNumberFromSign(ascendant.sign);
+              rasiNumber = calculateRasiForHouse(houseNumber, ascendantRasi);
+            } else {
+              // Last resort: use house number as rasi number (should rarely happen)
+              console.warn(`⚠️ No houseToRasiMap or ascendant for house ${houseNumber}, using house number as rasi`);
+              rasiNumber = houseNumber;
+            }
 
             return (
               <text
-                key={`rasi-${houseNum}`}
+                key={`rasi-${houseNumber}`}
                 x={rasiPosition.x}
                 y={rasiPosition.y}
                 textAnchor="middle"
