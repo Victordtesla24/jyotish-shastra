@@ -554,12 +554,25 @@ class ChartGenerationService {
         const result = await this.swisseph.swe_calc_ut(jd, planetId, this.calcFlags);
 
         // Handle both array and object result formats from sweph-wasm
-        if (Array.isArray(result) && result.length >= 4) {
-          // Array format: [longitude, latitude, distance, speed, ...]
-          const longitude = result[0];
-          const latitude = result[1];
-          const distance = result[2];
-          const speed = result[3];
+        // CRITICAL FIX: swisseph-wrapper returns [rcode, longitude, latitude, distance, speed_lon, speed_lat, speed_dist]
+        // We must check result[0] for rcode and use result[1] for longitude
+        if (Array.isArray(result) && result.length >= 5) {
+          // Array format from wrapper: [rcode, longitude, latitude, distance, speed_lon, speed_lat, speed_dist]
+          const rcode = result[0];
+          const longitude = result[1]; // CRITICAL: longitude is at index 1, not 0!
+          const latitude = result[2];
+          const distance = result[3];
+          const speed = result[4] || 0; // speed_lon is at index 4
+          
+          // Validate rcode before processing
+          if (rcode !== 0 && rcode !== undefined && rcode !== null) {
+            console.warn(`⚠️ Swiss Ephemeris warning for ${planetName}: rcode=${rcode}. Proceeding with calculated values.`);
+          }
+          
+          // Validate longitude is a valid number
+          if (typeof longitude !== 'number' || isNaN(longitude)) {
+            throw new Error(`Invalid longitude returned for ${planetName}: ${longitude} (type: ${typeof longitude}, rcode: ${rcode}). Expected valid number from Swiss Ephemeris calculation.`);
+          }
           
           // Normalize longitude to 0-360 range
           const normalizedLongitude = ((longitude % 360) + 360) % 360;
