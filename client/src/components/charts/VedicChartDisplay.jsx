@@ -236,17 +236,31 @@ function processChartData(chartData) {
       throw new Error(`Invalid longitude for planet ${planet.name || 'unknown'}: ${planet.longitude}. Expected a valid number from API.`);
     }
     
-    // Prefer API-provided house number if available, otherwise calculate from longitude
+    // CRITICAL FIX: Use house cusps from housePositions for accurate house assignment
+    // Prefer API-provided house number if available and valid, otherwise calculate using house cusps
     let house = planet.house;
     
     // Validate house number from API
     if (!house || house < 1 || house > 12 || !Number.isInteger(house)) {
-      // Calculate house from planet longitude relative to ascendant
+      // Calculate house using actual house cusps (most accurate) or fallback to formula
       try {
-        house = calculateHouseFromLongitude(planet.longitude, chart.ascendant.longitude);
+        if (housePositions && Array.isArray(housePositions) && housePositions.length === 12) {
+          // Use house cusps for accurate Placidus house system calculation
+          house = calculateHouseFromCusps(planet.longitude, housePositions);
+        } else {
+          // Fallback to formula-based calculation if housePositions not available
+          console.warn(`⚠️ housePositions not available for ${planet.name}, using formula calculation`);
+          house = calculateHouseFromLongitude(planet.longitude, chart.ascendant.longitude);
+        }
       } catch (calcError) {
         console.warn(`⚠️ Failed to calculate house for planet ${planet.name}:`, calcError.message);
-        house = null;
+        // Last resort: try formula-based calculation
+        try {
+          house = calculateHouseFromLongitude(planet.longitude, chart.ascendant.longitude);
+        } catch (fallbackError) {
+          console.error(`❌ Both house cusp and formula calculations failed for ${planet.name}:`, fallbackError.message);
+          house = null;
+        }
       }
     }
     
@@ -365,9 +379,63 @@ function processChartData(chartData) {
 }
 
 /**
+ * Calculate house number from planetary longitude using actual house cusps (most accurate)
+ * Uses Placidus house system cusps from housePositions array
+ * @param {number} planetLongitude - Planet longitude in degrees (0-360)
+ * @param {Array} housePositions - Array of house positions with cusp longitudes
+ * @returns {number} House number (1-12)
+ */
+function calculateHouseFromCusps(planetLongitude, housePositions) {
+  // PRODUCTION: Require valid inputs
+  if (typeof planetLongitude !== 'number' || isNaN(planetLongitude)) {
+    throw new Error(`Invalid planet longitude: ${planetLongitude}. Expected a valid number.`);
+  }
+  
+  if (!housePositions || !Array.isArray(housePositions) || housePositions.length !== 12) {
+    throw new Error(`Invalid housePositions: Expected array of 12 house cusps. Got: ${housePositions?.length || 'undefined'}`);
+  }
+
+  // Normalize planet longitude to 0-360 range
+  const normalizedPlanet = ((planetLongitude % 360) + 360) % 360;
+
+  // Iterate through all houses to find which one contains the planet
+  for (let i = 0; i < 12; i++) {
+    const currentHouse = housePositions[i];
+    const nextIndex = (i + 1) % 12;
+    const nextHouse = housePositions[nextIndex];
+
+    // Validate house structure
+    if (!currentHouse || typeof currentHouse.longitude !== 'number' || 
+        !nextHouse || typeof nextHouse.longitude !== 'number') {
+      throw new Error(`Invalid house cusp data at index ${i}. Expected house objects with longitude property.`);
+    }
+
+    const currentCusp = ((currentHouse.longitude % 360) + 360) % 360;
+    const nextCusp = ((nextHouse.longitude % 360) + 360) % 360;
+
+    // Check if planet longitude falls between current cusp and next cusp
+    // Handle wrap-around case where house spans across 0°
+    if (currentCusp <= nextCusp) {
+      // Normal case: house doesn't cross 0°
+      if (normalizedPlanet >= currentCusp && normalizedPlanet < nextCusp) {
+        return currentHouse.houseNumber || (i + 1);
+      }
+    } else {
+      // Wrap-around case: house crosses 0° (currentCusp > nextCusp)
+      if (normalizedPlanet >= currentCusp || normalizedPlanet < nextCusp) {
+        return currentHouse.houseNumber || (i + 1);
+      }
+    }
+  }
+
+  // If we reach here, planet wasn't found in any house (shouldn't happen)
+  throw new Error(`Unable to determine house for planet at longitude ${planetLongitude}. All house cusps checked.`);
+}
+
+/**
  * Calculate house number from planetary longitude with correct ascendant offset handling
  * Houses are calculated as 30-degree segments starting from the ascendant longitude
- * Fixed to match API response house positions accurately
+ * FALLBACK: Use this only when housePositions are not available
  */
 function calculateHouseFromLongitude(planetLongitude, ascendantLongitude) {
   // PRODUCTION: Require valid longitudes - throw error instead of fallback
