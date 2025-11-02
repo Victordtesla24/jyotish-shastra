@@ -275,7 +275,7 @@ class ErrorLogger {
       wasm: this.wasmErrors.length,
       react: this.reactErrors.length,
       apiParsing: this.apiParsingErrors.length,
-      warnings: this.warnings.length,
+      warningsCount: this.warnings.length,
       errors: this.errors,
       networkErrors: this.networkErrors,
       wasmErrors: this.wasmErrors,

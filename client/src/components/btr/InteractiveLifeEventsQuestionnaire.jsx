@@ -24,7 +24,7 @@ const InteractiveLifeEventsQuestionnaire = ({
     if (initialCompletedCategories.size > 0) {
       setCompletedCategories(new Set(initialCompletedCategories));
     }
-  }, []);
+  }, [initialAnswers, initialCompletedCategories]);
 
   const questionCategories = {
     education: {

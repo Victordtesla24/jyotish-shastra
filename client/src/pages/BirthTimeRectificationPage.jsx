@@ -182,6 +182,43 @@ const BirthTimeRectificationPageEnhanced = () => {
   const dataInterpreter = useMemo(() => new UIToAPIDataInterpreter(), []);
   const dataSaver = UIDataSaver;
 
+  // Memoize initial answers and completed categories for events persistence
+  // Must be at top level to comply with Rules of Hooks
+  const initialAnswers = useMemo(() => {
+    // Restore answers state from lifeEvents - convert events back to question format
+    return lifeEvents.reduce((acc, event) => {
+      // Map event data to component's answer format
+      if (event.id && event.date && event.description) {
+        acc[event.id] = {
+          date: event.date,
+          answer: event.description,
+          category: event.category || 'general',
+          importance: event.importance || 'high',
+          questionText: event.questionText || event.description
+        };
+      }
+      return acc;
+    }, {});
+  }, [lifeEvents]);
+
+  const initialCompletedCategories = useMemo(() => {
+    // Restore completed categories from lifeEvents
+    const categoryMap = {
+      'relationship': 'marriage',
+      'career': 'career',
+      'education': 'education',
+      'health': 'health',
+      'relocation': 'relocation',
+      'financial': 'financial'
+    };
+    return new Set(
+      Array.from(new Set(lifeEvents.map(e => {
+        const category = e.category?.toLowerCase();
+        return categoryMap[category] || category;
+      }))).filter(Boolean)
+    );
+  }, [lifeEvents]);
+
   // Production grade API connection check
   useEffect(() => {
     const checkApiConnection = async () => {
@@ -893,39 +930,8 @@ const BirthTimeRectificationPageEnhanced = () => {
                   // Progress update handler 
                   console.log('Progress updated:', progress);
                 }}
-                initialAnswers={useMemo(() => {
-                  // Restore answers state from lifeEvents - convert events back to question format
-                  return lifeEvents.reduce((acc, event) => {
-                    // Map event data to component's answer format
-                    if (event.id && event.date && event.description) {
-                      acc[event.id] = {
-                        date: event.date,
-                        answer: event.description,
-                        category: event.category || 'general',
-                        importance: event.importance || 'high',
-                        questionText: event.questionText || event.description
-                      };
-                    }
-                    return acc;
-                  }, {});
-                }, [lifeEvents])}
-                initialCompletedCategories={useMemo(() => {
-                  // Restore completed categories from lifeEvents
-                  const categoryMap = {
-                    'relationship': 'marriage',
-                    'career': 'career',
-                    'education': 'education',
-                    'health': 'health',
-                    'relocation': 'relocation',
-                    'financial': 'financial'
-                  };
-                  return new Set(
-                    Array.from(new Set(lifeEvents.map(e => {
-                      const category = e.category?.toLowerCase();
-                      return categoryMap[category] || category;
-                    }))).filter(Boolean)
-                  );
-                }, [lifeEvents])}
+                initialAnswers={initialAnswers}
+                initialCompletedCategories={initialCompletedCategories}
               />
 
               {lifeEvents.length > 0 && (
