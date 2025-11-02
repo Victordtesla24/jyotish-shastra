@@ -21,6 +21,27 @@ import { useChart } from '../contexts/ChartContext.js';
 import { formatTimeToHHMMSS } from '../utils/dateUtils.js';
 import { getApiUrl } from '../utils/apiConfig.js';
 
+// Type-safe rendering helpers to prevent React Error #130
+const safeNumber = (value) => {
+  if (typeof value === 'number' && !isNaN(value)) return value;
+  if (typeof value === 'string') {
+    const num = parseFloat(value);
+    return !isNaN(num) ? num : 0;
+  }
+  return 0;
+};
+
+const safeString = (value) => {
+  if (value == null) return 'N/A';
+  if (typeof value === 'string') return value;
+  if (typeof value === 'number') return String(value);
+  if (typeof value === 'object') {
+    // If it's an object, try to get a meaningful string representation
+    return value.sign || value.name || JSON.stringify(value);
+  }
+  return String(value);
+};
+
 const BirthTimeRectificationPageEnhanced = () => {
   const navigate = useNavigate();
   const { currentChart } = useChart();
@@ -240,11 +261,27 @@ const BirthTimeRectificationPageEnhanced = () => {
         return setError('Invalid validation response structure');
       }
       
-      setRectificationData(validation);
+      // CRITICAL FIX: Validate and normalize validation data structure to prevent React Error #130
+      // Ensure all values are primitives before rendering
+      const normalized = {
+        ...validation,
+        confidence: safeNumber(validation.confidence),
+        alignmentScore: safeNumber(validation.alignmentScore),
+        praanapada: validation.praanapada ? {
+          ...validation.praanapada,
+          sign: safeString(validation.praanapada.sign)
+        } : null,
+        ascendant: validation.ascendant ? {
+          ...validation.ascendant,
+          sign: safeString(validation.ascendant.sign)
+        } : null
+      };
+      
+      setRectificationData(normalized);
       setQuickValidationComplete(true);
       
       // Determine next step based on confidence score
-      const confidence = validation?.confidence || 0;
+      const confidence = normalized.confidence || 0;
       if (confidence >= 80) {
         setTimeout(() => setPageStep('results'), 1500);
       } else {
@@ -353,13 +390,29 @@ const BirthTimeRectificationPageEnhanced = () => {
         return setError('Invalid rectification response structure');
       }
       
+      // CRITICAL FIX: Validate and normalize rectification data structure to prevent React Error #130
+      // Ensure all values are primitives before rendering
+      const normalized = {
+        ...rectification,
+        confidence: safeNumber(rectification.confidence),
+        alignmentScore: safeNumber(rectification.alignmentScore),
+        praanapada: rectification.praanapada ? {
+          ...rectification.praanapada,
+          sign: safeString(rectification.praanapada.sign)
+        } : null,
+        ascendant: rectification.ascendant ? {
+          ...rectification.ascendant,
+          sign: safeString(rectification.ascendant.sign)
+        } : null
+      };
+      
       // Normalize data structure - store rectification object consistently with quick validation
-      setRectificationData(rectification);
+      setRectificationData(normalized);
       setPageStep('results');
       
       dataSaver.saveSession({
         ...dataSaver.loadSession(),
-        rectificationData: rectification || response.data
+        rectificationData: normalized || response.data
       });
     } catch (error) {
       console.error('Full analysis failed:', error);
@@ -502,16 +555,16 @@ const BirthTimeRectificationPageEnhanced = () => {
                       <div className="mt-6 p-6 bg-blue-50 rounded-lg border border-blue-200">
                         <h4 className="font-bold text-gray-900 mb-4">Quick Validation Results</h4>
                         <div className="space-y-3">
-                          <p><strong>Confidence Score:</strong> {rectificationData.confidence}%</p>
-                          <p><strong>Alignment Score:</strong> {rectificationData.alignmentScore}</p>
-                          <p><strong>Praanapada Sign:</strong> {rectificationData.praanapada?.sign}</p>
-                          <p><strong>Ascendant Sign:</strong> {rectificationData.ascendant?.sign}</p>
+                          <p><strong>Confidence Score:</strong> {safeNumber(rectificationData.confidence)}%</p>
+                          <p><strong>Alignment Score:</strong> {safeNumber(rectificationData.alignmentScore)}</p>
+                          <p><strong>Praanapada Sign:</strong> {safeString(rectificationData.praanapada?.sign)}</p>
+                          <p><strong>Ascendant Sign:</strong> {safeString(rectificationData.ascendant?.sign)}</p>
                         </div>
                         
-                        {rectificationData.confidence >= 80 ? (
+                        {safeNumber(rectificationData.confidence) >= 80 ? (
                           <Alert type="success" className="mt-4">
                             <p className="font-semibold">✅ High Confidence!</p>
-                            <p>Your birth time appears to be accurate with {rectificationData.confidence}% confidence.</p>
+                            <p>Your birth time appears to be accurate with {safeNumber(rectificationData.confidence)}% confidence.</p>
                             <Button
                               variant="secondary"
                               onClick={() => setPageStep('results')}
@@ -523,7 +576,7 @@ const BirthTimeRectificationPageEnhanced = () => {
                         ) : (
                           <Alert type="warning" className="mt-4">
                             <p className="font-semibold">⚠️ Additional Verification Needed</p>
-                            <p>Let's improve accuracy by adding some major life events (confidence: {rectificationData.confidence}%).</p>
+                            <p>Let's improve accuracy by adding some major life events (confidence: {safeNumber(rectificationData.confidence)}%).</p>
                             <Button
                               variant="secondary"
                               onClick={() => setPageStep('events')}
@@ -695,12 +748,12 @@ const BirthTimeRectificationPageEnhanced = () => {
                       <div className="w-full bg-gray-200 rounded-full h-4 mt-4">
                         <div 
                           className="bg-gradient-to-r from-green-500 to-emerald-600 h-4 rounded-full transition-all duration-2000"
-                          style={{ width: `${rectificationData?.confidence || 0}%` }}
+                          style={{ width: `${safeNumber(rectificationData?.confidence)}%` }}
                         />
                       </div>
                       
                       <div className="text-3xl font-bold text-green-600">
-                        {rectificationData?.confidence || 0}% Confidence
+                        {safeNumber(rectificationData?.confidence)}% Confidence
                       </div>
                     </div>
                   </Card>
