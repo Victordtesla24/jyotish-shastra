@@ -82,7 +82,18 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
     try {
       const savedSession = dataSaver.loadSession();
       if (savedSession && savedSession.birthData) {
-        setFormData(prev => ({ ...prev, ...savedSession.birthData }));
+        // Normalize dateOfBirth to yyyy-MM-dd format for date input
+        const normalizedBirthData = { ...savedSession.birthData };
+        if (normalizedBirthData.dateOfBirth) {
+          // Handle both Date objects and ISO strings
+          if (normalizedBirthData.dateOfBirth instanceof Date) {
+            normalizedBirthData.dateOfBirth = normalizedBirthData.dateOfBirth.toISOString().split('T')[0];
+          } else if (typeof normalizedBirthData.dateOfBirth === 'string') {
+            // Handle ISO string format (e.g., "1997-12-18T00:00:00.000Z")
+            normalizedBirthData.dateOfBirth = normalizedBirthData.dateOfBirth.split('T')[0];
+          }
+        }
+        setFormData(prev => ({ ...prev, ...normalizedBirthData }));
         if (savedSession.coordinates) {
           setCoordinates(savedSession.coordinates);
         }
@@ -121,9 +132,29 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
     return () => clearTimeout(safetyTimeout);
   }, [loading, geocoding]);
 
+  // Helper function to normalize date value to yyyy-MM-dd format
+  const normalizeDateValue = (value) => {
+    if (!value) return '';
+    if (value instanceof Date) {
+      return value.toISOString().split('T')[0];
+    }
+    if (typeof value === 'string') {
+      // Handle ISO string format (e.g., "1997-12-18T00:00:00.000Z")
+      return value.split('T')[0];
+    }
+    return value;
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    let normalizedValue = value;
+    
+    // Normalize date values for date input fields
+    if (name === 'dateOfBirth') {
+      normalizedValue = normalizeDateValue(value);
+    }
+    
+    setFormData(prev => ({ ...prev, [name]: normalizedValue }));
 
     // Clear error for this field
     if (errors[name]) {
@@ -319,7 +350,7 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
                 type="date"
                 id="dateOfBirth"
                 name="dateOfBirth"
-                value={formData.dateOfBirth}
+                value={normalizeDateValue(formData.dateOfBirth)}
                 onChange={handleChange}
                 required
                 min="1900-01-01"

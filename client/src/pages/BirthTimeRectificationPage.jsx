@@ -91,20 +91,44 @@ const normalizeRectificationData = (data) => {
     
     // Normalize analysis object if present (for full analysis responses)
     analysis: data.analysis ? {
-      bestCandidate: data.analysis.bestCandidate ? {
-        time: typeof data.analysis.bestCandidate.time === 'string' 
-          ? data.analysis.bestCandidate.time 
-          : null,
-        confidence: safeNumber(data.analysis.bestCandidate.confidence),
-        score: safeNumber(data.analysis.bestCandidate.score)
-      } : null,
+      bestCandidate: data.analysis.bestCandidate ? (() => {
+        const candidate = data.analysis.bestCandidate;
+        // Extract only primitive values from bestCandidate to prevent React Error #130
+        const normalized = {
+          time: typeof candidate.time === 'string' ? candidate.time : null,
+          confidence: safeNumber(candidate.confidence),
+          score: safeNumber(candidate.score)
+        };
+        // Add any other primitive properties that might exist
+        Object.keys(candidate).forEach(key => {
+          if (!normalized.hasOwnProperty(key)) {
+            const value = candidate[key];
+            if (value == null || typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+              normalized[key] = value;
+            }
+          }
+        });
+        return normalized;
+      })() : null,
       method: safeString(data.analysis.method),
       candidates: Array.isArray(data.analysis.candidates)
-        ? data.analysis.candidates.map(candidate => ({
-            time: typeof candidate.time === 'string' ? candidate.time : null,
-            confidence: safeNumber(candidate.confidence),
-            score: safeNumber(candidate.score)
-          }))
+        ? data.analysis.candidates.map(candidate => {
+            const normalized = {
+              time: typeof candidate.time === 'string' ? candidate.time : null,
+              confidence: safeNumber(candidate.confidence),
+              score: safeNumber(candidate.score)
+            };
+            // Add any other primitive properties
+            Object.keys(candidate).forEach(key => {
+              if (!normalized.hasOwnProperty(key)) {
+                const value = candidate[key];
+                if (value == null || typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+                  normalized[key] = value;
+                }
+              }
+            });
+            return normalized;
+          })
         : []
     } : null
   };
