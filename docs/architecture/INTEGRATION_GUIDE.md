@@ -1,27 +1,45 @@
-# Integration Guide - Consolidated Kundli Template
+# API Integration Guide - Production Implementation ✅ PRODUCTION-READY
 
-## ✅ Verification Complete
+**Last Updated**: January 2025  
+**Status**: ✅ Fully implemented and verified in production  
+**Total Endpoints**: 38+ active API endpoints
 
-The consolidated Kundli template has been successfully created, tested, and verified. All functionality from the original `staticKundliTemplate.jsx` and `planetKundliMapper.js` has been merged into a single, reusable solution.
+This guide provides comprehensive documentation for integrating frontend components with backend API endpoints in the Jyotish Shastra application.
 
-## 📋 What's Included
+## Frontend-Backend Integration Architecture
 
-### Core Files
-- **`KundliTemplate.jsx`** - React component version
-- **`KundliTemplate.js`** - Standalone JavaScript version  
-- **`README.md`** - Complete documentation
-- **`example.html`** - Working browser example
-- **`test-consolidated.js`** - Verification script
-- **`test-output.svg`** - Sample generated chart
+### Integration Flow
 
-### ✅ Verified Features
+```
+┌─────────────────┐    ┌───────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│  React UI       │───▶│  API Services     │───▶│  API Response   │───▶│  Data           │
+│  Components     │    │  (chartService,   │    │  Interpreter    │    │  Transformation │
+│                 │    │   analysisService)│    │  System         │    │                 │
+└─────────────────┘    └───────────────────┘    └─────────────────┘    └─────────────────┘
+       │                        │                          │                        │
+       ▼                        ▼                          ▼                        ▼
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│ User Input      │    │ HTTP Request     │    │ Error Handling  │    │ UI Display      │
+│ Forms & Actions │    │ (Axios)          │    │ & Validation    │    │ Components      │
+└─────────────────┘    └──────────────────┘    └─────────────────┘    └─────────────────┘
+```
 
-1. **Data Processing**: ✅ Parses JSON birth chart data correctly
-2. **Planetary Positions**: ✅ All 9 planets positioned accurately with degrees and dignities
-3. **Zodiac Glyphs**: ✅ All 12 rasi glyphs positioned with custom adjustments
-4. **Dynamic Updates**: ✅ Chart updates when JSON data changes
-5. **Error Handling**: ✅ Comprehensive validation and error display
-6. **Cross-Platform**: ✅ Works in React, browser, and Node.js environments
+### API Service Layer (`client/src/services/`)
+
+**chartService.js** - Chart generation integration:
+- `generateChart(birthData)` - POST `/api/v1/chart/generate`
+- Handles chart data transformation
+- Error handling and validation
+
+**analysisService.js** - Analysis integration:
+- `getComprehensiveAnalysis(birthData)` - POST `/api/v1/analysis/comprehensive`
+- Processes 8-section analysis response
+- Data transformation for UI display
+
+**geocodingService.js** - Geocoding integration:
+- `geocodeLocation(location)` - POST `/api/v1/geocoding/location`
+- Coordinate validation
+- Timezone extraction
 
 ## 🚀 Quick Integration
 

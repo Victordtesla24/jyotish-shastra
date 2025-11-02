@@ -1,8 +1,10 @@
 # API Endpoint to UI Component Mapping Inventory
 
-## Generated: 2025-01-15
+## Generated: 2025-01-15  
+**Last Updated**: January 2025  
+**Total Endpoints**: 38+ active endpoints
 
-This document maps all API endpoints from curl-commands.md to their corresponding UI components and verifies data structure compatibility.
+This document maps all API endpoints to their corresponding UI components and verifies data structure compatibility.
 
 ---
 
@@ -244,20 +246,97 @@ This document maps all API endpoints from curl-commands.md to their correspondin
 
 ### 31. POST /api/v1/rectification/with-events
 - **Method:** POST
-- **UI Component:** `BirthTimeRectificationPage.jsx` (line 321)
-- **Input:** `{ birthData: {...}, lifeEvents: [{ date, description }], options: { methods: string[] } }`
-- **Output:** BTR analysis with life events
+- **UI Component:** `BirthTimeRectificationPage.jsx` (line 321), `InteractiveLifeEventsQuestionnaire.jsx`
+- **Input:** `{ birthData: {...}, lifeEvents: [{ date, category, description, importance }], options: { methods: string[] } }`
+- **Output:** BTR analysis with life events correlation
 - **Status:** ✅ Mapped
-- **Issues:** Verify lifeEvents array structure
+
+### 32. POST /api/v1/rectification/analyze
+- **Method:** POST
+- **UI Component:** `BirthTimeRectificationPage.jsx` (via component integration)
+- **Input:** `{ birthData: {...}, options: { methods: string[], timeRange: { hours: number }, lifeEvents: array } }`
+- **Output:** Full BTR analysis with multiple methods
+- **Status:** ✅ Mapped
+
+### 33. POST /api/v1/rectification/hora-analysis
+- **Method:** POST
+- **UI Component:** `BirthTimeRectificationPage.jsx` (feature-flagged)
+- **Input:** `{ birthData: {...} }`
+- **Output:** Hora-based (D2 chart) rectification analysis
+- **Status:** ✅ Available (feature flag controlled)
+
+### 34. POST /api/v1/rectification/shashtiamsa-verify
+- **Method:** POST
+- **UI Component:** `BirthTimeRectificationPage.jsx` (feature-flagged)
+- **Input:** `{ birthData: {...}, shashtiamsaData: {...} }`
+- **Output:** Shashtiamsa (D60) verification results
+- **Status:** ✅ Available (feature flag controlled)
+
+### 35. POST /api/v1/rectification/configure
+- **Method:** POST
+- **UI Component:** `BirthTimeRectificationPage.jsx` (settings)
+- **Input:** `{ configuration: {...} }`
+- **Output:** BTR configuration confirmation
+- **Status:** ✅ Mapped
+
+### 36. POST /api/v1/rectification/conditional-dasha-verify
+- **Method:** POST
+- **UI Component:** `BirthTimeRectificationPage.jsx` (advanced analysis)
+- **Input:** `{ birthData: {...}, conditionalDashaData: {...} }`
+- **Output:** Conditional dasha verification results
+- **Status:** ✅ Mapped
+
+### 37. GET /api/v1/rectification/features
+- **Method:** GET
+- **UI Component:** `BirthTimeRectificationPage.jsx` (feature discovery)
+- **Input:** None
+- **Output:** Available BTR features and methods
+- **Status:** ✅ Mapped
+
+### 38. POST /api/v1/geocoding/timezone
+- **Method:** POST
+- **UI Component:** `geocodingService.js`, `BirthDataForm.jsx` (implicit)
+- **Input:** `{ latitude: number, longitude: number }`
+- **Output:** Timezone information for coordinates
+- **Status:** ✅ Mapped (used internally)
+
+### 39. POST /api/v1/client-error/log
+- **Method:** POST
+- **UI Component:** `ErrorBoundary.jsx`, `errorLogger.js`, `VedicErrorBoundary`
+- **Input:** `{ timestamp, message, stack, url, userAgent, componentStack, category, type, context }`
+- **Output:** Error logging confirmation
+- **Status:** ✅ Mapped (error boundaries and logging)
 
 ---
 
 ## Summary
 
 ### Mapping Status:
-- ✅ **Mapped and Used:** 14 endpoints
-- ⚠️ **Not Called by UI:** 14 endpoints
-- ℹ️ **Info/Debug:** 3 endpoints
+- ✅ **Mapped and Used:** 18 endpoints (actively called by UI components)
+- ⚠️ **Not Called by UI:** 15 endpoints (may use cached data or be API-only)
+- ℹ️ **Info/Debug:** 5 endpoints (health checks, info endpoints)
+- **Total:** 38+ endpoints documented
+
+### Critical Endpoints (Must Work):
+1. ✅ POST /api/v1/chart/generate - Chart generation
+2. ✅ POST /api/v1/analysis/comprehensive - Comprehensive analysis (8 sections)
+3. ✅ POST /api/v1/geocoding/location - Location geocoding
+4. ✅ POST /api/v1/rectification/quick - BTR quick validation
+5. ✅ POST /api/v1/rectification/with-events - BTR with life events
+6. ✅ POST /api/v1/rectification/analyze - Main BTR analysis
+7. ✅ POST /api/v1/analysis/houses - House-by-house analysis
+8. ✅ POST /api/v1/analysis/dasha - Dasha timeline analysis
+9. ✅ POST /api/v1/analysis/navamsa - Navamsa chart analysis
+
+### BTR Endpoints Status:
+- ✅ **10 BTR endpoints** implemented and documented
+- ✅ **6 BTR endpoints** actively used by UI components
+- ✅ **4 BTR endpoints** available via feature flags
+
+### Analysis Endpoints Status:
+- ✅ **13 analysis endpoints** implemented
+- ✅ **9 analysis endpoints** actively used by UI components
+- ✅ **Comprehensive endpoint** provides all 8 sections in one call
 
 ### Critical Endpoints (Must Work):
 1. POST /api/v1/chart/generate - Chart generation

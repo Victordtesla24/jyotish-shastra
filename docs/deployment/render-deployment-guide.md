@@ -84,10 +84,12 @@ render whoami
 
 **Configuration:**
 - **Root Directory:** `.` (project root)
-- **Build Command:** `npm install && npm run copy-wasm`
+- **Build Command:** `npm install && node scripts/validate-ephemeris-files.js`
 - **Start Command:** `node src/index.js`
 - **Node Version:** 18 or higher
 - **Instance Type:** Free tier (spins down after 15 min inactivity)
+
+**Note**: The `render.yaml` uses `validate-ephemeris-files.js` for build validation instead of `copy-wasm`. WASM files are handled automatically or via build process.
 
 ### Service 2: Frontend (Static Site)
 
@@ -147,7 +149,7 @@ GENERATE_SOURCEMAP=false
    - **Name:** `jjyotish-shastra-backend` (or your choice)
    - **Root Directory:** Leave blank (uses root)
    - **Runtime:** Node
-   - **Build Command:** `npm install && npm run copy-wasm`
+   - **Build Command:** `npm install && node scripts/validate-ephemeris-files.js`
    - **Start Command:** `node src/index.js`
 5. Add environment variables (see above)
 6. Select **Free** plan
@@ -176,7 +178,7 @@ render services create web-service \
   --repo https://github.com/your-username/your-repo.git \
   --branch main \
   --root-dir . \
-  --build-command "npm install && npm run copy-wasm" \
+  --build-command "npm install && node scripts/validate-ephemeris-files.js" \
   --start-command "node src/index.js" \
   --env NODE_ENV=production \
   --env GEOCODING_API_KEY=your_opencage_key
@@ -197,7 +199,41 @@ render services create static-site \
 
 ### Method 3: Using render.yaml (Infrastructure as Code)
 
-Create `render.yaml` in project root (see next section).
+The project includes a `render.yaml` file for Infrastructure as Code deployment:
+
+**Backend Service Configuration** (from `render.yaml`):
+```yaml
+services:
+  - type: web
+    name: jjyotish-shastra-backend
+    runtime: node
+    plan: free
+    buildCommand: npm install && node scripts/validate-ephemeris-files.js
+    startCommand: node src/index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: GEOCODING_API_KEY
+        sync: false  # Will prompt for value during deployment
+      - key: FRONTEND_URL
+        sync: false  # Set after frontend deployment
+```
+
+**Frontend Service Configuration** (from `render.yaml`):
+```yaml
+  - type: web
+    name: jjyotish-shastra-frontend
+    runtime: static
+    buildCommand: cd client && npm install && npm run build
+    staticPublishPath: client/build
+    envVars:
+      - key: REACT_APP_API_URL
+        value: https://jjyotish-shastra-backend.onrender.com
+      - key: GENERATE_SOURCEMAP
+        value: "false"
+```
+
+**Note**: Frontend service type in `render.yaml` is `web` with `runtime: static`, not `static-site` type. Verify this matches Render.com's current service type options.
 
 ---
 
@@ -213,8 +249,9 @@ Create `render.yaml` in project root (see next section).
   - `manifest.json`
 
 ### Backend Requirements:
-- **WASM Files:** Copied to `public/swisseph.wasm` (via `npm run copy-wasm`)
+- **WASM Files:** Handled via build process or automatically (Swiss Ephemeris initialization)
 - **Ephemeris Data:** Located in `ephemeris/` directory (seas_18.se1, semo_18.se1, sepl_18.se1)
+- **Build Validation:** `validate-ephemeris-files.js` script validates ephemeris files during build
 
 ---
 
@@ -278,10 +315,11 @@ curl https://your-backend-service.onrender.com/api/v1/health
 ### Issue: Swiss Ephemeris initialization fails
 
 **Solution:**
-1. Verify `npm run copy-wasm` runs during build
-2. Check WASM file exists in `public/swisseph.wasm`
-3. Review build logs for WASM copy confirmation
-4. Ensure ephemeris data files are in repository
+1. Verify `node scripts/validate-ephemeris-files.js` runs during build
+2. Check build logs for ephemeris file validation
+3. Verify ephemeris data files exist in `ephemeris/` directory
+4. Ensure ephemeris files (seas_18.se1, semo_18.se1, sepl_18.se1) are committed to repository
+5. Check Swiss Ephemeris initialization logs in service logs
 
 ### Issue: Free tier services sleeping
 

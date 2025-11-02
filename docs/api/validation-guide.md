@@ -11,8 +11,8 @@ This document provides comprehensive validation requirements for all API endpoin
 ### **Production-Ready API Response Interpreter System**
 - **Status**: ✅ **FULLY IMPLEMENTED AND VERIFIED**
 - **Total Implementation**: **2,651 lines** across 6 core files
-- **Server Health**: ✅ **Both servers healthy** (Frontend: 3002, Backend: 3001)
-- **API Functionality**: ✅ **Major endpoints tested and functional**
+- **Server Health**: ✅ **Both servers healthy** (Frontend: 3000, Backend: 3001)
+- **API Functionality**: ✅ **Major endpoints tested and functional** (38+ active endpoints)
 
 ### **Verified Core Components**
 | Component | Lines | Status | Function |
@@ -30,7 +30,7 @@ This document provides comprehensive validation requirements for all API endpoin
 | **Chart Generation** | `POST /v1/chart/generate` | `{"success":true}` | ✅ **FUNCTIONAL** |
 | **Comprehensive Analysis** | `POST /v1/analysis/comprehensive` | `{"success":true}` | ✅ **FUNCTIONAL** |
 | **Health Check** | `GET /health` | `{"status":"healthy"}` | ✅ **FUNCTIONAL** |
-| **Total Available** | **Multiple Tests** | **30+ endpoints** | ✅ **EXTENSIVE** |
+| **Total Available** | **Multiple Tests** | **38+ endpoints** | ✅ **EXTENSIVE** |
 
 ## 🔄 **IMPORTANT: Recent Validation Standardization (2024)**
 
@@ -631,3 +631,213 @@ All these formats pass validation and work correctly:
 - **Improved Onboarding**: New developers get optimized setup automatically
 
 This enhancement ensures the development environment supports the same level of quality and professionalism as the Vedic astrology analysis system itself.
+
+## Birth Time Rectification (BTR) Endpoint Validation
+
+### BTR Validation Overview
+
+Birth Time Rectification endpoints use specialized validation schemas that support multiple input formats and coordinate normalization.
+
+### BTR Endpoints
+
+#### POST /api/v1/rectification/analyze
+**Purpose**: Main birth time rectification analysis  
+**Validation Schema**: `rectificationAnalyzeRequestSchema`
+
+**Required Fields**:
+- `birthData` (object):
+  - `dateOfBirth` (YYYY-MM-DD format)
+  - `timeOfBirth` (HH:MM or HH:MM:SS format)
+  - Location: Either `latitude`/`longitude` OR `placeOfBirth` (string or object)
+  - `timezone` (IANA format or UTC offset)
+
+**Optional Fields**:
+- `name` (string, 1-100 characters) ✅ **OPTIONAL**
+- `gender` (male, female, other)
+- `options` (object):
+  - `lifeEvents` (array) - Life events for correlation
+  - `timeRange` (object) - Time range for rectification (±2 hours default)
+  - `methods` (array) - BTR methods to use ['praanapada', 'moon', 'gulika']
+
+**Example Request**:
+```json
+{
+  "birthData": {
+    "dateOfBirth": "1985-10-24",
+    "timeOfBirth": "14:30",
+    "latitude": 18.5204,
+    "longitude": 73.8567,
+    "timezone": "Asia/Kolkata"
+  },
+  "options": {
+    "timeRange": { "hours": 2 },
+    "methods": ["praanapada", "moon", "gulika"]
+  }
+}
+```
+
+#### POST /api/v1/rectification/with-events
+**Purpose**: BTR analysis with life events correlation  
+**Validation Schema**: `rectificationWithEventsRequestSchema`
+
+**Required Fields**:
+- `birthData` (same as `/analyze` endpoint)
+- `lifeEvents` (array):
+  - `date` (YYYY-MM-DD format)
+  - `category` (string) - Event category
+  - `description` (string) - Event description
+  - `importance` (string) - 'high', 'medium', or 'low'
+
+**Example Request**:
+```json
+{
+  "birthData": {
+    "dateOfBirth": "1985-10-24",
+    "timeOfBirth": "14:30",
+    "latitude": 18.5204,
+    "longitude": 73.8567,
+    "timezone": "Asia/Kolkata"
+  },
+  "lifeEvents": [
+    {
+      "date": "1995-06-15",
+      "category": "Education",
+      "description": "Graduated from university",
+      "importance": "high"
+    }
+  ]
+}
+```
+
+#### POST /api/v1/rectification/quick
+**Purpose**: Quick rectification validation  
+**Validation Schema**: `rectificationQuickRequestSchema`
+
+**Required Fields**:
+- Same as `/analyze` endpoint (simplified validation)
+
+#### POST /api/v1/rectification/hora-analysis
+**Purpose**: Hora-based (D2 chart) rectification  
+**Validation Schema**: `horaAnalysisRequestSchema`
+
+**Required Fields**:
+- `birthData` (same as `/analyze` endpoint)
+
+#### POST /api/v1/rectification/shashtiamsa-verify
+**Purpose**: Shashtiamsa (D60) verification  
+**Validation Schema**: `shashtiamsaVerificationRequestSchema`
+
+**Required Fields**:
+- `birthData` (same as `/analyze` endpoint)
+- `shashtiamsaData` (object) - D60 chart data for verification
+
+#### POST /api/v1/rectification/conditional-dasha-verify
+**Purpose**: Conditional dasha verification  
+**Validation Schema**: `rectificationEnhancedRequestSchema`
+
+**Required Fields**:
+- `birthData` (same as `/analyze` endpoint)
+- `conditionalDashaData` (object) - Conditional dasha data
+
+### BTR Coordinate Normalization
+
+**Important**: BTR endpoints automatically normalize coordinates before validation. This allows flexible input formats:
+
+**Supported Formats**:
+1. **Flat coordinates**: `birthData.latitude`, `birthData.longitude`
+2. **Nested coordinates**: `birthData.placeOfBirth.latitude`, `birthData.placeOfBirth.longitude`
+3. **Mixed format**: Coordinates normalized from either location
+
+**Normalization Process**:
+```javascript
+// Backend automatically extracts:
+const latitude = birthData.latitude || birthData.placeOfBirth?.latitude;
+const longitude = birthData.longitude || birthData.placeOfBirth?.longitude;
+const timezone = birthData.timezone || birthData.placeOfBirth?.timezone || 'UTC';
+```
+
+### BTR Validation Rules
+
+#### Time Range Validation
+- **Default**: ±2 hours from estimated birth time
+- **Custom range**: Specify in `options.timeRange.hours` (1-24 hours)
+- **Format**: `{ hours: 2 }`
+
+#### Life Events Validation
+- **Date format**: YYYY-MM-DD
+- **Category**: Any string (typically: Education, Career, Health, Marriage, etc.)
+- **Importance**: Must be 'high', 'medium', or 'low'
+- **Minimum events**: At least 1 event required for `/with-events` endpoint
+
+#### BTR Methods Validation
+- **Available methods**: `['praanapada', 'moon', 'gulika', 'hora', 'events']`
+- **Default**: `['praanapada', 'moon', 'gulika']`
+- **Format**: Array of method names
+
+### BTR Error Responses
+
+#### Validation Error Format
+```json
+{
+  "success": false,
+  "error": "Validation failed",
+  "message": "Latitude and longitude are required. Please provide birth location coordinates.",
+  "details": [
+    {
+      "field": "location",
+      "message": "Birth location coordinates are required for rectification"
+    }
+  ],
+  "errors": [
+    {
+      "field": "location",
+      "message": "Birth location coordinates are required for rectification"
+    }
+  ],
+  "timestamp": "2025-01-15T12:00:00.000Z"
+}
+```
+
+#### Coordinate Normalization Error
+If coordinates cannot be extracted from the provided format:
+```json
+{
+  "success": false,
+  "error": "Validation failed",
+  "message": "Latitude and longitude are required. Please provide birth location coordinates.",
+  "suggestion": "Provide coordinates either as birthData.latitude/longitude or birthData.placeOfBirth.latitude/longitude"
+}
+```
+
+### BTR Response Structure
+
+#### Successful Response
+```json
+{
+  "success": true,
+  "rectification": {
+    "originalData": { /* birth data */ },
+    "methods": {
+      "praanapada": { /* analysis results */ },
+      "moon": { /* analysis results */ },
+      "gulika": { /* analysis results */ }
+    },
+    "rectifiedTime": "14:32:15",
+    "confidence": 85,
+    "recommendations": [
+      "Rectified time: 14:32:15 (±2 minutes)",
+      "Confidence: 85% based on multiple method correlation"
+    ],
+    "analysisLog": [ /* analysis steps */ ]
+  },
+  "timestamp": "2025-01-15T12:00:00.000Z"
+}
+```
+
+### BTR Best Practices
+
+1. **Provide Accurate Coordinates**: Higher precision coordinates (6 decimal places) improve rectification accuracy
+2. **Include Multiple Life Events**: More events lead to better correlation and confidence
+3. **Use Appropriate Time Range**: ±2 hours is standard; adjust based on uncertainty
+4. **Combine Methods**: Using multiple methods (praanapada, moon, gulika) improves confidence
+5. **Verify Timezone**: Ensure timezone matches the birth location to avoid calculation errors

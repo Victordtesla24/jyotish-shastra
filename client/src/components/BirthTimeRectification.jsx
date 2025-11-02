@@ -5,6 +5,7 @@
 
 import React, { useState } from 'react';
 import axios from 'axios';
+import { getApiUrl } from '../utils/apiConfig';
 
 const BirthTimeRectification = ({ 
   initialBirthData = {}, 
@@ -32,8 +33,6 @@ const BirthTimeRectification = ({
     gulika: true,
     events: false
   });
-
-  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
 
   // Handle form input changes
   const handleInputChange = (e) => {
@@ -72,7 +71,7 @@ const BirthTimeRectification = ({
     setHasAttempted(true);
 
     try {
-      const response = await axios.post(`${API_URL}/v1/rectification/quick`, {
+      const response = await axios.post(getApiUrl('/api/v1/rectification/quick'), {
         birthData: formData,
         proposedTime: formData.timeOfBirth
       }, {
@@ -123,8 +122,8 @@ const BirthTimeRectification = ({
       }
 
       const endpoint = methods.events && validEvents.length > 0 
-        ? `${API_URL}/v1/rectification/with-events`
-        : `${API_URL}/v1/rectification/analyze`;
+        ? getApiUrl('/api/v1/rectification/with-events')
+        : getApiUrl('/api/v1/rectification/analyze');
 
       const response = await axios.post(endpoint, {
         birthData: formData,

@@ -727,6 +727,114 @@ const ComprehensiveAnalysisDisplay = ({ analysisData }) => {
   /**
    * Enhanced Generic Content Display - Uses Vedic design system
    */
+  /**
+   * Synthesis Display Component
+   * Formats section8 synthesis data into visually appealing cards
+   */
+  const SynthesisDisplay = ({ synthesis }) => {
+    if (!synthesis || typeof synthesis !== 'object') return null;
+
+    // Transform synthesis data into card format
+    const formatValue = (value) => {
+      if (value === null || value === undefined) return 'Not available';
+      if (typeof value === 'object') {
+        // Format nested objects as readable text
+        return Object.entries(value)
+          .map(([key, val]) => {
+            const formattedKey = key.replace(/([A-Z])/g, ' $1').trim();
+            return `${formattedKey}: ${val}`;
+          })
+          .join(', ');
+      }
+      return String(value);
+    };
+
+    // Create card data array from synthesis object
+    const cardData = [];
+    
+    Object.entries(synthesis).forEach(([key, value]) => {
+      // Skip empty or internal fields
+      if (!value || key.startsWith('_') || key === 'id') return;
+
+      // Format key as readable title
+      let title = key.replace(/([A-Z])/g, ' $1').trim();
+      title = title.charAt(0).toUpperCase() + title.slice(1);
+      
+      // Special handling for common fields
+      if (key === 'NAME') {
+        title = 'Synthesis Overview';
+      } else if (key === 'CORE_PERSONALITY' || key === 'PERSONALITY_PROFILE') {
+        title = 'Core Personality';
+      } else if (key === 'EMOTIONAL_NATURE') {
+        title = 'Emotional Nature';
+      } else if (key === 'PUBLIC_IMAGE') {
+        title = 'Public Image';
+      } else if (key === 'LAGNA_SIGN') {
+        title = 'Lagna Sign (Ascendant)';
+      } else if (key === 'LAGNA_LORD') {
+        title = 'Lagna Lord';
+      } else if (key === 'LAGNA_LORD_POSITION') {
+        title = 'Lagna Lord Position';
+      } else if (key === 'ARUDHA_LAGNA') {
+        title = 'Arudha Lagna';
+      }
+
+      const content = formatValue(value);
+      
+      cardData.push({
+        title,
+        content,
+        key
+      });
+    });
+
+    if (cardData.length === 0) return null;
+
+    return (
+      <div className="space-vedic">
+        <h3 className="text-2xl font-bold text-saffron mb-6 flex items-center gap-3">
+          <span className="w-10 h-10 bg-gradient-to-br from-saffron/20 to-gold/20 text-saffron rounded-full flex items-center justify-center text-xl">
+            📊
+          </span>
+          Comprehensive Report
+          <span className="ml-auto text-base font-normal text-muted">
+            {cardData.length} item{cardData.length !== 1 ? 's' : ''}
+          </span>
+        </h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {cardData.map((card, index) => (
+            <div
+              key={card.key || index}
+              className="card-vedic bg-gradient-to-br from-white via-sacred-cream/30 to-white border-2 border-saffron/20 hover:border-saffron/40 transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+            >
+              <div className="flex items-start gap-3 mb-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-saffron/20 to-gold/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <span className="text-lg">
+                    {card.key === 'NAME' ? '📋' :
+                     card.key?.includes('PERSONALITY') ? '🌟' :
+                     card.key?.includes('EMOTIONAL') ? '💭' :
+                     card.key?.includes('LAGNA') ? '🌅' :
+                     card.key?.includes('ARUDHA') ? '🎯' :
+                     '✨'}
+                  </span>
+                </div>
+                <div className="flex-1">
+                  <h4 className="text-lg font-bold text-primary mb-2 leading-tight">
+                    {card.title}
+                  </h4>
+                  <div className="text-secondary leading-relaxed whitespace-pre-wrap">
+                    {card.content}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   const GenericAnalysisDisplay = ({ data, title, icon = "📊" }) => {
     if (!data || typeof data !== 'object') return null;
 
@@ -856,14 +964,24 @@ const ComprehensiveAnalysisDisplay = ({ analysisData }) => {
           />
         )}
 
-        {/* Display unhandled content */}
+        {/* Special handling for section8 - Comprehensive Report with Synthesis */}
+        {sectionId === 'section8' && (
+          sectionData.analyses?.synthesis ? (
+            <SynthesisDisplay synthesis={sectionData.analyses.synthesis} />
+          ) : sectionData.synthesis ? (
+            <SynthesisDisplay synthesis={sectionData.synthesis} />
+          ) : null
+        )}
+
+        {/* Display unhandled content - but skip section8 if synthesis was already rendered */}
         {!sectionData.questions &&
          !sectionData.analyses &&
          !sectionData.houses &&
          !sectionData.aspects &&
          !sectionData.arudhaAnalysis &&
          !sectionData.navamsaAnalysis &&
-         !sectionData.dashaAnalysis && (
+         !sectionData.dashaAnalysis &&
+         !(sectionId === 'section8' && (sectionData.analyses?.synthesis || sectionData.synthesis)) && (
           <GenericAnalysisDisplay
             data={sectionData}
             title="Analysis Data"

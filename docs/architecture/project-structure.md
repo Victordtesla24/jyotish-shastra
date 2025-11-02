@@ -24,27 +24,40 @@ jyotish-shastra/
 #### API Layer (`src/api/`)
 - **controllers/**: HTTP request handlers for different endpoints
   - `ChartController.js`: Chart generation and analysis endpoints
-- **middleware/**: Request processing middleware
+  - `GeocodingController.js`: Geocoding and location services
+- **middleware/**: Request processing middleware (6 files)
   - `authentication.js`: JWT authentication middleware
   - `cors.js`: Cross-Origin Resource Sharing configuration
   - `errorHandling.js`: Centralized error handling
+  - `jsonSanitizer.js`: JSON parsing error handling
   - `logging.js`: Request/response logging
   - `rateLimiting.js`: API rate limiting
   - `validation.js`: Request validation middleware
-- **routes/**: Route definitions and API organization
+- **routes/**: Route definitions and API organization (6 route files, 38+ endpoints)
   - `chart.js`: Chart-related API routes
-  - `comprehensiveAnalysis.js`: Comprehensive analysis endpoints
+  - `comprehensiveAnalysis.js`: Comprehensive analysis endpoints (13 endpoints)
+  - `birthTimeRectification.js`: Birth Time Rectification routes (10 BTR endpoints)
+  - `geocoding.js`: Geocoding endpoints (3 endpoints)
+  - `clientErrorLog.js`: Client error logging endpoint
   - `index.js`: Main router configuration
 - **validators/**: Input validation schemas
-  - `birthDataValidator.js`: Birth data validation rules
+  - `birthDataValidator.js`: Birth data validation rules (includes BTR validation schemas)
 
 #### Core Logic (`src/core/`)
 - **calculations/**: Astronomical and astrological calculations
   - `chart-casting/`: Birth chart generation logic
   - `planetary/`: Planetary position calculations
   - `houses/`: House cusp calculations
-  - `aspects/`: Planetary aspect calculations
+  - `aspects/**: Planetary aspect calculations
   - `transits/`: Transit calculations
+  - `charts/`: Divisional chart calculations ✅ **NEW**
+    - `horaChart.js`: Hora (D2) chart calculator for BTR
+    - `timeDivisions.js`: Time division calculator for BTR
+  - `rectification/`: Birth time rectification calculations ✅ **NEW**
+    - `praanapada.js`: Praanapada longitude calculations
+    - `gulika.js`: Gulika longitude calculations
+  - `astronomy/`: Astronomical calculations
+    - `sunrise.js`: Sunrise/sunset calculations
 - **analysis/**: Astrological interpretation logic
   - `accuracy/`: Analysis accuracy verification
   - `aspects/`: Planetary aspect analysis
@@ -89,12 +102,20 @@ jyotish-shastra/
 - **analysis/**: Analysis orchestration services
   - `ArudhaAnalysisService.js`: Arudha Lagna analysis
   - `BirthDataAnalysisService.js`: Birth data validation and analysis
+  - `BirthTimeRectificationService.js`: ✅ **NEW** BPHS-based birth time rectification (main BTR service)
   - `DetailedDashaAnalysisService.js`: Comprehensive dasha analysis
   - `HouseAnalysisService.js`: *(DEPRECATED - consolidated to core)*
   - `LagnaAnalysisService.js`: Lagna analysis orchestration
   - `LuminariesAnalysisService.js`: Sun and Moon analysis
-  - `MasterAnalysisOrchestrator.js`: **MAIN** analysis coordinator
+  - `MasterAnalysisOrchestrator.js`: **MAIN** analysis coordinator (8-section orchestration)
   - `YogaDetectionService.js`: Yoga detection and interpretation
+- **analysis/eventClassification/**: BTR event classification ✅ **NEW**
+  - `BPHSEventClassifier.js`: Life event classification for BTR
+- **analysis/config/**: BTR configuration management ✅ **NEW**
+  - `BTRConfigurationManager.js`: BTR configuration and feature flags
+  - `FeatureFlags.js`: Feature flag management for BTR methods
+- **analysis/dasha/**: Dasha-related services
+  - `ConditionalDashaService.js`: Conditional dasha verification for BTR ✅ **NEW**
 - **chart/**: Chart-related business logic
   - `ChartGenerationService.js`: Core chart generation service
   - `EnhancedChartService.js`: Enhanced chart with geocoding
@@ -127,13 +148,40 @@ jyotish-shastra/
 - Static files, images, and HTML template
 
 #### Source Code (`client/src/`)
-- **components/**: Reusable UI components
+- **components/**: Reusable UI components (33 files)
   - `charts/`: Chart visualization components
+    - `VedicChartDisplay.jsx`: Main chart display component
   - `forms/`: Input form components
+    - `BirthDataForm.js`: Birth data input form
+    - `UIToAPIDataInterpreter.js`: Data transformation for API
+    - `UIDataSaver.js`: Local data persistence
   - `reports/`: Report display components
-- **pages/**: Page-level components
-- **services/**: API client services
-- **hooks/**: Custom React hooks
+  - `btr/`: Birth Time Rectification components ✅ **NEW**
+    - `BirthTimeRectification.jsx`: Main BTR component
+    - `InteractiveLifeEventsQuestionnaire.jsx`: Life events input (473 lines)
+    - `BPHSInfographic.jsx`: BPHS information display
+  - `ui/`: Reusable UI components
+    - `VedicLoadingSpinner.jsx`: Loading indicators
+    - `Button.jsx`, `Card.jsx`, `Alert.jsx`: Base UI components
+    - `ErrorMessage.jsx`: Error display component
+    - `modals/`: Modal components
+- **pages/**: Page-level components (7 pages)
+  - `HomePage.jsx`: Landing page with chart generation
+  - `ChartPage.jsx`: Chart display page
+  - `AnalysisPage.jsx`: Comprehensive analysis display
+  - `ComprehensiveAnalysisPage.jsx`: Detailed analysis page
+  - `BirthTimeRectificationPage.jsx`: ✅ **NEW** BTR page (1,340 lines)
+  - `ReportPage.jsx`: Report generation page
+  - `vedic-details/MeshaPage.jsx`: Sign-specific details
+- **services/**: API client services (2 files)
+  - `chartService.js`: Chart generation API client
+  - `analysisService.js`: Analysis API client
+- **hooks/**: Custom React hooks (1 file)
+  - `usePWA.js`: Progressive Web App hook
+- **contexts/**: React contexts (3 files)
+  - `ChartContext.js`: Chart data context
+  - `AnalysisContext.js`: Analysis data context
+  - `ThemeContext.js`: Theme management context
 - **utils/**: Client-side utilities ✅ **API Response Interpreter System**
   - **API Response Interpreter Core Files** ✅ **VERIFIED (2,651 lines)**:
     - `APIResponseInterpreter.js` (359 lines) - Error handling, validation
@@ -142,6 +190,9 @@ jyotish-shastra/
     - `apiResponseInterceptors.js` (416 lines) - Interceptor system
     - `ResponseCache.js` (414 lines) - Caching system
     - `responseSchemas.js` (413 lines) - Validation schemas
+  - `apiConfig.js`: API URL configuration
+  - `errorLogger.js`: Error logging utility
+  - `dateUtils.js`: Date formatting utilities
 
 #### API Response Interpreter Architecture ✅ **PRODUCTION-READY**
 

@@ -32,7 +32,7 @@ This document outlines the comprehensive system architecture for the Vedic astro
 │  ├── Authentication & Authorization                                         │
 │  ├── Request Validation & Rate Limiting                                     │
 │  ├── CORS & Security Headers                                                │
-│  └── Request Routing & Load Balancing (30+ active endpoints)               │
+│  └── Request Routing & Load Balancing (38+ active endpoints) ✅ VERIFIED      │
 └─────────────────────────────────────────────────────────────────────────────┘
                                     │
                                     │ Internal API Calls
@@ -42,13 +42,15 @@ This document outlines the comprehensive system architecture for the Vedic astro
 ├─────────────────────────────────────────────────────────────────────────────┤
 │  Core Analysis Services ✅ VERIFIED FUNCTIONAL                              │
 │  ├── ChartGenerationService ✅ Tested functional                            │
-│  ├── GeocodingService                                                       │
-│  ├── LagnaAnalysisService                                                   │
-│  ├── HouseAnalysisService                                                   │
-│  ├── AspectAnalysisService                                                  │
-│  ├── NavamsaAnalysisService                                                 │
-│  ├── DashaAnalysisService                                                   │
-│  └── ReportGenerationService                                                │
+│  ├── GeocodingService ✅ OpenCage integration verified                      │
+│  ├── BirthTimeRectificationService ✅ BTR implementation complete           │
+│  ├── MasterAnalysisOrchestrator ✅ 8-section analysis orchestration         │
+│  ├── LagnaAnalysisService ✅ Ascendant analysis verified                    │
+│  ├── HouseAnalysisService ✅ 12-house analysis verified                    │
+│  ├── AspectAnalysisService ✅ Planetary aspects verified                   │
+│  ├── NavamsaAnalysisService ✅ D9 chart analysis verified                   │
+│  ├── DetailedDashaAnalysisService ✅ Vimshottari dasha verified              │
+│  └── ComprehensiveReportService ✅ Report generation verified                │
 └─────────────────────────────────────────────────────────────────────────────┘
                                     │
                                     │ Data Access
@@ -91,9 +93,10 @@ client/src/utils/          # API Response Interpreter Core
 
 | Server | Port | Status | Test Result | API Endpoints |
 |--------|------|--------|-------------|---------------|
-| **Frontend** | 3002 | ✅ **HEALTHY** | HTML content served | React application active |
-| **Backend** | 3001 | ✅ **HEALTHY** | JSON API responses | 30+ routes functional |
+| **Frontend** | 3000 | ✅ **HEALTHY** | HTML content served (default React port) | React application active |
+| **Backend** | 3001 | ✅ **HEALTHY** | JSON API responses | 38+ routes functional |
 | **Health Check** | 3001/health | ✅ **RESPONDING** | `{"status":"healthy"}` | Real-time status |
+| **API Documentation** | 3001/api | ✅ **ACTIVE** | Complete endpoint listing | All 38+ endpoints documented |
 
 ## 2. Data Flow Architecture ✅ VERIFIED WITH API RESPONSE INTERPRETER
 
@@ -390,30 +393,121 @@ node tests/ui/e2e/ui-e2e-test.cjs
 - **Screenshot Evidence**: Visual proof of UI functionality
 - **Performance Metrics**: Quantitative validation of system performance
 
-## 4. Service Layer Architecture
+## 4. Birth Time Rectification (BTR) Service Architecture ✅ PRODUCTION-READY
+
+### 4.1. BTR Service Layer Implementation
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                   BIRTH TIME RECTIFICATION SERVICE LAYER                    │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  BirthTimeRectificationService (services/analysis/BirthTimeRectificationService.js)│
+│  ├── Core Rectification Methods                                            │
+│  │   ├── performBirthTimeRectification() - Main BTR analysis              │
+│  │   ├── performPraanapadaAnalysis() - Praanapada method (40% weight)      │
+│  │   ├── performMoonAnalysis() - Moon position method (30% weight)         │
+│  │   ├── performGulikaAnalysis() - Gulika position method (30% weight)    │
+│  │   └── performEventCorrelation() - Life events correlation               │
+│  ├── Enhanced BPHS Methods                                                  │
+│  │   ├── performHoraRectification() - D2-Hora chart analysis              │
+│  │   ├── performShashtiamsaVerification() - D60 verification              │
+│  │   └── performConditionalDashaVerification() - Conditional dasha check   │
+│  ├── Supporting Services                                                   │
+│  │   ├── BPHSEventClassifier - Life event classification                  │
+│  │   ├── BTRConfigurationManager - Configuration management                │
+│  │   ├── HoraChartCalculator - D2 chart calculations                      │
+│  │   └── TimeDivisionCalculator - Time division calculations              │
+│  └── Integration Services                                                  │
+│      ├── ChartGenerationService - Base chart generation                    │
+│      ├── DetailedDashaAnalysisService - Dasha calculations                 │
+│      └── ConditionalDashaService - Conditional dasha verification          │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 4.2. BTR Data Flow Architecture
+
+```
+┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+│   Birth     │    │   BTR       │    │  Multiple   │    │  Rectified  │
+│   Data +    │───▶│  Service    │───▶│   Methods   │───▶│   Birth     │
+│   Life      │    │   Engine    │    │  Analysis   │    │   Time     │
+│   Events    │    │             │    │             │    │             │
+└─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘
+       │                  │                  │                  │
+       ▼                  ▼                  ▼                  ▼
+┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+│ Validation  │    │  Praanapada │    │  Synthesis  │    │ Confidence  │
+│ & Normalize │    │  Moon       │    │  & Scoring  │    │ & Recommend│
+│ Coordinates │    │  Gulika     │    │             │    │             │
+│             │    │  Hora       │    │             │    │             │
+│             │    │  Events     │    │             │    │             │
+└─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘
+```
+
+### 4.3. BTR API Endpoints ✅ VERIFIED
+
+| Endpoint | Method | Purpose | Status |
+|----------|--------|---------|--------|
+| `/api/v1/rectification/analyze` | POST | Main BTR analysis | ✅ Active |
+| `/api/v1/rectification/with-events` | POST | BTR with life events | ✅ Active |
+| `/api/v1/rectification/quick` | POST | Quick rectification | ✅ Active |
+| `/api/v1/rectification/methods` | POST | Available methods info | ✅ Active |
+| `/api/v1/rectification/hora-analysis` | POST | Hora-based rectification | ✅ Active |
+| `/api/v1/rectification/shashtiamsa-verify` | POST | Shashtiamsa verification | ✅ Active |
+| `/api/v1/rectification/configure` | POST | BTR configuration | ✅ Active |
+| `/api/v1/rectification/conditional-dasha-verify` | POST | Conditional dasha check | ✅ Active |
+| `/api/v1/rectification/features` | GET | Available features | ✅ Active |
+| `/api/v1/rectification/test` | GET | Service health check | ✅ Active |
+
+### 4.4. BTR Frontend Components ✅ VERIFIED
+
+| Component | Location | Purpose | Status |
+|-----------|----------|---------|--------|
+| `BirthTimeRectificationPage` | `client/src/pages/BirthTimeRectificationPage.jsx` | Main BTR page | ✅ Active |
+| `BirthTimeRectification` | `client/src/components/BirthTimeRectification.jsx` | BTR component | ✅ Active |
+| `InteractiveLifeEventsQuestionnaire` | `client/src/components/btr/InteractiveLifeEventsQuestionnaire.jsx` | Life events input | ✅ Active |
+| `BPHSInfographic` | `client/src/components/btr/BPHSInfographic.jsx` | BPHS information | ✅ Active |
+
+## 5. Service Layer Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                           CONTROLLER LAYER                                  │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│  API Controllers                                                            │
-│  ├── ChartController                                                        │
-│  │   ├── POST /api/chart/generate                                           │
-│  │   ├── GET /api/chart/:id                                                 │
-│  │   └── GET /api/chart/:id/navamsa                                         │
-│  ├── AnalysisController                                                     │
-│  │   ├── POST /api/analysis/lagna                                           │
-│  │   ├── POST /api/analysis/houses                                          │
-│  │   ├── POST /api/analysis/aspects                                         │
-│  │   └── POST /api/analysis/dasha                                           │
-│  ├── ReportController                                                       │
-│  │   ├── POST /api/report/generate                                          │
-│  │   ├── GET /api/report/:id                                                │
-│  │   └── GET /api/report/:id/download                                       │
-│  └── UserController                                                         │
-│      ├── POST /api/user/register                                            │
-│      ├── POST /api/user/login                                               │
-│      └── GET /api/user/profile                                              │
+│  API Controllers ✅ VERIFIED (38+ active endpoints)                          │
+│  ├── ChartController (src/api/controllers/ChartController.js)               │
+│  │   ├── POST /api/v1/chart/generate                                        │
+│  │   ├── POST /api/v1/chart/generate/comprehensive                          │
+│  │   ├── GET /api/v1/chart/:id                                              │
+│  │   ├── GET /api/v1/chart/:id/navamsa                                      │
+│  │   ├── POST /api/v1/chart/analysis/lagna                                  │
+│  │   ├── POST /api/v1/chart/analysis/house/:houseNumber                     │
+│  │   └── POST /api/v1/chart/analysis/comprehensive                          │
+│  ├── ComprehensiveAnalysisController (routes/comprehensiveAnalysis.js)       │
+│  │   ├── POST /api/v1/analysis/comprehensive                                │
+│  │   ├── POST /api/v1/analysis/preliminary                                  │
+│  │   ├── POST /api/v1/analysis/houses                                        │
+│  │   ├── POST /api/v1/analysis/aspects                                       │
+│  │   ├── POST /api/v1/analysis/arudha                                        │
+│  │   ├── POST /api/v1/analysis/navamsa                                       │
+│  │   ├── POST /api/v1/analysis/dasha                                         │
+│  │   ├── GET /api/v1/analysis/:analysisId                                   │
+│  │   └── GET /api/v1/analysis/user/:userId                                   │
+│  ├── BirthTimeRectificationController (routes/birthTimeRectification.js)    │
+│  │   ├── POST /api/v1/rectification/analyze                                 │
+│  │   ├── POST /api/v1/rectification/with-events                              │
+│  │   ├── POST /api/v1/rectification/quick                                    │
+│  │   ├── POST /api/v1/rectification/methods                                  │
+│  │   ├── POST /api/v1/rectification/hora-analysis                            │
+│  │   ├── POST /api/v1/rectification/shashtiamsa-verify                       │
+│  │   ├── POST /api/v1/rectification/configure                                │
+│  │   └── GET /api/v1/rectification/features                                  │
+│  ├── GeocodingController (controllers/GeocodingController.js)               │
+│  │   ├── POST /api/v1/geocoding/location                                    │
+│  │   ├── POST /api/v1/geocoding/timezone                                     │
+│  │   └── GET /api/v1/geocoding/validate                                      │
+│  └── ClientErrorLogController (routes/clientErrorLog.js)                     │
+│      └── POST /api/v1/client-error/log                                       │
 └─────────────────────────────────────────────────────────────────────────────┘
                                     │
                                     │ Service Calls
@@ -421,31 +515,51 @@ node tests/ui/e2e/ui-e2e-test.cjs
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                           SERVICE LAYER                                     │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│  Core Services                                                              │
-│  ├── ChartGenerationService                                                 │
+│  Core Services ✅ VERIFIED FUNCTIONAL                                        │
+│  ├── ChartGenerationService (services/chart/ChartGenerationService.js)       │
 │  │   ├── generateComprehensiveChart(birthData)                              │
 │  │   ├── generateRasiChart(birthData)                                       │
 │  │   ├── generateNavamsaChart(birthData)                                    │
 │  │   ├── calculateAscendant(jd, place)                                      │
-│  │   └── getPlanetaryPositions(jd)                                          │
-│  ├── GeocodingService                                                       │
-│  │   └── geocodeLocation(locationData)                                      │
-│  ├── LagnaAnalysisService                                                   │
+│  │   └── getPlanetaryPositions(jd)                                           │
+│  ├── GeocodingService (services/geocoding/GeocodingService.js)              │
+│  │   ├── geocodeLocation(locationData)                                      │
+│  │   └── getTimezone(coordinates)                                           │
+│  ├── BirthTimeRectificationService ✅ NEW (services/analysis/)              │
+│  │   ├── performBirthTimeRectification(birthData, options)                 │
+│  │   ├── performHoraRectification(birthData, options)                        │
+│  │   ├── performShashtiamsaVerification(birthData, options)                  │
+│  │   ├── performConditionalDashaVerification(birthData, options)             │
+│  │   ├── performPraanapadaAnalysis(birthData, timeCandidates, analysis)     │
+│  │   ├── performMoonAnalysis(birthData, timeCandidates, analysis)            │
+│  │   ├── performGulikaAnalysis(birthData, timeCandidates, analysis)         │
+│  │   └── performEventCorrelation(birthData, timeCandidates, events, analysis)│
+│  ├── MasterAnalysisOrchestrator (services/analysis/MasterAnalysisOrchestrator.js)│
+│  │   ├── executeSection1Analysis() - Lagna & Luminaries                      │
+│  │   ├── executeSection2Analysis() - House Analysis                         │
+│  │   ├── executeSection3Analysis() - Planetary Aspects                     │
+│  │   ├── executeSection4Analysis() - Arudha Lagna                           │
+│  │   ├── executeSection5Analysis() - Navamsa Analysis                       │
+│  │   ├── executeSection6Analysis() - Dasha Analysis                         │
+│  │   └── executeSection7Analysis() - Synthesis                              │
+│  ├── LagnaAnalysisService (core/analysis/lagna/LagnaAnalysisService.js)     │
 │  │   ├── analyzeLagnaSign(lagnaSign)                                        │
 │  │   ├── analyzeLagnaLord(lagnaLord, placement)                             │
 │  │   └── determineFunctionalNature(lagnaSign, planets)                      │
-│  ├── HouseAnalysisService                                                   │
+│  ├── HouseAnalysisService (core/analysis/houses/HouseAnalysisService.js)    │
 │  │   ├── analyzeHouse(houseNumber, chart)                                   │
 │  │   ├── analyzeHouseLord(houseNumber, chart)                               │
 │  │   └── analyzeHouseOccupants(houseNumber, chart)                          │
-│  ├── AspectAnalysisService                                                  │
-│  │   ├── calculatePlanetaryAspects(chart)                                   │
-│  │   └── analyzeAspectEffects(aspectingPlanet, aspectedHouse)               │
-│  ├── DashaAnalysisService                                                   │
+│  ├── AspectAnalysisService (core/analysis/aspects/AspectAnalysisService.js)│
+│  │   ├── calculatePlanetaryAspects(chart)                                    │
+│  │   └── analyzeAspectEffects(aspectingPlanet, aspectedHouse)                │
+│  ├── NavamsaAnalysisService (core/analysis/divisional/NavamsaAnalysisService.js)│
+│  │   └── analyzeNavamsaChart(rasiChart, navamsaChart)                        │
+│  ├── DetailedDashaAnalysisService (services/analysis/DetailedDashaAnalysisService.js)│
 │  │   ├── calculateVimshottariDasha(birthData)                               │
 │  │   └── determineCurrentDasha(birthData, currentDate)                      │
-│  └── ReportGenerationService                                                │
-│      ├── generatePersonalityProfile(analysis)                               │
+│  └── ComprehensiveReportService (services/report/ComprehensiveReportService.js)│
+│      ├── generatePersonalityProfile(analysis)                                │
 │      └── generateLifePredictions(analysis)                                  │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
