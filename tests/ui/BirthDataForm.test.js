@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import BirthDataForm from '../../client/src/components/forms/BirthDataForm';
 import geocodingService from '../../client/src/services/geocodingService';
@@ -244,13 +244,17 @@ describe('BirthDataForm', () => {
     await userEvent.type(screen.getByLabelText(/name/i), 'Test User');
     await userEvent.type(screen.getByLabelText(/date of birth/i), '1985-10-24');
 
-    // Click clear button
+    // Click clear button with act() wrapper for async state updates
     const clearButton = screen.getByRole('button', { name: /clear/i });
-    await userEvent.click(clearButton);
+    await act(async () => {
+      await userEvent.click(clearButton);
+    });
 
-    // Check if fields are cleared
-    expect(screen.getByLabelText(/name/i)).toHaveValue('');
-    expect(screen.getByLabelText(/date of birth/i)).toHaveValue('');
+    // Wait for state updates to complete
+    await waitFor(() => {
+      expect(screen.getByLabelText(/name/i)).toHaveValue('');
+      expect(screen.getByLabelText(/date of birth/i)).toHaveValue('');
+    });
   });
 
   test('loads saved session data on mount', async () => {

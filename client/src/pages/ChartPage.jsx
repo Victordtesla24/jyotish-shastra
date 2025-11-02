@@ -104,39 +104,73 @@ const ChartPage = () => {
     console.log('🔍 ChartPage: Full currentChart data:', currentChart);
     console.log('🔍 ChartPage: API Response:', apiResponse);
 
-    if (apiResponse && apiResponse.success && apiResponse.data) {
-      console.log('✅ ChartPage: Using apiResponse.data:', apiResponse.data);
-      console.log('📋 Birth Data Available:', !!apiResponse.data.birthData);
-      console.log('📋 Birth Data Details:', {
-        name: apiResponse.data.birthData?.name,
-        dateOfBirth: apiResponse.data.birthData?.dateOfBirth,
-        timeOfBirth: apiResponse.data.birthData?.timeOfBirth,
-        latitude: apiResponse.data.birthData?.latitude,
-        longitude: apiResponse.data.birthData?.longitude,
-        geocodingInfo: apiResponse.data.birthData?.geocodingInfo
-      });
-      console.log('⏳ Dasha Info Available:', !!apiResponse.data.dashaInfo);
-      console.log('⏳ Dasha Info Details:', {
-        birthDasha: apiResponse.data.dashaInfo?.birthDasha,
-        currentDasha: apiResponse.data.dashaInfo?.currentDasha
-      });
+    // Enhanced response extraction with comprehensive fallback checks
+    if (apiResponse && apiResponse.success) {
+      // Handle multiple response structure variations
+      const chartData = apiResponse.data || apiResponse;
+      
+      if (chartData) {
+        console.log('✅ ChartPage: Using chart data:', chartData);
+        console.log('📋 Birth Data Available:', !!chartData.birthData);
+        console.log('📋 Birth Data Details:', {
+          name: chartData.birthData?.name,
+          dateOfBirth: chartData.birthData?.dateOfBirth,
+          timeOfBirth: chartData.birthData?.timeOfBirth,
+          latitude: chartData.birthData?.latitude,
+          longitude: chartData.birthData?.longitude,
+          geocodingInfo: chartData.birthData?.geocodingInfo
+        });
+        console.log('⏳ Dasha Info Available:', !!chartData.dashaInfo);
+        console.log('⏳ Dasha Info Details:', {
+          birthDasha: chartData.dashaInfo?.birthDasha,
+          currentDasha: chartData.dashaInfo?.currentDasha
+        });
 
-      // Save chart data to UIDataSaver as backup
-      UIDataSaver.saveApiResponse({
-        chart: apiResponse.data?.rasiChart || apiResponse.rasiChart,
-        navamsa: apiResponse.data?.navamsaChart || apiResponse.navamsaChart,
-        analysis: apiResponse.data?.analysis || apiResponse.analysis,
-        metadata: apiResponse.metadata,
-        success: apiResponse.success,
-        originalResponse: apiResponse
-      });
+        // Enhanced chart data extraction with fallback
+        const rasiChart = chartData.rasiChart || chartData.chart?.rasiChart || chartData.chart;
+        const navamsaChart = chartData.navamsaChart || chartData.chart?.navamsaChart || chartData.navamsa;
+        const analysis = chartData.analysis || chartData.chart?.analysis;
 
-      console.log('💾 ChartPage: Chart data saved to UIDataSaver as backup');
+        if (!rasiChart) {
+          console.error('❌ ChartPage: RasiChart not found in response');
+          throw new Error('Chart data is incomplete. RasiChart is missing from API response.');
+        }
 
-      setChartData(apiResponse.data);
+        // Save chart data to UIDataSaver as backup with enhanced structure
+        UIDataSaver.saveApiResponse({
+          chart: rasiChart,
+          navamsa: navamsaChart,
+          analysis: analysis,
+          metadata: apiResponse.metadata || chartData.metadata,
+          success: apiResponse.success,
+          originalResponse: apiResponse
+        });
+
+        console.log('💾 ChartPage: Chart data saved to UIDataSaver as backup');
+
+        // Set chart data with validated structure
+        setChartData({
+          ...chartData,
+          rasiChart,
+          navamsaChart,
+          analysis
+        });
+      } else {
+        throw new Error('Invalid API response format. Chart data is missing from response.');
+      }
     } else {
-      // Production code: Standard API response format required
-      throw new Error('Invalid API response format. Expected response.data structure with rasiChart property.');
+      // Enhanced error message with response structure information
+      const errorMsg = apiResponse?.error?.message || 
+                       apiResponse?.message || 
+                       'Invalid API response format. Expected response.success and response.data structure with rasiChart property.';
+      console.error('❌ ChartPage: Invalid API response:', {
+        success: apiResponse?.success,
+        hasData: !!apiResponse?.data,
+        hasRasiChart: !!(apiResponse?.data?.rasiChart || apiResponse?.rasiChart),
+        error: apiResponse?.error,
+        message: apiResponse?.message
+      });
+      throw new Error(errorMsg);
     }
   }, [currentChart, navigate]);
 

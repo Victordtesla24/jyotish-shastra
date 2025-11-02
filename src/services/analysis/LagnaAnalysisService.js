@@ -350,6 +350,19 @@ class LagnaAnalysisService {
    * @returns {Object} Lagna lord analysis
    */
   analyzeLagnaLord(lagnaLord, placement) {
+    // Production code - validate placement data before processing
+    if (!placement || typeof placement !== 'object') {
+      throw new Error(`Lagna lord ${lagnaLord} position not found in chart. Ensure complete planetary positions are provided.`);
+    }
+
+    if (typeof placement.longitude === 'undefined') {
+      throw new Error(`Lagna lord ${lagnaLord} longitude not found. Ensure complete planetary position data is provided.`);
+    }
+
+    if (typeof placement.house === 'undefined') {
+      throw new Error(`Lagna lord ${lagnaLord} house position not found. Ensure complete chart data with house positions is provided.`);
+    }
+
     const dignity = this.dignityCalculator.getDignity(lagnaLord, placement.longitude);
     const strength = this.calculatePlanetaryStrength(lagnaLord, placement);
     const effects = this.getLagnaLordEffects(lagnaLord, placement);
@@ -357,9 +370,9 @@ class LagnaAnalysisService {
     return {
       planet: lagnaLord,
       house: placement.house,
-      sign: placement.sign,
-      dignity: dignity.dignityType,
-      strength,
+      sign: placement.sign || 'Unknown',
+      dignity: dignity.dignityType || 'Neutral',
+      strength: strength || 5,
       effects
     };
   }
@@ -483,12 +496,153 @@ class LagnaAnalysisService {
   /**
    * Get Lagna lord effects based on placement
    * @param {string} lagnaLord - Lagna lord planet
-   * @param {Object} placement - Planet placement
-   * @returns {Array} Effects list
+   * @param {Object} placement - Planet placement details
+   * @returns {Array} Array of effect strings
    */
   getLagnaLordEffects(lagnaLord, placement) {
-    // This method can be enhanced with more detailed interpretations
-    return [];
+    if (!placement || !placement.house) {
+      return ['Lagna lord placement analysis requires valid planetary position data'];
+    }
+
+    const effects = [];
+    const house = placement.house;
+    const sign = placement.sign || '';
+    const dignity = this.dignityCalculator.getDignity(lagnaLord, placement.longitude || 0);
+    const dignityType = dignity.dignityType || 'Neutral';
+
+    // House-specific effects for Lagna Lord
+    const houseEffects = {
+      1: [
+        'Strong sense of self and identity',
+        'Natural leadership qualities',
+        'Good health and vitality',
+        'Self-confidence and independence',
+        'Physical appearance influenced by lagna lord'
+      ],
+      2: [
+        'Wealth accumulation abilities',
+        'Family prosperity and stability',
+        'Speech and communication skills',
+        'Financial wisdom and management',
+        'Family legacy and inheritance'
+      ],
+      3: [
+        'Courage and valor',
+        'Sibling relationships',
+        'Communication and writing skills',
+        'Short journeys and travels',
+        'Creative expression'
+      ],
+      4: [
+        'Home and property matters',
+        'Mother relationship',
+        'Education and learning',
+        'Emotional stability',
+        'Vehicle ownership and comfort'
+      ],
+      5: [
+        'Children and progeny',
+        'Creativity and intelligence',
+        'Investments and speculation',
+        'Romance and relationships',
+        'Past life credits'
+      ],
+      6: [
+        'Health and wellness',
+        'Service and daily work',
+        'Enemies and competition',
+        'Debts and obligations',
+        'Healing abilities'
+      ],
+      7: [
+        'Marriage and partnerships',
+        'Business relationships',
+        'Spouse characteristics',
+        'Legal matters',
+        'Public relationships'
+      ],
+      8: [
+        'Longevity and transformation',
+        'Occult knowledge and research',
+        'Inheritance and gains',
+        'Unexpected changes',
+        'Mystical insights'
+      ],
+      9: [
+        'Fortune and luck',
+        'Dharma and righteousness',
+        'Higher education',
+        'Spiritual guidance',
+        'Father relationship'
+      ],
+      10: [
+        'Career and profession',
+        'Reputation and fame',
+        'Public standing',
+        'Authority and leadership',
+        'Professional success'
+      ],
+      11: [
+        'Gains and income',
+        'Friends and social circle',
+        'Aspirations fulfillment',
+        'Elder siblings',
+        'Network and connections'
+      ],
+      12: [
+        'Spirituality and liberation',
+        'Foreign lands and travels',
+        'Expenses and losses',
+        'Hidden enemies',
+        'Karmic resolution'
+      ]
+    };
+
+    // Add house-specific effects
+    if (houseEffects[house]) {
+      effects.push(...houseEffects[house].slice(0, 3));
+    }
+
+    // Add dignity-based effects
+    if (dignityType === 'Exalted') {
+      effects.push(`Lagna lord is exalted, indicating exceptional strength and positive outcomes`);
+    } else if (dignityType === 'Own Sign') {
+      effects.push(`Lagna lord in own sign provides natural strength and authority`);
+    } else if (dignityType === 'Debilitated') {
+      effects.push(`Lagna lord is debilitated, requiring special attention and remedies`);
+    }
+
+    // Add sign-based effects
+    if (sign) {
+      const signElement = this.getSignElement(sign);
+      if (signElement === 'Fire') {
+        effects.push('Fiery nature enhances action and leadership');
+      } else if (signElement === 'Earth') {
+        effects.push('Earthly nature provides stability and practicality');
+      } else if (signElement === 'Air') {
+        effects.push('Airy nature enhances communication and intellect');
+      } else if (signElement === 'Water') {
+        effects.push('Watery nature provides emotional depth and intuition');
+      }
+    }
+
+    // Ensure at least one effect is returned
+    if (effects.length === 0) {
+      effects.push(`Lagna lord placement in ${house}th house influences personality and life direction`);
+    }
+
+    return effects;
+  }
+
+  /**
+   * Get sign element
+   * @param {string} sign - Zodiac sign
+   * @returns {string} Element (Fire, Earth, Air, Water)
+   */
+  getSignElement(sign) {
+    const signKey = sign.toUpperCase();
+    const signData = this.signCharacteristics[signKey];
+    return signData?.element || 'Fire';
   }
 
   /**
@@ -585,11 +739,27 @@ class LagnaAnalysisService {
    * @returns {Object} Complete Lagna analysis
    */
   analyzeLagna(chart) {
+    // Production code - validate chart structure before processing
+    if (!chart || !chart.ascendant) {
+      throw new Error('Invalid chart data: missing required ascendant. Ensure valid birth data is provided.');
+    }
+
+    if (!chart.planetaryPositions || typeof chart.planetaryPositions !== 'object') {
+      throw new Error('Invalid chart data: missing required planetary positions. Ensure valid birth data is provided.');
+    }
+
     const { ascendant, planetaryPositions } = chart;
 
     // Find Lagna lord
     const lagnaLord = this.findLagnaLord(ascendant.sign);
+    if (!lagnaLord || lagnaLord === 'Unknown') {
+      throw new Error(`Unable to determine lagna lord for sign ${ascendant.sign}. Ensure valid ascendant data is provided.`);
+    }
+
     const lagnaLordPosition = planetaryPositions[lagnaLord.toLowerCase()];
+    if (!lagnaLordPosition) {
+      throw new Error(`Lagna lord ${lagnaLord} position not found in planetary positions. Ensure complete chart data is provided.`);
+    }
 
     return {
       lagnaSign: this.analyzeLagnaSign(ascendant.sign),
@@ -658,7 +828,8 @@ class LagnaAnalysisService {
   generateLagnaSummary(ascendant, lagnaLordPosition) {
     try {
       const signAnalysis = this.analyzeLagnaSign(ascendant.sign);
-      const lordAnalysis = this.analyzeLagnaLord('lagnaLord', lagnaLordPosition);
+      const lagnaLord = this.findLagnaLord(ascendant.sign);
+      const lordAnalysis = this.analyzeLagnaLord(lagnaLord, lagnaLordPosition);
 
       // Production code - require valid data structure
       if (!signAnalysis.characteristics || !Array.isArray(signAnalysis.characteristics) || signAnalysis.characteristics.length < 2) {

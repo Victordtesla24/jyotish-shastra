@@ -874,6 +874,21 @@ class BirthTimeRectificationService {
       const longitude = birthData.longitude || birthData.placeOfBirth?.longitude;
       const timezone = birthData.timezone || birthData.placeOfBirth?.timezone;
 
+      // Convert timezone string to numeric offset if needed
+      let timezoneOffset = 0;
+      if (typeof timezone === 'string') {
+        try {
+          // Use moment-timezone to get offset in hours
+          const moment = (await import('moment-timezone')).default;
+          const timezoneMoment = moment.tz(birthLocal, timezone);
+          timezoneOffset = timezoneMoment.utcOffset() / 60; // Convert minutes to hours
+        } catch (tzError) {
+          timezoneOffset = 0;
+        }
+      } else {
+        timezoneOffset = timezone || 0;
+      }
+
       // Fix: Pass individual date components instead of Date object
       const sunriseResult = await computeSunriseSunset(
         birthLocal.getFullYear(), 
@@ -881,14 +896,18 @@ class BirthTimeRectificationService {
         birthLocal.getDate(), 
         latitude, 
         longitude, 
-        timezone
+        timezoneOffset
       );
       
-      if (!sunriseResult || !sunriseResult.sunriseLocal) {
+      // Handle both sunrise and sunriseLocal formats
+      const sunriseTime = sunriseResult?.sunrise?.time || sunriseResult?.sunriseLocal;
+      
+      if (!sunriseResult || !sunriseTime) {
         throw new Error(`Sunrise calculation failed for coordinates ${latitude}, ${longitude} and date ${dateStr}. Cannot perform Praanapada calculation without valid sunrise time. Result: ${JSON.stringify(sunriseResult)}`);
       }
       
-      const { sunriseLocal } = sunriseResult;
+      // Create Date object if it's not already one
+      const sunriseLocal = sunriseTime instanceof Date ? sunriseTime : new Date(sunriseTime);
 
       const pr = computePraanapadaLongitude({
         sunLongitudeDeg: sunPosition.longitude,
@@ -1034,7 +1053,12 @@ class BirthTimeRectificationService {
       return {
         rectifiedTime: (analysis && analysis.originalData && analysis.originalData.timeOfBirth) || '12:00',
         confidence: 0,
-        recommendations: ['Unable to rectify birth time with given data']
+        recommendations: ['Unable to rectify birth time with given data'],
+        analysis: {
+          bestCandidate: null,
+          allCandidates: [],
+          methodBreakdown: this.getMethodBreakdown(analysis.methods)
+        }
       };
     }
 

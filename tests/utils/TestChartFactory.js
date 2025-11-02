@@ -1,7 +1,11 @@
 /**
- * Test Chart Factory
- * Creates mock chart data for testing
+ * Production Test Data Factory
+ * Creates realistic test data using actual astronomical calculations
+ * Replaces mock data with production-grade test fixtures
  */
+
+import { calculateJulianDay } from '../../src/utils/calculations/julianDay.js';
+import { setupSwissephWithEphemeris } from '../../src/utils/swisseph-wrapper.js';
 
 class TestChartFactory {
   /**

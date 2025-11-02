@@ -51,19 +51,8 @@ const normalizeCoordinates = (req, res, next) => {
         req.body.birthData.placeOfBirth = birthData.placeOfBirth.name || birthData.placeOfBirth;
       }
       
-      // Enhanced logging for debugging
-      console.log('🔧 BTR Coordinate Normalization:', {
-        originalLat: birthData.latitude,
-        originalLng: birthData.longitude,
-        originalTz: birthData.timezone,
-        originalPlaceType: typeof birthData.placeOfBirth,
-        normalizedLat: latitude,
-        normalizedLng: longitude,
-        normalizedTz: timezone,
-        endpoint: req.path,
-        timestamp: new Date().toISOString()
-      });
-      
+      // Normalize coordinates for BTR analysis
+      // Birth data coordinates validated above
     }
     next();
   } catch (error) {
@@ -85,7 +74,7 @@ const normalizeCoordinates = (req, res, next) => {
 router.post('/analyze', normalizeCoordinates, validation(rectificationAnalyzeRequestSchema), async (req, res) => {
     try {
         // Use validated body from middleware
-        const { birthData, options } = req.validatedBody || req.body;
+        const { birthData, options } = req.validatedBody || req.body || {};
 
         // CRITICAL FIX: Extract and flatten coordinates BEFORE validation 
         const latitude = birthData.latitude || birthData.placeOfBirth?.latitude;
@@ -154,7 +143,7 @@ router.post('/analyze', normalizeCoordinates, validation(rectificationAnalyzeReq
 router.post('/with-events', normalizeCoordinates, validation(rectificationWithEventsRequestSchema), async (req, res) => {
     try {
         // Use validated body from middleware
-        const { birthData, lifeEvents, options } = req.validatedBody || req.body;
+        const { birthData, lifeEvents, options } = req.validatedBody || req.body || {};
 
         // CRITICAL FIX: Extract and flatten coordinates BEFORE validation 
         const latitude = birthData.latitude || birthData.placeOfBirth?.latitude;
@@ -225,7 +214,7 @@ router.post('/with-events', normalizeCoordinates, validation(rectificationWithEv
 router.post('/quick', normalizeCoordinates, validation(rectificationQuickRequestSchema), async (req, res) => {
     try {
         // Use validated body from middleware
-        const { birthData, proposedTime } = req.validatedBody || req.body;
+        const { birthData, proposedTime } = req.validatedBody || req.body || {};
 
         // CRITICAL FIX: Extract and flatten coordinates BEFORE validation
         const latitude = birthData.latitude || birthData.placeOfBirth?.latitude;
@@ -266,10 +255,35 @@ router.post('/quick', normalizeCoordinates, validation(rectificationQuickRequest
             throw new Error('Chart generation failed for proposed time');
         }
 
-        // Praanapada computation and alignment score
-        const praanapada = await btrService.calculatePraanapada({ time: proposedTime }, chart, flattenedBirthData);
-        const alignmentScore = btrService.calculateAscendantAlignment(chart.ascendant, praanapada);
+        // Praanapada computation and alignment score with error handling
+        let praanapada = null;
+        let alignmentScore = 0;
+        
+        try {
+            praanapada = await btrService.calculatePraanapada({ time: proposedTime }, chart, flattenedBirthData);
+            
+            if (!chart.ascendant || !praanapada) {
+                throw new Error('Ascendant or Praanapada calculation failed');
+            }
+            
+            alignmentScore = btrService.calculateAscendantAlignment(chart.ascendant, praanapada);
+        } catch (calculationError) {
+            console.error('Praanapada calculation error:', calculationError);
+            throw new Error(`Praanapada calculation failed: ${calculationError.message}`);
+        }
+
         const confidence = Math.min(Math.max(alignmentScore, 0), 100);
+
+        // Generate recommendations with error handling
+        let recommendations = [];
+        try {
+            recommendations = btrService.generateQuickRecommendations(proposedTime, alignmentScore, chart) || [];
+        } catch (recError) {
+            recommendations = [{
+                message: 'Recommendations unavailable',
+                priority: 'low'
+            }];
+        }
 
         const validation = {
             proposedTime,
@@ -277,7 +291,7 @@ router.post('/quick', normalizeCoordinates, validation(rectificationQuickRequest
             praanapada,
             ascendant: chart.ascendant,
             alignmentScore,
-            recommendations: btrService.generateQuickRecommendations(proposedTime, alignmentScore, chart),
+            recommendations,
             analysisLog: [
                 'Quick Praanapada validation completed',
                 `Alignment score: ${alignmentScore}/100`,
@@ -287,7 +301,7 @@ router.post('/quick', normalizeCoordinates, validation(rectificationQuickRequest
 
         res.json({
             success: true,
-            validation,
+            validation: validation,
             timestamp: new Date().toISOString()
         });
 

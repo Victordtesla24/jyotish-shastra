@@ -58,8 +58,6 @@ class ChartGenerationService {
    */
   async ensureSwissephInitialized() {
     try {
-      console.log('🔧 Ensuring Swiss Ephemeris initialization...');
-      
       // Use the improved wrapper to get Swiss Ephemeris
       this.swisseph = await getSwisseph();
       
@@ -73,18 +71,7 @@ class ChartGenerationService {
         throw new Error(`Swiss Ephemeris missing required methods: ${missingMethods.join(', ')}`);
       }
       
-      // PRODUCTION: Log available Swiss Ephemeris methods
-      if (process.env.NODE_ENV === 'production') {
-        console.log('📊 Swiss Ephemeris methods validated:', {
-          swe_julday: typeof this.swisseph.swe_julday,
-          swe_revjul: typeof this.swisseph.swe_revjul,
-          swe_calc_ut: typeof this.swisseph.swe_calc_ut,
-          swe_houses: typeof this.swisseph.swe_houses
-        });
-      }
-      
       this.swissephAvailable = true;
-      console.log('✅ Swiss Ephemeris initialized with all required methods');
     } catch (error) {
       this.swissephAvailable = false;
       console.error('❌ Swiss Ephemeris initialization failed:', {
@@ -100,8 +87,6 @@ class ChartGenerationService {
    */
   async initializeSwissEphemeris() {
     try {
-      console.log('🔧 Initializing Swiss Ephemeris with ephemeris setup...');
-      
       // Use the improved helper function for comprehensive initialization
       const { swisseph } = await setupSwissephWithEphemeris(astroConfig.CALCULATION_SETTINGS.EPHEMERIS_PATH);
       
@@ -110,8 +95,6 @@ class ChartGenerationService {
       
       // Set calculation flags for Vedic astrology
       this.calcFlags = SEFLG_SIDEREAL | SEFLG_SPEED;
-      
-      console.log('✅ Swiss Ephemeris initialized successfully');
       
     } catch (error) {
       this.swissephAvailable = false;
@@ -127,62 +110,31 @@ class ChartGenerationService {
   async generateComprehensiveChart(birthData) {
     // Ensure swisseph is initialized
     await this.ensureSwissephInitialized();
-    
-    console.log('🚀 CHART GENERATION SERVICE - Starting comprehensive chart generation...');
-    console.log('📊 Input Birth Data:', JSON.stringify(birthData, null, 2));
 
     try {
       // Initialize Swiss Ephemeris before any calculations
-      console.log('🔍 Step 1: Initializing Swiss Ephemeris...');
       await this.initializeSwissEphemeris();
-      console.log('✅ Swiss Ephemeris initialized successfully');
 
       // Validate birth data
-      console.log('🔍 Step 2: Validating birth data...');
       const isValid = this.validateBirthData(birthData);
       if (!isValid) {
         throw new Error('Birth data validation failed');
       }
-      console.log('✅ Birth data validation passed');
 
       // Geocode location if coordinates not provided
-      console.log('🔍 Step 3: Processing location data...');
       const geocodedData = await this.processLocationData(birthData);
-      console.log('✅ Location data processed:', {
-        latitude: geocodedData.latitude,
-        longitude: geocodedData.longitude,
-        geocodingInfo: geocodedData.geocodingInfo
-      });
 
       // Generate Rasi chart
-      console.log('🔍 Step 3: Generating Rasi chart...');
       const rasiChart = await this.generateRasiChart(geocodedData);
-      console.log('✅ Rasi chart generated:', {
-        ascendant: rasiChart.ascendant,
-        planetsCount: Object.keys(rasiChart.planetaryPositions || {}).length,
-        housesCount: rasiChart.housePositions?.length || 0
-      });
 
       // Generate Navamsa chart (pass rasiChart to avoid regeneration and potential errors)
-      console.log('🔍 Step 4: Generating Navamsa chart...');
       const navamsaChart = await this.generateNavamsaChart(geocodedData, rasiChart);
-      console.log('✅ Navamsa chart generated:', {
-        ascendant: navamsaChart.ascendant,
-        planetsCount: Object.keys(navamsaChart.planetaryPositions || {}).length
-      });
 
       // Calculate Dasha information
-      console.log('🔍 Step 5: Calculating Dasha information...');
       const dashaInfo = this.calculateDashaInfo(rasiChart);
-      console.log('✅ Dasha info calculated:', {
-        birthDasha: dashaInfo.birthDasha,
-        currentDasha: dashaInfo.currentDasha
-      });
 
       // Generate comprehensive analysis
-      console.log('🔍 Step 6: Generating comprehensive analysis...');
       const analysis = await this.generateComprehensiveAnalysis(rasiChart, navamsaChart);
-      console.log('✅ Analysis generated:', Object.keys(analysis));
 
       const result = {
         birthData: geocodedData,
@@ -193,20 +145,9 @@ class ChartGenerationService {
         generatedAt: new Date().toISOString()
       };
 
-      console.log('🎉 CHART GENERATION SERVICE - Comprehensive chart generation completed successfully!');
-      console.log('📈 Result structure:', {
-        hasBirthData: !!result.birthData,
-        hasRasiChart: !!result.rasiChart,
-        hasNavamsaChart: !!result.navamsaChart,
-        hasDashaInfo: !!result.dashaInfo,
-        hasAnalysis: !!result.analysis,
-        generatedAt: result.generatedAt
-      });
-
       return result;
     } catch (error) {
-      console.error('❌ CHART GENERATION SERVICE - Error during chart generation:', error);
-      console.error('❌ Error stack:', error.stack);
+      console.error('CHART GENERATION SERVICE - Error during chart generation:', error);
       throw new Error(`Failed to generate comprehensive chart: ${error.message}`);
     }
   }
@@ -366,7 +307,6 @@ class ChartGenerationService {
       
       // Generate Rasi chart if not provided (optimization for reuse)
       if (!rasiChart) {
-        console.log('🔍 Generating new Rasi chart for Navamsa calculation...');
         rasiChart = await this.generateRasiChart(birthData);
       }
       
@@ -400,11 +340,6 @@ class ChartGenerationService {
         throw new Error(errorMsg);
       }
       
-      console.log('✅ Rasi chart validation passed for Navamsa calculation:', { 
-        chartId: rasiChart.id.substring(0, 8) + '...',
-        hasJulianDay: !!rasiChart.jd,
-        hasCoordinates: !!(rasiChart.birthData.latitude && rasiChart.birthData.longitude)
-      });
       
       const navamsaPositions = {};
       const planets = []; // Add planets array for compatibility
@@ -413,13 +348,11 @@ class ChartGenerationService {
       for (const [planet, position] of Object.entries(rasiChart.planetaryPositions || {})) {
         // Add comprehensive null safety checks
         if (!position || typeof position !== 'object') {
-          console.warn(`Position is null or invalid for planet: ${planet}`);
           continue;
         }
 
         // Ensure position has required properties
         if (position.longitude === undefined || position.longitude === null) {
-          console.warn(`Invalid longitude for planet: ${planet}`);
           continue;
         }
 
@@ -427,7 +360,6 @@ class ChartGenerationService {
 
         // Add null safety for navamsa position
         if (!navamsaPosition || typeof navamsaPosition !== 'object') {
-          console.warn(`Failed to calculate Navamsa position for planet: ${planet}`);
           continue;
         }
 
@@ -448,7 +380,6 @@ class ChartGenerationService {
               houseNumber = 1;
             }
           } catch (error) {
-            console.warn(`Error calculating house number for planet ${planet}:`, error.message);
             houseNumber = 1;
           }
         }
@@ -503,42 +434,32 @@ class ChartGenerationService {
    */
   async calculateAscendant(jd, placeOfBirth) {
     try {
-      // PRODUCTION: Log input parameters for debugging
-      if (process.env.NODE_ENV === 'production') {
-        console.log('🔧 Calculating Ascendant with inputs:', {
-          jd,
-          latitude: placeOfBirth.latitude,
-          longitude: placeOfBirth.longitude
-        });
-      }
-
       const ascendantCalculator = new AscendantCalculator();
       // Convert Julian Day to date components using Swiss Ephemeris
       const result = await this.swisseph.swe_revjul(jd, SE_GREG_CAL);
       
-      // PRODUCTION: Log swe_revjul result structure
-      if (process.env.NODE_ENV === 'production') {
-        console.log('📊 Swiss Ephemeris swe_revjul result:', {
-          isArray: Array.isArray(result),
-          length: Array.isArray(result) ? result.length : 'N/A',
-          isObject: typeof result === 'object',
-          keys: result && typeof result === 'object' ? Object.keys(result) : []
-        });
-      }
-      
-      // Handle both array and object return formats from sweph-wasm
+      // Handle array return format from sweph wrapper
+      // sweph wrapper returns [year, month, day, hour] (4 elements)
       let year, month, day, hour, minutes;
-      if (Array.isArray(result) && result.length >= 6) {
-        // Array format: [year, month, day, hour, minute, second]
-        [year, month, day, hour, minutes] = result;
+      
+      if (Array.isArray(result) && result.length >= 4) {
+        // Array format: [year, month, day, hour]
+        [year, month, day, hour] = result;
+        // Extract minutes from decimal hour if needed
+        if (typeof hour === 'number' && hour % 1 !== 0) {
+          const decimalHour = hour;
+          hour = Math.floor(decimalHour);
+          minutes = Math.round((decimalHour - hour) * 60);
+        } else {
+          minutes = 0; // Default to 0 minutes if hour is integer
+        }
       } else if (result && typeof result === 'object') {
-        // Object format
+        // Object format (fallback for compatibility)
         year = result.year;
         month = result.month;
         day = result.day;
         
-        // CRITICAL FIX: Handle hour/minute extraction correctly
-        // sweph-wasm returns hour as decimal (e.g., 21.5 = 21:30)
+        // Handle hour/minute extraction
         if (typeof result.hour === 'number') {
           const decimalHour = result.hour;
           hour = Math.floor(decimalHour);
@@ -552,26 +473,15 @@ class ChartGenerationService {
       }
       
       // CRITICAL VALIDATION: Ensure all date components are valid numbers
-      if (!year || !month || !day || hour === undefined || minutes === undefined) {
+      if (typeof year !== 'number' || typeof month !== 'number' || typeof day !== 'number' || 
+          typeof hour !== 'number' || typeof minutes !== 'number' ||
+          isNaN(year) || isNaN(month) || isNaN(day) || isNaN(hour) || isNaN(minutes)) {
         throw new Error(`Invalid date components extracted: year=${year}, month=${month}, day=${day}, hour=${hour}, minutes=${minutes}`);
       }
       
-      // PRODUCTION: Log extracted date components
-      if (process.env.NODE_ENV === 'production') {
-        console.log('📅 Extracted date components:', { year, month, day, hour, minutes });
-      }
 
       const ascendantData = await ascendantCalculator.calculateAscendantAndHouses(year, month, day, hour, minutes, placeOfBirth.latitude, placeOfBirth.longitude);
       
-      // PRODUCTION: Log AscendantCalculator response structure
-      if (process.env.NODE_ENV === 'production') {
-        console.log('📊 AscendantCalculator response structure:', {
-          hasAscendant: !!ascendantData.ascendant,
-          ascendantKeys: ascendantData.ascendant ? Object.keys(ascendantData.ascendant) : [],
-          hasLongitude: ascendantData.ascendant ? typeof ascendantData.ascendant.longitude === 'number' : false,
-          longitudeValue: ascendantData.ascendant?.longitude
-        });
-      }
       
       // CRITICAL FIX: Extract just the ascendant object from the full result
       // AscendantCalculator returns {ascendant: {...}, houses: {...}, metadata: {...}}
@@ -588,13 +498,6 @@ class ChartGenerationService {
         throw new Error(`Invalid ascendant data structure - missing longitude: ${JSON.stringify(ascendant)}`);
       }
 
-      // PRODUCTION: Log successful ascendant calculation
-      if (process.env.NODE_ENV === 'production') {
-        console.log('✅ Ascendant calculated successfully:', {
-          longitude: ascendant.longitude,
-          sign: ascendant.signName || ascendant.sign
-        });
-      }
 
       // CRITICAL FIX: Ensure sign is always populated, calculate from longitude if needed
       const signFromLongitude = this.degreeToSign(ascendant.longitude);
@@ -763,42 +666,26 @@ class ChartGenerationService {
       const houses = await this.swisseph.swe_houses(jd, adjustedLatitude, longitude, 'P');
 
       // COMPREHENSIVE FIX: Handle ALL possible Swiss Ephemeris WASM return formats
-      // Log the actual structure for debugging in production
-      console.log('🔍 Swiss Ephemeris house data structure:', {
-        isArray: Array.isArray(houses),
-        isObject: typeof houses === 'object',
-        hasHouseProperty: houses && 'house' in houses,
-        hasCuspsProperty: houses && 'cusps' in houses,
-        hasDataProperty: houses && 'data' in houses,
-        length: Array.isArray(houses) ? houses.length : 'N/A',
-        keys: houses && typeof houses === 'object' ? Object.keys(houses) : 'N/A'
-      });
-
       let houseArray;
       
       // Format 1: Direct array [house1, house2, ..., house12, asc, mc, ...]
       if (Array.isArray(houses) && houses.length >= 12) {
-        console.log('✅ Using Format 1: Direct array');
         houseArray = houses.slice(0, 12);
       } 
       // Format 2: Object with 'house' property {house: [house1, house2, ...], ascendant: ..., mc: ...}
       else if (houses && houses.house && Array.isArray(houses.house) && houses.house.length >= 12) {
-        console.log('✅ Using Format 2: Object with house array');
         houseArray = houses.house;
       }
       // Format 3: Object with 'cusps' property (alternative WASM format)
       else if (houses && houses.cusps && Array.isArray(houses.cusps) && houses.cusps.length >= 12) {
-        console.log('✅ Using Format 3: Object with cusps array');
         houseArray = houses.cusps;
       }
       // Format 4: Object with 'data' property containing houses
       else if (houses && houses.data && Array.isArray(houses.data) && houses.data.length >= 12) {
-        console.log('✅ Using Format 4: Object with data array');
         houseArray = houses.data;
       }
       // Format 5: Object with numbered properties (0-11 or 1-12)
       else if (houses && typeof houses === 'object' && !Array.isArray(houses)) {
-        console.log('🔍 Checking Format 5: Object with numbered properties');
         // Try 0-indexed
         const zeroIndexed = [];
         for (let i = 0; i < 12; i++) {
@@ -807,7 +694,6 @@ class ChartGenerationService {
           }
         }
         if (zeroIndexed.length === 12) {
-          console.log('✅ Using Format 5a: Zero-indexed object properties');
           houseArray = zeroIndexed;
         } else {
           // Try 1-indexed
@@ -818,7 +704,6 @@ class ChartGenerationService {
             }
           }
           if (oneIndexed.length === 12) {
-            console.log('✅ Using Format 5b: One-indexed object properties');
             houseArray = oneIndexed;
           }
         }
@@ -867,7 +752,6 @@ class ChartGenerationService {
         });
       }
       
-      console.log('✅ Successfully calculated all 12 house positions');
       return housePositions;
       
     } catch (error) {

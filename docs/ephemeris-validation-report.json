@@ -1,0 +1,63 @@
+{
+  "timestamp": "2025-11-02T08:45:20.674Z",
+  "ephemerisDirectory": "/Users/Shared/cursor/jjyotish-shastra/ephemeris",
+  "validation": {
+    "success": true,
+    "results": {
+      "valid": [
+        {
+          "filename": "seas_18.se1",
+          "size": 223002
+        },
+        {
+          "filename": "semo_18.se1",
+          "size": 1304771
+        },
+        {
+          "filename": "sepl_18.se1",
+          "size": 484055
+        }
+      ],
+      "missing": [],
+      "invalid": [],
+      "warnings": [
+        {
+          "filename": "semo_18.se1",
+          "reason": "Size mismatch (expected 1200000-1300000, got 1304771)"
+        }
+      ]
+    }
+  },
+  "compatibility": {
+    "readable": [
+      {
+        "filename": "seas_18.se1",
+        "accessible": true,
+        "canRead": true
+      },
+      {
+        "filename": "semo_18.se1",
+        "accessible": true,
+        "canRead": true
+      },
+      {
+        "filename": "sepl_18.se1",
+        "accessible": true,
+        "canRead": true
+      }
+    ],
+    "errors": []
+  },
+  "requiredFiles": [
+    "seas_18.se1",
+    "semo_18.se1",
+    "sepl_18.se1"
+  ],
+  "summary": {
+    "allValid": true,
+    "validCount": 3,
+    "missingCount": 0,
+    "invalidCount": 0,
+    "warningsCount": 1
+  }
+}

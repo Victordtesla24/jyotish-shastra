@@ -139,6 +139,19 @@ class ComprehensiveReportService {
    * @returns {Object} All analysis results
    */
   async gatherAllAnalyses(chart) {
+    // Validate required chart data before processing
+    if (!chart || !chart.rasiChart) {
+      throw new Error('Incomplete chart data: rasiChart is required for comprehensive report generation');
+    }
+    
+    if (!chart.birthData || !chart.birthData.dateOfBirth || !chart.birthData.timeOfBirth) {
+      throw new Error('Incomplete chart data: birthData.dateOfBirth and birthData.timeOfBirth are required for comprehensive report generation');
+    }
+    
+    if (!chart.rasiChart.ascendant || !chart.rasiChart.planets) {
+      throw new Error('Incomplete chart data: rasiChart.ascendant and rasiChart.planets are required for comprehensive report generation');
+    }
+    
     try {
       const analyses = {
         birthData: this.birthDataService.analyzeBirthDataCollection(chart.birthData || {}, chart.rasiChart, chart.navamsaChart),
@@ -183,31 +196,16 @@ class ComprehensiveReportService {
   async generatePersonalityProfile(allAnalyses) {
     const { lagna, arudha, planetaryDignity } = allAnalyses;
 
-    // Extract key personality components with null safety
-    // Handle both object and nested object structures for lagna analysis
-    let lagnaAnalysis = null;
-    if (lagna && typeof lagna === 'object') {
-      // Try multiple possible structures
-      lagnaAnalysis = lagna.lagnaSign || lagna.ascendant || lagna.ascendantAnalysis || lagna;
-      
-      // If still no valid sign, try to construct from available data
-      if (!lagnaAnalysis || (!lagnaAnalysis.sign && !lagnaAnalysis.lagnaSign)) {
-        // Fallback: try to get sign from chart data if available (passed via allAnalyses if needed)
-        // For now, use fallback structure
-        lagnaAnalysis = null;
-      }
+    // Extract key personality components - no fallbacks
+    if (!lagna || typeof lagna !== 'object') {
+      throw new Error('Lagna analysis is required for personality assessment');
     }
     
-    // Final fallback if no lagna analysis available
+    // Try multiple possible structures
+    let lagnaAnalysis = lagna.lagnaSign || lagna.ascendant || lagna.ascendantAnalysis || lagna;
+    
     if (!lagnaAnalysis || (!lagnaAnalysis.sign && !lagnaAnalysis.lagnaSign)) {
-      lagnaAnalysis = {
-        sign: 'Unknown',
-        characteristics: ['dynamic'],
-        element: 'Unknown',
-        quality: 'Unknown',
-        strengths: ['adaptable'],
-        challenges: ['uncertainty']
-      };
+      throw new Error('Lagna analysis must contain sign information');
     }
 
     // Ensure sign property exists
@@ -235,7 +233,7 @@ class ComprehensiveReportService {
       corePersonality: {
         lagnaTraits: lagnaAnalysis.characteristics || ['adaptable'],
         innerSelf: {
-          description: `Your ${lagnaSign} Ascendant gives you ${(lagnaAnalysis.characteristics?.[0] || 'adaptive').toLowerCase()} characteristics`,
+          description: `Your ${lagnaSign} Ascendant gives you ${(lagnaAnalysis?.characteristics?.[0] || 'adaptive').toLowerCase()} characteristics`,
           element: lagnaAnalysis.element || 'Unknown',
           quality: lagnaAnalysis.quality || 'Unknown',
           strengths: lagnaAnalysis.strengths || ['adaptable'],
@@ -1031,15 +1029,28 @@ class ComprehensiveReportService {
    * @returns {string} Overall personality assessment
    */
   synthesizePersonalityAssessment(lagnaAnalysis, moonAnalysis, sunAnalysis, arudhaAnalysis, comparison) {
-    // Use fallbacks for missing data instead of throwing errors
-    const lagnaSign = lagnaAnalysis?.sign || lagnaAnalysis?.lagnaSign || 'Unknown';
-    const arudhaSign = arudhaAnalysis?.arudhaSign || 'Unknown';
-    const element = lagnaAnalysis?.element || lagnaAnalysis?.lagnaElement || 'Unknown';
-    const quality = lagnaAnalysis?.quality || lagnaAnalysis?.lagnaQuality || 'Unknown';
-    const emotionalPattern = moonAnalysis?.emotionalPattern || 'balanced';
-    const lifePurpose = sunAnalysis?.lifePurpose || 'self-discovery';
+    // No fallbacks - all analyses must be complete
+    if (!lagnaAnalysis?.sign && !lagnaAnalysis?.lagnaSign) {
+      throw new Error('Lagna sign is required for personality synthesis');
+    }
+    if (!arudhaAnalysis?.arudhaSign) {
+      throw new Error('Arudha sign is required for personality synthesis');
+    }
+    if (!moonAnalysis?.emotionalPattern) {
+      throw new Error('Moon emotional pattern is required for personality synthesis');
+    }
+    if (!sunAnalysis?.lifePurpose) {
+      throw new Error('Sun life purpose is required for personality synthesis');
+    }
 
-    let assessment = `You possess a ${element.toLowerCase()} nature with ${quality.toLowerCase()} qualities. `;
+    const lagnaSign = lagnaAnalysis.sign || lagnaAnalysis.lagnaSign;
+    const arudhaSign = arudhaAnalysis.arudhaSign;
+    const element = lagnaAnalysis.element || lagnaAnalysis.lagnaElement || 'unknown';
+    const quality = lagnaAnalysis.quality || lagnaAnalysis.lagnaQuality || 'unknown';
+    const emotionalPattern = moonAnalysis.emotionalPattern || 'balanced';
+    const lifePurpose = sunAnalysis.lifePurpose || 'self-discovery';
+
+    let assessment = `You possess a ${(element || 'unknown').toLowerCase()} nature with ${(quality || 'unknown').toLowerCase()} qualities. `;
     assessment += `Your emotional makeup is ${emotionalPattern}, while your core identity seeks ${lifePurpose}. `;
 
     if (comparison.areSame) {
@@ -1115,9 +1126,10 @@ class ComprehensiveReportService {
     }
 
     // Analyze planets in 6th house
-    const sixthHousePlanets = sixthHouseAnalysis.planetaryInfluences;
+    const sixthHousePlanets = sixthHouseAnalysis.planetaryInfluences || [];
 
     sixthHousePlanets.forEach(planet => {
+      if (!planet || !planet.name) return;
       switch (planet.name.toLowerCase()) {
         case 'sun':
           if (planet.strength >= 6) {
@@ -1213,9 +1225,10 @@ class ComprehensiveReportService {
       return implications;
     }
 
-    const eighthHousePlanets = eighthHouseAnalysis.planetaryInfluences;
+    const eighthHousePlanets = eighthHouseAnalysis.planetaryInfluences || [];
 
     eighthHousePlanets.forEach(planet => {
+      if (!planet || !planet.name) return;
       switch (planet.name.toLowerCase()) {
         case 'sun':
           implications.push('Monitor heart health during stress periods');

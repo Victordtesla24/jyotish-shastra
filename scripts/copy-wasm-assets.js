@@ -1,60 +1,149 @@
+#!/usr/bin/env node
+
 /**
- * Copy WASM Assets Script
- * Copies sweph-wasm WASM files to public directory for static serving
- * This enables WASM files to be accessible via URL in Vercel serverless environment
+ * Copy Swiss Ephemeris WASM files and ephemeris data to proper locations for deployment
+ * Ensures production-ready WASM file and ephemeris data serving
  */
 
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const isProduction = process.env.NODE_ENV === 'production';
+const isRender = Boolean(process.env.RENDER);
 
-const wasmSource = path.resolve(process.cwd(), 'node_modules/sweph-wasm/dist/wasm/swisseph.wasm');
-const wasmDestRoot = path.resolve(process.cwd(), 'public/swisseph.wasm');
-const wasmDestClient = path.resolve(process.cwd(), 'client/public/swisseph.wasm');
-
-// Copy to root public directory (for serverless functions)
-const publicDir = path.resolve(process.cwd(), 'public');
-if (!fs.existsSync(publicDir)) {
-  fs.mkdirSync(publicDir, { recursive: true });
-  console.log('✅ Created public directory');
-}
-
-// Copy to client public directory (for static build)
-const clientPublicDir = path.resolve(process.cwd(), 'client/public');
-if (!fs.existsSync(clientPublicDir)) {
-  fs.mkdirSync(clientPublicDir, { recursive: true });
-  console.log('✅ Created client/public directory');
-}
-
-// Copy WASM file to both locations
-if (fs.existsSync(wasmSource)) {
+/**
+ * Copy ephemeris files to ensure they're accessible
+ */
+async function ensureEphemerisFiles() {
+  console.log('🔧 Ensuring ephemeris files are accessible...');
+  
   try {
-    // Copy to root public directory
-    fs.copyFileSync(wasmSource, wasmDestRoot);
-    console.log('✅ WASM file copied to public directory:', wasmDestRoot);
+    const ephemerisDir = path.resolve(process.cwd(), 'ephemeris');
+    const requiredFiles = ['seas_18.se1', 'semo_18.se1', 'sepl_18.se1'];
     
-    // Copy to client public directory (for Vercel static build)
-    fs.copyFileSync(wasmSource, wasmDestClient);
-    console.log('✅ WASM file copied to client/public directory:', wasmDestClient);
+    if (!fs.existsSync(ephemerisDir)) {
+      console.error(`❌ Ephemeris directory does not exist: ${ephemerisDir}`);
+      return { success: false, error: 'Ephemeris directory not found' };
+    }
     
-    // Verify files were copied
-    if (fs.existsSync(wasmDestRoot)) {
-      const statsRoot = fs.statSync(wasmDestRoot);
-      console.log(`✅ Verified root: WASM file size: ${statsRoot.size} bytes`);
+    console.log(`✅ Ephemeris directory exists: ${ephemerisDir}`);
+    
+    // Verify all required files exist
+    const missingFiles = [];
+    for (const filename of requiredFiles) {
+      const filePath = path.join(ephemerisDir, filename);
+      if (!fs.existsSync(filePath)) {
+        missingFiles.push(filename);
+        console.error(`❌ Missing ephemeris file: ${filename}`);
+      } else {
+        const stats = fs.statSync(filePath);
+        console.log(`✅ Ephemeris file found: ${filename} (${(stats.size / 1024).toFixed(2)} KB)`);
+      }
     }
-    if (fs.existsSync(wasmDestClient)) {
-      const statsClient = fs.statSync(wasmDestClient);
-      console.log(`✅ Verified client: WASM file size: ${statsClient.size} bytes`);
+    
+    if (missingFiles.length > 0) {
+      return {
+        success: false,
+        error: `Missing ephemeris files: ${missingFiles.join(', ')}`,
+        missingFiles
+      };
     }
+    
+    console.log('✅ All ephemeris files are present and accessible');
+    return {
+      success: true,
+      ephemerisDir,
+      files: requiredFiles
+    };
   } catch (error) {
-    console.error('❌ Error copying WASM file:', error.message);
-    process.exit(1);
+    console.error('❌ Error checking ephemeris files:', error.message);
+    return {
+      success: false,
+      error: error.message
+    };
   }
-} else {
-  console.warn('⚠️ WASM source file not found:', wasmSource);
-  console.warn('⚠️ This may cause issues in production. Ensure sweph-wasm is installed.');
 }
 
+/**
+ * Main function to copy WASM files
+ */
+async function copyWasmAssets() {
+  console.log('🔧 Copying Swiss Ephemeris WASM files for deployment...');
+  
+  try {
+    // Source WASM files from various locations
+    const sourcePaths = [
+      path.resolve(process.cwd(), 'public/swisseph.wasm'),
+      path.resolve(process.cwd(), 'client/public/swisseph.wasm')
+    ];
+    
+    // Target location for production
+    const targetPath = path.resolve(process.cwd(), 'public/swisseph.wasm');
+    
+    // Create target directory if it doesn't exist
+    const targetDir = path.dirname(targetPath);
+    if (!fs.existsSync(targetDir)) {
+      fs.mkdirSync(targetDir, { recursive: true });
+    }
+    
+    // Log target paths
+    console.log(`📊 Target WASM location: ${targetPath}`);
+    console.log(`📁 Available source sources: ${sourcePaths.length}`);
+    
+    for (const sourcePath of sourcePaths) {
+      if (fs.existsSync(sourcePath)) {
+        console.log(`🔧 Copying from: ${sourcePath}`);
+        
+        try {
+          fs.copyFileSync(sourcePath, targetPath);
+          console.log(`✅ Copied to: ${targetPath}`);
+        } catch (error) {
+          console.error(`❌ Failed to copy from ${sourcePath}:`, error.message);
+        }
+      } else {
+        console.log(`⚠️ Source not found: ${sourcePath}`);
+      }
+    }
+    
+    // Verify the final file exists and is accessible
+    let wasmSuccess = false;
+    if (fs.existsSync(targetPath)) {
+      const stats = fs.statSync(targetPath);
+      console.log(`✅ WASM file copied successfully - Size: ${stats.size} bytes`);
+      wasmSuccess = true;
+    } else {
+      console.warn('⚠️ WASM file not found after copying - will use bundled version');
+    }
+    
+    // Ensure ephemeris files are accessible
+    const ephemerisResult = await ensureEphemerisFiles();
+    
+    return {
+      success: wasmSuccess || ephemerisResult.success, // Success if either works
+      wasmSuccess,
+      ephemerisResult,
+      targetPath: wasmSuccess ? targetPath : null
+    };
+    
+  } catch (error) {
+    console.error('❌ Error during WASM asset copying:', error.message);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+}
+
+// Run if called directly
+if (require.main === module && require.main === module) {
+  copyWasmAssets().then((result) => {
+    console.log('🎯 WASM asset copying completed:', result);
+    process.exit(result.success ? 0 : 1);
+  }).catch((error) => {
+    console.error('🚠 WASM asset copying failed:', error);
+    process.exit(1);
+  });
+}
+
+export default copyWasmAssets;

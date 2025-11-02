@@ -19,6 +19,7 @@ import { useChart } from '../contexts/ChartContext.js';
 
 // Import utilities
 import { formatTimeToHHMMSS } from '../utils/dateUtils.js';
+import { getApiUrl } from '../utils/apiConfig.js';
 
 const BirthTimeRectificationPageEnhanced = () => {
   const navigate = useNavigate();
@@ -41,7 +42,7 @@ const BirthTimeRectificationPageEnhanced = () => {
   useEffect(() => {
     const checkApiConnection = async () => {
       try {
-        const response = await axios.get('/api/v1/health', { timeout: 5000 });
+        const response = await axios.get(getApiUrl('/api/v1/health'), { timeout: 5000 });
         // CRITICAL FIX: Health endpoint returns 'healthy', not 'OK'
         // Also handle both 'healthy' and 'OK' status values for compatibility
         const status = response.data?.status;
@@ -207,7 +208,7 @@ const BirthTimeRectificationPageEnhanced = () => {
       });
 
       // Step 3: Make API call with validated request data
-      const response = await axios.post('/api/v1/rectification/quick', requestData, { timeout: 30000 });
+      const response = await axios.post(getApiUrl('/api/v1/rectification/quick'), requestData, { timeout: 30000 });
       
       if (!response.data?.success) {
         // Log detailed error information from backend validation
@@ -231,15 +232,19 @@ const BirthTimeRectificationPageEnhanced = () => {
         return setError(response.data?.message || 'Validation failed');
       }
       
-      if (!response.data?.validation) {
+      // CRITICAL FIX: API returns validation at top level, not nested in data
+      // API response: { success: true, validation: {...}, timestamp: ... }
+      const validation = response.data?.validation || response.data?.data?.validation || response.validation;
+      if (!validation) {
+        console.error('Invalid validation response structure:', response.data);
         return setError('Invalid validation response structure');
       }
       
-      setRectificationData(response.data.validation);
+      setRectificationData(validation);
       setQuickValidationComplete(true);
       
       // Determine next step based on confidence score
-      const confidence = response.data.validation.confidence || 0;
+      const confidence = validation?.confidence || 0;
       if (confidence >= 80) {
         setTimeout(() => setPageStep('results'), 1500);
       } else {
@@ -316,7 +321,7 @@ const BirthTimeRectificationPageEnhanced = () => {
       });
 
       // Step 5: Make API call with validated request data
-      const response = await axios.post('/api/v1/rectification/with-events', requestData, { timeout: 60000 });
+      const response = await axios.post(getApiUrl('/api/v1/rectification/with-events'), requestData, { timeout: 60000 });
       
       if (!response.data?.success) {
         // Log detailed error information from backend validation
@@ -340,17 +345,21 @@ const BirthTimeRectificationPageEnhanced = () => {
         return setError(response.data?.message || 'Full analysis failed');
       }
       
-      if (!response.data?.rectification) {
+      // CRITICAL FIX: API returns rectification at top level, not nested in data
+      // API response: { success: true, rectification: {...}, timestamp: ... }
+      const rectification = response.data?.rectification || response.data?.data?.rectification || response.rectification;
+      if (!rectification) {
+        console.error('Invalid rectification response structure:', response.data);
         return setError('Invalid rectification response structure');
       }
       
       // Normalize data structure - store rectification object consistently with quick validation
-      setRectificationData(response.data.rectification);
+      setRectificationData(rectification);
       setPageStep('results');
       
       dataSaver.saveSession({
         ...dataSaver.loadSession(),
-        rectificationData: response.data
+        rectificationData: rectification || response.data
       });
     } catch (error) {
       console.error('Full analysis failed:', error);

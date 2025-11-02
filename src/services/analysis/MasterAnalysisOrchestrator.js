@@ -278,7 +278,6 @@ class MasterAnalysisOrchestrator {
       try {
         section.analyses.lagna = this.lagnaService.analyzeLagna(rasiChart);
       } catch (error) {
-        console.warn('⚠️ [Section2] Lagna analysis failed, continuing with other analyses:', error.message);
         analysis.errors.push(`Lagna analysis error: ${error.message}`);
         section.analyses.lagna = { error: error.message, incomplete: true };
       }
@@ -287,7 +286,6 @@ class MasterAnalysisOrchestrator {
       try {
         section.analyses.luminaries = this.luminariesService.analyzeLuminaries(rasiChart);
       } catch (error) {
-        console.warn('⚠️ [Section2] Luminaries analysis failed, continuing:', error.message);
         analysis.errors.push(`Luminaries analysis error: ${error.message}`);
       }
 
@@ -295,7 +293,6 @@ class MasterAnalysisOrchestrator {
       try {
         section.analyses.distribution = this.lagnaService.analyzeHouseClustering(rasiChart);
       } catch (error) {
-        console.warn('⚠️ [Section2] Distribution analysis failed, continuing:', error.message);
         analysis.errors.push(`Distribution analysis error: ${error.message}`);
       }
 
@@ -304,7 +301,6 @@ class MasterAnalysisOrchestrator {
         section.analyses.conjunctions = this.lagnaService.analyzePlanetaryConjunctions(rasiChart);
         section.analyses.oppositions = this.lagnaService.detectPlanetaryOppositions(rasiChart);
       } catch (error) {
-        console.warn('⚠️ [Section2] Conjunction/opposition analysis failed, continuing:', error.message);
         analysis.errors.push(`Conjunction analysis error: ${error.message}`);
       }
 
@@ -332,7 +328,6 @@ class MasterAnalysisOrchestrator {
           rasiChart.planetaryPositions
         );
       } catch (error) {
-        console.warn('⚠️ [Section2] Functional nature analysis failed, continuing:', error.message);
         analysis.errors.push(`Functional nature analysis error: ${error.message}`);
       }
 
@@ -340,7 +335,6 @@ class MasterAnalysisOrchestrator {
       try {
         section.analyses.yogas = this.yogaService.detectAllYogas(rasiChart);
       } catch (error) {
-        console.warn('⚠️ [Section2] Yoga detection failed, continuing:', error.message);
         analysis.errors.push(`Yoga analysis error: ${error.message}`);
       }
 
@@ -348,7 +342,6 @@ class MasterAnalysisOrchestrator {
       try {
         section.keyFindings = this.extractSection2KeyFindings(section.analyses);
       } catch (error) {
-        console.warn('⚠️ [Section2] Key findings extraction failed:', error.message);
         section.keyFindings = [];
       }
 
@@ -479,11 +472,6 @@ class MasterAnalysisOrchestrator {
    */
   async executeSection6Analysis(charts, analysis) {
     try {
-      // CRITICAL FIX: Only log in development environment
-    if (process.env.NODE_ENV === 'development') {
-      console.log('🔸 Generating Section 6: Navamsa Analysis (D9)');
-    }
-
       const { rasiChart, navamsaChart } = charts;
 
       if (!rasiChart || !navamsaChart) {
@@ -778,7 +766,6 @@ class MasterAnalysisOrchestrator {
         keyTraits = luminaries.moonAnalysis.signCharacteristics?.traits || [];
       }
     } catch (error) {
-      console.warn('⚠️ [synthesizePersonalityProfile] Key traits extraction failed:', error.message);
       keyTraits = [];
     }
 
@@ -787,7 +774,6 @@ class MasterAnalysisOrchestrator {
     try {
       strengths = this.identifyPersonalityStrengths(analysis);
     } catch (error) {
-      console.warn('⚠️ [synthesizePersonalityProfile] Strengths identification failed:', error.message);
       strengths = [];
     }
 
@@ -796,7 +782,6 @@ class MasterAnalysisOrchestrator {
     try {
       challenges = this.identifyPersonalityChallenges(analysis);
     } catch (error) {
-      console.warn('⚠️ [synthesizePersonalityProfile] Challenges identification failed:', error.message);
       challenges = [];
     }
 
@@ -911,14 +896,10 @@ class MasterAnalysisOrchestrator {
 
       if (analysis.sections.section6?.navamsaAnalysis && Object.keys(analysis.sections.section6.navamsaAnalysis).length > 0) {
         hasNavamsa = true;
-      } else {
-        console.warn('⚠️ [MasterAnalysisOrchestrator] Navamsa analysis missing, generating general recommendations');
       }
 
       if (analysis.sections.section3?.houses && Object.keys(analysis.sections.section3.houses).length > 0) {
         hasHouses = true;
-      } else {
-        console.warn('⚠️ [MasterAnalysisOrchestrator] House analysis missing, generating general recommendations');
       }
 
       // Generate actual expert recommendations based on comprehensive analysis
@@ -1044,7 +1025,6 @@ class MasterAnalysisOrchestrator {
   extractKeyPersonalityTraits(lagna, luminaries, arudha) {
     // Handle missing data gracefully - return empty array instead of throwing
     if (!lagna || !luminaries?.moonAnalysis) {
-      console.warn('⚠️ [extractKeyPersonalityTraits] Missing lagna or luminaries data');
       return [];
     }
 
@@ -1063,7 +1043,6 @@ class MasterAnalysisOrchestrator {
     const dignity = analysis.sections.section2?.analyses?.dignity;
     if (!dignity) {
       // Return empty array instead of throwing - allow synthesis to continue
-      console.warn('⚠️ [identifyPersonalityStrengths] Dignity analysis missing');
       return [];
     }
 
@@ -1094,7 +1073,6 @@ class MasterAnalysisOrchestrator {
     const dignity = analysis.sections.section2?.analyses?.dignity;
     if (!dignity) {
       // Return empty array instead of throwing - allow synthesis to continue
-      console.warn('⚠️ [identifyPersonalityChallenges] Dignity analysis missing');
       return [];
     }
 
@@ -1182,21 +1160,6 @@ class MasterAnalysisOrchestrator {
       const relationshipAnalysis = analysis.sections.section3?.houses?.house7;
       const navamsaAnalysis = analysis.sections.section6?.navamsaAnalysis;
 
-      // Debug logging
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Debug generateRelationshipRecommendations:');
-        console.log('  - section3 exists:', !!analysis.sections.section3);
-        console.log('  - section3.houses exists:', !!analysis.sections.section3?.houses);
-        console.log('  - house7 exists:', !!analysis.sections.section3?.houses?.house7);
-        console.log('  - section6 exists:', !!analysis.sections.section6);
-        console.log('  - navamsaAnalysis exists:', !!analysis.sections.section6?.navamsaAnalysis);
-
-        if (relationshipAnalysis) {
-          console.log('  - house7 has analysis:', !!relationshipAnalysis.analysis);
-          console.log('  - house7 has recommendations:', !!relationshipAnalysis.recommendations);
-          console.log('  - house7.analysis has recommendations:', !!relationshipAnalysis.analysis?.recommendations);
-        }
-      }
 
       // If we don't have both required analyses, return default recommendations
       if (!relationshipAnalysis || !navamsaAnalysis) {
@@ -1253,7 +1216,6 @@ class MasterAnalysisOrchestrator {
     const currentDasha = analysis.sections.section7?.dashaAnalysis?.currentDasha;
     // CRITICAL FIX: Return default recommendations instead of throwing error
     if (!currentDasha) {
-      console.warn('⚠️ [generateImmediateRecommendations] Current dasha missing, returning general recommendations');
       return ["General immediate recommendations available after complete analysis"];
     }
     return currentDasha.immediateRecommendations || ["General immediate recommendations available after complete analysis"];
@@ -1263,7 +1225,6 @@ class MasterAnalysisOrchestrator {
     const dashaAnalysis = analysis.sections.section7?.dashaAnalysis;
     // CRITICAL FIX: Return default recommendations instead of throwing error
     if (!dashaAnalysis) {
-      console.warn('⚠️ [generateShortTermRecommendations] Dasha analysis missing, returning general recommendations');
       return ["General short-term recommendations available after complete analysis"];
     }
     return dashaAnalysis.shortTermRecommendations || ["General short-term recommendations available after complete analysis"];
@@ -1273,7 +1234,6 @@ class MasterAnalysisOrchestrator {
     const dashaAnalysis = analysis.sections.section7?.dashaAnalysis;
     // CRITICAL FIX: Return default recommendations instead of throwing error
     if (!dashaAnalysis) {
-      console.warn('⚠️ [generateLongTermRecommendations] Dasha analysis missing, returning general recommendations');
       return ["General long-term recommendations available after complete analysis"];
     }
     return dashaAnalysis.longTermRecommendations || ["General long-term recommendations available after complete analysis"];
@@ -1283,7 +1243,6 @@ class MasterAnalysisOrchestrator {
     const navamsaAnalysis = analysis.sections.section6?.navamsaAnalysis;
     // CRITICAL FIX: Return default recommendations instead of throwing error
     if (!navamsaAnalysis || Object.keys(navamsaAnalysis).length === 0) {
-      console.warn('⚠️ [generateSpiritualRecommendations] Navamsa analysis missing, returning general recommendations');
       return ["General spiritual recommendations available after complete analysis"];
     }
     return navamsaAnalysis.spiritualIndications?.recommendations || ["General spiritual recommendations available after complete analysis"];
@@ -1299,25 +1258,14 @@ class MasterAnalysisOrchestrator {
     try {
       return recommendationFn();
     } catch (error) {
-      console.warn(`⚠️ [MasterAnalysisOrchestrator] ${type} recommendations failed:`, error.message);
       return ["General recommendations available after complete analysis"];
     }
   }
 
   generateRemedialRecommendations(analysis) {
     try {
-      // Debug logging to understand section2 state
-      console.log('🔍 [generateRemedialRecommendations] Checking section2:', {
-        section2Exists: !!analysis.sections.section2,
-        hasError: analysis.sections.section2?.error,
-        hasAnalyses: !!analysis.sections.section2?.analyses,
-        hasDignity: !!analysis.sections.section2?.analyses?.dignity,
-        section2Keys: analysis.sections.section2 ? Object.keys(analysis.sections.section2) : []
-      });
-      
       // CRITICAL FIX: Handle missing section2 gracefully - never throw errors
       if (!analysis.sections.section2 || analysis.sections.section2.error) {
-        console.warn('⚠️ [MasterAnalysisOrchestrator] Section2 missing or has error, providing general remedial recommendations');
         return [
           "Chart analysis completed - general remedial measures recommended",
           "Regular spiritual practices recommended",
@@ -1328,7 +1276,6 @@ class MasterAnalysisOrchestrator {
       
       // CRITICAL FIX: Handle missing analyses gracefully - never throw errors
       if (!analysis.sections.section2.analyses) {
-        console.warn('⚠️ [MasterAnalysisOrchestrator] Section2 analyses missing, providing general remedial recommendations');
         return [
           "Chart analysis completed - general remedial measures recommended",
           "Regular spiritual practices recommended",
@@ -1340,7 +1287,6 @@ class MasterAnalysisOrchestrator {
       const planetaryAnalysis = analysis.sections.section2.analyses.dignity;
       // CRITICAL FIX: If dignity analysis is missing, provide general recommendations instead of throwing error
       if (!planetaryAnalysis) {
-        console.warn('⚠️ [MasterAnalysisOrchestrator] Dignity analysis missing from section2, providing general remedial recommendations');
         return [
           "Chart analysis completed - general remedial measures recommended",
           "Regular spiritual practices recommended",

@@ -40,7 +40,7 @@ CardHeader.displayName = 'CardHeader';
  * CardTitle Component
  * Title section of the card
  */
-export const CardTitle = React.forwardRef(({ className, ...props }, ref) => {
+export const CardTitle = React.forwardRef(({ className, children, ...props }, ref) => {
   return (
     <h3
       ref={ref}
@@ -48,8 +48,11 @@ export const CardTitle = React.forwardRef(({ className, ...props }, ref) => {
         'text-2xl font-semibold leading-none tracking-tight text-gray-900 dark:text-dark-text-primary',
         className
       )}
+      aria-label={children || 'Card title'}
       {...props}
-    />
+    >
+      {children}
+    </h3>
   );
 });
 

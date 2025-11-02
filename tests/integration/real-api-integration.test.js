@@ -38,6 +38,14 @@ describe('Real API Integration Tests', () => {
   test('Comprehensive analysis API should return real data', async () => {
     const response = await request(app).post('/api/v1/analysis/comprehensive').send(realBirthData);
 
+    // If WASM initialization fails, test should fail (not mask the error)
+    if (response.status === 500) {
+      const errorMsg = response.body?.error?.message || response.body?.error?.details || response.body?.message || 'Unknown error';
+      if (errorMsg.includes('Swiss Ephemeris') || errorMsg.includes('WASM')) {
+        throw new Error(`WASM initialization failed: ${errorMsg}. This should not happen if WASM is properly configured.`);
+      }
+    }
+
     expect(response.status).toBe(200);
     expect(response.body.success).toBe(true);
     // Comprehensive analysis returns analysis object with sections
@@ -57,6 +65,14 @@ describe('Real API Integration Tests', () => {
 
   test('Chart generation API should return real calculations', async () => {
     const response = await request(app).post('/api/v1/chart/generate').send(realBirthData);
+
+    // If WASM initialization fails, test should fail (not mask the error)
+    if (response.status === 500) {
+      const errorMsg = response.body?.error?.message || response.body?.error?.details || response.body?.message || 'Unknown error';
+      if (errorMsg.includes('Swiss Ephemeris') || errorMsg.includes('WASM')) {
+        throw new Error(`WASM initialization failed: ${errorMsg}. This should not happen if WASM is properly configured.`);
+      }
+    }
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBe(true);

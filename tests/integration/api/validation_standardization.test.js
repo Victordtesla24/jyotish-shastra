@@ -67,9 +67,17 @@ describe('Validation Standardization Integration Tests', () => {
 
       const response = await request(app)
         .post('/api/v1/analysis/comprehensive')
-        .send({ birthData: dataWithName })
-        .expect(200);
+        .send({ birthData: dataWithName });
 
+      // If WASM initialization fails, test should fail (not mask the error)
+      if (response.status === 500) {
+        const errorMsg = response.body?.error?.message || response.body?.error?.details || response.body?.message || 'Unknown error';
+        if (errorMsg.includes('Swiss Ephemeris') || errorMsg.includes('WASM')) {
+          throw new Error(`WASM initialization failed: ${errorMsg}. This should not happen if WASM is properly configured.`);
+        }
+      }
+
+      expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
     });
 
@@ -79,9 +87,17 @@ describe('Validation Standardization Integration Tests', () => {
 
       const response = await request(app)
         .post('/api/v1/analysis/comprehensive')
-        .send({ birthData: dataWithoutName })
-        .expect(200);
+        .send({ birthData: dataWithoutName });
 
+      // If WASM initialization fails, test should fail (not mask the error)
+      if (response.status === 500) {
+        const errorMsg = response.body?.error?.message || response.body?.error?.details || response.body?.message || 'Unknown error';
+        if (errorMsg.includes('Swiss Ephemeris') || errorMsg.includes('WASM')) {
+          throw new Error(`WASM initialization failed: ${errorMsg}. This should not happen if WASM is properly configured.`);
+        }
+      }
+
+      expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
     });
 

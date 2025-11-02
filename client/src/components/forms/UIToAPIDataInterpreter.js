@@ -21,36 +21,61 @@ class UIToAPIDataInterpreter {
         validatedData.dateOfBirth = formData.dateOfBirth.split('T')[0];
       }
 
-      if (!formData.timeOfBirth || !/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(formData.timeOfBirth)) {
-        errors.push('Please enter a valid birth time (HH:MM format)');
+      // CRITICAL FIX: Accept both HH:MM and HH:MM:SS formats to match API validator
+      // API timeSchema accepts: /^([0-1]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$/
+      const timePattern = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$/;
+      if (!formData.timeOfBirth || !timePattern.test(formData.timeOfBirth)) {
+        errors.push('Please enter a valid birth time (HH:MM or HH:MM:SS format)');
       } else {
         validatedData.timeOfBirth = formData.timeOfBirth;
       }
 
       // Location validation - coordinates OR place name required
+      // CRITICAL FIX: Handle both nested placeOfBirth object and string format (matches API)
       const hasCoordinates = formData.latitude && formData.longitude;
-      const hasPlaceName = formData.placeOfBirth && formData.placeOfBirth.trim().length >= 2;
+      const hasNestedPlace = formData.placeOfBirth && typeof formData.placeOfBirth === 'object' && 
+                            formData.placeOfBirth.latitude && formData.placeOfBirth.longitude;
+      const hasPlaceString = formData.placeOfBirth && typeof formData.placeOfBirth === 'string' && 
+                            formData.placeOfBirth.trim().length >= 2;
+      const hasPlaceName = hasNestedPlace || hasPlaceString;
 
       if (!hasCoordinates && !hasPlaceName) {
         errors.push('Location is required - provide either coordinates or place name');
       } else {
         validatedData.name = formData.name?.trim() || '';
-        validatedData.placeOfBirth = formData.placeOfBirth?.trim() || '';
+        
+        // Handle place of birth - support both nested object and string format
+        if (hasNestedPlace) {
+          // Extract from nested placeOfBirth object
+          validatedData.placeOfBirth = formData.placeOfBirth.name || '';
+          validatedData.latitude = parseFloat(formData.placeOfBirth.latitude);
+          validatedData.longitude = parseFloat(formData.placeOfBirth.longitude);
+          validatedData.timezone = formData.placeOfBirth.timezone || formData.timezone || 'UTC';
+        } else if (hasPlaceString) {
+          // Handle string format
+          validatedData.placeOfBirth = formData.placeOfBirth.trim();
+        }
+        
+        // Handle top-level coordinates (takes precedence over nested if both exist)
         if (hasCoordinates) {
           validatedData.latitude = parseFloat(formData.latitude);
           validatedData.longitude = parseFloat(formData.longitude);
         }
-        // Always include timezone if provided (important for validation)
+        
+        // CRITICAL FIX: Standardize default timezone logic
+        // Priority: provided timezone > inferred from coordinates > place name > default
         if (formData.timezone) {
           validatedData.timezone = formData.timezone;
-        }
-        // Provide default timezone if coordinates are present but timezone is missing
-        if (hasCoordinates && !formData.timezone) {
+        } else if ((hasCoordinates || hasNestedPlace) && !validatedData.timezone) {
+          // If coordinates are available but no timezone, try to infer from coordinates
+          // For now, default to Asia/Kolkata (most common use case for Vedic astrology)
           validatedData.timezone = 'Asia/Kolkata';
-        }
-        // Provide default timezone if only place name is provided (for validation robustness)
-        if (!hasCoordinates && hasPlaceName && !formData.timezone) {
-          validatedData.timezone = 'UTC'; // Default to UTC for place-only scenarios
+        } else if (!hasCoordinates && !hasNestedPlace && hasPlaceString && !validatedData.timezone) {
+          // Place name only - default to UTC (will be corrected by geocoding)
+          validatedData.timezone = 'UTC';
+        } else if (!validatedData.timezone) {
+          // Final fallback - use UTC as safe default
+          validatedData.timezone = 'UTC';
         }
       }
 

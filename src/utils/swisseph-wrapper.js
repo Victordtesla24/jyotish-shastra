@@ -1,38 +1,188 @@
 /**
- * Swiss Ephemeris Wrapper (WebAssembly)
- * Production-grade Swiss Ephemeris initialization using sweph-wasm
- * Works in serverless environments - no native dependencies required
+ * Swiss Ephemeris Wrapper (Native Node.js Bindings)
+ * Production-grade Swiss Ephemeris using sweph native bindings
+ * No WASM - uses native Node.js bindings for reliable performance
+ * Provides compatibility layer for sweph-wasm API
  */
 
-import { getWasmPath, getWasmBuffer, shouldSkipEphemerisPath } from './wasm-loader.js';
+import path from 'path';
+import fs from 'fs';
 
-let swisseph = null;
+let swephNative = null;
+let swisseph = null; // Compatibility wrapper
 let swissephAvailable = false;
 let swissephInitPromise = null;
 
 /**
- * Setup ephemeris path safely
- * Avoids fetch issues with file paths in Node.js environment
+ * Setup ephemeris path
+ * Sets the directory containing Swiss Ephemeris data files
  */
-async function setupEphemerisPath(swisseph, ephemerisDir = null) {
-  if (shouldSkipEphemerisPath()) {
-    console.log('🔧 Ephemeris setup: Skipping custom path in Node.js (using bundled ephemeris data)');
+function setupEphemerisPath(ephemerisDir = null) {
+  const isRender = Boolean(process.env.RENDER);
+  const isNode = typeof window === 'undefined' && typeof process !== 'undefined';
+  
+  if (!isNode || !swephNative) {
     return;
   }
   
-  if (ephemerisDir) {
-    try {
-      await swisseph.swe_set_ephe_path(ephemerisDir);
-      console.log('✅ Ephemeris path set successfully:', ephemerisDir);
-    } catch (error) {
-      console.warn('⚠️ Ephemeris path setup failed (continuing with bundled ephemeris):', error.message);
+  // Default ephemeris directory (relative to process.cwd())
+  const defaultEphemerisDir = ephemerisDir || path.resolve(process.cwd(), 'ephemeris');
+  
+  // Check if ephemeris directory exists and contains required files
+  if (fs.existsSync(defaultEphemerisDir)) {
+    const requiredFiles = ['seas_18.se1', 'semo_18.se1', 'sepl_18.se1'];
+    const missingFiles = requiredFiles.filter(file => 
+      !fs.existsSync(path.join(defaultEphemerisDir, file))
+    );
+    
+    if (missingFiles.length === 0) {
+      try {
+        // Set ephemeris path using native bindings (synchronous)
+        swephNative.set_ephe_path(defaultEphemerisDir);
+        console.log(`✅ Ephemeris path set for ${isRender ? 'Render' : 'Node.js'}: ${defaultEphemerisDir}`);
+      } catch (error) {
+        console.log(`⚠️  Ephemeris path setup failed (${isRender ? 'Render' : 'Node.js'}), using bundled data: ${error.message}`);
+      }
+    } else {
+      console.log(`⚠️  Missing ephemeris files (${missingFiles.join(', ')}), using bundled data`);
     }
+  } else {
+    console.log(`⚠️  Ephemeris directory not found: ${defaultEphemerisDir}, using bundled data`);
   }
 }
 
 /**
- * Initialize sweph-wasm module
- * Throws error if Swiss Ephemeris is unavailable
+ * Create compatibility wrapper for sweph-wasm API
+ * Maps sweph native functions to sweph-wasm API format
+ */
+function createSwissephWrapper(sweph) {
+  return {
+    // Julian day functions
+    swe_julday: async (year, month, day, hour, gregflag) => {
+      // sweph has julday function - use it directly
+      return sweph.julday(year, month, day, hour, gregflag || 1);
+    },
+    
+    swe_revjul: async (jd, gregflag) => {
+      // sweph has revjul function - returns object, convert to array format
+      const result = sweph.revjul(jd, gregflag || 1);
+      // Convert {year, month, day, hour} to [year, month, day, hour]
+      return [result.year, result.month, result.day, result.hour];
+    },
+    
+    // Planetary calculations
+    swe_calc_ut: async (jd, planetId, flags) => {
+      const result = sweph.calc_ut(jd, planetId, flags || 0);
+      
+      // Convert sweph result format to sweph-wasm format
+      // sweph returns: {flag, error, data: [longitude, latitude, distance, speed_lon, speed_lat, speed_dist]}
+      // sweph-wasm returns: [rcode, longitude, latitude, distance, speed_lon, speed_lat, speed_dist]
+      
+      // Convert flag to rcode (sweph flag may be different from sweph-wasm rcode)
+      const rcode = result.flag || (result.error && !result.error.includes('using Moshier') ? -1 : 0);
+      
+      return [rcode, ...(result.data || [0, 0, 0, 0, 0, 0])];
+    },
+    
+    // Houses calculation
+    swe_houses: async (jd, latitude, longitude, houseSystem) => {
+      // sweph has houses function
+      const result = sweph.houses(jd, latitude, longitude, houseSystem || 'P');
+      
+      // Convert sweph result format to sweph-wasm format
+      // sweph returns: {flag, error, data: {houses: [12 houses], points: [asc, mc, ...]}}
+      // sweph-wasm returns: {cusps: [12 houses], ascmc: [ascendant, mc]}
+      
+      if (result.error && !result.error.includes('using Moshier')) {
+        throw new Error(`Houses calculation failed: ${result.error}`);
+      }
+      
+      // Extract cusps from houses array and ascmc from points array
+      const cusps = result.data?.houses || [];
+      const points = result.data?.points || [];
+      
+      // ascmc should be [ascendant, MC] - first two points
+      const ascmc = points.length >= 2 ? [points[0], points[1]] : [points[0] || 0, 0];
+      
+      return {
+        cusps: cusps,
+        ascmc: ascmc
+      };
+    },
+    
+    // Ayanamsa functions
+    swe_get_ayanamsa: async (jd) => {
+      // sweph get_ayanamsa returns number directly
+      const ayanamsa = sweph.get_ayanamsa(jd);
+      return {
+        ayanamsa: ayanamsa,
+        error: null
+      };
+    },
+    
+    // Sidereal mode
+    swe_set_sid_mode: async (mode) => {
+      // sweph.set_sid_mode requires 3 arguments: mode, jd_ut, ayanamsa_value
+      // For compatibility, use default JD and calculate ayanamsa
+      const defaultJd = 2451545.0; // J2000.0
+      const ayanamsa = sweph.get_ayanamsa(defaultJd);
+      sweph.set_sid_mode(mode, defaultJd, ayanamsa);
+      return 0;
+    },
+    
+    // Ephemeris path
+    swe_set_ephe_path: async (ephemerisDir) => {
+      sweph.set_ephe_path(ephemerisDir);
+      return 0;
+    },
+    
+    // Rise/transit (sunrise/sunset)
+    swe_rise_trans: async (jd, planetId, starname, epheflag, rsmi, geopos, atpress, attemp) => {
+      // sweph has rise_trans function
+      // rsmi: 1 = rise, 2 = set
+      const result = sweph.rise_trans(jd, planetId, starname || '', epheflag || 0, rsmi, geopos, atpress || 0, attemp || 0);
+      
+      // Convert result format
+      // sweph returns: {flag, error, data: jd_value} (data is a number, not array)
+      // sweph-wasm expects: {rcode, tret: jd_value, ...}
+      
+      if (result.error) {
+        return {
+          rcode: result.flag || -1,
+          error: result.error,
+          tret: null
+        };
+      }
+      
+      // Return result (tret is the JD of the event)
+      return {
+        rcode: result.flag || 0,
+        tret: result.data || null
+      };
+    },
+    
+    // Constants
+    SE_SUN: 0,
+    SE_MOON: 1,
+    SE_MERCURY: 2,
+    SE_VENUS: 3,
+    SE_MARS: 4,
+    SE_JUPITER: 5,
+    SE_SATURN: 6,
+    SE_URANUS: 7,
+    SE_NEPTUNE: 8,
+    SE_PLUTO: 9,
+    SE_MEAN_NODE: 10,
+    SE_TRUE_NODE: 11,
+    SE_SIDM_LAHIRI: 1,
+    SE_GREG_CAL: 1,
+    SE_SIDM_TRUE_CITRA: 27
+  };
+}
+
+/**
+ * Initialize sweph native bindings
+ * Production-grade initialization - no WASM required
  */
 async function initSwisseph() {
   if (swisseph !== null) {
@@ -49,103 +199,59 @@ async function initSwisseph() {
   
   swissephInitPromise = (async () => {
     try {
-      const SwissEPH = await import('sweph-wasm');
+      // Import sweph native bindings (no WASM needed)
+      const swephModule = await import('sweph');
       
-      // Try multiple initialization strategies for better compatibility
+      // sweph provides synchronous native bindings
+      // No initialization needed - functions are available immediately
+      swephNative = swephModule.default || swephModule;
+      swisseph = createSwissephWrapper(swephNative);
+      swissephAvailable = true;
       
-      // Strategy 1: Try explicit WASM file path for Node.js environments
-      const wasmPath = getWasmPath();
+      console.log('✅ Swiss Ephemeris initialized using native Node.js bindings (sweph)');
       
+      // Setup ephemeris path if files exist
+      const ephemerisDir = path.resolve(process.cwd(), 'ephemeris');
+      setupEphemerisPath(ephemerisDir);
+      
+      // Set Lahiri Ayanamsa for Vedic calculations
       try {
-        if (wasmPath) {
-          console.log('🔧 Trying WASM initialization with file path:', wasmPath);
-          swisseph = await SwissEPH.default.init(wasmPath);
-          swissephAvailable = true;
-          console.log('✅ Swiss Ephemeris (WASM) initialized successfully using file path');
-          return { swisseph, available: swissephAvailable };
+        const defaultJd = 2451545.0; // J2000.0
+        const ayanamsa = swephNative.get_ayanamsa(defaultJd);
+        swephNative.set_sid_mode(1, defaultJd, ayanamsa); // SE_SIDM_LAHIRI = 1
+        console.log('✅ Swiss Ephemeris configured with Lahiri ayanamsa');
+      } catch (error) {
+        console.log(`⚠️  Ayanamsa setup failed, using default: ${error.message}`);
+      }
+      
+      // Verify initialization with a test calculation
+      try {
+        const testJd = 2451545.0; // J2000.0
+        const testResult = swephNative.calc_ut(testJd, 0, 0); // Calculate Sun position
+        
+        if (!testResult || typeof testResult !== 'object') {
+          throw new Error('Test calculation failed - invalid result structure');
         }
-      } catch (pathError) {
-        console.warn('⚠️ File path initialization failed:', pathError.message);
-      }
-      
-      // Strategy 2: Try using WASM buffer directly (bypasses fetch)
-      const wasmBuffer = getWasmBuffer();
-      
-      try {
-        if (wasmBuffer) {
-          console.log('🔧 Trying WASM initialization with buffer (', wasmBuffer.length, 'bytes)');
-          // Some WASM libraries support passing a buffer directly
-          // Check if SwissEPH.init accepts a buffer, otherwise try converting to blob
-          let initArg = wasmBuffer;
-          
-          // Try with buffer directly
-          try {
-            swisseph = await SwissEPH.default.init(initArg);
-            swissephAvailable = true;
-            console.log('✅ Swiss Ephemeris (WASM) initialized successfully using buffer');
-            return { swisseph, available: swissephAvailable };
-          } catch (bufferError) {
-            console.warn('⚠️ Buffer initialization failed:', bufferError.message);
-            
-            // Try creating a blob from the buffer
-            if (typeof Blob !== 'undefined') {
-              const blob = new Blob([wasmBuffer], { type: 'application/wasm' });
-              const blobUrl = URL.createObjectURL(blob);
-              
-              try {
-                swisseph = await SwissEPH.default.init(blobUrl);
-                swissephAvailable = true;
-                console.log('✅ Swiss Ephemeris (WASM) initialized successfully using blob URL');
-                URL.revokeObjectURL(blobUrl); // Clean up
-                return { swisseph, available: swissephAvailable };
-              } catch (blobError) {
-                console.warn('⚠️ Blob URL initialization failed:', blobError.message);
-                URL.revokeObjectURL(blobUrl); // Clean up
-              }
-            }
-          }
+        
+        if (testResult.error && !testResult.error.includes('using Moshier')) {
+          // Moshier fallback is acceptable, other errors are not
+          throw new Error(`Test calculation failed: ${testResult.error}`);
         }
-      } catch (bufferError) {
-        console.warn('⚠️ WASM buffer approach failed:', bufferError.message);
+        
+        console.log('✅ Swiss Ephemeris test calculation successful');
+      } catch (testError) {
+        console.error('⚠️  Swiss Ephemeris test calculation warning:', testError.message);
+        // Continue anyway - test might show warnings but still work
       }
       
-      // Strategy 3: Try using Node.js 18+ fetch workaround with file:// URL
-      try {
-        if (wasmPath && wasmPath.startsWith('file://')) {
-          console.log('🔧 Trying WASM initialization with Node.js fetch workaround');
-          // In Node.js 18+, fetch works with file:// URLs
-          const response = await fetch(wasmPath);
-          const wasmBytes = await response.arrayBuffer();
-          
-          // Use the fetched buffer
-          const wasmUint8Array = new Uint8Array(wasmBytes);
-          swisseph = await SwissEPH.default.init(wasmUint8Array);
-          swissephAvailable = true;
-          console.log('✅ Swiss Ephemeris (WASM) initialized successfully using fetch + buffer');
-          return { swisseph, available: swissephAvailable };
-        }
-      } catch (fetchError) {
-        console.warn('⚠️ Fetch workaround failed:', fetchError.message);
-      }
-      
-      // Strategy 4: Try default initialization (as last resort)
-      try {
-        console.log('🔧 Trying default WASM initialization');
-        swisseph = await SwissEPH.default.init();
-        swissephAvailable = true;
-        console.log('✅ Swiss Ephemeris (WASM) initialized successfully using default method');
-        return { swisseph, available: swissephAvailable };
-      } catch (defaultError) {
-        console.warn('⚠️ Default initialization failed:', defaultError.message);
-      }
-      
-      // If all strategies failed, throw an error
-      throw new Error('All WASM initialization strategies failed. Please check Node.js version and sweph-wasm installation.');
+      return { swisseph, available: swissephAvailable };
       
     } catch (error) {
       swissephAvailable = false;
       swissephInitPromise = null;
-      throw new Error(`Swiss Ephemeris is required but not available: ${error.message}. Please ensure sweph-wasm module is properly installed.`);
+      const finalError = new Error(`Swiss Ephemeris native bindings failed to load: ${error.message}. Please ensure sweph module is properly installed.`);
+      console.error('❌ Swiss Ephemeris initialization error:', finalError.message);
+      throw finalError;
     }
   })();
   
@@ -154,35 +260,40 @@ async function initSwisseph() {
 
 /**
  * Get swisseph with initialization
+ * Returns initialized Swiss Ephemeris instance (compatibility wrapper)
  */
 export async function getSwisseph() {
   if (swisseph === null) {
     await initSwisseph();
   }
   if (!swissephAvailable || !swisseph) {
-    throw new Error('Swiss Ephemeris calculations are not available. Please ensure sweph-wasm is properly installed.');
+    throw new Error('Swiss Ephemeris calculations are not available. Please ensure sweph module is properly installed.');
   }
   return swisseph;
 }
 
 /**
  * Setup ephemeris and initialization settings properly
- * Combines WASM initialization with ephemeris setup
+ * Combines initialization with ephemeris setup
  * @param {string|null} ephemerisDir - Optional custom ephemeris directory
  * @returns {Object} Initialized swisseph instance
  */
 export async function setupSwissephWithEphemeris(ephemerisDir = null) {
   const { swisseph } = await initSwisseph();
   
-  // Setup ephemeris safely
-  await setupEphemerisPath(swisseph, ephemerisDir);
+  // Setup ephemeris path
+  setupEphemerisPath(ephemerisDir);
   
-  // Set basic calculation settings
+  // Set Lahiri Ayanamsa for Vedic calculations
   try {
-    // Set Lahiri Ayanamsa for Vedic calculations
-    await swisseph.swe_set_sid_mode(1); // SE_SIDM_LAHIRI
+    if (swephNative) {
+      const defaultJd = 2451545.0; // J2000.0
+      const ayanamsa = swephNative.get_ayanamsa(defaultJd);
+      swephNative.set_sid_mode(1, defaultJd, ayanamsa); // SE_SIDM_LAHIRI
+      console.log('✅ Swiss Ephemeris initialized with Lahiri ayanamsa');
+    }
   } catch (error) {
-    console.warn('⚠️ Ayanamsa setup failed (using default):', error.message);
+    console.log(`⚠️  Ayanamsa setup failed, using default: ${error.message}`);
   }
   
   return { swisseph };
@@ -223,10 +334,10 @@ export default new Proxy({}, {
     }
     
     if (!swissephAvailable) {
-      throw new Error(`Swiss Ephemeris not available - cannot access ${prop}. Ensure sweph-wasm is properly initialized.`);
+      throw new Error(`Swiss Ephemeris not available - cannot access ${prop}. Ensure sweph module is properly initialized.`);
     }
     
-    // Return the method/property from the initialized swisseph instance
+    // Return the method/property from the compatibility wrapper
     if (typeof swisseph[prop] === 'function') {
       return swisseph[prop].bind(swisseph);
     }

@@ -4,7 +4,7 @@ services:
     name: jjyotish-shastra-backend
     runtime: node
     plan: free
-    buildCommand: npm install && npm run copy-wasm
+    buildCommand: npm install && node scripts/validate-ephemeris-files.js
     startCommand: node src/index.js
     envVars:
       - key: NODE_ENV

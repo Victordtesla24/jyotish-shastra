@@ -85,6 +85,14 @@ describe('Analysis API Integration Tests', () => {
         .post('/api/analysis/dasha')
         .send(dashaBirthData);  // Use birth data instead of chart payload
 
+      // If WASM initialization fails, test should fail (not mask the error)
+      if (response.status === 500) {
+        const errorMsg = response.body?.error?.message || response.body?.message || 'Unknown error';
+        if (errorMsg.includes('Swiss Ephemeris') || errorMsg.includes('WASM')) {
+          throw new Error(`WASM initialization failed: ${errorMsg}. This should not happen if WASM is properly configured.`);
+        }
+      }
+
       expect(response.status).toBe(200);
       expect(response.body).toBeDefined();
       expect(response.body.analysis).toHaveProperty('dashaAnalysis');

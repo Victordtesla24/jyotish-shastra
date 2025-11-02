@@ -792,7 +792,7 @@ function sanitizeBirthData(data) {
  * @param {boolean} isTechnicalValidation - Legacy parameter for test compatibility (unused)
  * @returns {Object} Validation result
  */
-function validateComprehensiveAnalysis(data, isStandardization = false, isTechnicalValidation = false) {
+function validateComprehensiveAnalysis(data) {
   const birthData = data.birthData || data;
   const isWrapped = !!data.birthData; // Track if data came in wrapped format
 
@@ -868,7 +868,7 @@ function validateComprehensiveAnalysis(data, isStandardization = false, isTechni
  * @param {boolean} isWrapped - Whether the original data was wrapped in birthData
  * @returns {Object} Validation result
  */
-function validateWithNameRequired(data, helpText = 'Analysis requires name, birth date, time, and location information.', isWrapped = false, isStandardization = false, isTechnicalValidation = false) {
+function validateWithNameRequired(data, helpText = 'Analysis requires name, birth date, time, and location information.', isWrapped = false) {
   // Create schema with name required
   const schemaWithNameRequired = analysisRequiredSchema.keys({
     name: nameSchema.required()
@@ -938,7 +938,7 @@ function validateWithNameRequired(data, helpText = 'Analysis requires name, birt
  * @param {boolean} isStandardization - Legacy parameter for test compatibility (unused)
  * @returns {Object} Validation result
  */
-function validateHouseAnalysis(data, isStandardization = false) {
+function validateHouseAnalysis(data) {
   const birthData = data.birthData || data;
 
   // CRITICAL FIX: Use analysisRequiredSchema by default (name optional) for production readiness
@@ -994,9 +994,9 @@ function validateHouseAnalysis(data, isStandardization = false) {
  * @param {boolean} isStandardization - Legacy parameter for test compatibility (unused)
  * @returns {Object} Validation result
  */
-function validateAspectAnalysis(data, isStandardization = false) {
+function validateAspectAnalysis(data) {
   // CRITICAL FIX: Use standard house analysis validation with name optional by default
-  return validateHouseAnalysis(data, isStandardization);
+  return validateHouseAnalysis(data);
 }
 
 /**
@@ -1006,9 +1006,9 @@ function validateAspectAnalysis(data, isStandardization = false) {
  * @param {boolean} isStandardization - Legacy parameter for test compatibility (unused)
  * @returns {Object} Validation result
  */
-function validateArudhaAnalysis(data, isStandardization = false) {
+function validateArudhaAnalysis(data) {
   // CRITICAL FIX: Use standard house analysis validation with name optional by default
-  return validateHouseAnalysis(data, isStandardization);
+  return validateHouseAnalysis(data);
 }
 
 /**
@@ -1018,7 +1018,7 @@ function validateArudhaAnalysis(data, isStandardization = false) {
  * @param {boolean} isStandardization - Legacy parameter for test compatibility (unused)
  * @returns {Object} Validation result
  */
-function validateNavamsaAnalysis(data, isStandardization = false) {
+function validateNavamsaAnalysis(data) {
   const birthData = data.birthData || data;
 
   // CRITICAL FIX: Use analysisRequiredSchema by default (name optional) for production readiness
@@ -1073,7 +1073,7 @@ function validateNavamsaAnalysis(data, isStandardization = false) {
  * @param {boolean} isStandardization - Legacy parameter for test compatibility (unused)
  * @returns {Object} Validation result
  */
-function validateDashaAnalysis(data, isStandardization = false) {
+function validateDashaAnalysis(data) {
   const birthData = data.birthData || data;
 
   // CRITICAL FIX: Use analysisRequiredSchema by default (name optional) for production readiness

@@ -72,17 +72,11 @@ const formatAnalysisSections = (sections) => {
  */
 router.post('/comprehensive', async (req, res) => {
     try {
-        // CRITICAL FIX: Only log in development environment
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Starting comprehensive analysis...');
-    }
 
         const requestData = req.body;
-        const isStandardizationTest = req.headers['x-test-type'] === 'standardization';
-        const isTechnicalValidationTest = req.headers['x-test-type'] === 'technical-validation';
 
-        // Use flexible validation where name is optional for standardization tests
-        const validationResult = validateComprehensiveAnalysis(requestData, isStandardizationTest, isTechnicalValidationTest);
+        // Use production-grade validation for consistent behavior
+        const validationResult = validateComprehensiveAnalysis(requestData);
 
         if (!validationResult.isValid) {
             return res.status(400).json({
@@ -145,10 +139,6 @@ router.post('/comprehensive', async (req, res) => {
           throw new Error('Analysis completed but sections are missing. Expected 8 sections (section1-section8).');
         }
 
-        // CRITICAL FIX: Only log in development environment
-        if (process.env.NODE_ENV === 'development') {
-          console.log('Analysis completed successfully');
-        }
 
         // CRITICAL FIX: Ensure sections property is preserved for API compatibility
         const response = {
@@ -283,10 +273,9 @@ router.post('/birth-data', async (req, res) => {
 router.post('/houses', async (req, res) => {
     try {
         const requestData = req.body;
-        const isStandardizationTest = req.headers['x-test-type'] === 'standardization';
 
-        // Use flexible validation where name is optional for standardization tests
-        const validationResult = validateHouseAnalysis(requestData, isStandardizationTest);
+        // Use production-grade validation for houses analysis
+        const validationResult = validateHouseAnalysis(requestData);
 
         if (!validationResult.isValid) {
             return res.status(400).json({
@@ -365,10 +354,9 @@ router.post('/houses', async (req, res) => {
 router.post('/aspects', async (req, res) => {
     try {
         const requestData = req.body;
-        const isStandardizationTest = req.headers['x-test-type'] === 'standardization';
 
-        // Use flexible validation where name is optional for standardization tests
-        const validationResult = validateAspectAnalysis(requestData, isStandardizationTest);
+        // Use production-grade validation for aspects analysis
+        const validationResult = validateAspectAnalysis(requestData);
 
         if (!validationResult.isValid) {
             return res.status(400).json({
@@ -405,10 +393,9 @@ router.post('/aspects', async (req, res) => {
 router.post('/arudha', async (req, res) => {
     try {
         const requestData = req.body;
-        const isStandardizationTest = req.headers['x-test-type'] === 'standardization';
 
-        // Use flexible validation where name is optional for standardization tests
-        const validationResult = validateArudhaAnalysis(requestData, isStandardizationTest);
+        // Use production-grade validation for arudha analysis
+        const validationResult = validateArudhaAnalysis(requestData);
 
         if (!validationResult.isValid) {
             return res.status(400).json({
@@ -445,10 +432,9 @@ router.post('/arudha', async (req, res) => {
 router.post('/navamsa', async (req, res) => {
     try {
         const requestData = req.body;
-        const isStandardizationTest = req.headers['x-test-type'] === 'standardization';
 
-        // Use flexible validation where name is optional for standardization tests
-        const validationResult = validateNavamsaAnalysis(requestData, isStandardizationTest);
+        // Use production-grade validation for navamsa analysis
+        const validationResult = validateNavamsaAnalysis(requestData);
 
         if (!validationResult.isValid) {
             return res.status(400).json({
@@ -528,55 +514,66 @@ router.post('/navamsa', async (req, res) => {
 router.post('/lagna', async (req, res) => {
     try {
         const requestData = req.body;
-        const isStandardizationTest = req.headers['x-test-type'] === 'standardization';
 
-        // Use flexible validation where name is optional for standardization tests
-        const validationResult = validateDashaAnalysis(requestData, isStandardizationTest);
+        // Use production-grade validation for lagna analysis
+        const validationResult = validateBirthData(requestData);
 
         if (!validationResult.isValid) {
             return res.status(400).json({
                 success: false,
                 error: 'Validation failed',
+                message: 'Lagna analysis requires birth date, time, and location information.',
                 details: validationResult.errors,
                 suggestions: validationResult.suggestions || [],
-                helpText: 'Lagna analysis requires birth date, time, and location information.'
+                timestamp: new Date().toISOString()
             });
         }
 
         const finalBirthData = validationResult.data.birthData || validationResult.data;
         const charts = await orchestrator.generateCharts(finalBirthData);
 
-        // Initialize proper analysis object structure
-        const analysisContext = {
-            errors: [],
-            warnings: [],
-            birthData: finalBirthData,
-            sections: {}
-        };
+        if (!charts || !charts.rasiChart) {
+            throw new Error('Chart generation failed for lagna analysis');
+        }
 
-        // Simple lagna analysis response structure
+        // Handle both planets array and planetaryPositions object formats
+        const planetaryData = charts.rasiChart.planets || 
+            (charts.rasiChart.planetaryPositions ? Object.values(charts.rasiChart.planetaryPositions) : []);
+
+        // Lagna analysis response structure with standardized format
         const lagnaAnalysis = {
-            lagnaSign: charts?.rasiChart?.ascendant?.sign || 'Unknown',
-            lagnaLord: charts?.rasiChart?.ascendant?.lord || 'Unknown',
+            lagnaSign: charts.rasiChart.ascendant?.sign || charts.rasiChart.ascendant?.signName || 'Unknown',
+            signId: charts.rasiChart.ascendant?.signId || null,
+            lagnaLord: charts.rasiChart.ascendant?.lord || 'Unknown',
+            degree: charts.rasiChart.ascendant?.degree || charts.rasiChart.ascendant?.degreeInSign || null,
+            longitude: charts.rasiChart.ascendant?.longitude || null,
             lagnaStrength: 'Medium',
             interpretation: 'Lagna analysis indicates the foundational structure of the personality and life path.',
-            planetaryInfluences: charts?.rasiChart?.planetaryPositions || []
+            planetaryInfluences: planetaryData
         };
 
         res.status(200).json({
             success: true,
-            section: 'lagna',
-            lagnaAnalysis: lagnaAnalysis,
-            message: 'Lagna analysis completed successfully'
+            data: {
+                analysis: {
+                    section: 'lagna',
+                    lagnaAnalysis: lagnaAnalysis
+                }
+            },
+            message: 'Lagna analysis completed successfully',
+            timestamp: new Date().toISOString()
         });
 
     } catch (error) {
         console.error('Lagna analysis error:', error);
         res.status(500).json({
             success: false,
-            error: 'Internal server error',
-            message: 'Failed to complete lagna analysis',
-            details: error.message
+            error: {
+                message: 'Failed to complete lagna analysis',
+                details: error.message,
+                code: 'LAGNA_ANALYSIS_ERROR',
+                timestamp: new Date().toISOString()
+            }
         });
     }
 });
@@ -584,10 +581,9 @@ router.post('/lagna', async (req, res) => {
 router.post('/dasha', async (req, res) => {
     try {
         const requestData = req.body;
-        const isStandardizationTest = req.headers['x-test-type'] === 'standardization';
 
-        // Use flexible validation where name is optional for standardization tests
-        const validationResult = validateDashaAnalysis(requestData, isStandardizationTest);
+        // Use production-grade validation for dasha analysis
+        const validationResult = validateDashaAnalysis(requestData);
 
         if (!validationResult.isValid) {
             return res.status(400).json({

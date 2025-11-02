@@ -31,9 +31,16 @@ export function getApiUrl(endpoint) {
   const baseUrl = getApiBaseUrl();
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
   
-  // If base URL is empty, return relative path
+  // If base URL is empty, return relative path (works with proxy)
   if (!baseUrl) {
     return cleanEndpoint;
+  }
+  
+  // If base URL ends with '/api' and endpoint starts with '/api', remove duplicate
+  if (baseUrl.endsWith('/api') && cleanEndpoint.startsWith('/api')) {
+    // Remove '/api' prefix from endpoint to avoid double '/api/api' path
+    const endpointWithoutApi = cleanEndpoint.replace(/^\/api/, '');
+    return `${baseUrl}${endpointWithoutApi}`;
   }
   
   // Combine base URL and endpoint
@@ -46,8 +53,6 @@ export function getApiUrl(endpoint) {
  * @returns {Object} Fetch options with proper headers
  */
 export function getApiFetchOptions(options = {}) {
-  const baseUrl = getApiBaseUrl();
-  
   return {
     ...options,
     headers: {
@@ -58,9 +63,11 @@ export function getApiFetchOptions(options = {}) {
 }
 
 // Export default for backward compatibility
-export default {
+const apiConfig = {
   getApiBaseUrl,
   getApiUrl,
   getApiFetchOptions,
 };
+
+export default apiConfig;
 

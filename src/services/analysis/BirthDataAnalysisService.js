@@ -4,16 +4,9 @@
  * "Birth Data Collection and Chart Casting"
  */
 
-// Optional sweph-wasm import for serverless compatibility (not currently used but imported)
-let swisseph = null;
-(async () => {
-  try {
-    const SwissEPH = await import('sweph-wasm');
-    swisseph = await SwissEPH.default.init();
-  } catch (error) {
-    // Sweph-WASM not available - service doesn't require it currently
-  }
-})();
+// Swiss Ephemeris is not required for this service
+// This service only handles birth data analysis, not astronomical calculations
+// Removed direct sweph-wasm import to avoid initialization issues in test environments
 
 import moment from 'moment';
 import { getSign, getSignName } from '../../utils/helpers/astrologyHelpers.js';

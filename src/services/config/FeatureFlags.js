@@ -16,10 +16,7 @@ class FeatureFlagsService {
       enhancedEvents: process.env.BTR_FEATURE_ENHANCED_EVENTS === 'true',
       divisionalCharts: process.env.BTR_FEATURE_DIVISIONAL_CHARTS === 'true',
       
-      // ADDITIONAL SAFETY FLAGS
-      debugMode: process.env.BTR_DEBUG_MODE === 'true',
-      testingMode: process.env.BTR_TESTING_MODE === 'true',
-      performanceMonitoring: process.env.BTR_PERFORMANCE_MONITORING === 'true'
+      
     };
   }
 
@@ -52,10 +49,7 @@ class FeatureFlagsService {
       timeDivisions: this.isFeatureEnabled('timeDivisions'), 
       conditionalDashas: this.isFeatureEnabled('conditionalDashas'),
       enhancedEvents: this.isFeatureEnabled('enhancedEvents'),
-      divisionalCharts: this.isFeatureEnabled('divisionalCharts'),
-      debugMode: this.isFeatureEnabled('debugMode'),
-      testingMode: this.isFeatureEnabled('testingMode'),
-      performanceMonitoring: this.isFeatureEnabled('performanceMonitoring')
+      divisionalCharts: this.isFeatureEnabled('divisionalCharts')
     };
   }
 

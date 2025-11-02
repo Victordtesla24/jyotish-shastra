@@ -40,6 +40,12 @@ describe('Rectification API Integration', () => {
     const res = await request(app)
       .post('/api/v1/rectification/quick')
       .send({ birthData: sampleBirthData, proposedTime: sampleBirthData.timeOfBirth });
+    
+    // If WASM initialization fails, test should fail (not mask the error)
+    if (res.status === 500 && res.body.message?.includes('Swiss Ephemeris')) {
+      throw new Error(`WASM initialization failed: ${res.body.message}. This should not happen if WASM is properly configured.`);
+    }
+    
     expect([200, 400]).toContain(res.status);
     if (res.status === 200) {
       expect(res.body).toHaveProperty('success', true);
@@ -51,6 +57,12 @@ describe('Rectification API Integration', () => {
     const res = await request(app)
       .post('/api/v1/rectification/analyze')
       .send({ birthData: sampleBirthData, options: { methods: ['praanapada', 'moon', 'gulika'] } });
+    
+    // If WASM initialization fails, test should fail (not mask the error)
+    if (res.status === 500 && res.body.message?.includes('Swiss Ephemeris')) {
+      throw new Error(`WASM initialization failed: ${res.body.message}. This should not happen if WASM is properly configured.`);
+    }
+    
     expect([200, 400, 500]).toContain(res.status);
     if (res.status === 200) {
       expect(res.body).toHaveProperty('success', true);

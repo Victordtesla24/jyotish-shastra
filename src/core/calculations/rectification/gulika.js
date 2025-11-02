@@ -1,41 +1,5 @@
 import { computeSunriseSunset, normalizeDegrees } from '../astronomy/sunrise.js';
-
-// Production-grade Swiss Ephemeris import - no fallbacks
-// Lazy initialization to avoid serverless function timeouts
-let swisseph = null;
-let swissephAvailable = false;
-let swissephInitPromise = null;
-
-async function ensureSwissephLoaded() {
-  if (swisseph !== null) {
-    return { swisseph, available: swissephAvailable };
-  }
-  
-  if (swissephInitPromise) {
-    return swissephInitPromise;
-  }
-  
-  swissephInitPromise = (async () => {
-    try {
-      const SwissEPH = await import('sweph-wasm');
-      const { getWasmPath } = await import('../../../utils/wasm-loader.js');
-      
-      // Get explicit WASM file path for Node.js environments
-      const wasmPath = getWasmPath();
-      
-      // Initialize sweph-wasm with explicit WASM path if available
-      // This ensures proper WASM file loading in Node.js environments
-      swisseph = await SwissEPH.default.init(wasmPath || undefined);
-      swissephAvailable = true;
-      return { swisseph, available: swissephAvailable };
-    } catch (error) {
-      swissephAvailable = false;
-      throw new Error(`Swiss Ephemeris is required for gulika calculations but not available: ${error.message}. Please ensure sweph-wasm module is properly installed.`);
-    }
-  })();
-  
-  return swissephInitPromise;
-}
+import { getSwisseph } from '../../../utils/swisseph-wrapper.js';
 
 import AscendantCalculator from '../chart-casting/AscendantCalculator.js';
 
@@ -60,7 +24,7 @@ const NIGHT_GULIKA_SEGMENT_INDEX = {
 };
 
 async function toJulianDayUT(dateUtc) {
-  const { swisseph: localSwisseph } = await ensureSwissephLoaded();
+  const localSwisseph = await getSwisseph();
   
   const y = dateUtc.getUTCFullYear();
   const m = dateUtc.getUTCMonth() + 1;
@@ -83,8 +47,6 @@ export async function computeGulikaLongitude({
   timezone,
   sunriseOptions
 }) {
-  console.log(`🔍 GULIKA computeGulikaLongitude ENTRY: birthDateLocal=${birthDateLocal}, type=${typeof birthDateLocal}, instanceof Date=${birthDateLocal instanceof Date}, isNaN(getTime())=${birthDateLocal ? isNaN(birthDateLocal.getTime()) : 'N/A'}, lat=${latitude}, lng=${longitude}, tz="${timezone}"`);
-  
   // Production-grade validation - check date type explicitly
   if (!birthDateLocal || !(birthDateLocal instanceof Date) || isNaN(birthDateLocal.getTime())) {
     console.error(`❌ GULIKA VALIDATION FAILED: birthDateLocal=${birthDateLocal}, typeof=${typeof birthDateLocal}, instanceof Date=${birthDateLocal instanceof Date}, getTime()=${birthDateLocal?.getTime()}, isNaN=${birthDateLocal ? isNaN(birthDateLocal.getTime()) : 'N/A'}`);
@@ -97,17 +59,40 @@ export async function computeGulikaLongitude({
     throw new Error('Timezone is required for Gulika calculation');
   }
 
-  console.log(`🔍 GULIKA About to call computeSunriseSunset with: birthDateLocal=${birthDateLocal.toISOString()}, lat=${latitude}, lng=${longitude}, tz="${timezone}"`);
-  const { sunriseLocal, sunsetLocal, tzOffsetHours } = await computeSunriseSunset(
+  const sunriseSunsetResult = await computeSunriseSunset(
     birthDateLocal.getFullYear(),
     birthDateLocal.getMonth() + 1, // JavaScript months are 0-based, need 1-based
     birthDateLocal.getDate(),
     latitude,
     longitude,
-    timezone,
-    sunriseOptions || {}
+    timezone
   );
-  console.log(`✅ GULIKA computeSunriseSunset SUCCESS: sunriseLocal=${sunriseLocal?.toISOString()}, sunsetLocal=${sunsetLocal?.toISOString()}`);
+  
+  // Extract sunrise and sunset times from result object
+  const sunriseLocal = sunriseSunsetResult?.sunrise?.time;
+  const sunsetLocal = sunriseSunsetResult?.sunset?.time;
+  
+  // Parse timezone offset from timezone string (e.g., '+05:30' -> 5.5)
+  let tzOffsetHours = 0;
+  if (timezone && typeof timezone === 'string') {
+    // Parse timezone string format: '+05:30' or '-05:00' or 'Asia/Kolkata'
+    const tzMatch = timezone.match(/^([+-])(\d{2}):(\d{2})$/);
+    if (tzMatch) {
+      const sign = tzMatch[1] === '+' ? 1 : -1;
+      const hours = parseInt(tzMatch[2], 10);
+      const minutes = parseInt(tzMatch[3], 10);
+      tzOffsetHours = sign * (hours + minutes / 60);
+    } else {
+      // Try to get offset from sunriseSunsetResult if available
+      tzOffsetHours = sunriseSunsetResult?.timezoneOffset || sunriseSunsetResult?.timezone || 0;
+      
+      // If still not available, default to 0 and log warning
+      if (!Number.isFinite(tzOffsetHours)) {
+        console.warn(`Could not parse timezone offset from: ${timezone}, defaulting to 0`);
+        tzOffsetHours = 0;
+      }
+    }
+  }
 
   const isDay = birthDateLocal >= sunriseLocal && birthDateLocal <= sunsetLocal;
   const weekday = birthDateLocal.getDay(); // 0 Sunday
@@ -131,15 +116,15 @@ export async function computeGulikaLongitude({
     if (isNaN(nextDay.getTime()) || !(nextDay instanceof Date)) {
       throw new Error(`Failed to create next day date for night Gulika calculation from sunrise: ${sunriseLocal}`);
     }
-    const { sunriseLocal: nextSunriseLocal } = await computeSunriseSunset(
+    const nextSunriseSunsetResult = await computeSunriseSunset(
         nextDay.getFullYear(),
         nextDay.getMonth() + 1, // JavaScript months are 0-based, need 1-based
         nextDay.getDate(),
         latitude,
         longitude,
-        timezone,
-        sunriseOptions || {}
+        timezone
       );
+      const nextSunriseLocal = nextSunriseSunsetResult?.sunrise?.time;
     durationMs = nextSunriseLocal.getTime() - sunsetLocal.getTime();
     startLocal = sunsetLocal;
     segmentIndex = NIGHT_GULIKA_SEGMENT_INDEX[weekday];
@@ -147,18 +132,74 @@ export async function computeGulikaLongitude({
 
   const kalaMs = durationMs / 8;
   const gulikaLocal = new Date(startLocal.getTime() + segmentIndex * kalaMs);
+  
+  // Validate gulikaLocal is a valid date
+  if (isNaN(gulikaLocal.getTime())) {
+    throw new Error(`Invalid Gulika local date calculated from startLocal: ${startLocal}, segmentIndex: ${segmentIndex}, kalaMs: ${kalaMs}`);
+  }
+
+  // Validate tzOffsetHours is a valid number
+  if (!Number.isFinite(tzOffsetHours) || isNaN(tzOffsetHours)) {
+    throw new Error(`Invalid timezone offset: ${tzOffsetHours} (timezone: ${timezone})`);
+  }
 
   // Convert local Gulika time to UTC
   const gulikaUtc = new Date(gulikaLocal.getTime() - tzOffsetHours * 3600 * 1000);
+  
+  // Validate gulikaUtc is a valid date
+  if (isNaN(gulikaUtc.getTime())) {
+    throw new Error(`Invalid Gulika UTC date calculated from gulikaLocal: ${gulikaLocal}, tzOffsetHours: ${tzOffsetHours}`);
+  }
+  
   const jdUt = await toJulianDayUT(gulikaUtc);
+  
+  // Validate JD is a valid number
+  if (!Number.isFinite(jdUt) || isNaN(jdUt)) {
+    throw new Error(`Invalid Julian Day calculated: ${jdUt}`);
+  }
 
   // Compute ascendant at Gulika time; use as Gulika longitude
   const ascCalc = new AscendantCalculator('LAHIRI');
-  const asc = await ascCalc.calculate(jdUt, latitude, longitude);
+  await ascCalc.initialize();
+  
+  // Extract date components - always use Date conversion for reliability
+  // Date conversion is more reliable than revjul for edge cases
+  const gulikaUtcDate = new Date((jdUt - 2440587.5) * 86400000);
+  const year = Math.floor(gulikaUtcDate.getUTCFullYear());
+  const month = Math.floor(gulikaUtcDate.getUTCMonth() + 1); // getUTCMonth returns 0-11, so add 1
+  const day = Math.floor(gulikaUtcDate.getUTCDate());
+  const hour = Math.floor(gulikaUtcDate.getUTCHours());
+  const minutes = Math.floor(gulikaUtcDate.getUTCMinutes());
+  
+  // Validate extracted values
+  if (!Number.isInteger(year) || !Number.isInteger(month) || !Number.isInteger(day) ||
+      !Number.isInteger(hour) || !Number.isInteger(minutes)) {
+    throw new Error(`Invalid date components extracted: year=${year}, month=${month}, day=${day}, hour=${hour}, minutes=${minutes}`);
+  }
+  
+  if (month < 1 || month > 12) {
+    throw new Error(`Invalid month extracted: ${month} (should be 1-12)`);
+  }
+  
+  if (day < 1 || day > 31) {
+    throw new Error(`Invalid day extracted: ${day} (should be 1-31)`);
+  }
+  
+  const asc = await ascCalc.calculateAscendantAndHouses(
+    year,
+    month,
+    day,
+    hour,
+    minutes,
+    latitude,
+    longitude
+  );
+  const ascendantResult = asc.ascendant;
+  
   return {
-    longitude: normalizeDegrees(asc.longitude),
-    sign: asc.sign,
-    degree: asc.degree,
+    longitude: normalizeDegrees(ascendantResult.longitude),
+    sign: ascendantResult.signName,
+    degree: ascendantResult.longitude % 30,
     gulikaTimeLocal: gulikaLocal
   };
 }

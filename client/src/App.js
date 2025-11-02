@@ -130,8 +130,24 @@ class ErrorBoundary extends React.Component {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error, errorInfo) {
+  async componentDidCatch(error, errorInfo) {
     console.error('App Error:', error, errorInfo);
+    
+    // Log error to backend via errorLogger
+    try {
+      const errorLogger = (await import('./utils/errorLogger.js')).default;
+      errorLogger.logError({
+        type: 'react_error',
+        error: error,
+        message: error?.message || error?.toString() || 'React component error',
+        stack: error?.stack,
+        componentStack: errorInfo?.componentStack,
+        timestamp: new Date().toISOString()
+      });
+    } catch (logError) {
+      // Silently fail if error logging fails
+      console.debug('Error logging failed:', logError);
+    }
   }
 
   render() {

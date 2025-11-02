@@ -4,7 +4,9 @@ module.exports = {
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
     '^react$': '<rootDir>/node_modules/react',
     '^react-dom$': '<rootDir>/node_modules/react-dom',
-    '^mongoose$': '<rootDir>/tests/__mocks__/mongoose.js'
+    '^mongoose$': '<rootDir>/tests/__mocks__/mongoose.js',
+    '^(.*/)?wasm-loader\\.js$': '<rootDir>/tests/__mocks__/wasm-loader.js',
+    '^.*/wasm-loader$': '<rootDir>/tests/__mocks__/wasm-loader.js'
   },
   setupFilesAfterEnv: ['<rootDir>/tests/setup.js'],
   testMatch: [

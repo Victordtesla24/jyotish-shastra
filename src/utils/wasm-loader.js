@@ -27,63 +27,46 @@ export function getWasmPath() {
   const isRender = Boolean(process.env.RENDER);
   
   if (isProduction || isRender) {
-    console.log('🔧 wasm-loader: Detected production environment');
-    
     // In Render, WASM files should be accessible via file system
     // First try to find the file locally
     const publicPath = path.resolve(process.cwd(), 'public/swisseph.wasm');
     if (fs.existsSync(publicPath)) {
       const publicUrl = new URL(`file://${publicPath.replace(/\\/g, '/')}`).href;
-      console.log('🔧 wasm-loader: Found public WASM file at:', publicUrl);
       return publicUrl;
     }
     
     // If file system access works, try relative path for HTTP access
-    console.log('🔧 wasm-loader: Using relative path for WASM file');
     return '/swisseph.wasm';
   }
   
-  console.log('🔧 wasm-loader: Local Node.js environment detected');
-  
   // For local Node.js development, try to provide explicit WASM path
   // This avoids fetch issues in Node.js environments (especially Node.js < 18)
+  // Priority: node_modules first, then public directories
+  const cwd = process.cwd();
   const possiblePaths = [
-    path.resolve(process.cwd(), 'node_modules/sweph-wasm/dist/wasm/swisseph.wasm'),
+    path.resolve(cwd, 'node_modules/sweph-wasm/dist/wasm/swisseph.wasm'),
     path.resolve(__dirname, '../../node_modules/sweph-wasm/dist/wasm/swisseph.wasm'),
-    path.resolve(process.cwd(), 'node_modules/sweph-wasm/dist/wasm/swisseph.wasm')
+    path.resolve(__dirname, '../../../node_modules/sweph-wasm/dist/wasm/swisseph.wasm'),
+    path.resolve(cwd, 'public/swisseph.wasm'),
+    path.resolve(cwd, 'client/public/swisseph.wasm')
   ];
   
   for (const wasmPath of possiblePaths) {
-    if (fs.existsSync(wasmPath)) {
-      // Convert to file:// URL for Node.js
-      // On Windows, path.resolve might create paths with backslashes
-      const normalizedPath = wasmPath.replace(/\\/g, '/');
-      const fileUrl = new URL(`file://${normalizedPath}`).href;
-      console.log('🔧 wasm-loader: Found WASM file at:', fileUrl);
-      return fileUrl;
+    try {
+      if (fs.existsSync(wasmPath)) {
+        // Convert to file:// URL for Node.js
+        // On Windows, path.resolve might create paths with backslashes
+        const normalizedPath = wasmPath.replace(/\\/g, '/');
+        const fileUrl = new URL(`file://${normalizedPath}`).href;
+        return fileUrl;
+      }
+    } catch (error) {
+      // Continue to next path if this one fails
+      continue;
     }
   }
   
-  console.warn('⚠️ wasm-loader: WASM file not found in node_modules, trying client directory');
-  
-  // Check if we should try client directory (copied during build)
-  const clientPath = path.resolve(process.cwd(), 'client/public/swisseph.wasm');
-  if (fs.existsSync(clientPath)) {
-    const clientUrl = new URL(`file://${clientPath.replace(/\\/g, '/')}`).href;
-    console.log('🔧 wasm-loader: Found client WASM file at:', clientUrl);
-    return clientUrl;
-  }
-  
-  // Check root public directory
-  const publicPath = path.resolve(process.cwd(), 'public/swisseph.wasm');
-  if (fs.existsSync(publicPath)) {
-    const publicUrl = new URL(`file://${publicPath.replace(/\\/g, '/')}`).href;
-    console.log('🔧 wasm-loader: Found public WASM file at:', publicUrl);
-    return publicUrl;
-  }
-  
-  console.warn('⚠️ wasm-loader: WASM file not found, falling back to default behavior');
-  return null; // Fallback to default behavior if file not found
+  return null;
 }
 
 /**
@@ -118,26 +101,29 @@ export function getWasmBuffer() {
     return null; // Browser doesn't need this
   }
   
-  // For local Node.js development, try to read WASM file directly into buffer
+  // Enhanced path resolution with comprehensive search paths
+  const cwd = process.cwd();
   const possiblePaths = [
-    path.resolve(process.cwd(), 'node_modules/sweph-wasm/dist/wasm/swisseph.wasm'),
+    path.resolve(cwd, 'node_modules/sweph-wasm/dist/wasm/swisseph.wasm'),
     path.resolve(__dirname, '../../node_modules/sweph-wasm/dist/wasm/swisseph.wasm'),
-    path.resolve(process.cwd(), 'node_modules/sweph-wasm/dist/wasm/swisseph.wasm')
+    path.resolve(__dirname, '../../../node_modules/sweph-wasm/dist/wasm/swisseph.wasm'),
+    path.resolve(cwd, 'public/swisseph.wasm'),
+    path.resolve(cwd, 'client/public/swisseph.wasm')
   ];
   
   for (const wasmPath of possiblePaths) {
-    if (fs.existsSync(wasmPath)) {
-      try {
+    try {
+      if (fs.existsSync(wasmPath)) {
         const wasmBuffer = fs.readFileSync(wasmPath);
-        console.log('🔧 wasm-loader: Read WASM file into buffer:', wasmPath);
         return wasmBuffer;
-      } catch (error) {
-        console.warn('⚠️ wasm-loader: Failed to read WASM file:', error.message);
       }
+    } catch (error) {
+      // Continue to next path if this one fails
+      continue;
     }
   }
   
-  return null; // Fallback if file not found
+  return null;
 }
 
 /**
@@ -155,16 +141,18 @@ export function getEphemerisPathUrl(ephemerisDir) {
   
   // For Node.js, we need to avoid setting ephemeris path that causes fetch issues
   // with file paths. We'll return null to use bundled ephemeris data instead.
-  console.log('🔧 wasm-loader: Skipping ephemeris path setup in Node.js (using bundled data)');
-  return null; // This will cause sweph-wasm to use bundled ephemeris
+  return null;
 }
 
 /**
  * Check if we should skip ephemeris path setup
- * In Node.js environments with sweph-wasm, it's better to skip custom ephemeris paths
- * @returns {boolean} True if ephemeris path should be skipped
+ * In Node.js environments (including Render), we can now set ephemeris paths
+ * This was previously skipped but is now supported with proper file system access
+ * @returns {boolean} True if ephemeris path should be skipped (browser only)
  */
 export function shouldSkipEphemerisPath() {
   const isNode = typeof window === 'undefined' && typeof process !== 'undefined';
-  return isNode; // In Node.js, skip custom ephemeris paths to avoid fetch issues
+  // In Node.js (including Render), we can now set ephemeris paths
+  // Previously skipped to avoid fetch issues, but file system access works now
+  return !isNode; // Only skip in browser environments
 }

@@ -32,8 +32,6 @@ class GeocodingService {
     const { city, state, country, placeOfBirth } = locationData;
     const query = placeOfBirth || `${city}, ${state}, ${country}`;
 
-    console.log('🌍 Geocoding request for:', query);
-
     // Check if API key is available
     if (!this.apiKey) {
       throw new Error('Geocoding API key is not configured or invalid');
@@ -41,20 +39,12 @@ class GeocodingService {
 
     // Production logic with enhanced error handling
     try {
-      console.log('🔍 Calling OpenCage API...');
       const response = await this.geocoder.geocode({ q: query, key: this.apiKey });
-
-      console.log('📡 OpenCage API response structure:', {
-        hasResults: !!response?.results,
-        resultsLength: response?.results?.length || 0
-      });
 
       if (response && Array.isArray(response.results) && response.results.length > 0) {
         const { geometry, components, formatted, annotations } = response.results[0];
         const { lat, lng } = geometry;
         const timezone = annotations?.timezone?.name || '';
-
-        console.log('✅ Geocoding successful:', { lat, lng, timezone, formatted });
 
         return {
           latitude: lat,

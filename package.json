@@ -23,7 +23,7 @@
     "build:render": "npm run copy-wasm",
     "prebuild": "npm run copy-wasm",
     "deploy:render": "render services deploy",
-    "postinstall": "node -e \"try { require('sweph-wasm') } catch(e) { console.log('Sweph-WASM: optional module during build, will fail gracefully at runtime if unavailable') }\"",
+    "postinstall": "node -e \"try { require('sweph') } catch(e) { console.log('Sweph: native bindings module - required for all calculations') }\"",
     "test:summary": "node scripts/test-summary.js",
     "test:summary-full": "node scripts/test-summary.js && open user-docs",
     "test:comprehensive": "node scripts/comprehensive-test-summary.js",
@@ -45,7 +45,7 @@
     "mongoose": "^8.16.1",
     "morgan": "^1.10.1",
     "opencage-api-client": "^1.1.0",
-    "sweph-wasm": "^2.6.9",
+    "sweph": "^2.10.3-b-1",
     "uuid": "^9.0.0"
   },
   "devDependencies": {

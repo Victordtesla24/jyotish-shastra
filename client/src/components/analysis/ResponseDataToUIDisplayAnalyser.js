@@ -18,19 +18,45 @@ const ResponseDataToUIDisplayAnalyser = {
 
     // CRITICAL FIX: Check if API returned an error
     if (!apiResponse.success || apiResponse.metadata?.status === 'failed') {
-      const errorMessage = apiResponse.error?.message || apiResponse.error?.details || apiResponse.message || 
+      const errorMessage = apiResponse.error?.message || 
+                          apiResponse.error?.details || 
+                          apiResponse.message || 
                           'Comprehensive analysis failed. Unable to process response.';
-      throw new Error(errorMessage);
+      
+      // Enhanced error object with user-friendly message
+      const error = new Error(errorMessage);
+      error.userMessage = errorMessage;
+      error.technicalDetails = {
+        success: apiResponse.success,
+        status: apiResponse.metadata?.status,
+        error: apiResponse.error
+      };
+      throw error;
     }
 
-    // Handle multiple response formats
+    // Handle multiple response formats with enhanced fallback logic
     let analysis;
     if (apiResponse.analysis) {
       analysis = apiResponse.analysis; // Standard: {success: true, analysis: {sections: {}}}
+    } else if (apiResponse.data?.analysis) {
+      analysis = apiResponse.data.analysis; // Nested: {success: true, data: {analysis: {sections: {}}}}
     } else if (apiResponse.sections) {
       analysis = apiResponse; // Direct: {sections: {}}
+    } else if (apiResponse.data?.sections) {
+      analysis = { sections: apiResponse.data.sections }; // Nested: {success: true, data: {sections: {}}}
     } else {
-      throw new Error('Invalid API response structure. Expected apiResponse.analysis or apiResponse.sections');
+      // Enhanced error with response structure information
+      const error = new Error('Invalid API response structure. Expected apiResponse.analysis, apiResponse.data.analysis, apiResponse.sections, or apiResponse.data.sections.');
+      error.responseStructure = {
+        hasSuccess: 'success' in apiResponse,
+        hasAnalysis: 'analysis' in apiResponse,
+        hasData: 'data' in apiResponse,
+        hasDataAnalysis: 'data' in apiResponse && 'analysis' in apiResponse.data,
+        hasSections: 'sections' in apiResponse,
+        hasDataSections: 'data' in apiResponse && 'sections' in apiResponse.data,
+        keys: Object.keys(apiResponse)
+      };
+      throw error;
     }
 
     const { sections } = analysis;
@@ -38,18 +64,19 @@ const ResponseDataToUIDisplayAnalyser = {
       throw new Error('Sections data is missing from API response. Expected analysis.sections with 8 sections (section1-section8).');
     }
 
-    // CRITICAL FIX: Validate section count (should be 8 sections)
+    // CRITICAL FIX: Validate section count (should be 8 sections) with graceful handling
     const sectionKeys = Object.keys(sections);
     if (sectionKeys.length < 8) {
       console.warn(`⚠️ [ResponseDataToUIDisplayAnalyser] Expected 8 sections but found ${sectionKeys.length}. Sections: ${sectionKeys.join(', ')}`);
+      // Continue processing with available sections
     }
 
     return {
       success: apiResponse.success || true,
       sections: sections,
       sectionOrder: ['section1', 'section2', 'section3', 'section4', 'section5', 'section6', 'section7', 'section8'],
-      synthesis: analysis.synthesis || null,
-      recommendations: analysis.recommendations || null
+      synthesis: analysis.synthesis || analysis.synthesis || null,
+      recommendations: analysis.recommendations || analysis.recommendations || null
     };
   },
 

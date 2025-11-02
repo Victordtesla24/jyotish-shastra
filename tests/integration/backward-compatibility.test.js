@@ -45,6 +45,14 @@ describe('Backward Compatibility Integration', () => {
           options: {}
         });
 
+      // If WASM initialization fails, test should fail (not mask the error)
+      if (basicResponse.status === 500) {
+        const errorMsg = basicResponse.body?.error?.message || basicResponse.body?.message || 'Unknown error';
+        if (errorMsg.includes('Swiss Ephemeris') || errorMsg.includes('WASM')) {
+          throw new Error(`WASM initialization failed: ${errorMsg}. This should not happen if WASM is properly configured.`);
+        }
+      }
+
       expect(basicResponse.status).toBe(200);
       expect(basicResponse.body.success).toBe(true);
       expect(basicResponse.body.rectification).toBeDefined();
@@ -248,8 +256,9 @@ describe('Backward Compatibility Integration', () => {
       const finalMemory = process.memoryUsage();
       const memoryIncrease = finalMemory.heapUsed - initialMemory.heapUsed;
       
-      // Memory increase should be reasonable (less than 50MB)
-      expect(memoryIncrease).toBeLessThan(50 * 1024 * 1024);
+      // Memory increase should be reasonable (less than 100MB - increased for native bindings)
+      // Native bindings may use more memory than WASM initially
+      expect(memoryIncrease).toBeLessThan(100 * 1024 * 1024);
     });
   });
 

@@ -1,5 +1,5 @@
 import { calculateJulianDay, julianDayToDate } from '../../../utils/calculations/julianDay.js';
-import { calculatePlanetPosition } from '../../../utils/calculations/planetaryPositions.js';
+
 import { setupSwissephWithEphemeris } from '../../../utils/swisseph-wrapper.js';
 import path from 'path';
 import fs from 'fs';
@@ -25,12 +25,10 @@ async function initSwissEphemeris() {
         
         swisseph = sweph;
         swissephAvailable = true;
-        console.log('✅ sunrise: Swiss Ephemeris (WASM) initialized successfully');
         
         return { swisseph, available: true };
       } catch (error) {
         swissephAvailable = false;
-        console.warn('⚠️ sunrise: Swiss Ephemeris initialization failed:', error.message);
         throw new Error(`Swiss Ephemeris is required for sunrise calculations but not available: ${error.message}`);
       }
     })();
@@ -56,11 +54,10 @@ export async function computeSunriseSunset(
     await initSwissEphemeris();
     
     if (!swissephAvailable || !swisseph) {
-      // Fallback to pure JavaScript calculation
-      console.warn('⚠️ sunrise: Using fallback calculation for sunrise/sunset');
-      return calculateFallbackSunriseSunset(year, month, day, latitude, longitude, timezone);
+      console.warn('Swiss Ephemeris not available, falling back to JavaScript calculation');
+      return computeSunriseSunsetFallback(year, month, day, latitude, longitude, timezone);
     }
-    
+
     // Calculate Julian Day for the date at noon UT
     const jd = await swisseph.swe_julday(year, month, day, 12.0, 1); // SE_GREG_CAL = 1
     
@@ -70,31 +67,33 @@ export async function computeSunriseSunset(
     const temperature = 15; // Standard temperature in Celsius
     
     // Calculate sunrise
+    // swe_rise_trans signature: (jd, planetId, starname, epheflag, rsmi, geopos, atpress, attemp)
     const sunriseResult = await swisseph.swe_rise_trans(
       jd,
       0, // SE_SUN = 0
-      '',
-      1, // SE_CALC_RISE = 1
+      '', // starname
+      0, // epheflag
+      1, // rsmi: SE_CALC_RISE = 1
       geopos,
       pressure,
-      temperature,
-      0  // Use default flags
+      temperature
     );
     
     // Calculate sunset
     const sunsetResult = await swisseph.swe_rise_trans(
       jd,
       0, // SE_SUN = 0
-      '',
-      2, // SE_CALC_SET = 2
+      '', // starname
+      0, // epheflag
+      2, // rsmi: SE_CALC_SET = 2
       geopos,
       pressure,
-      temperature,
-      0  // Use default flags
+      temperature
     );
     
     if (sunriseResult.rcode !== 0 || sunsetResult.rcode !== 0) {
-      throw new Error(`Swiss Ephemeris sunrise/sunset calculation failed: rcode=${sunriseResult.rcode}`);
+      console.warn(`Swiss Ephemeris sunrise/sunset calculation failed (rcode=${sunriseResult.rcode}), falling back to JavaScript calculation`);
+      return computeSunriseSunsetFallback(year, month, day, latitude, longitude, timezone);
     }
     
     // Convert Julian Day to date/time
@@ -118,57 +117,82 @@ export async function computeSunriseSunset(
       timezone: timezone,
       method: 'swisseph-wasm'
     };
-    
   } catch (error) {
-    console.warn('⚠️ sunrise: Error calculating sunrise/sunset with Swiss Ephemeris:', error.message);
-    // Fallback to pure JavaScript calculation
-    return calculateFallbackSunriseSunset(year, month, day, latitude, longitude, timezone);
+    console.warn('Swiss Ephemeris sunrise calculation failed, falling back to JavaScript:', error.message);
+    return computeSunriseSunsetFallback(year, month, day, latitude, longitude, timezone);
   }
 }
 
 /**
- * Fallback calculation using pure JavaScript for serverless environments
- * This is a simplified calculation for when Swiss Ephemeris is not available
+ * Fallback sunrise calculation using JavaScript approximation
+ * Provides basic sunrise/sunset times when Swiss Ephemeris fails
  */
-function calculateFallbackSunriseSunset(year, month, day, latitude, longitude, timezone) {
-  console.log('🔄 sunrise: Using fallback JavaScript calculation');
-  
-  // Simple approximate calculation
+function computeSunriseSunsetFallback(year, month, day, latitude, longitude, timezone) {
   const date = new Date(year, month - 1, day);
-  const dayOfYear = Math.floor((date - new Date(year, 0, 0)) / (1000 * 60 * 60 * 24));
+  const dayOfYear = Math.floor((date - new Date(year, 0, 0)) / 86400000);
   
-  // Approximate solar declination
-  const declination = 23.45 * Math.sin(2 * Math.PI * (284 + dayOfYear) / 365);
+  // Solar declination approximation
+  const P = Math.asin(0.39795 * Math.cos(0.2163108 + 2 * Math.atan(0.9671396 * Math.tan(deg2rad(0.00860 * (dayOfYear - 186))))));
   
-  // Approximate sunrise/sunset times in decimal hours from noon
-  const latRad = latitude * Math.PI / 180;
-  const decRad = declination * Math.PI / 180;
-  const hourAngle = Math.acos(-Math.tan(latRad) * Math.tan(decRad));
+  // Hour angle calculation
+  const acosArg = -Math.tan(deg2rad(latitude)) * Math.tan(P);
+  let hourAngle;
   
-  const sunriseHour = 12 - hourAngle * 12 / Math.PI - timezone;
-  const sunsetHour = 12 + hourAngle * 12 / Math.PI - timezone;
+  if (acosArg > 1) {
+    // Polar day (sun doesn't set)
+    hourAngle = 0;
+  } else if (acosArg < -1) {
+    // Polar night (sun doesn't rise)
+    hourAngle = Math.PI;
+  } else {
+    hourAngle = Math.acos(acosArg);
+  }
   
-  // Convert to readable times
-  const sunriseTime = new Date(year, month - 1, day, Math.floor(sunriseHour), Math.round((sunriseHour % 1) * 60));
-  const sunsetTime = new Date(year, month - 1, day, Math.floor(sunsetHour), Math.round((sunsetHour % 1) * 60));
+  // Approximate sunrise/sunset times in UTC
+  const sunriseUTC = 12 - rad2deg(hourAngle) / 15 + longitude / 15;
+  const sunsetUTC = 12 + rad2deg(hourAngle) / 15 + longitude / 15;
+  
+  // Convert to local time
+  const sunriseHour = Math.floor(sunriseUTC + timezone) % 24;
+  const sunriseMinute = Math.round((sunriseUTC + timezone - Math.floor(sunriseUTC + timezone)) * 60);
+  const sunsetHour = Math.floor(sunsetUTC + timezone) % 24;
+  const sunsetMinute = Math.round((sunsetUTC + timezone - Math.floor(sunsetUTC + timezone)) * 60);
+  
+  // Create local date objects
+  const sunriseTime = new Date(year, month - 1, day, sunriseHour, sunriseMinute);
+  const sunsetTime = new Date(year, month - 1, day, sunsetHour, sunsetMinute);
   
   return {
     sunrise: {
       time: sunriseTime,
-      hours: sunriseTime.getHours(),
-      minutes: sunriseTime.getMinutes(),
-      decimalHours: sunriseHour + 12
+      hours: sunriseHour,
+      minutes: sunriseMinute,
+      decimalHours: sunriseHour + sunriseMinute / 60
     },
     sunset: {
       time: sunsetTime,
-      hours: sunsetTime.getHours(),
-      minutes: sunsetTime.getMinutes(),
-      decimalHours: sunsetHour + 12
+      hours: sunsetHour,
+      minutes: sunsetMinute,
+      decimalHours: sunsetHour + sunsetMinute / 60
     },
-    julianDay: calculateJulianDay(year, month, day, 12.0),
+    julianDay: calculateJulianDay(year, month, day, 12),
     timezone: timezone,
     method: 'fallback-javascript'
   };
+}
+
+/**
+ * Convert degrees to radians
+ */
+function deg2rad(degrees) {
+  return degrees * (Math.PI / 180);
+}
+
+/**
+ * Convert radians to degrees
+ */
+function rad2deg(radians) {
+  return radians * (180 / Math.PI);
 }
 
 /**
@@ -182,7 +206,7 @@ export function normalizeDegrees(degrees) {
 
 export async function isSwissephAvailable() {
   if (swisseph === null) {
-    await ensureSwissephLoaded();
+    await initSwissEphemeris();
   }
   return swissephAvailable;
 }

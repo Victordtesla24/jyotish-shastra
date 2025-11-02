@@ -1,55 +1,11 @@
 /**
  * Transit Calculator
  * Calculates current planetary transits and their effects
- * Integrates with Swiss Ephemeris (WebAssembly) for precise calculations
+ * Integrates with Swiss Ephemeris (Native Node.js Bindings) for precise calculations
  */
 import { calculateJulianDay } from '../../../utils/calculations/julianDay.js';
-import { calculatePlanetPosition } from '../../../utils/calculations/planetaryPositions.js';
 import { getSignName } from '../../../utils/helpers/astrologyHelpers.js';
-
-// Swiss Ephemeris (WebAssembly) - handles serverless environments gracefully
-let swisseph = null;
-let swissephAvailable = false;
-let swissephInitPromise = null;
-
-/**
- * Initialize sweph-wasm module with explicit WASM path support
- */
-async function ensureSwissephLoaded() {
-  if (swisseph !== null) {
-    return { swisseph, available: swissephAvailable };
-  }
-  
-  if (swissephInitPromise) {
-    return swissephInitPromise;
-  }
-  
-  swissephInitPromise = (async () => {
-    try {
-      const SwissEPH = await import('sweph-wasm');
-      const { getWasmPath } = await import('../../../utils/wasm-loader.js');
-      
-      // Get explicit WASM file path for Node.js environments
-      const wasmPath = getWasmPath();
-      
-      if (wasmPath) {
-        console.log('🔮 TransitCalculator: Using WASM path:', wasmPath);
-      }
-      
-      // Initialize sweph-wasm with explicit WASM path if available
-      swisseph = await SwissEPH.default.init(wasmPath || undefined);
-      swissephAvailable = true;
-      console.log('✅ TransitCalculator: Swiss Ephemeris (WASM) initialized successfully');
-      return { swisseph, available: swissephAvailable };
-    } catch (error) {
-      swissephAvailable = false;
-      console.warn('⚠️ TransitCalculator: sweph-wasm not available:', error.message);
-      throw new Error(`Swiss Ephemeris is required for transit calculations but not available: ${error.message}`);
-    }
-  })();
-  
-  return swissephInitPromise;
-}
+import { getSwisseph } from '../../../utils/swisseph-wrapper.js';
 
 class TransitCalculator {
   constructor(natalChart) {
@@ -127,31 +83,18 @@ class TransitCalculator {
     }
     
     try {
-      // Ensure Swiss Ephemeris is loaded
-      const { swisseph, available } = await ensureSwissephLoaded();
+      // Use centralized Swiss Ephemeris wrapper (native bindings, no WASM)
+      this.swisseph = await getSwisseph();
+      this.swissephAvailable = true;
       
-      if (!available) {
-        console.warn('⚠️ TransitCalculator: Swiss Ephemeris not available - using fallback calculations');
-        this.swissephAvailable = false;
-        this.initialized = true;
-        return true;
-      }
-      
-      this.swisseph = swisseph;
-      this.swissephAvailable = available;
-      
-      // Set sidereal mode to Lahiri by default
-      await this.swisseph.swe_set_sid_mode(1); // SE_SIDM_LAHIRI = 1
+      // Set sidereal mode to Lahiri by default (handled by wrapper during initialization)
       
       this.initialized = true;
-      console.log('✅ TransitCalculator: Initialization completed successfully');
+      console.log('✅ TransitCalculator: Initialized successfully with native Swiss Ephemeris bindings');
       return true;
       
     } catch (error) {
-      console.warn('⚠️ TransitCalculator: Initialization failed:', error.message);
-      this.swissephAvailable = false;
-      this.initialized = true; // Mark as initialized to allow fallback calculations
-      return true;
+      throw new Error(`Transit calculator initialization failed: ${error.message}`);
     }
   }
 
@@ -173,126 +116,65 @@ class TransitCalculator {
       const result = await this.swisseph.swe_julday(year, month, day, hour, 1); // SE_GREG_CAL = 1
       julianDay = typeof result === 'object' && result.julianDay ? result.julianDay : result;
     } else {
-      console.log('📝 TransitCalculator: Using pure JavaScript Julian Day calculation (swisseph unavailable)');
-      julianDay = calculateJulianDay(year, month, day, hour, 1);
+      throw new Error('Swiss Ephemeris is required for transit calculations but is not available');
     }
     
     const planets = ['sun', 'moon', 'mars', 'mercury', 'jupiter', 'venus', 'saturn', 'rahu', 'ketu'];
     const positions = {};
     
-    // Use Swiss Ephemeris if available, otherwise use pure JavaScript calculations
-    if (this.swissephAvailable && this.swisseph) {
-      for (const planet of planets) {
-        // Handle Ketu separately (opposite to Rahu)
-        if (planet === 'ketu') {
-          if (positions.rahu) {
-            const ketuLongitude = (positions.rahu.longitude + 180) % 360;
-            positions[planet] = {
-              longitude: ketuLongitude,
-              sign: Math.floor(ketuLongitude / 30),
-              degree: ketuLongitude % 30,
-              signName: getSignName(Math.floor(ketuLongitude / 30))
-            };
-          }
-          continue;
-        }
-        
-        try {
-          // Map planet names to Swiss Ephemeris constants
-          const planetConstants = {
-            'sun': 0,      // SE_SUN
-            'moon': 1,     // SE_MOON
-            'mars': 2,     // SE_MARS
-            'mercury': 3,  // SE_MERCURY
-            'jupiter': 4,  // SE_JUPITER
-            'venus': 5,    // SE_VENUS
-            'saturn': 6,   // SE_SATURN
-            'rahu': 10     // SE_MEAN_NODE (for Rahu/Ketu)
+    // Use Swiss Ephemeris - no fallbacks
+    for (const planet of planets) {
+      // Handle Ketu separately (opposite to Rahu)
+      if (planet === 'ketu') {
+        if (positions.rahu) {
+          const ketuLongitude = (positions.rahu.longitude + 180) % 360;
+          positions[planet] = {
+            longitude: ketuLongitude,
+            sign: Math.floor(ketuLongitude / 30),
+            degree: ketuLongitude % 30,
+            signName: getSignName(Math.floor(ketuLongitude / 30))
           };
-          
-          const planetId = planetConstants[planet];
-          if (planetId === undefined) {
-            console.warn(`⚠️ TransitCalculator: Planet ID not found for ${planet}`);
-            continue;
-          }
-          
-          const result = await this.swisseph.swe_calc_ut(julianDay, planetId, 2); // SEFLG_SPEED = 2
-          
-          if (result && result.rcode === 0) {
-            positions[planet] = {
-              longitude: result.data.longitude,
-              sign: Math.floor(result.data.longitude / 30),
-              degree: result.data.longitude % 30,
-              signName: getSignName(Math.floor(result.data.longitude / 30)),
-              speed: result.data.speed || 0
-            };
-          } else {
-            throw new Error(`Swiss Ephemeris calculation failed for ${planet}: rcode=${result ? result.rcode : 'unknown'}`);
-          }
-        } catch (error) {
-          console.warn(`⚠️ TransitCalculator: Error in swisseph calculation for ${planet}:`, error.message);
-          // Fall back to pure JavaScript calculation for this planet
-          await this.calculatePlanetFallback(planet, julianDay, positions);
         }
+        continue;
       }
-    }
-    
-    // If Swiss Ephemeris is not available or failed, use pure JavaScript calculations
-    if (Object.keys(positions).length === 0) {
-      console.log('📝 TransitCalculator: Using pure JavaScript planetary position calculations (swisseph unavailable)');
       
-      for (const planet of planets) {
-        if (planet === 'ketu') {
-          if (positions.rahu) {
-            const ketuLongitude = (positions.rahu.longitude + 180) % 360;
-            positions[planet] = {
-              longitude: ketuLongitude,
-              sign: Math.floor(ketuLongitude / 30),
-              degree: ketuLongitude % 30,
-              signName: getSignName(Math.floor(ketuLongitude / 30))
-            };
-          }
-          continue;
+      try {
+        // Map planet names to Swiss Ephemeris constants
+        const planetConstants = {
+          'sun': 0,      // SE_SUN
+          'moon': 1,     // SE_MOON
+          'mars': 2,     // SE_MARS
+          'mercury': 3,  // SE_MERCURY
+          'jupiter': 4,  // SE_JUPITER
+          'venus': 5,    // SE_VENUS
+          'saturn': 6,   // SE_SATURN
+          'rahu': 10     // SE_MEAN_NODE (for Rahu/Ketu)
+        };
+        
+        const planetId = planetConstants[planet];
+        if (planetId === undefined) {
+          throw new Error(`Planet ID not found for ${planet}`);
         }
         
-        try {
-          const result = calculatePlanetPosition(planet, julianDay);
-          
-          if (result && result.returnCode === 0) {
-            positions[planet] = {
-              longitude: result.longitude,
-              sign: Math.floor(result.longitude / 30),
-              degree: result.longitude % 30,
-              signName: getSignName(Math.floor(result.longitude / 30))
-            };
-          }
-        } catch (error) {
-          console.warn(`⚠️ TransitCalculator: Error calculating ${planet} position:`, error.message);
+        const result = await this.swisseph.swe_calc_ut(julianDay, planetId, 2); // SEFLG_SPEED = 2
+        
+        if (result && result.rcode === 0) {
+          positions[planet] = {
+            longitude: result.data.longitude,
+            sign: Math.floor(result.data.longitude / 30),
+            degree: result.data.longitude % 30,
+            signName: getSignName(Math.floor(result.data.longitude / 30)),
+            speed: result.data.speed || 0
+          };
+        } else {
+          throw new Error(`Swiss Ephemeris calculation failed for ${planet}: rcode=${result ? result.rcode : 'unknown'}`);
         }
+      } catch (error) {
+        throw new Error(`Swiss Ephemeris calculation failed for ${planet}: ${error.message}`);
       }
     }
     
     return positions;
-  }
-
-  /**
-   * Fallback calculation for individual planet using pure JavaScript
-   */
-  async calculatePlanetFallback(planet, julianDay, positions) {
-    try {
-      const result = calculatePlanetPosition(planet, julianDay);
-      
-      if (result && result.returnCode === 0) {
-        positions[planet] = {
-          longitude: result.longitude,
-          sign: Math.floor(result.longitude / 30),
-          degree: result.longitude % 30,
-          signName: getSignName(Math.floor(result.longitude / 30))
-        };
-      }
-    } catch (error) {
-      console.warn(`⚠️ TransitCalculator: Error in fallback calculation for ${planet}:`, error.message);
-    }
   }
 
   /**
@@ -404,7 +286,7 @@ class TransitCalculator {
       transitAspects: transitAspects,
       significantTransits: significantTransits,
       sadeSati: sadeSatiAnalysis,
-      method: this.swissephAvailable ? 'swisseph-wasm' : 'fallback-javascript'
+      method: 'swisseph-wasm'
     };
   }
 

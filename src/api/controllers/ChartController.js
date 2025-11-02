@@ -44,9 +44,17 @@ class ChartController {
       // Generate comprehensive chart with geocoding
       const chartData = await this.chartService.generateComprehensiveChart(birthData);
 
+      // Generate chartId to match response format expected by UI
+      const { v4: uuidv4 } = await import('uuid');
+      const chartId = uuidv4();
+
+      // Format response consistently with other endpoints
       res.status(200).json({
         success: true,
-        data: chartData
+        data: {
+          chartId,
+          ...chartData
+        }
       });
 
     } catch (error) {
@@ -121,21 +129,8 @@ class ChartController {
         chartData.navamsaChart
       );
 
-            // CRITICAL FIX: Generate chartId for E2E workflow (minimal approach)
-      // Use temporary in-memory storage for E2E tests to avoid complex schema mapping
+      // Generate chartId for API response
       const chartId = crypto.randomUUID();
-
-      // Store chart data temporarily for E2E workflow (could be enhanced with Redis/cache later)
-      global.tempChartStorage = global.tempChartStorage || new Map();
-      global.tempChartStorage.set(chartId, {
-        birthData: chartData.birthData,
-        rasiChart: chartData.rasiChart,
-        navamsaChart: chartData.navamsaChart,
-        analysis: chartData.analysis,
-        dashaInfo: chartData.dashaInfo,
-        birthDataAnalysis: birthDataAnalysis,
-        generatedAt: chartData.generatedAt
-      });
 
       return res.status(200).json({
         success: true,
@@ -504,8 +499,11 @@ class ChartController {
         if (!validationResult.isValid) {
           return res.status(400).json({
             success: false,
+            error: 'Validation failed',
             message: 'Invalid birth data provided',
-            errors: validationResult.errors
+            details: validationResult.errors,
+            suggestions: this.generateValidationSuggestions(validationResult.errors),
+            helpText: 'Lagna analysis requires valid birth date, time, and location information.'
           });
         }
 
@@ -518,8 +516,10 @@ class ChartController {
 
         // Check for nested placeOfBirth structure
         if (!latitude && !longitude && processedBirthData.placeOfBirth) {
-          latitude = processedBirthData.placeOfBirth.latitude;
-          longitude = processedBirthData.placeOfBirth.longitude;
+          if (typeof processedBirthData.placeOfBirth === 'object') {
+            latitude = processedBirthData.placeOfBirth.latitude;
+            longitude = processedBirthData.placeOfBirth.longitude;
+          }
         }
 
         // Geocode location only if coordinates are not provided
@@ -534,23 +534,154 @@ class ChartController {
 
         // Generate comprehensive chart
         const generatedChart = await this.chartService.generateComprehensiveChart(processedBirthData);
+        
+        // Validate chart structure
+        if (!generatedChart || !generatedChart.rasiChart) {
+          throw new Error('Chart generation returned invalid structure. Expected generatedChart.rasiChart to contain ascendant and planetaryPositions.');
+        }
+        
         chartData = generatedChart.rasiChart;
       }
 
-      const lagnaAnalysis = this.lagnaService.analyzeLagna(chartData);
+      // Validate chart data structure
+      if (!chartData) {
+        throw new Error('Chart data is required for lagna analysis');
+      }
+      
+      if (!chartData.ascendant) {
+        throw new Error('Ascendant data is missing from chart. Chart generation may have failed.');
+      }
+      
+      if (!chartData.planetaryPositions && !chartData.planets) {
+        throw new Error('Planetary positions are missing from chart. Chart generation may have failed.');
+      }
+
+      // Normalize planetary positions format (handle both array and object formats)
+      let planetaryPositions = chartData.planetaryPositions;
+      if (!planetaryPositions && chartData.planets) {
+        // Convert planets array to planetaryPositions object format
+        planetaryPositions = {};
+        chartData.planets.forEach(planet => {
+          planetaryPositions[planet.name?.toLowerCase() || planet.planet?.toLowerCase()] = {
+            sign: planet.sign,
+            degree: planet.degree,
+            longitude: planet.longitude || planet.degree,
+            house: planet.house,
+            ...planet
+          };
+        });
+        chartData.planetaryPositions = planetaryPositions;
+      }
+
+      // CRITICAL FIX: Ensure all planetary positions have house numbers calculated
+      // ChartGenerationService may return positions without house numbers
+      if (planetaryPositions && chartData.ascendant && chartData.ascendant.longitude !== undefined) {
+        const { calculateHouseNumber } = await import('../../utils/helpers/astrologyHelpers.js');
+        for (const [planetName, position] of Object.entries(planetaryPositions)) {
+          if (position && typeof position.longitude === 'number' && 
+              (position.house === undefined || position.house === null)) {
+            try {
+              position.house = calculateHouseNumber(position.longitude, chartData.ascendant.longitude);
+              // Validate house number
+              if (!position.house || position.house < 1 || position.house > 12) {
+                // Fallback: calculate from sign difference (approximate)
+                const signDiff = Math.floor((position.longitude - chartData.ascendant.longitude + 360) % 360 / 30);
+                position.house = ((signDiff % 12) + 1);
+              }
+            } catch (error) {
+              // If house calculation fails, use approximate method
+              const signDiff = Math.floor((position.longitude - chartData.ascendant.longitude + 360) % 360 / 30);
+              position.house = ((signDiff % 12) + 1);
+            }
+          }
+        }
+      }
+
+      // Perform lagna analysis with error handling
+      let lagnaAnalysis;
+      try {
+        lagnaAnalysis = this.lagnaService.analyzeLagna(chartData);
+      } catch (lagnaError) {
+        // Enhanced error handling for lagna analysis failures
+        console.error('Lagna service analysis error:', lagnaError);
+        
+        // If lagna service fails, provide basic lagna information
+        if (chartData.ascendant) {
+          const lagnaLord = this.lagnaService.findLagnaLord(chartData.ascendant.sign);
+          lagnaAnalysis = {
+            lagnaSign: {
+              sign: chartData.ascendant.sign,
+              degree: chartData.ascendant.degree,
+              longitude: chartData.ascendant.longitude,
+              characteristics: [`${chartData.ascendant.sign} Ascendant`],
+              message: 'Basic lagna information available. Full analysis requires complete planetary data.'
+            },
+            lagnaLord: {
+              lord: lagnaLord,
+              message: 'Lagna lord identified. Full analysis requires complete planetary positions.',
+              house: null,
+              effects: [`${lagnaLord} is the lord of ${chartData.ascendant.sign}`]
+            },
+            error: lagnaError.message,
+            partial: true
+          };
+        } else {
+          throw new Error(`Lagna analysis failed: ${lagnaError.message}. Chart data structure is invalid.`);
+        }
+      }
 
       res.status(200).json({
         success: true,
-        data: lagnaAnalysis
+        data: {
+          analysis: {
+            section: 'lagna',
+            lagnaAnalysis: lagnaAnalysis
+          }
+        },
+        timestamp: new Date().toISOString()
       });
 
     } catch (error) {
       console.error('Lagna analysis error:', error);
-      res.status(500).json({
+      
+      // Enhanced error response with detailed information
+      const errorResponse = {
         success: false,
-        message: 'Failed to analyze Lagna',
-        error: error.message
-      });
+        error: 'Lagna Analysis Failed',
+        message: error.message || 'Failed to analyze Lagna',
+        details: [],
+        suggestions: [],
+        helpText: 'Lagna analysis requires valid birth data and successful chart generation. Please verify birth date, time, and location information.'
+      };
+
+      // Add specific error details based on error type
+      if (error.message.includes('Chart generation')) {
+        errorResponse.details.push({
+          field: 'chart_generation',
+          message: 'Chart generation failed',
+          providedValue: null
+        });
+        errorResponse.suggestions.push('Verify birth data accuracy and completeness');
+        errorResponse.suggestions.push('Check coordinates are valid');
+      } else if (error.message.includes('Ascendant')) {
+        errorResponse.details.push({
+          field: 'ascendant',
+          message: 'Ascendant calculation failed',
+          providedValue: null
+        });
+        errorResponse.suggestions.push('Verify coordinates are correct');
+        errorResponse.suggestions.push('Check timezone is accurate');
+      } else if (error.message.includes('planetary')) {
+        errorResponse.details.push({
+          field: 'planetary_positions',
+          message: 'Planetary positions calculation failed',
+          providedValue: null
+        });
+        errorResponse.suggestions.push('Ensure date and time are valid');
+        errorResponse.suggestions.push('Verify Swiss Ephemeris is initialized');
+      }
+
+      res.status(500).json(errorResponse);
     }
   }
 

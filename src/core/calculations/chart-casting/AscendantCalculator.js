@@ -1,54 +1,8 @@
 import { getSign, getSignName, getSignId } from '../../../utils/helpers/astrologyHelpers.js';
 import { calculateJulianDay } from '../../../utils/calculations/julianDay.js';
+import { getSwisseph } from '../../../utils/swisseph-wrapper.js';
 import path from 'path';
 import fs from 'fs';
-
-// Swiss Ephemeris (WebAssembly) - handles serverless environments gracefully
-let swisseph = null;
-let swissephAvailable = false;
-let swissephInitPromise = null;
-
-/**
- * Initialize sweph-wasm module with explicit WASM path support
- */
-async function ensureSwissephLoaded() {
-  if (swisseph !== null) {
-    return { swisseph, available: swissephAvailable };
-  }
-  
-  if (swissephInitPromise) {
-    return swissephInitPromise;
-  }
-  
-  swissephInitPromise = (async () => {
-    try {
-      const SwissEPH = await import('sweph-wasm');
-      const { getWasmPath } = await import('../../../utils/wasm-loader.js');
-      
-      // Get explicit WASM file path for Node.js environments
-      const wasmPath = getWasmPath();
-      
-      if (wasmPath) {
-        console.log('🏛️ AscendantCalculator: Using WASM path:', wasmPath);
-      }
-      
-      // Initialize sweph-wasm with explicit WASM path if available
-      swisseph = await SwissEPH.default.init(wasmPath || undefined);
-      swissephAvailable = true;
-      console.log('✅ AscendantCalculator: Swiss Ephemeris (WASM) initialized successfully');
-      return { swisseph, available: swissephAvailable };
-    } catch (error) {
-      swissephAvailable = false;
-      console.warn('⚠️ AscendantCalculator: sweph-wasm not available:', error.message);
-      throw new Error(`Swiss Ephemeris is required for ascendant calculations but not available: ${error.message}`);
-    }
-  })();
-  
-  return swissephInitPromise;
-}
-
-// Cross-environment directory resolution
-const __dirname = path.resolve(process.cwd(), 'src/core/calculations/chart-casting');
 
 /**
  * Swiss Ephemeris House Calculator with proper WASM initialization
@@ -82,49 +36,38 @@ class AscendantCalculator {
 
   async _doInitialize() {
     try {
-      // Ensure Swiss Ephemeris is loaded
-      const { swisseph, available } = await ensureSwissephLoaded();
+      // Use centralized Swiss Ephemeris wrapper (native bindings, no WASM)
+      this.swisseph = await getSwisseph();
+      this.swissephAvailable = true;
       
-      if (!available) {
-        console.warn('⚠️ AscendantCalculator: Swiss Ephemeris not available - calculations disabled');
-        this.initialized = false;
-        return false;
-      }
-      
-      this.swisseph = swisseph;
-      this.swissephAvailable = available;
-      
-      // Set ephemeris path
+      // Enhanced ephemeris path setup with Render compatibility
       this.ephePath = path.resolve(process.cwd(), 'ephemeris');
       
-      // For serverless environments, ephemeris data is often bundled
       if (fs.existsSync(this.ephePath)) {
         this.validateEphemerisFiles(this.ephePath);
-        await this.swisseph.swe_set_ephe_path(this.ephePath);
-        console.log('✅ AscendantCalculator: Ephemeris path set to:', this.ephePath);
+        console.log(`✅ AscendantCalculator: Ephemeris files validated for ${process.env.RENDER ? 'Render' : 'Node.js'}: ${this.ephePath}`);
       } else {
-        console.warn('⚠️ AscendantCalculator: Ephemeris directory not found:', this.ephePath);
-        console.warn('⚠️ AscendantCalculator: Using bundled ephemeris data');
+        console.log(`📁 AscendantCalculator: Ephemeris directory not found, using bundled data: ${this.ephePath}`);
       }
       
-      // Set sidereal mode to Lahiri by default
-      await this.swisseph.swe_set_sid_mode(1); // SE_SIDM_LAHIRI = 1
+      // Set sidereal mode to Lahiri by default (handled by wrapper during initialization)
       
       // Test Swiss Ephemeris functionality with a known date
       const testDate = 2451545.0; // J2000.0
       const testResult = await this.swisseph.swe_houses(testDate, 28.7041, 77.1025, 'P');
       
-      // Validate that Swiss Ephemeris is working properly
-      if (!testResult || typeof testResult.ascendant !== 'number' || isNaN(testResult.ascendant)) {
+      // Swiss Ephemeris returns {cusps: array, ascmc: array} structure
+      // ascmc[0] is the ascendant, ascmc[1] is the MC
+      if (!testResult || !testResult.cusps || !testResult.ascmc || 
+          typeof testResult.ascmc[0] !== 'number' || isNaN(testResult.ascmc[0])) {
         throw new Error('Swiss Ephemeris test calculation failed - ephemeris not functional');
       }
       
       this.initialized = true;
-      console.log('✅ AscendantCalculator: Initialization completed successfully');
+      console.log('✅ AscendantCalculator: Initialized successfully with native Swiss Ephemeris bindings');
       return true;
       
     } catch (error) {
-      console.warn('⚠️ AscendantCalculator: Initialization failed:', error.message);
       this.initialized = false;
       throw new Error(`AscendantCalculator initialization failed: ${error.message}`);
     }
@@ -132,29 +75,39 @@ class AscendantCalculator {
 
   /**
    * Validate ephemeris files exist (optional but helpful)
+   * In Node.js, we use bundled ephemeris data, so local files are just for reference
    */
   validateEphemerisFiles(ephePath) {
     try {
       if (!fs.existsSync(ephePath)) {
-        throw new Error(`Ephemeris directory not found: ${ephePath}`);
+        console.log(`📂 Ephemeris directory not found: ${ephePath} (using bundled data)`);
+        return;
       }
       
       // Check for essential ephemeris files
       const essentialFiles = ['sepl_18.se1', 'semo_18.se1', 'seas_18.se1'];
+      const foundFiles = [];
       const missingFiles = [];
       
       for (const file of essentialFiles) {
         const filePath = path.join(ephePath, file);
-        if (!fs.existsSync(filePath)) {
+        if (fs.existsSync(filePath)) {
+          foundFiles.push(file);
+        } else {
           missingFiles.push(file);
         }
       }
       
+      if (foundFiles.length > 0) {
+        console.log(`📁 Found local ephemeris files: ${foundFiles.join(', ')}`);
+        console.log('🔄 Using bundled ephemeris data for Node.js compatibility');
+      }
+      
       if (missingFiles.length > 0) {
-        console.warn('⚠️ AscendantCalculator: Some ephemeris files missing:', missingFiles.join(', '));
+        console.log(`⚠️  Missing local ephemeris files: ${missingFiles.join(', ')} (will use bundled data)`);
       }
     } catch (error) {
-      console.warn('⚠️ AscendantCalculator: Error validating ephemeris files:', error.message);
+      console.log(`📂 Ephemeris validation error: ${error.message} (using bundled data)`);
     }
   }
 
@@ -162,108 +115,55 @@ class AscendantCalculator {
    * Calculate ascendant and house cusps
    */
   async calculateAscendantAndHouses(year, month, day, hours, minutes, latitude, longitude, houseSystem = 'P') {
-    try {
-      // Ensure calculator is initialized
-      await this.initialize();
-      
-      if (!this.initialized || !this.swissephAvailable) {
-        // Fallback to pure JavaScript calculation
-        console.warn('⚠️ AscendantCalculator: Using fallback calculation');
-        return this.calculateFallbackAscendantAndHouses(year, month, day, hours, minutes, latitude, longitude);
-      }
-      
-      // Calculate Julian Day
-      const julianDay = calculateJulianDay(year, month, day, hours + minutes / 60.0);
-      
-      // Calculate houses using Swiss Ephemeris
-      const housesResult = await this.swisseph.swe_houses(julianDay, latitude, longitude, houseSystem);
-      
-      if (!housesResult || typeof housesResult.ascendant !== 'number') {
-        throw new Error('Swiss Ephemeris house calculation failed');
-      }
-      
-      // Calculate ayanamsa
-      const ayanamsaResult = await this.swisseph.swe_get_ayanamsa(julianDay);
-      const ayanamsa = ayanamsaResult.ayanamsa || 0;
-      
-      // Apply ayanamsa to ascendant (convert tropical to sidereal)
-      const tropicalAscendant = housesResult.ascendant;
-      const siderealAscendant = tropicalAscendant - ayanamsa;
-      
-      // Normalize degrees
-      const normalizedAscendant = this.normalizeDegrees(siderealAscendant);
-      
-      // Get sign information
-      const ascendantSign = getSign(normalizedAscendant);
-      
-      // Apply ayanamsa to all house cusps
-      const siderealHouses = housesResult.house.map(cusp => this.normalizeDegrees(cusp - ayanamsa));
-      
-      // Get house signs
-      const houseSigns = siderealHouses.map(cusp => getSign(cusp));
-      
+    // Ensure calculator is initialized
+    await this.initialize();
+    
+    if (!this.initialized || !this.swissephAvailable) {
+      throw new Error('Swiss Ephemeris is required for ascendant calculations but is not available');
+    }
+    
+    // Calculate Julian Day
+    const julianDay = calculateJulianDay(year, month, day, hours + minutes / 60.0);
+    
+    // Calculate houses using Swiss Ephemeris
+    const housesResult = await this.swisseph.swe_houses(julianDay, latitude, longitude, houseSystem);
+    
+    if (!housesResult || !housesResult.cusps || !housesResult.ascmc || 
+        typeof housesResult.ascmc[0] !== 'number') {
+      throw new Error('Swiss Ephemeris house calculation failed - invalid house data');
+    }
+    
+    // Calculate ayanamsa
+    const ayanamsaResult = await this.swisseph.swe_get_ayanamsa(julianDay);
+    const ayanamsa = ayanamsaResult.ayanamsa || 0;
+    
+    // Apply ayanamsa to ascendant (convert tropical to sidereal)
+    const tropicalAscendant = housesResult.ascmc[0]; // ascendant is index 0
+    const siderealAscendant = tropicalAscendant - ayanamsa;
+    
+    // Normalize degrees
+    const normalizedAscendant = this.normalizeDegrees(siderealAscendant);
+    
+    // Get sign information
+    const signInfo = getSign(normalizedAscendant);
+    const ascendantSign = {
+      index: signInfo.signIndex,
+      name: getSignName(signInfo.signIndex),
+      id: getSignId(signInfo.signIndex)
+    };
+    
+    // Apply ayanamsa to all house cusps
+    const siderealHouses = housesResult.cusps.map(cusp => this.normalizeDegrees(cusp - ayanamsa));
+    
+    // Get house signs
+    const houseSigns = siderealHouses.map(cusp => {
+      const signInfo = getSign(cusp);
       return {
-        ascendant: {
-          longitude: normalizedAscendant,
-          signIndex: ascendantSign.index,
-          signName: ascendantSign.name,
-          signId: ascendantSign.id,
-          longitudeTropical: tropicalAscendant,
-          ayanamsa: ayanamsa
-        },
-        houses: {
-          cusps: siderealHouses,
-          signs: houseSigns,
-          system: houseSystem,
-          tropicalCusps: housesResult.house,
-          ascendant: housesResult.ascendant, // tropical ascendant
-          midheaven: this.normalizeDegrees(housesResult.mc - ayanamsa),
-          midheavenTropical: housesResult.mc
-        },
-        metadata: {
-          julianDay: julianDay,
-          ayanamsaType: this.ayanamsaType,
-          method: 'swisseph-wasm',
-          coordinates: {
-            latitude: latitude,
-            longitude: longitude
-          }
-        }
+        index: signInfo.signIndex,
+        name: getSignName(signInfo.signIndex),
+        id: getSignId(signInfo.signIndex)
       };
-      
-    } catch (error) {
-      console.warn('⚠️ AscendantCalculator: Error calculating with Swiss Ephemeris:', error.message);
-      // Fallback to pure JavaScript calculation
-      return this.calculateFallbackAscendantAndHouses(year, month, day, hours, minutes, latitude, longitude);
-    }
-  }
-
-  /**
-   * Fallback calculation using pure JavaScript for serverless environments
-   */
-  calculateFallbackAscendantAndHouses(year, month, day, hours, minutes, latitude, longitude) {
-    console.log('🔄 AscendantCalculator: Using fallback JavaScript calculation');
-    
-    // Very simplified fallback calculation
-    const date = new Date(year, month - 1, day, hours, minutes);
-    const dayOfYear = Math.floor((date - new Date(year, 0, 0)) / (1000 * 60 * 60 * 24));
-    
-    // Approximate ascendant calculation (simplified)
-    const lst = date.getHours() + date.getMinutes() / 60.0 + longitude / 15.0;
-    const ascendantDegrees = (lst * 15 + dayOfYear * 0.9863 - 90) % 360;
-    const normalizedAscendant = this.normalizeDegrees(ascendantDegrees);
-    
-    // Get ascendant sign
-    const ascendantSign = getSign(normalizedAscendant);
-    
-    // Simplified house calculation
-    const houses = [];
-    for (let i = 1; i <= 12; i++) {
-      const houseAngle = (i - 1) * 30 + normalizedAscendant;
-      houses.push(this.normalizeDegrees(houseAngle));
-    }
-    
-    const houseSigns = houses.map(cusp => getSign(cusp));
+    });
     
     return {
       ascendant: {
@@ -271,22 +171,22 @@ class AscendantCalculator {
         signIndex: ascendantSign.index,
         signName: ascendantSign.name,
         signId: ascendantSign.id,
-        longitudeTropical: normalizedAscendant,
-        ayanamsa: 0
+        longitudeTropical: tropicalAscendant,
+        ayanamsa: ayanamsa
       },
       houses: {
-        cusps: houses,
+        cusps: siderealHouses,
         signs: houseSigns,
-        system: 'P',
-        tropicalCusps: houses,
-        ascendant: normalizedAscendant,
-        midheaven: this.normalizeDegrees(90 + normalizedAscendant),
-        midheavenTropical: this.normalizeDegrees(90 + normalizedAscendant)
+        system: houseSystem,
+        tropicalCusps: housesResult.cusps,
+        ascendant: housesResult.ascmc[0], // tropical ascendant
+        midheaven: this.normalizeDegrees(housesResult.ascmc[1] - ayanamsa), // MC is index 1
+        midheavenTropical: housesResult.ascmc[1] // MC is index 1
       },
       metadata: {
-        julianDay: calculateJulianDay(year, month, day, hours + minutes / 60.0),
+        julianDay: julianDay,
         ayanamsaType: this.ayanamsaType,
-        method: 'fallback-javascript',
+        method: 'sweph-native',
         coordinates: {
           latitude: latitude,
           longitude: longitude
@@ -294,6 +194,8 @@ class AscendantCalculator {
       }
     };
   }
+
+  
 
   /**
    * Normalize degrees to 0-360 range
@@ -331,7 +233,7 @@ export function getAscendantCalculator(ayanamsa = 'LAHIRI') {
 export default AscendantCalculator;
 
 // Export utility functions
-export { ensureSwissephLoaded };
+// Export removed - use getSwisseph() from swisseph-wrapper.js instead
 export async function isSwissephAvailable() {
   if (swisseph === null) {
     await ensureSwissephLoaded();
