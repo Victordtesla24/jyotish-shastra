@@ -110,39 +110,38 @@ function calculateRasiForHouse(houseNumber, ascendantRasi) {
 }
 
 
-// North Indian chart house positions (diamond layout) - Template-validated coordinates
-// Updated for perfect kundli template alignment with precise positioning
+// North Indian chart house positions (diamond layout) - Template-calibrated coordinates
+// Precisely calibrated for perfect kundli template alignment
 const HOUSE_POSITIONS = {
-  1:  { x: CENTER_X, y: PADDING + 40 },           // Top center (Ascendant position - always centered)
-  2:  { x: CENTER_X + 95, y: PADDING + 70 },      // Top right-upper quadrant
-  3:  { x: CHART_SIZE - PADDING - 40, y: CENTER_Y - 70 }, // Right upper
-  4:  { x: CHART_SIZE - PADDING - 40, y: CENTER_Y },      // Right center
-  5:  { x: CHART_SIZE - PADDING - 40, y: CENTER_Y + 70 }, // Right lower
-  6:  { x: CENTER_X + 95, y: CHART_SIZE - PADDING - 70 }, // Bottom right-lower quadrant
-  7:  { x: CENTER_X, y: CHART_SIZE - PADDING - 40 },      // Bottom center
-  8:  { x: CENTER_X - 95, y: CHART_SIZE - PADDING - 70 }, // Bottom left-lower quadrant
-  9:  { x: PADDING + 40, y: CENTER_Y + 70 },       // Left lower
-  10: { x: PADDING + 40, y: CENTER_Y },            // Left center
-  11: { x: PADDING + 40, y: CENTER_Y - 70 },       // Left upper
-  12: { x: CENTER_X - 95, y: PADDING + 70 }        // Top left-upper quadrant
+  1:  { x: 250, y: 100 },       // Top center - Ascendant position (template-calibrated)
+  2:  { x: 345, y: 130 },            // Top right-upper quadrant (template-calibrated)
+  3:  { x: 400, y: 180 },            // Right upper (template-calibrated)
+  4:  { x: 400, y: 250 },       // Right center (template-calibrated)
+  5:  { x: 400, y: 320 },            // Right lower (template-calibrated)
+  6:  { x: 345, y: 370 },            // Bottom right-lower quadrant (template-calibrated)
+  7:  { x: 250, y: 400 },        // Bottom center (template-calibrated)
+  8:  { x: 155, y: 370 },            // Bottom left-lower quadrant (template-calibrated)
+  9:  { x: 100, y: 320 },            // Left lower (template-calibrated)
+  10: { x: 100, y: 250 },       // Left center (template-calibrated)
+  11: { x: 100, y: 180 },            // Left upper (template-calibrated)
+  12: { x: 155, y: 130 }             // Top left-upper quadrant (template-calibrated)
 };
 
-// Rasi number positions matching the template diamond structure
-// Precisely positioned at house boundaries for accurate display
-// Refined coordinates based on template analysis for perfect alignment
+// Rasi number positions - Template-calibrated diamond intersections
+// Precisely positioned for authentic Kundli template alignment
 const RASI_NUMBER_POSITIONS = {
-  1:  { x: PADDING + 90, y: PADDING + 90 },           // Top-left corner (between houses 12 and 1)
-  2:  { x: CENTER_X - 70, y: PADDING + 50 },           // Top edge left (between houses 1 and 2)
-  3:  { x: CENTER_X + 70, y: PADDING + 50 },           // Top edge right (between houses 2 and 3)
-  4:  { x: CHART_SIZE - PADDING - 90, y: PADDING + 90 }, // Top-right corner (between houses 3 and 4)
-  5:  { x: CHART_SIZE - PADDING - 50, y: CENTER_Y - 70 },  // Right edge top (between houses 4 and 5)
-  6:  { x: CHART_SIZE - PADDING - 50, y: CENTER_Y + 70 },  // Right edge bottom (between houses 5 and 6)
-  7:  { x: CHART_SIZE - PADDING - 90, y: CHART_SIZE - PADDING - 90 }, // Bottom-right corner
-  8:  { x: CENTER_X + 70, y: CHART_SIZE - PADDING - 50 },  // Bottom edge right
-  9:  { x: CENTER_X - 70, y: CHART_SIZE - PADDING - 50 },  // Bottom edge left
-  10: { x: PADDING + 90, y: CHART_SIZE - PADDING - 90 }, // Bottom-left corner
-  11: { x: PADDING + 50, y: CENTER_Y + 70 },            // Left edge bottom
-  12: { x: PADDING + 50, y: CENTER_Y - 70 }             // Left edge top
+  1:  { x: 150, y: 150 },    // Top-left intersection (between houses 12 and 1)
+  2:  { x: 180, y: 110 },    // Top edge left (between houses 1 and 2)
+  3:  { x: 320, y: 110 },    // Top edge right (between houses 2 and 3)
+  4:  { x: 350, y: 150 },    // Top-right intersection (between houses 3 and 4)
+  5:  { x: 390, y: 180 },    // Right edge top (between houses 4 and 5)
+  6:  { x: 390, y: 320 },    // Right edge bottom (between houses 5 and 6)
+  7:  { x: 350, y: 350 },    // Bottom-right intersection (between houses 6 and 7)
+  8:  { x: 320, y: 390 },    // Bottom edge right (between houses 7 and 8)
+  9:  { x: 180, y: 390 },    // Bottom edge left (between houses 8 and 9)
+  10: { x: 150, y: 350 },    // Bottom-left intersection (between houses 9 and 10)
+  11: { x: 110, y: 320 },    // Left edge bottom (between houses 10 and 11)
+  12: { x: 110, y: 180 }     // Left edge top (between houses 11 and 12)
 };
 
 // Removed unused DIAMOND_FRAME constant
@@ -482,7 +481,7 @@ function calculateHouseFromLongitude(planetLongitude, ascendantLongitude) {
 
 /**
  * Calculate precise planetary position to match kundli template exactly
- * Implements template-validated corner positioning with clustering prevention
+ * Enhanced clustering prevention with template-calibrated corner spacing
  * @param {Object} housePosition - Base house coordinates
  * @param {Object} planet - Planet data
  * @param {Array} allPlanetsInHouse - All planets in this house
@@ -490,16 +489,20 @@ function calculateHouseFromLongitude(planetLongitude, ascendantLongitude) {
  * @returns {Object} Precise x, y coordinates for planet
  */
 function calculatePrecisePlanetPosition(housePosition, planet, allPlanetsInHouse, houseNumber) {
-  // Template-validated corner offsets for perfect alignment
+  // Template-calibrated corner offsets for enhanced clustering prevention
   const CORNER_OFFSETS = {
-    primary: { x: 65, y: 60 },    // Primary corner placement
-    secondary: { x: 65, y: -60 }, // Secondary corner
-    tertiary: { x: -65, y: 60 },  // Tertiary corner
-    quaternary: { x: -65, y: -60 } // Quaternary corner
+    primary: { x: 60, y: 50 },
+    secondary: { x: 60, y: -50 },
+    tertiary: { x: -60, y: 50 },
+    quaternary: { x: -60, y: -50 }
   };
 
-  // Minimum spacing between planets to prevent clustering (reserved for future enhancements)
-  // const MIN_PLANET_SPACING = 18;
+  // Enhanced spacing parameters for dense planetary configurations
+  const CLUSTERING_PREVENTION = {
+    MIN_PLANET_SPACING: 15,        // Minimum pixel distance between planets
+    LAYER_OFFSET: 12,               // Offset for layered positioning
+    MAX_LAYERS: 3                   // Maximum layers for dense houses
+  };
   
   let textX = housePosition.x;
   let textY = housePosition.y;
@@ -511,7 +514,6 @@ function calculatePrecisePlanetPosition(housePosition, planet, allPlanetsInHouse
 
   // Separate Ascendant from other planets for positioning
   const nonAscendantPlanets = allPlanetsInHouse.filter(p => p.name !== 'Ascendant' && p.code !== 'As');
-  // const hasAscendant = nonAscendantPlanets.length !== allPlanetsInHouse.length && allPlanetsInHouse.some(p => p.name === 'Ascendant' || p.code === 'As');
   
   // Get index among non-ascendant planets only
   const planetIndex = nonAscendantPlanets.findIndex(p => 
@@ -519,52 +521,89 @@ function calculatePrecisePlanetPosition(housePosition, planet, allPlanetsInHouse
     (p.house === planet.house && Math.abs(p.degrees - planet.degrees) < 0.01)
   );
 
-  // Template-validated positioning patterns
-  if (nonAscendantPlanets.length === 1) {
-    // Single planet: Position in primary corner (top-right)
-    textX += CORNER_OFFSETS.primary.x;
-    textY += CORNER_OFFSETS.primary.y;
-  } else if (nonAscendantPlanets.length === 2) {
-    // Two planets: Use diagonal corners to maximize spacing
-    if (planetIndex === 0) {
-      textX += CORNER_OFFSETS.primary.x;
-      textY += CORNER_OFFSETS.primary.y; // top-right
-    } else {
-      textX += CORNER_OFFSETS.tertiary.x;
-      textY += CORNER_OFFSETS.tertiary.y; // bottom-left
-    }
-  } else if (nonAscendantPlanets.length === 3) {
-    // Three planets: Use triangular corner arrangement
-    const positions = [
-      CORNER_OFFSETS.primary,   // top-right
-      CORNER_OFFSETS.secondary, // top-left  
-      CORNER_OFFSETS.tertiary   // bottom-left
-    ];
-    const offset = positions[planetIndex % 3];
-    textX += offset.x;
-    textY += offset.y;
-  } else if (nonAscendantPlanets.length >= 4) {
-    // Four or more planets: Use all four corners with layering
-    const positions = [
-      CORNER_OFFSETS.primary,   // top-right
-      CORNER_OFFSETS.secondary, // top-left
-      CORNER_OFFSETS.tertiary,  // bottom-left
-      CORNER_OFFSETS.quaternary // bottom-right
-    ];
-    const primaryIndex = planetIndex % 4;
-    const offset = positions[primaryIndex];
-    textX += offset.x;
-    textY += offset.y;
+  // Enhanced positioning with improved clustering prevention
+  function placePlanetsInCorners(index, totalPlanets, houseCenter) {
+    const corners = ['primary', 'secondary', 'tertiary', 'quaternary'];
+    let offset;
     
-    // For 5+ planets, add secondary layering
-    if (planetIndex >= 4) {
-      const layerOffset = Math.floor(planetIndex / 4);
-      textX += (layerOffset % 2 === 0 ? 15 : -15); // Alternating horizontal offset
-      textY += (primaryIndex < 2 ? 15 : -15);      // Vertical offset based on corner
+    if (totalPlanets === 1) {
+      // Single planet: Primary corner positioning
+      offset = CORNER_OFFSETS.primary;
+    } else if (totalPlanets === 2) {
+      // Two planets: Diagonal corners for maximum spacing
+      offset = index === 0 ? CORNER_OFFSETS.primary : CORNER_OFFSETS.tertiary;
+    } else if (totalPlanets === 3) {
+      // Three planets: Triangular corner arrangement
+      offset = CORNER_OFFSETS[corners[index % 3]];
+    } else if (totalPlanets === 4) {
+      // Four planets: All four corners
+      offset = CORNER_OFFSETS[corners[index % 4]];
+    } else {
+      // 5+ planets: All corners with intelligent layering
+      const baseCorner = corners[index % 4];
+      offset = { ...CORNER_OFFSETS[baseCorner] };
+      
+      // Enhanced layering for multiple planets in same corner
+      const layerIndex = Math.floor(index / 4);
+      if (layerIndex > 0 && layerIndex <= CLUSTERING_PREVENTION.MAX_LAYERS) {
+        // Calculate layer offset with anti-clustering
+        const layerXOffset = CLUSTERING_PREVENTION.LAYER_OFFSET * layerIndex;
+        const layerYOffset = CLUSTERING_PREVENTION.LAYER_OFFSET * Math.floor(layerIndex / 2);
+        
+        // Apply alternating pattern to prevent clustering
+        offset.x += (layerIndex % 2 === 0 ? layerXOffset : -layerXOffset);
+        offset.y += (index % 4 < 2 ? layerYOffset : -layerYOffset);
+        
+        // Add micro-adjustment for houses with 6+ planets
+        if (totalPlanets >= 6 && layerIndex >= 2) {
+          offset.x += (index % 3 === 0 ? 5 : -5);
+          offset.y += (planetIndex % 2 === 0 ? 5 : -5);
+        }
+      }
+    }
+    
+    return {
+      x: houseCenter.x + offset.x,
+      y: houseCenter.y + offset.y
+    };
+  }
+
+  const position = placePlanetsInCorners(planetIndex, nonAscendantPlanets.length, { x: textX, y: textY });
+  
+  // Validate minimum spacing to prevent clustering
+  if (nonAscendantPlanets.length > 1) {
+    const otherPlanets = nonAscendantPlanets.filter((_, idx) => idx !== planetIndex);
+    for (const otherPlanet of otherPlanets) {
+      const otherPosition = placePlanetsInCorners(
+        nonAscendantPlanets.findIndex(p => 
+          (p.name === otherPlanet.name && p.code === otherPlanet.code) ||
+          (p.house === otherPlanet.house && Math.abs(p.degrees - otherPlanet.degrees) < 0.01)
+        ), 
+        nonAscendantPlanets.length, 
+        { x: textX, y: textY }
+      );
+      
+      // Distance calculation for clustering prevention
+      const distance = Math.sqrt(
+        Math.pow(position.x - otherPosition.x, 2) + 
+        Math.pow(position.y - otherPosition.y, 2)
+      );
+      
+      // Enhanced clustering detection with dynamic spacing
+      const minRequiredSpacing = CLUSTERING_PREVENTION.MIN_PLANET_SPACING + 
+        Math.floor(nonAscendantPlanets.length / 3) * 2;
+      
+      if (distance < minRequiredSpacing) {
+        console.warn(`⚠️ Potential clustering detected for ${planet.name} in house ${houseNumber}. Distance: ${distance}px, required: ${minRequiredSpacing}px`);
+        // Apply emergency separation adjustment
+        const emergencyOffset = minRequiredSpacing - distance + 3;
+        position.x += (planetIndex % 2 === 0 ? emergencyOffset : -emergencyOffset);
+        position.y += (planetIndex % 3 === 0 ? emergencyOffset : -emergencyOffset);
+      }
     }
   }
 
-  return { x: textX, y: textY };
+  return position;
 }
 
 /**

@@ -475,3 +475,215 @@ npm start                    # Restart servers
 - [ ] Zero errors: Clean console and server logs
 
 **Task Complete When**: UI displays real 124KB+ API responses with zero "NO REAL DATA" messages and all 8 analysis sections populated correctly.
+
+---
+
+## ***Enhanced Vedic Chart Alignment & Planetary Position Verification Protocol***
+
+### **🎯 PRIMARY OBJECTIVE**
+Achieve perfect visual and functional alignment between the current chart UI and the reference Kundli template through systematic discrepancy analysis and precise positioning fixes.
+
+### **📋 PRE-EXECUTION REQUIREMENTS**
+
+#### **Environment Verification**
+```bash
+# Confirm all components are in place before execution
+ls client/src/components/charts/VedicChartDisplay.jsx  # Verify target file exists
+ls Planet-To-House-Position-Mapping.png                # Verify current state reference
+ls kundli-template.png                                 # Verify target template exists
+npm run lint                                            # Confirm codebase compiles without errors
+```
+
+#### **Reference Materials Preparation**
+1. **Planet-To-House-Position-Mapping.png**: Document current planetary/rasi positions in the UI
+2. **kundli-template.png**: Reference target for exact positioning
+3. **VedicChartDisplay.jsx**: Component requiring modification
+4. **Browser DevTools**: For real-time positioning verification
+
+### **🔍 PHASE 1: COMPREHENSIVE ANALYSIS (30-45 minutes)**
+
+#### **Step 1.1: Visual Position Mapping**
+- Open both reference images in parallel view mode
+- Create a systematic comparison matrix documenting:
+  - **House Positions**: 1-12, noting boundary lines and divisions
+  - **Planetary Locations**: Exact house placement for each planet (Sun, Moon, Mars, Mercury, Jupiter, Venus, Saturn, Rahu, Ketu)
+  - **Rasi (Zodiac Sign) Positions**: Each house's zodiac sign alignment
+  - **Visual Relationships**: Angular distances and aspect indicators
+
+#### **Step 1.2: Discrepancy Documentation**
+Systematically identify and document ALL positioning mismatches:
+```markdown
+# Discrepancy Matrix Example:
+House 1:
+- Current: Mars in [position], Aries rasi [position]
+- Target: [specify exact target positions]
+- Issue: [distance/direction misalignment]
+
+House 2:
+[Repeat for all houses with discrepancies]
+```
+
+#### **Step 1.3: Code Position Mapping**
+- Analyze VedicChartDisplay.jsx coordinate calculation functions
+- Identify specific mathematical formulas determining positions:
+  - Angular calculations for house boundaries
+  - Planetary position algorithms
+  - Rasi positioning logic
+  - Overlap prevention mechanisms
+
+### **🔧 PHASE 2: PRECISE POSITIONING FIXES (60-90 minutes)**
+
+#### **Step 2.1: House Boundary Corrections**
+- Recalculate house positioning algorithms to match template exactly
+- Verify 360°/12 = 30° division accuracy
+- Adjust for Vedic chart orientation (typically counter-clockwise from Ascendant)
+- Ensure consistent house width and spacing
+
+#### **Step 2.2: Planetary Position Implementation**
+For each planet requiring repositioning:
+```javascript
+// Example of precise planetary positioning fix
+const planetPosition = {
+  sun: { house: 5, angle: calculateExactAngle(5, referenceTemplate.sunPosition) },
+  moon: { house: 1, angle: calculateExactAngle(1, referenceTemplate.moonPosition) },
+  // Continue for all planets...
+};
+
+// Implement overlap prevention
+const preventPlanetClustering = (planets) => {
+  // Calculate minimum distance between planets in same house
+  // Apply spacing algorithm to maintain visibility
+};
+```
+
+#### **Step 2.3: Rasi Alignment Corrections**
+- Align zodiac signs to match template house assignments
+- Ensure proper Vedic notation (Mesha, Vrishabha, etc.)
+- Verify correct zodiac progression direction
+
+#### **Step 2.4: Visual Enhancement Implementation**
+```javascript
+// Sophisticated visibility improvements
+const enhanceChartClarity = {
+  preventDenseClustering: true,
+  minimumPlanetDistance: 15, // degrees
+  aspectLineOpacity: 0.6,
+  labelFontSize: 'responsive',
+  colorContrastOptimization: true
+};
+```
+
+### **✅ PHASE 3: COMPREHENSIVE VALIDATION (45-60 minutes)**
+
+#### **Step 3.1: Component-Level Testing**
+```bash
+# Test individual component rendering
+npm test -- --testPathPattern=VedicChartDisplay
+npm run build                                  # Verify compilation success
+npm start                                       # Launch development server
+```
+
+#### **Step 3.2: Browser-Based Visual Verification**
+1. Navigate to chart UI page
+2. Take full-page screenshot at 100% zoom
+3. Compare against kundli-template.png using overlay analysis:
+   - **House boundaries**: Exact alignment tolerance ±2px
+   - **Planet positions**: Exact placement tolerance ±3px
+   - **Rasi labels**: Proper font, size, and positioning
+   - **Aspect lines**: Correct angles and opacity
+
+#### **Step 3.3: Multi-Device Compatibility Testing**
+- Test at various viewport sizes (mobile, tablet, desktop)
+- Verify responsive positioning maintains accuracy
+- Check touch interaction reliability on mobile devices
+
+#### **✅ STEP 3.4: SYSTEMATIC COMPARISON PROTOCOL**
+Execute precise visual comparison:
+```markdown
+# Visual Verification Checklist:
+House 1 Boundary Match: [✅/❌] - Template Position vs Current: [° difference]
+Planet in House 1: [✅/❌] - Name: [planet], Target Position: [°], Current: [°]
+Rasi in House 1: [✅/❌] - Target: [sign], Current: [sign]
+Aspect Lines from House 1: [✅/❌] - Target Count: [n], Current: [n]
+
+[Repeat for all 12 houses with detailed angle measurements]
+```
+
+### **📊 SUCCESS METRICS & VALIDATION CRITERIA**
+
+#### **Absolute Zero-Tolerance Requirements**
+- ✅ **100% House Boundary Alignment**: All 12 house lines match template exactly (±2px tolerance)
+- ✅ **100% Planetary Position Accuracy**: Every planet in correct house at correct angle (±3px tolerance)
+- ✅ **100% Rasi Label Placement**: All zodiac signs correctly positioned and legible
+- ✅ **Zero Planet Clustering**: No more than 2 planets within 30° of each other without visual separation
+- ✅ **Zero Overlap Issues**: Planets, signs, and aspect lines remain visually distinct
+- ✅ **Responsive Compatibility**: Accurate rendering across all device sizes
+- ✅ **Performance Optimization**: Chart rendering completes within 2 seconds
+
+#### **Secondary Quality Indicators**
+- 🎯 **Visual Hierarchy**: Ascendant (Lagna) visually prominent
+- 🎯 **Readability**: All text labels legible at minimum viewing distance
+- 🎯 **Aesthetic Consistency**: Matches Vedic astrology chart conventions
+- 🎯 **Interactive Functionality**: Hover states and tooltips operate correctly
+
+### **🔧 TECHNICAL IMPLEMENTATION STANDARDS**
+
+#### **Code Quality Requirements**
+```javascript
+// Maintain consistent coding patterns
+const positioningAlgorithm = {
+  // Use descriptive function names
+  calculateOptimalPlanetPosition: (houseNumber, templateData) => {
+    // Implement precise angle calculation
+    // Prevent clustering with minimum distance checks
+    // Return coordinates for rendering
+  },
+  
+  // Maintain Vedic chart conventions
+  calculateHouseBoundaries: (startingAngle) => {
+    // Implement 30° house divisions
+    // Account for Vedic orientation (counter-clockwise)
+    // Return boundary coordinates array
+  }
+};
+```
+
+#### **Version Control Protocol**
+```bash
+# Before making changes
+git checkout -b fix/chart-positioning-alignment
+git add client/src/components/charts/VedicChartDisplay.jsx
+
+# After successful validation
+git commit -m "Fix planetary positions to match kundli template exactly - eliminate clustering and overlap issues"
+git push origin fix/chart-positioning-alignment
+```
+
+### **🚨 QUALITY ASSURANCE CHECKLIST**
+
+#### **Pre-Deployment Verification**
+- [ ] All positioning discrepancies identified and logged
+- [ ] Code fixes implemented following architectural patterns
+- [ ] Component compiles without warnings or errors
+- [ ] Manual tests pass at multiple viewport sizes
+- [ ] Visual comparison confirms 100% template matching
+- [ ] Performance optimizations maintain sub-2-second rendering
+
+#### **Final Acceptance Criteria**
+```
+✅ Visual Analysis: Chart UI screenshot matches kundli-template.png when overlaid
+✅ Functional Test: All planets positioned in correct houses with accurate angles
+✅ User Experience: Clean, readable chart with no overlapping elements
+✅ Technical Quality: Code follows project patterns and maintains performance
+```
+
+### **⏱️ TIME ESTIMATION & MILESTONES**
+
+- **Phase 1 (Analysis)**: 45 minutes - Complete discrepancy identification
+- **Phase 2 (Implementation)**: 90 minutes - All positioning corrections complete
+- **Phase 3 (Validation)**: 60 minutes - Full verification and testing
+- **Total Time**: 3 hours 15 minutes
+
+### **📋 EXECUTION COMMAND**
+
+Execute this protocol systematically to achieve perfect chart alignment. Begin with comprehensive analysis, implement precise fixes, and validate thoroughly. The goal is 100% visual and functional accuracy compared to the reference template.
