@@ -204,6 +204,18 @@ const BirthTimeRectificationPageEnhanced = () => {
     checkApiConnection();
   }, [error]);
 
+  // Auto-trigger full analysis when navigating to analysis step with events
+  useEffect(() => {
+    if (pageStep === 'analysis' && lifeEvents.length > 0 && !loading && !rectificationData) {
+      console.log('🔄 Auto-triggering full analysis with events:', lifeEvents.length);
+      performFullAnalysisWithEvents(lifeEvents).catch((error) => {
+        console.error('❌ Auto-triggered analysis failed:', error);
+        setError(error.message || 'Analysis failed');
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pageStep, lifeEvents.length]);
+
   // Load and validate saved data from previous steps - production grade data flow
   useEffect(() => {
     const loadBirthData = async () => {

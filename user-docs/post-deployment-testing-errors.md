@@ -141,6 +141,61 @@ Timeout 30000ms exceeded - element is not stable
 
 ---
 
+### 4. BPHS-BTR Analysis Step Navigation Issue
+**Severity**: Medium (Analysis API call not triggered)
+**Location**: Production frontend - BirthTimeRectificationPage
+**Route**: `/birth-time-rectification` Step 4 (Analysis)
+
+**Error Message**:
+- Analysis page shows "Loading..." but API call never triggered
+- No `POST /api/v1/rectification/with-events` API call in network requests
+
+**Root Cause**:
+- Clicking "Next Step" button only changes `pageStep` to 'analysis' without triggering `performFullAnalysisWithEvents()`
+- Analysis should be triggered by clicking "Complete With X Events" button which calls `handleEventsComplete` → `performFullAnalysisWithEvents`
+- OR there should be a useEffect that auto-triggers analysis when pageStep changes to 'analysis' and lifeEvents.length > 0
+
+**Impact**:
+- Analysis step shows loading state indefinitely
+- Full analysis with events never completes
+- User cannot proceed to results step
+
+**Fix Required**:
+- Option 1: Add useEffect that triggers `performFullAnalysisWithEvents` when pageStep changes to 'analysis' and lifeEvents.length > 0
+- Option 2: Prevent "Next Step" button from events step and require "Complete With X Events" button
+- Option 3: Make "Next Step" button trigger analysis if lifeEvents exist
+
+**File**: `client/src/pages/BirthTimeRectificationPage.jsx`
+
+---
+
+### 5. BPHS-BTR Events State Persistence Issue
+**Severity**: Low (State resets when navigating)
+**Location**: Production frontend - BirthTimeRectificationPage Step 3
+**Route**: `/birth-time-rectification` Step 3 (Life Events)
+
+**Error Message**:
+- Events progress resets from "3 of 8 (38%)" to "0 of 8 (0%)" when navigating back from analysis step
+- Completed categories (Relationship, Career) show as incomplete after navigation
+
+**Root Cause**:
+- `InteractiveLifeEventsQuestionnaire` component state is being reset when navigating between steps
+- Component unmounting/remounting loses local state
+- Events data not persisted in parent component state
+
+**Impact**:
+- User must re-fill events if they navigate back
+- Minor UX issue, not blocking
+
+**Fix Required**:
+- Persist events data in parent component state (`lifeEvents` state in BirthTimeRectificationPage)
+- Pass initial answers/state to `InteractiveLifeEventsQuestionnaire` when remounting
+- Use UIDataSaver to persist events data between navigations
+
+**File**: `client/src/pages/BirthTimeRectificationPage.jsx`, `client/src/components/btr/InteractiveLifeEventsQuestionnaire.jsx`
+
+---
+
 ## Fixes Applied
 
 ### ✅ Fix 1: Date Format Warning
@@ -161,6 +216,19 @@ Timeout 30000ms exceeded - element is not stable
 - This ensures all routes serve index.html for React Router
 
 **Note**: Render may require additional configuration in dashboard for static sites
+
+### ✅ Fix 3: BPHS-BTR Analysis Auto-Trigger
+**Status**: FIXED
+**File**: `client/src/pages/BirthTimeRectificationPage.jsx`
+**Changes**:
+- Added useEffect hook that auto-triggers `performFullAnalysisWithEvents()` when:
+  - `pageStep` changes to 'analysis'
+  - `lifeEvents.length > 0` (events exist)
+  - `!loading` (not already loading)
+  - `!rectificationData` (analysis hasn't completed)
+- This ensures analysis is triggered when navigating via "Next Step" button
+
+**Result**: Analysis will now automatically trigger when navigating to analysis step with events
 
 ## Next Steps
 
