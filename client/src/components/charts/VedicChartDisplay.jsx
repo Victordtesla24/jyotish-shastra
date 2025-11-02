@@ -481,7 +481,8 @@ function calculateHouseFromLongitude(planetLongitude, ascendantLongitude) {
 
 /**
  * Calculate precise planetary position to match kundli template exactly
- * Enhanced clustering prevention with template-calibrated corner spacing
+ * Enhanced center-based vertical stacking with overlap prevention
+ * Prevents planets from overlapping rasi numbers, house borders, or clustering too closely
  * @param {Object} housePosition - Base house coordinates
  * @param {Object} planet - Planet data
  * @param {Array} allPlanetsInHouse - All planets in this house
@@ -489,27 +490,34 @@ function calculateHouseFromLongitude(planetLongitude, ascendantLongitude) {
  * @returns {Object} Precise x, y coordinates for planet
  */
 function calculatePrecisePlanetPosition(housePosition, planet, allPlanetsInHouse, houseNumber) {
-  // Template-calibrated corner offsets for enhanced clustering prevention
-  const CORNER_OFFSETS = {
-    primary: { x: 60, y: 50 },
-    secondary: { x: 60, y: -50 },
-    tertiary: { x: -60, y: 50 },
-    quaternary: { x: -60, y: -50 }
-  };
-
-  // Enhanced spacing parameters for dense planetary configurations
-  const CLUSTERING_PREVENTION = {
-    MIN_PLANET_SPACING: 15,        // Minimum pixel distance between planets
-    LAYER_OFFSET: 12,               // Offset for layered positioning
-    MAX_LAYERS: 3                   // Maximum layers for dense houses
-  };
+  // Positioning parameters for clean, readable chart
+  const VERTICAL_SPACING = 18; // Pixel spacing between planets (18px as per template)
+  const MIN_RASI_DISTANCE = 25; // Minimum distance from rasi numbers (25px to prevent overlap)
+  const MIN_BORDER_DISTANCE = 20; // Minimum distance from house borders (20px for readability)
   
-  let textX = housePosition.x;
-  let textY = housePosition.y;
+  const houseCenterX = housePosition.x;
+  const houseCenterY = housePosition.y;
 
   // Special handling for Ascendant - always centered in its position
   if (planet.name === 'Ascendant' || planet.code === 'As') {
-    return { x: textX, y: textY };
+    // Check if ascendant would overlap with rasi number, apply slight offset if needed
+    const rasiPosition = findNearestRasiNumber(houseNumber, houseCenterX, houseCenterY);
+    if (rasiPosition) {
+      const distance = Math.sqrt(
+        Math.pow(houseCenterX - rasiPosition.x, 2) + 
+        Math.pow(houseCenterY - rasiPosition.y, 2)
+      );
+      if (distance < MIN_RASI_DISTANCE) {
+        // Apply small offset away from rasi number
+        const offsetX = (houseCenterX - rasiPosition.x) / distance * (MIN_RASI_DISTANCE - distance + 5);
+        const offsetY = (houseCenterY - rasiPosition.y) / distance * (MIN_RASI_DISTANCE - distance + 5);
+        return { 
+          x: houseCenterX + offsetX, 
+          y: houseCenterY + offsetY 
+        };
+      }
+    }
+    return { x: houseCenterX, y: houseCenterY };
   }
 
   // Separate Ascendant from other planets for positioning
@@ -521,89 +529,153 @@ function calculatePrecisePlanetPosition(housePosition, planet, allPlanetsInHouse
     (p.house === planet.house && Math.abs(p.degrees - planet.degrees) < 0.01)
   );
 
-  // Enhanced positioning with improved clustering prevention
-  function placePlanetsInCorners(index, totalPlanets, houseCenter) {
-    const corners = ['primary', 'secondary', 'tertiary', 'quaternary'];
-    let offset;
-    
-    if (totalPlanets === 1) {
-      // Single planet: Primary corner positioning
-      offset = CORNER_OFFSETS.primary;
-    } else if (totalPlanets === 2) {
-      // Two planets: Diagonal corners for maximum spacing
-      offset = index === 0 ? CORNER_OFFSETS.primary : CORNER_OFFSETS.tertiary;
-    } else if (totalPlanets === 3) {
-      // Three planets: Triangular corner arrangement
-      offset = CORNER_OFFSETS[corners[index % 3]];
-    } else if (totalPlanets === 4) {
-      // Four planets: All four corners
-      offset = CORNER_OFFSETS[corners[index % 4]];
-    } else {
-      // 5+ planets: All corners with intelligent layering
-      const baseCorner = corners[index % 4];
-      offset = { ...CORNER_OFFSETS[baseCorner] };
-      
-      // Enhanced layering for multiple planets in same corner
-      const layerIndex = Math.floor(index / 4);
-      if (layerIndex > 0 && layerIndex <= CLUSTERING_PREVENTION.MAX_LAYERS) {
-        // Calculate layer offset with anti-clustering
-        const layerXOffset = CLUSTERING_PREVENTION.LAYER_OFFSET * layerIndex;
-        const layerYOffset = CLUSTERING_PREVENTION.LAYER_OFFSET * Math.floor(layerIndex / 2);
-        
-        // Apply alternating pattern to prevent clustering
-        offset.x += (layerIndex % 2 === 0 ? layerXOffset : -layerXOffset);
-        offset.y += (index % 4 < 2 ? layerYOffset : -layerYOffset);
-        
-        // Add micro-adjustment for houses with 6+ planets
-        if (totalPlanets >= 6 && layerIndex >= 2) {
-          offset.x += (index % 3 === 0 ? 5 : -5);
-          offset.y += (planetIndex % 2 === 0 ? 5 : -5);
-        }
-      }
-    }
-    
-    return {
-      x: houseCenter.x + offset.x,
-      y: houseCenter.y + offset.y
-    };
-  }
-
-  const position = placePlanetsInCorners(planetIndex, nonAscendantPlanets.length, { x: textX, y: textY });
+  const totalPlanets = nonAscendantPlanets.length;
   
-  // Validate minimum spacing to prevent clustering
-  if (nonAscendantPlanets.length > 1) {
-    const otherPlanets = nonAscendantPlanets.filter((_, idx) => idx !== planetIndex);
-    for (const otherPlanet of otherPlanets) {
-      const otherPosition = placePlanetsInCorners(
-        nonAscendantPlanets.findIndex(p => 
-          (p.name === otherPlanet.name && p.code === otherPlanet.code) ||
-          (p.house === otherPlanet.house && Math.abs(p.degrees - otherPlanet.degrees) < 0.01)
-        ), 
-        nonAscendantPlanets.length, 
-        { x: textX, y: textY }
-      );
-      
-      // Distance calculation for clustering prevention
-      const distance = Math.sqrt(
-        Math.pow(position.x - otherPosition.x, 2) + 
-        Math.pow(position.y - otherPosition.y, 2)
-      );
-      
-      // Enhanced clustering detection with dynamic spacing
-      const minRequiredSpacing = CLUSTERING_PREVENTION.MIN_PLANET_SPACING + 
-        Math.floor(nonAscendantPlanets.length / 3) * 2;
-      
-      if (distance < minRequiredSpacing) {
-        console.warn(`⚠️ Potential clustering detected for ${planet.name} in house ${houseNumber}. Distance: ${distance}px, required: ${minRequiredSpacing}px`);
-        // Apply emergency separation adjustment
-        const emergencyOffset = minRequiredSpacing - distance + 3;
-        position.x += (planetIndex % 2 === 0 ? emergencyOffset : -emergencyOffset);
-        position.y += (planetIndex % 3 === 0 ? emergencyOffset : -emergencyOffset);
+  // Calculate base position with vertical stacking
+  let planetX = houseCenterX;
+  let planetY;
+  
+  if (totalPlanets === 1) {
+    // Single planet: Centered both horizontally and vertically
+    planetY = houseCenterY;
+  } else {
+    // Multiple planets: Centered horizontally, stacked vertically
+    // Calculate total height needed for all planets
+    const totalHeight = (totalPlanets - 1) * VERTICAL_SPACING;
+    const startY = houseCenterY - (totalHeight / 2);
+    
+    // Calculate this planet's vertical position
+    const verticalOffset = planetIndex * VERTICAL_SPACING;
+    planetY = startY + verticalOffset;
+  }
+  
+  // Apply overlap prevention adjustments
+  const adjustedPosition = preventOverlaps(
+    { x: planetX, y: planetY },
+    houseNumber,
+    housePosition,
+    MIN_RASI_DISTANCE,
+    MIN_BORDER_DISTANCE
+  );
+  
+  return adjustedPosition;
+}
+
+/**
+ * Find the nearest rasi number position to a given house
+ * @param {number} houseNumber - House number (1-12)
+ * @param {number} x - X coordinate to check from
+ * @param {number} y - Y coordinate to check from
+ * @returns {Object|null} Nearest rasi number position {x, y} or null
+ */
+function findNearestRasiNumber(houseNumber, x, y) {
+  let nearestRasi = null;
+  let minDistance = Infinity;
+  
+  // Check all rasi number positions to find the closest one to this house
+  Object.entries(RASI_NUMBER_POSITIONS).forEach(([rasiKey, rasiPos]) => {
+    const distance = Math.sqrt(
+      Math.pow(x - rasiPos.x, 2) + 
+      Math.pow(y - rasiPos.y, 2)
+    );
+    
+    // For houses near diamond intersections, check adjacent rasi positions
+    // House 1 is near rasi positions 1 and 2 (top-left and top-edge-left)
+    // Map house numbers to nearby rasi positions
+    const nearbyRasiIndices = getNearbyRasiIndices(houseNumber);
+    
+    if (nearbyRasiIndices.includes(parseInt(rasiKey))) {
+      if (distance < minDistance) {
+        minDistance = distance;
+        nearestRasi = rasiPos;
       }
     }
-  }
+  });
+  
+  return nearestRasi;
+}
 
-  return position;
+/**
+ * Get rasi number indices that are near a given house number
+ * Based on North Indian diamond layout structure
+ * @param {number} houseNumber - House number (1-12)
+ * @returns {Array} Array of nearby rasi number indices
+ */
+function getNearbyRasiIndices(houseNumber) {
+  // Map each house to nearby rasi number positions based on diamond layout
+  // Rasi numbers are at diamond intersections and edges
+  const houseToRasiMap = {
+    1: [1, 2],      // House 1: Near rasi 1 (top-left intersection), rasi 2 (top-edge-left)
+    2: [2, 3],      // House 2: Near rasi 2 (top-edge-left), rasi 3 (top-edge-right)
+    3: [3, 4],      // House 3: Near rasi 3 (top-edge-right), rasi 4 (top-right intersection)
+    4: [4, 5],      // House 4: Near rasi 4 (top-right intersection), rasi 5 (right-edge-top)
+    5: [5, 6],      // House 5: Near rasi 5 (right-edge-top), rasi 6 (right-edge-bottom)
+    6: [6, 7],      // House 6: Near rasi 6 (right-edge-bottom), rasi 7 (bottom-right intersection)
+    7: [7, 8],      // House 7: Near rasi 7 (bottom-right intersection), rasi 8 (bottom-edge-right)
+    8: [8, 9],      // House 8: Near rasi 8 (bottom-edge-right), rasi 9 (bottom-edge-left)
+    9: [9, 10],     // House 9: Near rasi 9 (bottom-edge-left), rasi 10 (bottom-left intersection)
+    10: [10, 11],   // House 10: Near rasi 10 (bottom-left intersection), rasi 11 (left-edge-bottom)
+    11: [11, 12],   // House 11: Near rasi 11 (left-edge-bottom), rasi 12 (left-edge-top)
+    12: [12, 1]     // House 12: Near rasi 12 (left-edge-top), rasi 1 (top-left intersection)
+  };
+  
+  return houseToRasiMap[houseNumber] || [];
+}
+
+/**
+ * Prevent overlaps with rasi numbers and house borders
+ * Adjusts position to maintain minimum clearances
+ * @param {Object} position - Initial position {x, y}
+ * @param {number} houseNumber - House number (1-12)
+ * @param {Object} housePosition - House center position {x, y}
+ * @param {number} minRasiDistance - Minimum distance from rasi numbers
+ * @param {number} minBorderDistance - Minimum distance from house borders
+ * @returns {Object} Adjusted position {x, y}
+ */
+function preventOverlaps(position, houseNumber, housePosition, minRasiDistance, minBorderDistance) {
+  let adjustedX = position.x;
+  let adjustedY = position.y;
+  
+  // Check distance from rasi numbers
+  const nearbyRasiIndices = getNearbyRasiIndices(houseNumber);
+  for (const rasiIndex of nearbyRasiIndices) {
+    const rasiPos = RASI_NUMBER_POSITIONS[rasiIndex];
+    if (!rasiPos) continue;
+    
+    const distance = Math.sqrt(
+      Math.pow(adjustedX - rasiPos.x, 2) + 
+      Math.pow(adjustedY - rasiPos.y, 2)
+    );
+    
+    if (distance < minRasiDistance) {
+      // Calculate offset to push planet away from rasi number
+      const angle = Math.atan2(adjustedY - rasiPos.y, adjustedX - rasiPos.x);
+      const requiredDistance = minRasiDistance + 5; // Add 5px buffer
+      
+      adjustedX = rasiPos.x + Math.cos(angle) * requiredDistance;
+      adjustedY = rasiPos.y + Math.sin(angle) * requiredDistance;
+    }
+  }
+  
+  // Check distance from house borders
+  // Calculate approximate house boundaries based on house position and chart structure
+  const CHART_SIZE = 500;
+  const PADDING = 60;
+  
+  // Define approximate house boundaries based on North Indian diamond layout
+  // Houses are within the square from PADDING to CHART_SIZE - PADDING
+  const minX = PADDING + minBorderDistance;
+  const maxX = CHART_SIZE - PADDING - minBorderDistance;
+  const minY = PADDING + minBorderDistance;
+  const maxY = CHART_SIZE - PADDING - minBorderDistance;
+  
+  // Adjust if too close to borders
+  if (adjustedX < minX) adjustedX = minX;
+  if (adjustedX > maxX) adjustedX = maxX;
+  if (adjustedY < minY) adjustedY = minY;
+  if (adjustedY > maxY) adjustedY = maxY;
+  
+  return { x: adjustedX, y: adjustedY };
 }
 
 /**
