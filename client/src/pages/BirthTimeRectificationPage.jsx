@@ -42,6 +42,95 @@ const safeString = (value) => {
   return String(value);
 };
 
+// Comprehensive normalization function to prevent React Error #130
+// Converts all objects to safe primitive types for React rendering
+const normalizeRectificationData = (data) => {
+  if (!data || typeof data !== 'object') {
+    return null;
+  }
+
+  const normalized = {
+    // Preserve primitive properties
+    proposedTime: typeof data.proposedTime === 'string' ? data.proposedTime : null,
+    confidence: safeNumber(data.confidence),
+    alignmentScore: safeNumber(data.alignmentScore),
+    rectifiedTime: typeof data.rectifiedTime === 'string' ? data.rectifiedTime : null,
+    
+    // Normalize ascendant object - extract only primitive values
+    ascendant: data.ascendant ? {
+      sign: safeString(data.ascendant.sign || data.ascendant.signName),
+      signId: typeof data.ascendant.signId === 'string' || typeof data.ascendant.signId === 'number' 
+        ? safeString(data.ascendant.signId) 
+        : null,
+      degree: safeNumber(data.ascendant.degree || data.ascendant.longitude),
+      longitude: safeNumber(data.ascendant.longitude || data.ascendant.siderealLongitude)
+    } : null,
+    
+    // Normalize praanapada object - extract only primitive values
+    praanapada: data.praanapada ? {
+      sign: safeString(data.praanapada.sign || data.praanapada.signName),
+      degree: safeNumber(data.praanapada.degree || data.praanapada.longitude),
+      longitude: safeNumber(data.praanapada.longitude)
+    } : null,
+    
+    // Normalize recommendations array - convert objects to safe strings
+    recommendations: Array.isArray(data.recommendations) 
+      ? data.recommendations.map(rec => {
+          if (typeof rec === 'string') return rec;
+          if (rec && typeof rec === 'object') {
+            return safeString(rec.message || rec.text || rec.description || rec);
+          }
+          return safeString(rec);
+        })
+      : [],
+    
+    // Normalize analysisLog array - ensure all are strings
+    analysisLog: Array.isArray(data.analysisLog)
+      ? data.analysisLog.map(log => safeString(log))
+      : [],
+    
+    // Normalize analysis object if present (for full analysis responses)
+    analysis: data.analysis ? {
+      bestCandidate: data.analysis.bestCandidate ? {
+        time: typeof data.analysis.bestCandidate.time === 'string' 
+          ? data.analysis.bestCandidate.time 
+          : null,
+        confidence: safeNumber(data.analysis.bestCandidate.confidence),
+        score: safeNumber(data.analysis.bestCandidate.score)
+      } : null,
+      method: safeString(data.analysis.method),
+      candidates: Array.isArray(data.analysis.candidates)
+        ? data.analysis.candidates.map(candidate => ({
+            time: typeof candidate.time === 'string' ? candidate.time : null,
+            confidence: safeNumber(candidate.confidence),
+            score: safeNumber(candidate.score)
+          }))
+        : []
+    } : null
+  };
+
+  // Preserve any other primitive properties that might exist
+  Object.keys(data).forEach(key => {
+    if (!normalized.hasOwnProperty(key)) {
+      const value = data[key];
+      if (value == null || typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+        normalized[key] = value;
+      } else if (Array.isArray(value)) {
+        normalized[key] = value.map(item => {
+          if (typeof item === 'string' || typeof item === 'number' || typeof item === 'boolean') {
+            return item;
+          }
+          return safeString(item);
+        });
+      } else {
+        // Skip objects - they're not safe to render
+      }
+    }
+  });
+
+  return normalized;
+};
+
 const BirthTimeRectificationPageEnhanced = () => {
   const navigate = useNavigate();
   const { currentChart } = useChart();
@@ -261,21 +350,43 @@ const BirthTimeRectificationPageEnhanced = () => {
         return setError('Invalid validation response structure');
       }
       
-      // CRITICAL FIX: Validate and normalize validation data structure to prevent React Error #130
-      // Ensure all values are primitives before rendering
-      const normalized = {
-        ...validation,
-        confidence: safeNumber(validation.confidence),
-        alignmentScore: safeNumber(validation.alignmentScore),
-        praanapada: validation.praanapada ? {
-          ...validation.praanapada,
-          sign: safeString(validation.praanapada.sign)
-        } : null,
-        ascendant: validation.ascendant ? {
-          ...validation.ascendant,
-          sign: safeString(validation.ascendant.sign)
-        } : null
+      // CRITICAL FIX: Comprehensive normalization to prevent React Error #130
+      // Normalize ALL properties, especially objects, to safe primitive types
+      const normalized = normalizeRectificationData(validation);
+      
+      if (!normalized) {
+        console.error('Normalization failed for validation data:', validation);
+        return setError('Data normalization failed');
+      }
+      
+      // Validate normalized structure contains only primitives
+      const validateNormalized = (obj, path = '') => {
+        for (const key in obj) {
+          const value = obj[key];
+          const currentPath = path ? `${path}.${key}` : key;
+          
+          if (value === null || value === undefined) {
+            continue; // null/undefined are safe
+          }
+          
+          if (Array.isArray(value)) {
+            value.forEach((item, index) => {
+              if (item !== null && typeof item === 'object' && !Array.isArray(item)) {
+                console.error(`Object found in array at ${currentPath}[${index}]`);
+              }
+            });
+          } else if (typeof value === 'object' && !Array.isArray(value)) {
+            // Nested objects are only allowed for ascendant/praanapada/analysis which are normalized
+            if (['ascendant', 'praanapada', 'analysis'].includes(key)) {
+              validateNormalized(value, currentPath);
+            } else {
+              console.error(`Unnormalized object found at ${currentPath}`);
+            }
+          }
+        }
       };
+      
+      validateNormalized(normalized);
       
       setRectificationData(normalized);
       setQuickValidationComplete(true);
@@ -390,21 +501,43 @@ const BirthTimeRectificationPageEnhanced = () => {
         return setError('Invalid rectification response structure');
       }
       
-      // CRITICAL FIX: Validate and normalize rectification data structure to prevent React Error #130
-      // Ensure all values are primitives before rendering
-      const normalized = {
-        ...rectification,
-        confidence: safeNumber(rectification.confidence),
-        alignmentScore: safeNumber(rectification.alignmentScore),
-        praanapada: rectification.praanapada ? {
-          ...rectification.praanapada,
-          sign: safeString(rectification.praanapada.sign)
-        } : null,
-        ascendant: rectification.ascendant ? {
-          ...rectification.ascendant,
-          sign: safeString(rectification.ascendant.sign)
-        } : null
+      // CRITICAL FIX: Comprehensive normalization to prevent React Error #130
+      // Normalize ALL properties, especially objects, to safe primitive types
+      const normalized = normalizeRectificationData(rectification);
+      
+      if (!normalized) {
+        console.error('Normalization failed for rectification data:', rectification);
+        return setError('Data normalization failed');
+      }
+      
+      // Validate normalized structure contains only primitives
+      const validateNormalized = (obj, path = '') => {
+        for (const key in obj) {
+          const value = obj[key];
+          const currentPath = path ? `${path}.${key}` : key;
+          
+          if (value === null || value === undefined) {
+            continue; // null/undefined are safe
+          }
+          
+          if (Array.isArray(value)) {
+            value.forEach((item, index) => {
+              if (item !== null && typeof item === 'object' && !Array.isArray(item)) {
+                console.error(`Object found in array at ${currentPath}[${index}]`);
+              }
+            });
+          } else if (typeof value === 'object' && !Array.isArray(value)) {
+            // Nested objects are only allowed for ascendant/praanapada/analysis which are normalized
+            if (['ascendant', 'praanapada', 'analysis'].includes(key)) {
+              validateNormalized(value, currentPath);
+            } else {
+              console.error(`Unnormalized object found at ${currentPath}`);
+            }
+          }
+        }
       };
+      
+      validateNormalized(normalized);
       
       // Normalize data structure - store rectification object consistently with quick validation
       setRectificationData(normalized);

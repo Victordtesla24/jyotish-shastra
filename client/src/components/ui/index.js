@@ -1,5 +1,6 @@
 import React, { forwardRef } from 'react';
 import clsx from 'clsx';
+import VedicLoadingSpinner from './VedicLoadingSpinner.jsx';
 
 // Updated Button component with more variants
 export const Button = forwardRef(({
@@ -102,16 +103,20 @@ export {
   SkeletonChart
 } from './loading/Skeleton.jsx';
 
+// Loading Components - export from correct location
 export {
-  default as VedicLoadingSpinner,
-  ChartLoadingSpinner,
-  AnalysisLoadingSpinner,
-  PageLoadingSpinner,
-  InlineVedicSpinner
-} from './loading/VedicLoadingSpinner.jsx';
+  VedicLoadingSpinner as default,
+  VedicLoadingSpinner
+};
+
+// Named exports from VedicLoadingSpinner (for backward compatibility)
+export const ChartLoadingSpinner = VedicLoadingSpinner;
+export const AnalysisLoadingSpinner = VedicLoadingSpinner;
+export const PageLoadingSpinner = VedicLoadingSpinner;
+export const InlineVedicSpinner = VedicLoadingSpinner;
 
 // Alias for LoadingSpinner (expected by tests)
-export { default as LoadingSpinner } from './loading/VedicLoadingSpinner.jsx';
+export { VedicLoadingSpinner as LoadingSpinner };
 
 // Theme Components
 export { default as ThemeToggle } from './ThemeToggle.jsx';
