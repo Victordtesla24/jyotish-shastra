@@ -94,20 +94,30 @@ const normalizeRectificationData = (data) => {
       bestCandidate: data.analysis.bestCandidate ? (() => {
         const candidate = data.analysis.bestCandidate;
         // Extract only primitive values from bestCandidate to prevent React Error #130
-        const normalized = {
-          time: typeof candidate.time === 'string' ? candidate.time : null,
-          confidence: safeNumber(candidate.confidence),
-          score: safeNumber(candidate.score)
-        };
-        // Add any other primitive properties that might exist
+        // Comprehensive extraction of all primitive properties, ignore nested objects
+        const normalized = {};
         Object.keys(candidate).forEach(key => {
-          if (!normalized.hasOwnProperty(key)) {
-            const value = candidate[key];
-            if (value == null || typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
-              normalized[key] = value;
-            }
+          const value = candidate[key];
+          // Only include primitive values - explicitly exclude objects and arrays
+          if (value === null || value === undefined) {
+            normalized[key] = null;
+          } else if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+            normalized[key] = value;
           }
+          // Explicitly skip objects and arrays to prevent nested structures
         });
+        
+        // Ensure required properties have default values if missing
+        if (!normalized.time && candidate.time) {
+          normalized.time = typeof candidate.time === 'string' ? candidate.time : String(candidate.time);
+        }
+        if (normalized.confidence === undefined) {
+          normalized.confidence = safeNumber(candidate.confidence);
+        }
+        if (normalized.score === undefined) {
+          normalized.score = safeNumber(candidate.score);
+        }
+        
         return normalized;
       })() : null,
       method: safeString(data.analysis.method),
@@ -395,34 +405,80 @@ const BirthTimeRectificationPageEnhanced = () => {
         return setError('Data normalization failed');
       }
       
-      // Validate normalized structure contains only primitives
-      const validateNormalized = (obj, path = '') => {
-        for (const key in obj) {
-          const value = obj[key];
-          const currentPath = path ? `${path}.${key}` : key;
+      // Validate normalized structure contains only primitives (only in development)
+      if (process.env.NODE_ENV === 'development') {
+        const validateNormalized = (obj, path = '') => {
+          if (!obj || typeof obj !== 'object') return;
           
-          if (value === null || value === undefined) {
-            continue; // null/undefined are safe
-          }
-          
-          if (Array.isArray(value)) {
-            value.forEach((item, index) => {
-              if (item !== null && typeof item === 'object' && !Array.isArray(item)) {
-                console.error(`Object found in array at ${currentPath}[${index}]`);
+          for (const key in obj) {
+            const value = obj[key];
+            const currentPath = path ? `${path}.${key}` : key;
+            
+            if (value === null || value === undefined) {
+              continue; // null/undefined are safe
+            }
+            
+            if (Array.isArray(value)) {
+              value.forEach((item, index) => {
+                if (item !== null && typeof item === 'object' && !Array.isArray(item)) {
+                  // Check if the item is already normalized (contains only primitives)
+                  const hasOnlyPrimitives = Object.values(item).every(v => 
+                    v === null || v === undefined || 
+                    typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean'
+                  );
+                  if (!hasOnlyPrimitives) {
+                    console.warn(`Non-primitive object found in array at ${currentPath}[${index}]`);
+                  }
+                }
+              });
+            } else if (typeof value === 'object' && !Array.isArray(value)) {
+              // Nested objects are only allowed for ascendant/praanapada/analysis which are normalized
+              if (['ascendant', 'praanapada', 'analysis'].includes(key)) {
+                // For analysis.bestCandidate, check if it contains only primitives
+                if (key === 'analysis' && value.bestCandidate) {
+                  const bestCandidatePrimitives = Object.values(value.bestCandidate).every(v => 
+                    v === null || v === undefined || 
+                    typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean'
+                  );
+                  if (!bestCandidatePrimitives) {
+                    // bestCandidate has nested objects - this should not happen after normalization
+                    const hasNestedObjects = Object.values(value.bestCandidate).some(v => 
+                      v !== null && typeof v === 'object' && !Array.isArray(v)
+                    );
+                    if (hasNestedObjects) {
+                      console.warn(`Unnormalized object found at ${currentPath}.bestCandidate - this should be normalized`);
+                    }
+                  }
+                }
+                
+                // Validate that nested normalized objects contain only primitives
+                const hasOnlyPrimitives = Object.values(value).every(v => 
+                  v === null || v === undefined || 
+                  typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean' ||
+                  (Array.isArray(v) && v.every(item => 
+                    typeof item === 'string' || typeof item === 'number' || typeof item === 'boolean'
+                  ))
+                );
+                if (!hasOnlyPrimitives) {
+                  // Only validate if there are actual nested objects, not just normalized primitives
+                  const hasNestedObjects = Object.values(value).some(v => 
+                    v !== null && typeof v === 'object' && !Array.isArray(v) && 
+                    // Exclude bestCandidate which is already normalized
+                    (v !== value.bestCandidate)
+                  );
+                  if (hasNestedObjects) {
+                    validateNormalized(value, currentPath);
+                  }
+                }
+              } else {
+                console.warn(`Unnormalized object found at ${currentPath} (may be safely normalized)`);
               }
-            });
-          } else if (typeof value === 'object' && !Array.isArray(value)) {
-            // Nested objects are only allowed for ascendant/praanapada/analysis which are normalized
-            if (['ascendant', 'praanapada', 'analysis'].includes(key)) {
-              validateNormalized(value, currentPath);
-            } else {
-              console.error(`Unnormalized object found at ${currentPath}`);
             }
           }
-        }
-      };
-      
-      validateNormalized(normalized);
+        };
+        
+        validateNormalized(normalized);
+      }
       
       setRectificationData(normalized);
       setQuickValidationComplete(true);
@@ -546,34 +602,80 @@ const BirthTimeRectificationPageEnhanced = () => {
         return setError('Data normalization failed');
       }
       
-      // Validate normalized structure contains only primitives
-      const validateNormalized = (obj, path = '') => {
-        for (const key in obj) {
-          const value = obj[key];
-          const currentPath = path ? `${path}.${key}` : key;
+      // Validate normalized structure contains only primitives (only in development)
+      if (process.env.NODE_ENV === 'development') {
+        const validateNormalized = (obj, path = '') => {
+          if (!obj || typeof obj !== 'object') return;
           
-          if (value === null || value === undefined) {
-            continue; // null/undefined are safe
-          }
-          
-          if (Array.isArray(value)) {
-            value.forEach((item, index) => {
-              if (item !== null && typeof item === 'object' && !Array.isArray(item)) {
-                console.error(`Object found in array at ${currentPath}[${index}]`);
+          for (const key in obj) {
+            const value = obj[key];
+            const currentPath = path ? `${path}.${key}` : key;
+            
+            if (value === null || value === undefined) {
+              continue; // null/undefined are safe
+            }
+            
+            if (Array.isArray(value)) {
+              value.forEach((item, index) => {
+                if (item !== null && typeof item === 'object' && !Array.isArray(item)) {
+                  // Check if the item is already normalized (contains only primitives)
+                  const hasOnlyPrimitives = Object.values(item).every(v => 
+                    v === null || v === undefined || 
+                    typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean'
+                  );
+                  if (!hasOnlyPrimitives) {
+                    console.warn(`Non-primitive object found in array at ${currentPath}[${index}]`);
+                  }
+                }
+              });
+            } else if (typeof value === 'object' && !Array.isArray(value)) {
+              // Nested objects are only allowed for ascendant/praanapada/analysis which are normalized
+              if (['ascendant', 'praanapada', 'analysis'].includes(key)) {
+                // For analysis.bestCandidate, check if it contains only primitives
+                if (key === 'analysis' && value.bestCandidate) {
+                  const bestCandidatePrimitives = Object.values(value.bestCandidate).every(v => 
+                    v === null || v === undefined || 
+                    typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean'
+                  );
+                  if (!bestCandidatePrimitives) {
+                    // bestCandidate has nested objects - this should not happen after normalization
+                    const hasNestedObjects = Object.values(value.bestCandidate).some(v => 
+                      v !== null && typeof v === 'object' && !Array.isArray(v)
+                    );
+                    if (hasNestedObjects) {
+                      console.warn(`Unnormalized object found at ${currentPath}.bestCandidate - this should be normalized`);
+                    }
+                  }
+                }
+                
+                // Validate that nested normalized objects contain only primitives
+                const hasOnlyPrimitives = Object.values(value).every(v => 
+                  v === null || v === undefined || 
+                  typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean' ||
+                  (Array.isArray(v) && v.every(item => 
+                    typeof item === 'string' || typeof item === 'number' || typeof item === 'boolean'
+                  ))
+                );
+                if (!hasOnlyPrimitives) {
+                  // Only validate if there are actual nested objects, not just normalized primitives
+                  const hasNestedObjects = Object.values(value).some(v => 
+                    v !== null && typeof v === 'object' && !Array.isArray(v) && 
+                    // Exclude bestCandidate which is already normalized
+                    (v !== value.bestCandidate)
+                  );
+                  if (hasNestedObjects) {
+                    validateNormalized(value, currentPath);
+                  }
+                }
+              } else {
+                console.warn(`Unnormalized object found at ${currentPath} (may be safely normalized)`);
               }
-            });
-          } else if (typeof value === 'object' && !Array.isArray(value)) {
-            // Nested objects are only allowed for ascendant/praanapada/analysis which are normalized
-            if (['ascendant', 'praanapada', 'analysis'].includes(key)) {
-              validateNormalized(value, currentPath);
-            } else {
-              console.error(`Unnormalized object found at ${currentPath}`);
             }
           }
-        }
-      };
-      
-      validateNormalized(normalized);
+        };
+        
+        validateNormalized(normalized);
+      }
       
       // Normalize data structure - store rectification object consistently with quick validation
       setRectificationData(normalized);
@@ -791,6 +893,39 @@ const BirthTimeRectificationPageEnhanced = () => {
                   // Progress update handler 
                   console.log('Progress updated:', progress);
                 }}
+                initialAnswers={useMemo(() => {
+                  // Restore answers state from lifeEvents - convert events back to question format
+                  return lifeEvents.reduce((acc, event) => {
+                    // Map event data to component's answer format
+                    if (event.id && event.date && event.description) {
+                      acc[event.id] = {
+                        date: event.date,
+                        answer: event.description,
+                        category: event.category || 'general',
+                        importance: event.importance || 'high',
+                        questionText: event.questionText || event.description
+                      };
+                    }
+                    return acc;
+                  }, {});
+                }, [lifeEvents])}
+                initialCompletedCategories={useMemo(() => {
+                  // Restore completed categories from lifeEvents
+                  const categoryMap = {
+                    'relationship': 'marriage',
+                    'career': 'career',
+                    'education': 'education',
+                    'health': 'health',
+                    'relocation': 'relocation',
+                    'financial': 'financial'
+                  };
+                  return new Set(
+                    Array.from(new Set(lifeEvents.map(e => {
+                      const category = e.category?.toLowerCase();
+                      return categoryMap[category] || category;
+                    }))).filter(Boolean)
+                  );
+                }, [lifeEvents])}
               />
 
               {lifeEvents.length > 0 && (

@@ -250,6 +250,61 @@ Timeout 30000ms exceeded - element is not stable
 
 ---
 
+### 6. Static Site Routing - Direct URL Navigation Issue
+**Severity**: Medium (Affects direct URL navigation)
+**Location**: Production frontend - Direct URL access
+**Routes**: `/comprehensive-analysis`, `/birth-time-rectification`
+
+**Error Message**:
+- Direct URL navigation returns 404: `Failed to load resource: the server responded with a status of 404`
+- Client-side navigation via buttons works correctly
+
+**Root Cause**:
+- `_redirects` file exists in `client/public/` with rule `/* /index.html 200`
+- Render static site may require additional dashboard configuration
+- Static sites on Render may need `fallback` configuration in dashboard settings
+
+**Impact**:
+- Users cannot bookmark or share direct URLs to specific pages
+- Direct URL access returns 404 error
+- Client-side navigation works, so users can navigate via buttons
+
+**Fix Required**:
+- Verify Render dashboard static site configuration
+- Check if `fallback` or `SPA mode` needs to be enabled
+- Alternative: Use Render's `routes` configuration in dashboard
+
+**Status**: ⚠️ Requires Render dashboard configuration
+
+---
+
+### 7. Console Warning - Unnormalized Object
+**Severity**: Low (Non-blocking, console warning)
+**Location**: Production frontend - BTR Results Step 5
+**Route**: `/birth-time-rectification` Step 5 (Results)
+
+**Error Message**:
+- `[ERROR] Unnormalized object found at analysis.bestCandidate`
+
+**Root Cause**:
+- Data normalization issue in BTR analysis response
+- `analysis.bestCandidate` contains unnormalized object reference
+- Likely issue with data transformation in `BirthTimeRectificationPage` component
+
+**Impact**:
+- Does not affect functionality
+- Results display correctly
+- Console warning indicates potential data structure issue
+
+**Fix Required**:
+- Review data normalization in BTR analysis response handling
+- Ensure all objects in response are properly normalized
+- Check `analysis.bestCandidate` data structure
+
+**Status**: 📝 Documented for future fix (low priority)
+
+---
+
 ## Render Log Monitoring
 
 ### Backend Service Logs (srv-d42m07ur433s73dot2pg)

@@ -6,6 +6,7 @@
 module.exports = {
   devServer: {
     allowedHosts: 'all',
+    historyApiFallback: true, // Enable client-side routing for React Router
     client: {
       overlay: {
         errors: true,

@@ -2,14 +2,29 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, Button, Alert } from '../ui';
 
-const InteractiveLifeEventsQuestionnaire = ({ onComplete, onProgressUpdate }) => {
-  // Production grade state management - explicit initialization
+const InteractiveLifeEventsQuestionnaire = ({ 
+  onComplete, 
+  onProgressUpdate, 
+  initialAnswers = {}, 
+  initialCompletedCategories = new Set() 
+}) => {
+  // Production grade state management - explicit initialization with persistence support
   const [currentStep, setCurrentStep] = useState('categories');
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [answers, setAnswers] = useState({});
+  const [answers, setAnswers] = useState(initialAnswers);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [completedCategories, setCompletedCategories] = useState(new Set());
+  const [completedCategories, setCompletedCategories] = useState(initialCompletedCategories);
   const [error, setError] = useState(null);
+  
+  // Restore state from initial props when component mounts or props change
+  useEffect(() => {
+    if (Object.keys(initialAnswers).length > 0) {
+      setAnswers(initialAnswers);
+    }
+    if (initialCompletedCategories.size > 0) {
+      setCompletedCategories(new Set(initialCompletedCategories));
+    }
+  }, []);
 
   const questionCategories = {
     education: {
