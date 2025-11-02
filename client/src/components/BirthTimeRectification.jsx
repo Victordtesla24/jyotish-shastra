@@ -24,6 +24,7 @@ const BirthTimeRectification = ({
   const [analysisResults, setAnalysisResults] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [hasAttempted, setHasAttempted] = useState(false);
   const [lifeEvents, setLifeEvents] = useState([{ date: '', description: '' }]);
   const [methods, setMethods] = useState({
     praanapada: true,
@@ -62,24 +63,37 @@ const BirthTimeRectification = ({
   const handleQuickValidation = async () => {
     if (!formData.dateOfBirth || !formData.placeOfBirth || !formData.timeOfBirth) {
       setError('Please provide date, place, and time of birth');
+      setHasAttempted(true);
       return;
     }
 
     setLoading(true);
     setError('');
+    setHasAttempted(true);
 
     try {
       const response = await axios.post(`${API_URL}/v1/rectification/quick`, {
         birthData: formData,
         proposedTime: formData.timeOfBirth
+      }, {
+        timeout: 30000
       });
 
-      if (response.data.success) {
-        setAnalysisResults(response.data.validation);
-        onResponse(response.data.validation);
+      if (response.data?.success) {
+        setAnalysisResults(response.data.validation || response.data);
+        if (onRectificationComplete) {
+          onRectificationComplete(response.data.validation || response.data, response.data);
+        }
+      } else {
+        setError(response.data?.message || response.data?.error?.message || 'Validation failed');
       }
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Validation failed');
+      const errorMessage = err.response?.data?.error?.message || 
+                          err.response?.data?.message || 
+                          err.message || 
+                          'Validation failed. Please check your birth data and try again.';
+      setError(errorMessage);
+      console.error('BTR Quick Validation Error:', err.response?.data || err.message);
     } finally {
       setLoading(false);
     }
@@ -89,11 +103,13 @@ const BirthTimeRectification = ({
   const handleFullAnalysis = async () => {
     if (!formData.dateOfBirth || !formData.placeOfBirth) {
       setError('Please provide date and place of birth');
+      setHasAttempted(true);
       return;
     }
 
     setLoading(true);
     setError('');
+    setHasAttempted(true);
 
     try {
       const requestOptions = {
@@ -113,28 +129,28 @@ const BirthTimeRectification = ({
       const response = await axios.post(endpoint, {
         birthData: formData,
         ...requestOptions
+      }, {
+        timeout: 60000
       });
 
-      if (response.data.success) {
-        setAnalysisResults(response.data.rectification);
-        onResponse(response.data.rectification);
+      if (response.data?.success) {
+        const rectification = response.data.rectification || response.data;
+        setAnalysisResults(rectification);
+        if (onRectificationComplete) {
+          onRectificationComplete(rectification, response.data);
+        }
+      } else {
+        setError(response.data?.message || response.data?.error?.message || 'Analysis failed');
       }
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Rectification analysis failed');
+      const errorMessage = err.response?.data?.error?.message || 
+                          err.response?.data?.message || 
+                          err.message || 
+                          'Rectification analysis failed. Please check your birth data and try again.';
+      setError(errorMessage);
+      console.error('BTR Full Analysis Error:', err.response?.data || err.message);
     } finally {
       setLoading(false);
-    }
-  };
-
-  // Handle response from parent component
-  const onResponse = (results) => {
-    if (onRectificationComplete) {
-      const rectifiedData = {
-        ...formData,
-        timeOfBirth: results.rectifiedTime || formData.timeOfBirth,
-        rectifiedWith: results.confidence > 60 ? 'BPHS BTR Analysis' : 'Original time'
-      };
-      onRectificationComplete(rectifiedData, results);
     }
   };
 
@@ -161,14 +177,22 @@ const BirthTimeRectification = ({
       <div className="btr-tabs">
         <button
           className={`tab-btn ${activeTab === 'quick' ? 'active' : ''}`}
-          onClick={() => setActiveTab('quick')}
+          onClick={() => {
+            setActiveTab('quick');
+            setError('');
+            setHasAttempted(false);
+          }}
         >
           Quick Validation
         </button>
         {showOptional && (
           <button
             className={`tab-btn ${activeTab === 'full' ? 'active' : ''}`}
-            onClick={() => setActiveTab('full')}
+            onClick={() => {
+              setActiveTab('full');
+              setError('');
+              setHasAttempted(false);
+            }}
           >
             Full Analysis
           </button>
@@ -352,10 +376,11 @@ const BirthTimeRectification = ({
           </div>
         </div>
 
-        {/* Error Display */}
-        {error && (
-          <div className="error-message">
-            {error}
+        {/* Error Display - Only show after user attempts */}
+        {error && hasAttempted && (
+          <div className="error-message" role="alert">
+            <strong>Rectification analysis failed</strong>
+            <p>{error}</p>
           </div>
         )}
 

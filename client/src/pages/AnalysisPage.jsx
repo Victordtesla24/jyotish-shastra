@@ -2833,14 +2833,39 @@ const AnalysisPage = () => {
             const rawLagnaData = comprehensiveData.sections.section2.analyses.lagna;
 
             // Transform the data structure to match what LagnaDisplay expects
+            const lagnaSign = rawLagnaData.lagnaSign || rawLagnaData.lagna || {};
+            const lagnaLord = rawLagnaData.lagnaLord || rawLagnaData.lord || {};
+            const currentPosition = lagnaLord.currentPosition || lagnaLord.position || {};
+            
+            // Ensure characteristics is an array
+            let characteristics = lagnaSign.characteristics;
+            if (!Array.isArray(characteristics)) {
+              if (typeof characteristics === 'string') {
+                characteristics = [characteristics];
+              } else if (characteristics && typeof characteristics === 'object') {
+                characteristics = Object.values(characteristics);
+              } else {
+                characteristics = [];
+              }
+            }
+
+            // Extract description from various possible locations
+            const description = rawLagnaData.description || 
+                              rawLagnaData.interpretation || 
+                              rawLagnaData.analysis ||
+                              lagnaSign.description ||
+                              lagnaSign.interpretation ||
+                              'Lagna analysis data available';
+
             const formattedLagnaData = {
               analysis: {
-                sign: rawLagnaData.lagnaSign?.sign,
-                signLord: rawLagnaData.lagnaSign?.ruler,
-                element: rawLagnaData.lagnaSign?.element,
-                characteristics: rawLagnaData.lagnaSign?.characteristics,
-                degree: rawLagnaData.lagnaLord?.currentPosition?.degree,
-                nakshatra: rawLagnaData.lagnaLord?.currentPosition?.nakshatra,
+                sign: lagnaSign.sign || lagnaSign.name || rawLagnaData.sign,
+                signLord: lagnaSign.ruler || lagnaSign.lord || lagnaLord.name || rawLagnaData.signLord,
+                element: lagnaSign.element || rawLagnaData.element,
+                characteristics: characteristics,
+                description: description,
+                degree: currentPosition.degree || lagnaLord.degree || rawLagnaData.degree,
+                nakshatra: currentPosition.nakshatra || lagnaLord.nakshatra || rawLagnaData.nakshatra,
                 // Include the full raw data for comprehensive access
                 fullData: rawLagnaData
               },
@@ -2848,10 +2873,33 @@ const AnalysisPage = () => {
             };
 
             extractedData.lagna = formattedLagnaData;
-            console.log('✅ Extracted lagna data from section2');
+            console.log('✅ Extracted lagna data from section2:', {
+              sign: formattedLagnaData.analysis.sign,
+              hasDescription: !!formattedLagnaData.analysis.description,
+              characteristicsCount: formattedLagnaData.analysis.characteristics.length
+            });
           } else if (comprehensiveData.sections.section2) {
-            // Extract lagna data from section2 structure
-            extractedData.lagna = { analysis: comprehensiveData.sections.section2, success: true };
+            // Extract lagna data from section2 structure with fallback formatting
+            const section2 = comprehensiveData.sections.section2;
+            const formattedLagnaData = {
+              analysis: {
+                sign: section2.sign || section2.lagnaSign?.sign || section2.lagna?.sign,
+                signLord: section2.signLord || section2.ruler || section2.lord,
+                element: section2.element || section2.lagnaSign?.element,
+                description: section2.description || section2.interpretation || section2.analysis || 'Lagna analysis available',
+                degree: section2.degree || section2.lagnaLord?.currentPosition?.degree,
+                nakshatra: section2.nakshatra || section2.lagnaLord?.currentPosition?.nakshatra,
+                characteristics: Array.isArray(section2.characteristics) ? section2.characteristics : 
+                                (section2.lagnaSign?.characteristics ? (Array.isArray(section2.lagnaSign.characteristics) ? section2.lagnaSign.characteristics : [section2.lagnaSign.characteristics]) : []),
+                fullData: section2
+              },
+              success: true
+            };
+            extractedData.lagna = formattedLagnaData;
+            console.log('✅ Extracted lagna data from section2 (fallback):', {
+              sign: formattedLagnaData.analysis.sign,
+              hasDescription: !!formattedLagnaData.analysis.description
+            });
           }
         }
 
@@ -3274,10 +3322,10 @@ const AnalysisPage = () => {
                       console.log(`🏠 AnalysisPage: Switching to house ${house.number}`);
                       setActiveHouse(house.number);
                     }}
-                    className={`tab-vedic ${activeHouse === house.number ? 'active' : ''}`}
+                    className={`tab-vedic flex flex-col items-center gap-1 ${activeHouse === house.number ? 'active' : ''}`}
                   >
-                    <span>{house.number}</span>
-                    <span className="text-xs">{house.description}</span>
+                    <span className="font-bold text-base">{house.number}</span>
+                    <span className="text-xs text-center whitespace-normal">{house.description}</span>
                   </button>
                 ))}
               </div>
