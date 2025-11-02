@@ -33,13 +33,40 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
   const [geocoding, setGeocoding] = useState(false);
   const [locationSuggestions, setLocationSuggestions] = useState([]);
 
+  // Track last geocoded location to prevent duplicate calls
+  const lastGeocodedLocationRef = React.useRef(null);
+  // Track geocoding in progress to prevent concurrent calls
+  const isGeocodingRef = React.useRef(false);
+
   // Geocode location function wrapped in useCallback
+  // REMOVED formData from dependencies to prevent infinite loop
   const geocodeLocation = useCallback(async (location) => {
+    // Normalize location string (trim whitespace)
+    const trimmedLocation = location?.trim() || '';
+    
+    // Prevent geocoding empty or too short locations
+    if (!trimmedLocation || trimmedLocation.length < 4) {
+      return;
+    }
+
+    // Prevent duplicate calls for same location (normalized comparison)
+    if (lastGeocodedLocationRef.current === trimmedLocation) {
+      return;
+    }
+
+    // Prevent geocoding if already in progress
+    if (isGeocodingRef.current) {
+      return;
+    }
+
+    // Set flags BEFORE async operation to prevent concurrent calls
+    isGeocodingRef.current = true;
+    lastGeocodedLocationRef.current = trimmedLocation;
     setGeocoding(true);
     setLocationSuggestions([]);
 
     try {
-      const result = await geocodingService.geocodeLocation(location);
+      const result = await geocodingService.geocodeLocation(trimmedLocation);
 
       if (result.success) {
         setCoordinates({
@@ -49,14 +76,17 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
         });
         setErrors(prev => ({ ...prev, placeOfBirth: null }));
 
-        // Save to session
-        dataSaver.saveSession({
-          birthData: formData,
-          coordinates: {
-            latitude: result.latitude,
-            longitude: result.longitude,
-            timezone: result.timezone
-          }
+        // Save to session - get current formData at save time, not from closure
+        setFormData(currentFormData => {
+          dataSaver.saveSession({
+            birthData: currentFormData,
+            coordinates: {
+              latitude: result.latitude,
+              longitude: result.longitude,
+              timezone: result.timezone
+            }
+          });
+          return currentFormData; // Return unchanged to avoid re-render
         });
       } else {
         setLocationSuggestions(result.suggestions || []);
@@ -64,6 +94,7 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
           ...prev,
           placeOfBirth: result.error || 'Location not found'
         }));
+        lastGeocodedLocationRef.current = null; // Allow retry on error
       }
     } catch (error) {
       console.error('Geocoding error:', error);
@@ -72,10 +103,12 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
         ...prev,
         placeOfBirth: errorMessage
       }));
+      lastGeocodedLocationRef.current = null; // Allow retry on error
     } finally {
+      isGeocodingRef.current = false;
       setGeocoding(false);
     }
-  }, [formData, dataSaver]);
+  }, [dataSaver]); // Removed formData dependency - causes infinite loop
 
   // Load saved session data on mount
   useEffect(() => {
@@ -96,6 +129,8 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
         setFormData(prev => ({ ...prev, ...normalizedBirthData }));
         if (savedSession.coordinates) {
           setCoordinates(savedSession.coordinates);
+          // Set last geocoded location to prevent immediate re-geocoding
+          lastGeocodedLocationRef.current = savedSession.birthData.placeOfBirth || null;
         }
       }
     } catch (error) {
@@ -104,17 +139,57 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
     }
   }, [dataSaver]);
 
-  // Debounced geocoding
+  // Debounced geocoding - Enhanced with better guards and longer debounce
   useEffect(() => {
+    // Skip if no location entered or too short
+    if (!formData.placeOfBirth || formData.placeOfBirth.trim().length < 4) {
+      return;
+    }
+
+    // Skip if coordinates already exist for this exact location
+    if (coordinates.latitude && coordinates.longitude && 
+        lastGeocodedLocationRef.current === formData.placeOfBirth.trim()) {
+      return;
+    }
+
+    // Skip if geocoding is already in progress
+    if (isGeocodingRef.current) {
+      return;
+    }
+
+    // Skip if this is the same location we just geocoded
+    if (lastGeocodedLocationRef.current === formData.placeOfBirth.trim()) {
+      return;
+    }
+
+    // Enhanced debounce to 3000ms (3 seconds) to better prevent excessive calls
     const timer = setTimeout(() => {
-      if (formData.placeOfBirth && formData.placeOfBirth.length > 3) {
-        console.log('🔍 BirthDataForm: Debounced geocoding triggered for:', formData.placeOfBirth);
-        geocodeLocation(formData.placeOfBirth);
+      const trimmedLocation = formData.placeOfBirth.trim();
+      
+      // Final checks before making API call
+      if (!trimmedLocation || trimmedLocation.length < 4) {
+        return;
       }
-    }, 1000);
+
+      // Double-check we're not already geocoding or already have this location
+      if (isGeocodingRef.current) {
+        console.log('⏸️ BirthDataForm: Skipping - geocoding already in progress');
+        return;
+      }
+
+      if (lastGeocodedLocationRef.current === trimmedLocation) {
+        console.log('⏸️ BirthDataForm: Skipping - location already geocoded');
+        return;
+      }
+
+      // Only geocode if location actually changed and not already geocoding
+      console.log('🌍 BirthDataForm: Geocoding request for:', trimmedLocation);
+      geocodeLocation(trimmedLocation);
+    }, 3000); // Increased to 3000ms for better debouncing
 
     return () => clearTimeout(timer);
-  }, [formData.placeOfBirth, geocodeLocation]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData.placeOfBirth]); // Removed geocodeLocation from dependencies to prevent infinite loop
 
   // Safety cleanup for loading state
   useEffect(() => {

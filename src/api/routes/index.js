@@ -30,6 +30,56 @@ router.use(`${API_VERSION}/geocoding`, geocodingRoutes);
 // Client error logging
 router.use('', clientErrorLogRoutes);
 
+// Comprehensive Chart Generation - SINGLE CALL OPTIMIZATION
+router.post(`${API_VERSION}/chart/generate/comprehensive`, async (req, res) => {
+  try {
+    const birthData = req.body;
+    
+    console.log('🚀 Comprehensive chart generation request received');
+    console.log(`📊 Birth data provided: ${JSON.stringify(birthData).slice(0, 200)}...`);
+    
+    // Import ChartController dynamically
+    const { default: ChartController } = await import('../controllers/ChartController.js');
+    const chartController = new ChartController();
+    
+    // Get singleton chart service
+    const chartService = await chartController.getChartService();
+    
+    // Generate comprehensive chart and analysis in single call
+    const comprehensiveResult = await chartService.generateComprehensiveChart(birthData);
+    
+    // Generate comprehensive analysis in the same service to prevent duplicate calls
+    const analysisService = await import('../services/analysis/BirthDataAnalysisService.js');
+    const analysisInstance = new analysisService.default();
+    const analysisResult = analysisInstance.analyzeBirthDataCollection(comprehensiveResult);
+    
+    console.log('✅ Comprehensive chart and analysis generated successfully');
+    
+    // Return combined result
+    res.status(200).json({
+      success: true,
+      data: {
+        chart: comprehensiveResult,
+        analysis: analysisResult,
+        combined: true, // Flag indicating single API call
+      },
+      metadata: {
+        timestamp: new Date().toISOString(),
+        optimized: 'single_call',
+        endpoint: '/api/v1/chart/generate/comprehensive'
+      }
+    });
+    
+  } catch (error) {
+    console.error('❌ Comprehensive chart generation failed:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Failed to generate comprehensive chart',
+      details: 'Please check birth data format and try again'
+    });
+  }
+});
+
 // Health check endpoint
 router.get('/v1/health', (req, res) => {
   res.json({

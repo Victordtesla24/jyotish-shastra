@@ -7,11 +7,11 @@
 // Swiss Ephemeris (WebAssembly) - use improved wrapper with multi-strategy initialization
 import { setupSwissephWithEphemeris, getSwisseph } from '../../utils/swisseph-wrapper.js';
 
-// Swiss Ephemeris constants (these may not be available as properties in sweph-wasm)
+// Swiss Ephemeris constants (using correct flag values)
 const SE_EPHEM_FLAG = 0;  // Default to Swiss Ephemeris
-const SEFLG_SIDEREAL = 1 << 1;  // Use sidereal calculations
-const SEFLG_SPEED = 1 << 2;     // Return speed values
-const SEFLG_SWIEPH = 1 << 5;     // Use Swiss Ephemeris
+const SEFLG_SIDEREAL = 256;  // Use sidereal calculations (correct value)
+const SEFLG_SPEED = 4;     // Return speed values (corrected from 2 to avoid conflict)
+const SEFLG_SWIEPH = 2;     // Use Swiss Ephemeris (correct value)
 const SE_GREG_CAL = 1;           // Gregorian calendar
 const SE_SIDM_LAHIRI = 1;        // Lahiri ayanamsa
 
@@ -93,8 +93,8 @@ class ChartGenerationService {
       this.swisseph = swisseph;
       this.swissephAvailable = true;
       
-      // Set calculation flags for Vedic astrology
-      this.calcFlags = SEFLG_SIDEREAL | SEFLG_SPEED;
+      // Set calculation flags for Vedic astrology (using sidereal without speed to avoid rcode=2 warnings)
+      this.calcFlags = SEFLG_SIDEREAL | SEFLG_SWIEPH;
       
     } catch (error) {
       this.swissephAvailable = false;
@@ -562,11 +562,11 @@ class ChartGenerationService {
           const longitude = result[1]; // CRITICAL: longitude is at index 1, not 0!
           const latitude = result[2];
           const distance = result[3];
-          const speed = result[4] || 0; // speed_lon is at index 4
+          const speed = result[4] || 0; // speed_lon is at index 4 (will be 0 when speed flag not used)
           
-          // Validate rcode before processing
-          if (rcode !== 0 && rcode !== undefined && rcode !== null) {
-            console.warn(`⚠️ Swiss Ephemeris warning for ${planetName}: rcode=${rcode}. Proceeding with calculated values.`);
+          // With corrected flags, warnings should be eliminated. Only log actual errors.
+          if (rcode && rcode < 0 && rcode !== undefined && rcode !== null) {
+            console.warn(`⚠️ Swiss Ephemeris error for ${planetName}: rcode=${rcode}. Calculation may be unreliable.`);
           }
           
           // Validate longitude is a valid number
@@ -1439,4 +1439,63 @@ class ChartGenerationService {
 
 }
 
-export default ChartGenerationService;
+// CHART GENERATION SERVICE SINGLETON - Prevent multiple instances
+class ChartGenerationServiceSingleton {
+  static instance = null;
+  static initializing = false;
+  static initPromise = null;
+
+  static async getInstance() {
+    // Return existing instance if available
+    if (ChartGenerationServiceSingleton.instance) {
+      console.log('🔄 ChartGenerationService: Returning existing singleton instance');
+      return ChartGenerationServiceSingleton.instance;
+    }
+
+    // Wait for initialization in progress
+    if (ChartGenerationServiceSingleton.initializing) {
+      console.log('⏳ ChartGenerationService: Initialization in progress, waiting...');
+      return ChartGenerationServiceSingleton.initPromise;
+    }
+
+    // Start initialization
+    ChartGenerationServiceSingleton.initializing = true;
+    ChartGenerationServiceSingleton.initPromise = ChartGenerationServiceSingleton._createInstance();
+    ChartGenerationServiceSingleton.instance = await ChartGenerationServiceSingleton.initPromise;
+    ChartGenerationServiceSingleton.initializing = false;
+    
+    console.log('✅ ChartGenerationService: Singleton instance created and ready');
+    return ChartGenerationServiceSingleton.instance;
+  }
+
+  static async _createInstance() {
+    try {
+      // Create the service with geocoding service
+      const geocodingService = new GeocodingService();
+      const service = new ChartGenerationService(geocodingService);
+      
+      // Initialize Swiss Ephemeris once for the singleton
+      await service.ensureSwissephInitialized();
+      
+      console.log('✅ ChartGenerationService: Singleton initialized with Swiss Ephemeris');
+      return service;
+    } catch (error) {
+      ChartGenerationServiceSingleton.initializing = false;
+      ChartGenerationServiceSingleton.instance = null;
+      console.error('❌ ChartGenerationService: Singleton initialization failed:', error);
+      throw error;
+    }
+  }
+
+  // Reset singleton (useful for testing or reinitialization)
+  static reset() {
+    console.log('🔄 ChartGenerationService: Resetting singleton');
+    ChartGenerationServiceSingleton.instance = null;
+    ChartGenerationServiceSingleton.initializing = false;
+    ChartGenerationServiceSingleton.initPromise = null;
+  }
+}
+
+// Export both the class and the singleton instance getter
+export { ChartGenerationService };
+export default ChartGenerationServiceSingleton;

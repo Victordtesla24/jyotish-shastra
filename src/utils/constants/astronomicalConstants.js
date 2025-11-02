@@ -19,7 +19,7 @@ const SWISS_EPHEMERIS_CONSTANTS = {
   // Calculation flags
   SEFLG_SWIEPH: 2,
   SEFLG_SIDEREAL: 256,
-  SEFLG_SPEED: 2,
+  SEFLG_SPEED: 4,  // Corrected bit value for speed calculations
   SEFLG_NOGEO: 0,
   SEFLG_NOLIGHT: 0,
   SEFLG_NOABER: 0,

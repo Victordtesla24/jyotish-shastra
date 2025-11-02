@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import VedicLoadingSpinner from '../ui/VedicLoadingSpinner.jsx';
 
 /**
@@ -127,8 +127,9 @@ const HOUSE_POSITIONS = {
   12: { x: 155, y: 130 }             // Top left-upper quadrant (template-calibrated)
 };
 
-// Rasi number positions - Template-calibrated diamond intersections
-// Precisely positioned for authentic Kundli template alignment
+// Rasi number positions - DEPRECATED: No longer used, kept for reference only
+// Rasi numbers are now positioned inside houses using calculateRasiPositionForHouse()
+// eslint-disable-next-line no-unused-vars
 const RASI_NUMBER_POSITIONS = {
   1:  { x: 150, y: 150 },    // Top-left intersection (between houses 12 and 1)
   2:  { x: 180, y: 110 },    // Top edge left (between houses 1 and 2)
@@ -480,8 +481,25 @@ function calculateHouseFromLongitude(planetLongitude, ascendantLongitude) {
 }
 
 /**
- * Calculate precise planetary position to match kundli template exactly
- * Enhanced center-based vertical stacking with overlap prevention
+ * Calculate rasi number position inside a house
+ * Positions rasi number inside house, offset from house center
+ * @param {number} houseNumber - House number (1-12)
+ * @param {Object} housePosition - House center position {x, y}
+ * @returns {Object} Rasi number position {x, y} inside house
+ */
+function calculateRasiPositionForHouse(houseNumber, housePosition) {
+  const RASI_OFFSET_Y = -35; // Offset above house center (35px for rasi number placement)
+  
+  // Rasi number is centered horizontally, positioned above house center
+  return {
+    x: housePosition.x, // Centered horizontally
+    y: housePosition.y + RASI_OFFSET_Y // Offset above house center
+  };
+}
+
+/**
+ * FIXED: Enhanced planetary positioning with improved spacing and overlap prevention
+ * Dynamic positioning based on planet count with special handling for crowded houses
  * Prevents planets from overlapping rasi numbers, house borders, or clustering too closely
  * @param {Object} housePosition - Base house coordinates
  * @param {Object} planet - Planet data
@@ -490,186 +508,189 @@ function calculateHouseFromLongitude(planetLongitude, ascendantLongitude) {
  * @returns {Object} Precise x, y coordinates for planet
  */
 function calculatePrecisePlanetPosition(housePosition, planet, allPlanetsInHouse, houseNumber) {
-  // Positioning parameters for clean, readable chart
-  const VERTICAL_SPACING = 18; // Pixel spacing between planets (18px as per template)
-  const MIN_RASI_DISTANCE = 25; // Minimum distance from rasi numbers (25px to prevent overlap)
-  const MIN_BORDER_DISTANCE = 20; // Minimum distance from house borders (20px for readability)
+  // ENHANCED positioning parameters for clean, readable chart
+  const SPACING_CONFIG = {
+    VERTICAL_SPACING: 22,        // Increased from 18px for better readability
+    MIN_RASI_DISTANCE: 45,      // Increased from 30px for clearer separation
+    MIN_BORDER_DISTANCE: 30,     // Increased from 20px to avoid edge crowding
+    PLANET_CLUSTER_THRESHOLD: 3,  // Special handling for 3+ planets
+    RASI_PLANET_GAP: 35,         // Increased from 25px for better gap
+    MAX_STACK_HEIGHT: 80         // Maximum vertical stack in a house
+  };
   
   const houseCenterX = housePosition.x;
   const houseCenterY = housePosition.y;
 
-  // Special handling for Ascendant - always centered in its position
+  // Calculate rasi number position in house
+  const rasiPosition = calculateRasiPositionForHouse(houseNumber, housePosition);
+
+  // Special handling for Ascendant - always positioned carefully
   if (planet.name === 'Ascendant' || planet.code === 'As') {
-    // Check if ascendant would overlap with rasi number, apply slight offset if needed
-    const rasiPosition = findNearestRasiNumber(houseNumber, houseCenterX, houseCenterY);
-    if (rasiPosition) {
-      const distance = Math.sqrt(
-        Math.pow(houseCenterX - rasiPosition.x, 2) + 
-        Math.pow(houseCenterY - rasiPosition.y, 2)
-      );
-      if (distance < MIN_RASI_DISTANCE) {
-        // Apply small offset away from rasi number
-        const offsetX = (houseCenterX - rasiPosition.x) / distance * (MIN_RASI_DISTANCE - distance + 5);
-        const offsetY = (houseCenterY - rasiPosition.y) / distance * (MIN_RASI_DISTANCE - distance + 5);
-        return { 
-          x: houseCenterX + offsetX, 
-          y: houseCenterY + offsetY 
-        };
-      }
-    }
-    return { x: houseCenterX, y: houseCenterY };
+    return calculateAscendantPosition(houseCenterX, houseCenterY, rasiPosition, SPACING_CONFIG);
   }
 
   // Separate Ascendant from other planets for positioning
   const nonAscendantPlanets = allPlanetsInHouse.filter(p => p.name !== 'Ascendant' && p.code !== 'As');
+  const planetCount = nonAscendantPlanets.length;
   
-  // Get index among non-ascendant planets only
-  const planetIndex = nonAscendantPlanets.findIndex(p => 
+  // Dynamic positioning based on planet count
+  if (planetCount >= SPACING_CONFIG.PLANET_CLUSTER_THRESHOLD) {
+    return calculateCrowdedHousePosition(housePosition, planet, nonAscendantPlanets, rasiPosition, SPACING_CONFIG);
+  } else {
+    return calculateStandardPlanetPosition(housePosition, planet, nonAscendantPlanets, rasiPosition, SPACING_CONFIG);
+  }
+}
+
+// Enhanced planetary positioning helper functions for improved layout
+
+/**
+ * Calculate optimized position for Ascendant to avoid Rasi number overlap
+ */
+function calculateAscendantPosition(houseCenterX, houseCenterY, rasiPosition, config) {
+  const distance = Math.sqrt(
+    Math.pow(houseCenterX - rasiPosition.x, 2) + 
+    Math.pow(houseCenterY - rasiPosition.y, 2)
+  );
+  
+  if (distance < config.MIN_RASI_DISTANCE) {
+    // Apply offset away from rasi number
+    const offsetX = (houseCenterX - rasiPosition.x) / distance * (config.MIN_RASI_DISTANCE - distance + 8);
+    const offsetY = (houseCenterY - rasiPosition.y) / distance * (config.MIN_RASI_DISTANCE - distance + 8);
+    return { 
+      x: houseCenterX + offsetX, 
+      y: houseCenterY + offsetY 
+    };
+  }
+  return { x: houseCenterX, y: houseCenterY };
+}
+
+/**
+ * Calculate position for standard houses with few planets
+ */
+function calculateStandardPlanetPosition(housePosition, planet, planetsInHouse, rasiPosition, config) {
+  const houseCenterX = housePosition.x;
+  const houseCenterY = housePosition.y;
+  
+  // Get planet index for vertical stacking
+  const planetIndex = planetsInHouse.findIndex(p => 
     (p.name === planet.name && p.code === planet.code) ||
     (p.house === planet.house && Math.abs(p.degrees - planet.degrees) < 0.01)
   );
 
-  const totalPlanets = nonAscendantPlanets.length;
+  // Calculate starting position below Rasi number
+  const rasiBottom = rasiPosition.y + 12; // Approximate font height
+  const planetStartY = rasiBottom + config.RASI_PLANET_GAP;
   
-  // Calculate base position with vertical stacking
   let planetX = houseCenterX;
   let planetY;
   
-  if (totalPlanets === 1) {
-    // Single planet: Centered both horizontally and vertically
-    planetY = houseCenterY;
+  if (planetsInHouse.length === 1) {
+    // Single planet: Optimize positioning
+    const distanceToRasi = Math.abs(houseCenterY - rasiPosition.y);
+    if (distanceToRasi < 60) {
+      planetY = planetStartY;
+    } else {
+      planetY = houseCenterY;
+    }
   } else {
-    // Multiple planets: Centered horizontally, stacked vertically
-    // Calculate total height needed for all planets
-    const totalHeight = (totalPlanets - 1) * VERTICAL_SPACING;
-    const startY = houseCenterY - (totalHeight / 2);
-    
-    // Calculate this planet's vertical position
-    const verticalOffset = planetIndex * VERTICAL_SPACING;
-    planetY = startY + verticalOffset;
+    // Multiple planets: Stack vertically
+    const verticalOffset = planetIndex * config.VERTICAL_SPACING;
+    planetY = planetStartY + verticalOffset;
   }
   
-  // Apply overlap prevention adjustments
-  const adjustedPosition = preventOverlaps(
+  return preventOverlaps(
     { x: planetX, y: planetY },
-    houseNumber,
     housePosition,
-    MIN_RASI_DISTANCE,
-    MIN_BORDER_DISTANCE
+    rasiPosition,
+    config
+  );
+}
+
+/**
+ * Calculate position for crowded houses with many planets (3+)
+ */
+function calculateCrowdedHousePosition(housePosition, planet, planetsInHouse, rasiPosition, config) {
+  const houseCenterX = housePosition.x;
+  const houseCenterY = housePosition.y;
+  
+  // Use advanced layout for crowded houses
+  const planetIndex = planetsInHouse.findIndex(p => 
+    (p.name === planet.name && p.code === planet.code) ||
+    (p.house === planet.house && Math.abs(p.degrees - planet.degrees) < 0.01)
   );
   
-  return adjustedPosition;
+  // Calculate grid-like positioning for crowded houses
+  const maxColumns = 2; // Use 2-column layout for crowded houses
+  const column = planetIndex % maxColumns;
+  const row = Math.floor(planetIndex / maxColumns);
+  
+  const horizontalSpacing = 60; // Wider spacing for columns
+  const verticalSpacing = config.VERTICAL_SPACING;
+  
+  // Start position below rasi number
+  const rasiBottom = rasiPosition.y + 12;
+  const baseY = rasiBottom + config.RASI_PLANET_GAP;
+  
+  // Calculate position with column offset
+  let planetX = houseCenterX - horizontalSpacing/2 + (column * horizontalSpacing);
+  let planetY = baseY + (row * verticalSpacing);
+  
+  // Ensure planets stay within reasonable bounds
+  const maxY = houseCenterY + config.MAX_STACK_HEIGHT;
+  if (planetY > maxY) {
+    planetY = maxY;
+  }
+  
+  return preventOverlaps(
+    { x: planetX, y: planetY },
+    housePosition,
+    rasiPosition,
+    config
+  );
 }
 
 /**
- * Find the nearest rasi number position to a given house
- * @param {number} houseNumber - House number (1-12)
- * @param {number} x - X coordinate to check from
- * @param {number} y - Y coordinate to check from
- * @returns {Object|null} Nearest rasi number position {x, y} or null
- */
-function findNearestRasiNumber(houseNumber, x, y) {
-  let nearestRasi = null;
-  let minDistance = Infinity;
-  
-  // Check all rasi number positions to find the closest one to this house
-  Object.entries(RASI_NUMBER_POSITIONS).forEach(([rasiKey, rasiPos]) => {
-    const distance = Math.sqrt(
-      Math.pow(x - rasiPos.x, 2) + 
-      Math.pow(y - rasiPos.y, 2)
-    );
-    
-    // For houses near diamond intersections, check adjacent rasi positions
-    // House 1 is near rasi positions 1 and 2 (top-left and top-edge-left)
-    // Map house numbers to nearby rasi positions
-    const nearbyRasiIndices = getNearbyRasiIndices(houseNumber);
-    
-    if (nearbyRasiIndices.includes(parseInt(rasiKey))) {
-      if (distance < minDistance) {
-        minDistance = distance;
-        nearestRasi = rasiPos;
-      }
-    }
-  });
-  
-  return nearestRasi;
-}
-
-/**
- * Get rasi number indices that are near a given house number
- * Based on North Indian diamond layout structure
- * @param {number} houseNumber - House number (1-12)
- * @returns {Array} Array of nearby rasi number indices
- */
-function getNearbyRasiIndices(houseNumber) {
-  // Map each house to nearby rasi number positions based on diamond layout
-  // Rasi numbers are at diamond intersections and edges
-  const houseToRasiMap = {
-    1: [1, 2],      // House 1: Near rasi 1 (top-left intersection), rasi 2 (top-edge-left)
-    2: [2, 3],      // House 2: Near rasi 2 (top-edge-left), rasi 3 (top-edge-right)
-    3: [3, 4],      // House 3: Near rasi 3 (top-edge-right), rasi 4 (top-right intersection)
-    4: [4, 5],      // House 4: Near rasi 4 (top-right intersection), rasi 5 (right-edge-top)
-    5: [5, 6],      // House 5: Near rasi 5 (right-edge-top), rasi 6 (right-edge-bottom)
-    6: [6, 7],      // House 6: Near rasi 6 (right-edge-bottom), rasi 7 (bottom-right intersection)
-    7: [7, 8],      // House 7: Near rasi 7 (bottom-right intersection), rasi 8 (bottom-edge-right)
-    8: [8, 9],      // House 8: Near rasi 8 (bottom-edge-right), rasi 9 (bottom-edge-left)
-    9: [9, 10],     // House 9: Near rasi 9 (bottom-edge-left), rasi 10 (bottom-left intersection)
-    10: [10, 11],   // House 10: Near rasi 10 (bottom-left intersection), rasi 11 (left-edge-bottom)
-    11: [11, 12],   // House 11: Near rasi 11 (left-edge-bottom), rasi 12 (left-edge-top)
-    12: [12, 1]     // House 12: Near rasi 12 (left-edge-top), rasi 1 (top-left intersection)
-  };
-  
-  return houseToRasiMap[houseNumber] || [];
-}
-
-/**
- * Prevent overlaps with rasi numbers and house borders
- * Adjusts position to maintain minimum clearances
+ * Prevent overlaps with rasi numbers and house borders - ENHANCED VERSION
+ * Adjusts position to maintain minimum clearances with improved logic
  * @param {Object} position - Initial position {x, y}
- * @param {number} houseNumber - House number (1-12)
  * @param {Object} housePosition - House center position {x, y}
- * @param {number} minRasiDistance - Minimum distance from rasi numbers
- * @param {number} minBorderDistance - Minimum distance from house borders
+ * @param {Object} rasiPosition - Rasi number position {x, y}
+ * @param {Object} config - Spacing configuration
  * @returns {Object} Adjusted position {x, y}
  */
-function preventOverlaps(position, houseNumber, housePosition, minRasiDistance, minBorderDistance) {
+function preventOverlaps(position, housePosition, rasiPosition, config) {
   let adjustedX = position.x;
   let adjustedY = position.y;
   
-  // Check distance from rasi numbers
-  const nearbyRasiIndices = getNearbyRasiIndices(houseNumber);
-  for (const rasiIndex of nearbyRasiIndices) {
-    const rasiPos = RASI_NUMBER_POSITIONS[rasiIndex];
-    if (!rasiPos) continue;
-    
-    const distance = Math.sqrt(
-      Math.pow(adjustedX - rasiPos.x, 2) + 
-      Math.pow(adjustedY - rasiPos.y, 2)
-    );
-    
-    if (distance < minRasiDistance) {
-      // Calculate offset to push planet away from rasi number
-      const angle = Math.atan2(adjustedY - rasiPos.y, adjustedX - rasiPos.x);
-      const requiredDistance = minRasiDistance + 5; // Add 5px buffer
-      
-      adjustedX = rasiPos.x + Math.cos(angle) * requiredDistance;
-      adjustedY = rasiPos.y + Math.sin(angle) * requiredDistance;
+  // Enhanced rasi number overlap prevention
+  const distanceToRasi = Math.sqrt(
+    Math.pow(adjustedX - rasiPosition.x, 2) + 
+    Math.pow(adjustedY - rasiPosition.y, 2)
+  );
+  
+  if (distanceToRasi < config.MIN_RASI_DISTANCE) {
+    // Calculate offset to push planet away from rasi number
+    if (distanceToRasi > 0) {
+      const angle = Math.atan2(adjustedY - rasiPosition.y, adjustedX - rasiPosition.x);
+      const requiredDistance = config.MIN_RASI_DISTANCE + 8; // Increased buffer
+      adjustedX = rasiPosition.x + Math.cos(angle) * requiredDistance;
+      adjustedY = rasiPosition.y + Math.sin(angle) * requiredDistance;
+    } else {
+      // Default offset if distance is 0
+      adjustedY = rasiPosition.y + config.MIN_RASI_DISTANCE + 8;
     }
   }
   
-  // Check distance from house borders
-  // Calculate approximate house boundaries based on house position and chart structure
+  // Enhanced border distance prevention
   const CHART_SIZE = 500;
   const PADDING = 60;
   
-  // Define approximate house boundaries based on North Indian diamond layout
-  // Houses are within the square from PADDING to CHART_SIZE - PADDING
-  const minX = PADDING + minBorderDistance;
-  const maxX = CHART_SIZE - PADDING - minBorderDistance;
-  const minY = PADDING + minBorderDistance;
-  const maxY = CHART_SIZE - PADDING - minBorderDistance;
+  const minX = PADDING + config.MIN_BORDER_DISTANCE;
+  const maxX = CHART_SIZE - PADDING - config.MIN_BORDER_DISTANCE;
+  const minY = PADDING + config.MIN_BORDER_DISTANCE;
+  const maxY = CHART_SIZE - PADDING - config.MIN_BORDER_DISTANCE;
   
-  // Adjust if too close to borders
+  // Apply border constraints with buffer zone
   if (adjustedX < minX) adjustedX = minX;
   if (adjustedX > maxX) adjustedX = maxX;
   if (adjustedY < minY) adjustedY = minY;
@@ -807,30 +828,44 @@ export default function VedicChartDisplay({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Process chart data
-  useEffect(() => {
+  // Memoized chart data processing to prevent unnecessary reprocessing
+  const processedChartData = useMemo(() => {
     if (!chartData) {
-      setProcessedData(null);
-      setLoading(false);
-      return;
+      return null;
     }
 
     try {
-      setLoading(true);
-
       const { planets, ascendant, housePositions, houseToRasiMap } = processChartData(chartData);
       const houseGroups = groupPlanetsByHouse(planets, ascendant);
-
-      setProcessedData({ planets, ascendant, houseGroups, housePositions, houseToRasiMap });
-      setError(null);
-      setLoading(false);
+      
+      return { planets, ascendant, houseGroups, housePositions, houseToRasiMap };
     } catch (err) {
-      setError(err.message || 'Failed to process chart data');
+      console.error('Chart data processing error:', err);
+      return null;
+    }
+  }, [chartData]);
+
+  // Process chart data - simplified state management
+  useEffect(() => {
+    if (!processedChartData) {
       setProcessedData(null);
       setLoading(false);
-      onError?.(err);
+      setError(null);
+      return;
     }
-  }, [chartData, onError]); // Add chartData as dependency to ensure re-render on data change
+
+    setProcessedData(processedChartData);
+    setLoading(false);
+    setError(null);
+  }, [processedChartData]); // Only depend on memoized processed data
+
+  // Handle errors from memoized processing
+  useEffect(() => {
+    if (!processedChartData && chartData) {
+      setError('Failed to process chart data. Please check the chart data format.');
+      setLoading(false);
+    }
+  }, [processedChartData, chartData]);
 
   // Loading state
   if (loading) {
@@ -951,61 +986,84 @@ export default function VedicChartDisplay({
             <line x1={PADDING} y1={CENTER_Y} x2={CENTER_X} y2={PADDING} />
           </g>
 
-          {/* Rasi Numbers - positioned at diamond intersections (blue circle locations) */}
-          {Object.entries(RASI_NUMBER_POSITIONS).map(([positionKey, rasiPosition]) => {
-            // RASI_NUMBER_POSITIONS keys correspond to house numbers in North Indian diamond layout
-            // Position 1 = house 1 (top center), Position 2 = house 2 (top right), etc.
-            const houseNumber = parseInt(positionKey);
+          {/* Rasi Numbers - positioned inside houses, one per house, one unique rasi number 1-12 */}
+          {(() => {
+            // Build map of houseNumber -> rasiNumber first, ensuring uniqueness
+            const houseToRasiMapping = {};
+            const usedRasiNumbers = new Set();
             
-            if (houseNumber < 1 || houseNumber > 12) {
-              console.warn(`⚠️ Invalid house number in RASI_NUMBER_POSITIONS: ${houseNumber}`);
-              return null;
-            }
-            
-            let rasiNumber;
-            
-            // CRITICAL: Use houseToRasiMap from API housePositions - this is the authoritative source
-            if (houseToRasiMap && houseToRasiMap[houseNumber]) {
-              // Get rasi number from actual sign in housePositions from API
-              const houseSign = houseToRasiMap[houseNumber].sign;
-              try {
-                rasiNumber = getRasiNumberFromSign(houseSign);
-              } catch (error) {
-                console.error(`❌ Error getting rasi number for house ${houseNumber} with sign ${houseSign}:`, error);
-                // Fallback to calculation if sign lookup fails
-                if (ascendant) {
-                  const ascendantRasi = getRasiNumberFromSign(ascendant.sign);
-                  rasiNumber = calculateRasiForHouse(houseNumber, ascendantRasi);
-                } else {
-                  rasiNumber = houseNumber; // Last resort
+            // First pass: build mapping from houseToRasiMap (authoritative source)
+            for (let houseNumber = 1; houseNumber <= 12; houseNumber++) {
+              const housePosition = HOUSE_POSITIONS[houseNumber];
+              if (!housePosition) continue;
+              
+              let rasiNumber;
+              
+              // CRITICAL: Use houseToRasiMap from API housePositions - this is the authoritative source
+              if (houseToRasiMap && houseToRasiMap[houseNumber]) {
+                const houseSign = houseToRasiMap[houseNumber].sign;
+                try {
+                  rasiNumber = getRasiNumberFromSign(houseSign);
+                } catch (error) {
+                  console.error(`❌ Error getting rasi number for house ${houseNumber} with sign ${houseSign}:`, error);
+                  if (ascendant) {
+                    const ascendantRasi = getRasiNumberFromSign(ascendant.sign);
+                    rasiNumber = calculateRasiForHouse(houseNumber, ascendantRasi);
+                  } else {
+                    continue;
+                  }
                 }
+              } else if (ascendant) {
+                const ascendantRasi = getRasiNumberFromSign(ascendant.sign);
+                rasiNumber = calculateRasiForHouse(houseNumber, ascendantRasi);
+              } else {
+                continue;
               }
-            } else if (ascendant) {
-              // Fallback to formula-based calculation only if housePositions not available
-              console.warn(`⚠️ houseToRasiMap missing for house ${houseNumber}, using formula calculation`);
-              const ascendantRasi = getRasiNumberFromSign(ascendant.sign);
-              rasiNumber = calculateRasiForHouse(houseNumber, ascendantRasi);
-            } else {
-              // Last resort: use house number as rasi number (should rarely happen)
-              console.warn(`⚠️ No houseToRasiMap or ascendant for house ${houseNumber}, using house number as rasi`);
-              rasiNumber = houseNumber;
+              
+              // Validate rasi number is in valid range
+              if (!rasiNumber || rasiNumber < 1 || rasiNumber > 12) {
+                continue;
+              }
+              
+              // ENSURE UNIQUENESS: If this rasi number already used, skip it
+              if (usedRasiNumbers.has(rasiNumber)) {
+                console.warn(`⚠️ Duplicate rasi number ${rasiNumber} detected for house ${houseNumber}. Skipping to maintain uniqueness.`);
+                continue;
+              }
+              
+              houseToRasiMapping[houseNumber] = rasiNumber;
+              usedRasiNumbers.add(rasiNumber);
             }
-
-            return (
-              <text
-                key={`rasi-${houseNumber}`}
-                x={rasiPosition.x}
-                y={rasiPosition.y}
-                textAnchor="middle"
-                fontSize="14"
-                fill="#000000"
-                fontWeight="bold"
-                fontFamily="Arial, sans-serif"
-              >
-                {rasiNumber}
-              </text>
-            );
-          })}
+            
+            // Second pass: render rasi numbers
+            return Array.from({ length: 12 }, (_, i) => i + 1).map((houseNumber) => {
+              const housePosition = HOUSE_POSITIONS[houseNumber];
+              if (!housePosition) return null;
+              
+              const rasiNumber = houseToRasiMapping[houseNumber];
+              if (!rasiNumber) {
+                // No valid rasi number for this house - skip rendering
+                return null;
+              }
+              
+              const rasiPosition = calculateRasiPositionForHouse(houseNumber, housePosition);
+              
+              return (
+                <text
+                  key={`rasi-house-${houseNumber}`}
+                  x={rasiPosition.x}
+                  y={rasiPosition.y}
+                  textAnchor="middle"
+                  fontSize="14"
+                  fill="#000000"
+                  fontWeight="bold"
+                  fontFamily="Arial, sans-serif"
+                >
+                  {rasiNumber}
+                </text>
+              );
+            }).filter(Boolean);
+          })()}
 
 
           {/* Planetary Positions - Template-validated positioning for perfect kundli alignment */}

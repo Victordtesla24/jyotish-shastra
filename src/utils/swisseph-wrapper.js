@@ -12,6 +12,7 @@ let swephNative = null;
 let swisseph = null; // Compatibility wrapper
 let swissephAvailable = false;
 let swissephInitPromise = null;
+let initializationCount = 0; // Track initialization attempts for debugging
 
 /**
  * Setup ephemeris path
@@ -181,21 +182,25 @@ function createSwissephWrapper(sweph) {
 }
 
 /**
- * Initialize sweph native bindings
+ * SWISS EPHEMERIS SINGLETON - Prevent multiple initializations
  * Production-grade initialization - no WASM required
  */
 async function initSwisseph() {
-  if (swisseph !== null) {
-    if (!swissephAvailable) {
-      throw new Error('Swiss Ephemeris initialization failed. Swiss Ephemeris is required for all calculations.');
-    }
+  // If already initialized and working, return immediately
+  if (swisseph && swissephAvailable) {
+    console.log(`🔄 Swiss Ephemeris already initialized (instance #${initializationCount}) - reusing`);
     return { swisseph, available: swissephAvailable };
   }
 
-  // If initialization is already in progress, return the promise
+  // If initialization is in progress, wait for it
   if (swissephInitPromise) {
+    console.log(`⏳ Swiss Ephemeris initialization in progress, waiting... (instance #${initializationCount + 1})`);
     return swissephInitPromise;
   }
+  
+  // Start initialization
+  initializationCount++;
+  console.log(`🚀 Starting Swiss Ephemeris initialization (instance #${initializationCount})`);
   
   swissephInitPromise = (async () => {
     try {
@@ -208,23 +213,23 @@ async function initSwisseph() {
       swisseph = createSwissephWrapper(swephNative);
       swissephAvailable = true;
       
-      console.log('✅ Swiss Ephemeris initialized using native Node.js bindings (sweph)');
+      // Only log on first initialization to prevent repeated messages
+      console.log(`✅ Swiss Ephemeris initialized using native Node.js bindings (instance #${initializationCount})`);
       
       // Setup ephemeris path if files exist
       const ephemerisDir = path.resolve(process.cwd(), 'ephemeris');
       setupEphemerisPath(ephemerisDir);
       
-      // Set Lahiri Ayanamsa for Vedic calculations
+      // Set Lahiri Ayanamsa for Vedic calculations only if not already configured
       try {
         const defaultJd = 2451545.0; // J2000.0
-        const ayanamsa = swephNative.get_ayanamsa(defaultJd);
-        swephNative.set_sid_mode(1, defaultJd, ayanamsa); // SE_SIDM_LAHIRI = 1
-        console.log('✅ Swiss Ephemeris configured with Lahiri ayanamsa');
+        swephNative.set_sid_mode(1, defaultJd, 0); // SE_SIDM_LAHIRI = 1
+        console.log(`✅ Swiss Ephemeris configured with Lahiri ayanamsa (instance #${initializationCount})`);
       } catch (error) {
         console.log(`⚠️  Ayanamsa setup failed, using default: ${error.message}`);
       }
       
-      // Verify initialization with a test calculation
+      // Verify initialization with a test calculation (only log once)
       try {
         const testJd = 2451545.0; // J2000.0
         const testResult = swephNative.calc_ut(testJd, 0, 0); // Calculate Sun position
@@ -234,13 +239,12 @@ async function initSwisseph() {
         }
         
         if (testResult.error && !testResult.error.includes('using Moshier')) {
-          // Moshier fallback is acceptable, other errors are not
           throw new Error(`Test calculation failed: ${testResult.error}`);
         }
         
-        console.log('✅ Swiss Ephemeris test calculation successful');
+        console.log(`✅ Swiss Ephemeris test calculation successful (instance #${initializationCount})`);
       } catch (testError) {
-        console.error('⚠️  Swiss Ephemeris test calculation warning:', testError.message);
+        console.error(`⚠️  Swiss Ephemeris test calculation warning (instance #${initializationCount}):`, testError.message);
         // Continue anyway - test might show warnings but still work
       }
       
@@ -248,9 +252,9 @@ async function initSwisseph() {
       
     } catch (error) {
       swissephAvailable = false;
-      swissephInitPromise = null;
+      swissephInitPromise = null; // Reset on failure to allow retry
       const finalError = new Error(`Swiss Ephemeris native bindings failed to load: ${error.message}. Please ensure sweph module is properly installed.`);
-      console.error('❌ Swiss Ephemeris initialization error:', finalError.message);
+      console.error(`❌ Swiss Ephemeris initialization error (instance #${initializationCount}):`, finalError.message);
       throw finalError;
     }
   })();
@@ -259,16 +263,25 @@ async function initSwisseph() {
 }
 
 /**
- * Get swisseph with initialization
+ * Get swisseph with initialization - SINGLETON ENHANCED
  * Returns initialized Swiss Ephemeris instance (compatibility wrapper)
  */
 export async function getSwisseph() {
+  // If already initialized and working, return immediately
+  if (swisseph && swissephAvailable) {
+    return swisseph;
+  }
+  
+  // If not initialized, initialize once and wait
   if (swisseph === null) {
     await initSwisseph();
   }
+  
+  // Check after initialization
   if (!swissephAvailable || !swisseph) {
     throw new Error('Swiss Ephemeris calculations are not available. Please ensure sweph module is properly installed.');
   }
+  
   return swisseph;
 }
 

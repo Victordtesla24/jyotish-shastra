@@ -28,7 +28,7 @@ class MasterAnalysisOrchestrator {
     this.navamsaService = new NavamsaAnalysisService();
     this.dashaService = new DetailedDashaAnalysisService();
     this.yogaService = new YogaDetectionService();
-    this.chartService = new ChartGenerationService();
+    this.chartService = null; // Chart service - will be initialized as singleton
     this.geocodingService = new GeocodingService();
 
     // Analysis completion tracking
@@ -42,6 +42,18 @@ class MasterAnalysisOrchestrator {
       section7: { name: 'Dasha Analysis', complete: false, weight: 15 },
       section8: { name: 'Synthesis', complete: false, weight: 5 }
     };
+  }
+
+  /**
+   * Get ChartGenerationService singleton instance
+   * @returns {Promise<ChartGenerationService>}
+   */
+  async getChartService() {
+    if (!this.chartService) {
+      const ChartGenerationServiceSingleton = await import('../../services/chart/ChartGenerationService.js');
+      this.chartService = await ChartGenerationServiceSingleton.default.getInstance();
+    }
+    return this.chartService;
   }
 
   /**
@@ -678,8 +690,9 @@ class MasterAnalysisOrchestrator {
         finalBirthData.timezone = geoData.timezone;
       }
 
-      const rasiChart = await this.chartService.generateRasiChart(finalBirthData);
-      const navamsaChart = await this.chartService.generateNavamsaChart(finalBirthData);
+      const chartService = await this.getChartService();
+      const rasiChart = await chartService.generateRasiChart(finalBirthData);
+      const navamsaChart = await chartService.generateNavamsaChart(finalBirthData);
       return { rasiChart, navamsaChart };
     } catch (error) {
       throw new Error(`Chart generation failed: ${error.message}`);

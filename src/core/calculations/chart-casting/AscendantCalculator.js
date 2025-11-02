@@ -63,8 +63,10 @@ class AscendantCalculator {
         throw new Error('Swiss Ephemeris test calculation failed - ephemeris not functional');
       }
       
+      if (!this.initialized) {
+        console.log('✅ AscendantCalculator: Initialized successfully with native Swiss Ephemeris bindings');
+      }
       this.initialized = true;
-      console.log('✅ AscendantCalculator: Initialized successfully with native Swiss Ephemeris bindings');
       return true;
       
     } catch (error) {
@@ -80,7 +82,9 @@ class AscendantCalculator {
   validateEphemerisFiles(ephePath) {
     try {
       if (!fs.existsSync(ephePath)) {
-        console.log(`📂 Ephemeris directory not found: ${ephePath} (using bundled data)`);
+        if (!this.initialized) {
+          console.log(`📂 Ephemeris directory not found: ${ephePath} (using bundled data)`);
+        }
         return;
       }
       
@@ -98,16 +102,19 @@ class AscendantCalculator {
         }
       }
       
-      if (foundFiles.length > 0) {
+      // Only log on initialization to prevent repeated messages
+      if (foundFiles.length > 0 && !this.initialized) {
         console.log(`📁 Found local ephemeris files: ${foundFiles.join(', ')}`);
         console.log('🔄 Using bundled ephemeris data for Node.js compatibility');
       }
       
-      if (missingFiles.length > 0) {
+      if (missingFiles.length > 0 && !this.initialized) {
         console.log(`⚠️  Missing local ephemeris files: ${missingFiles.join(', ')} (will use bundled data)`);
       }
     } catch (error) {
-      console.log(`📂 Ephemeris validation error: ${error.message} (using bundled data)`);
+      if (!this.initialized) {
+        console.log(`📂 Ephemeris validation error: ${error.message} (using bundled data)`);
+      }
     }
   }
 

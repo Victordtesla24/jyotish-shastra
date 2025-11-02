@@ -12,14 +12,27 @@ import BirthDataAnalysisService from '../../services/analysis/BirthDataAnalysisS
 import { v4 as uuidv4 } from 'uuid';
 import { validateChartRequest } from '../validators/birthDataValidator.js';
 import crypto from 'crypto';
+import ChartGenerationServiceSingleton from '../../services/chart/ChartGenerationService.js';
 
 class ChartController {
   constructor() {
     this.geocodingService = new GeocodingService();
-    this.chartService = new ChartGenerationService(this.geocodingService);
+    // Initialize singleton reference (will be initialized when first used)
+    this.chartService = null;
     this.lagnaService = new LagnaAnalysisService();
     this.houseService = new HouseAnalysisService();
     this.birthDataAnalysisService = new BirthDataAnalysisService();
+  }
+
+  /**
+   * Get ChartGenerationService singleton instance
+   * @returns {Promise<ChartGenerationService>}
+   */
+  async getChartService() {
+    if (!this.chartService) {
+      this.chartService = await ChartGenerationServiceSingleton.getInstance();
+    }
+    return this.chartService;
   }
 
   /**
@@ -42,7 +55,8 @@ class ChartController {
       }
 
       // Generate comprehensive chart with geocoding
-      const chartData = await this.chartService.generateComprehensiveChart(birthData);
+      const chartService = await this.getChartService();
+      const chartData = await chartService.generateComprehensiveChart(birthData);
 
       // Generate chartId to match response format expected by UI
       const { v4: uuidv4 } = await import('uuid');
@@ -828,7 +842,8 @@ class ChartController {
       }
 
       // Generate charts first
-      const chartData = await this.chartService.generateComprehensiveChart(birthData);
+      const chartService = await this.getChartService();
+      const chartData = await chartService.generateComprehensiveChart(birthData);
 
       // Perform systematic analysis of Section 1 questions
       const birthDataAnalysis = this.birthDataAnalysisService.analyzeBirthDataCollection(
