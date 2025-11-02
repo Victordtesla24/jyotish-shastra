@@ -110,38 +110,39 @@ function calculateRasiForHouse(houseNumber, ascendantRasi) {
 }
 
 
-// North Indian chart house positions (diamond layout) - Optimized for better text visibility
+// North Indian chart house positions (diamond layout) - Template-validated coordinates
+// Updated for perfect kundli template alignment with precise positioning
 const HOUSE_POSITIONS = {
-  1:  { x: CENTER_X, y: PADDING + 30 },           // Top center
-  2:  { x: CENTER_X + 80, y: PADDING + 60 },      // Top right
-  3:  { x: CHART_SIZE - PADDING - 30, y: CENTER_Y - 80 }, // Right top
-  4:  { x: CHART_SIZE - PADDING - 30, y: CENTER_Y },      // Right center
-  5:  { x: CHART_SIZE - PADDING - 30, y: CENTER_Y + 80 }, // Right bottom
-  6:  { x: CENTER_X + 80, y: CHART_SIZE - PADDING - 60 }, // Bottom right
-  7:  { x: CENTER_X, y: CHART_SIZE - PADDING - 30 },      // Bottom center
-  8:  { x: CENTER_X - 80, y: CHART_SIZE - PADDING - 60 }, // Bottom left
-  9:  { x: PADDING + 30, y: CENTER_Y + 80 },       // Left bottom
-  10: { x: PADDING + 30, y: CENTER_Y },            // Left center
-  11: { x: PADDING + 30, y: CENTER_Y - 80 },       // Left top
-  12: { x: CENTER_X - 80, y: PADDING + 60 }        // Top left
+  1:  { x: CENTER_X, y: PADDING + 40 },           // Top center (Ascendant position - always centered)
+  2:  { x: CENTER_X + 95, y: PADDING + 70 },      // Top right-upper quadrant
+  3:  { x: CHART_SIZE - PADDING - 40, y: CENTER_Y - 70 }, // Right upper
+  4:  { x: CHART_SIZE - PADDING - 40, y: CENTER_Y },      // Right center
+  5:  { x: CHART_SIZE - PADDING - 40, y: CENTER_Y + 70 }, // Right lower
+  6:  { x: CENTER_X + 95, y: CHART_SIZE - PADDING - 70 }, // Bottom right-lower quadrant
+  7:  { x: CENTER_X, y: CHART_SIZE - PADDING - 40 },      // Bottom center
+  8:  { x: CENTER_X - 95, y: CHART_SIZE - PADDING - 70 }, // Bottom left-lower quadrant
+  9:  { x: PADDING + 40, y: CENTER_Y + 70 },       // Left lower
+  10: { x: PADDING + 40, y: CENTER_Y },            // Left center
+  11: { x: PADDING + 40, y: CENTER_Y - 70 },       // Left upper
+  12: { x: CENTER_X - 95, y: PADDING + 70 }        // Top left-upper quadrant
 };
 
-// Rasi number positions matching the red circles in North Indian chart
-// Houses are numbered anti-clockwise starting from top (1st house)
-// Based on the red circles in the reference image
+// Rasi number positions matching the template diamond structure
+// Precisely positioned at house boundaries for accurate display
+// Refined coordinates based on template analysis for perfect alignment
 const RASI_NUMBER_POSITIONS = {
-  1:  { x: PADDING + 100, y: PADDING + 100 },           // Top-left corner (between houses 12 and 1)
-  2:  { x: CENTER_X - 80, y: PADDING + 60 },            // Top edge left (between houses 1 and 2)
-  3:  { x: CENTER_X + 80, y: PADDING + 60 },            // Top edge right (between houses 2 and 3)
-  4:  { x: CHART_SIZE - PADDING - 100, y: PADDING + 100 }, // Top-right corner (between houses 3 and 4)
-  5:  { x: CHART_SIZE - PADDING - 60, y: CENTER_Y - 80 },  // Right edge top (between houses 4 and 5)
-  6:  { x: CHART_SIZE - PADDING - 60, y: CENTER_Y + 80 },  // Right edge bottom (between houses 5 and 6)
-  7:  { x: CHART_SIZE - PADDING - 100, y: CHART_SIZE - PADDING - 100 }, // Bottom-right corner
-  8:  { x: CENTER_X + 80, y: CHART_SIZE - PADDING - 60 },  // Bottom edge right
-  9:  { x: CENTER_X - 80, y: CHART_SIZE - PADDING - 60 },  // Bottom edge left
-  10: { x: PADDING + 100, y: CHART_SIZE - PADDING - 100 }, // Bottom-left corner
-  11: { x: PADDING + 60, y: CENTER_Y + 80 },            // Left edge bottom
-  12: { x: PADDING + 60, y: CENTER_Y - 80 }             // Left edge top
+  1:  { x: PADDING + 90, y: PADDING + 90 },           // Top-left corner (between houses 12 and 1)
+  2:  { x: CENTER_X - 70, y: PADDING + 50 },           // Top edge left (between houses 1 and 2)
+  3:  { x: CENTER_X + 70, y: PADDING + 50 },           // Top edge right (between houses 2 and 3)
+  4:  { x: CHART_SIZE - PADDING - 90, y: PADDING + 90 }, // Top-right corner (between houses 3 and 4)
+  5:  { x: CHART_SIZE - PADDING - 50, y: CENTER_Y - 70 },  // Right edge top (between houses 4 and 5)
+  6:  { x: CHART_SIZE - PADDING - 50, y: CENTER_Y + 70 },  // Right edge bottom (between houses 5 and 6)
+  7:  { x: CHART_SIZE - PADDING - 90, y: CHART_SIZE - PADDING - 90 }, // Bottom-right corner
+  8:  { x: CENTER_X + 70, y: CHART_SIZE - PADDING - 50 },  // Bottom edge right
+  9:  { x: CENTER_X - 70, y: CHART_SIZE - PADDING - 50 },  // Bottom edge left
+  10: { x: PADDING + 90, y: CHART_SIZE - PADDING - 90 }, // Bottom-left corner
+  11: { x: PADDING + 50, y: CENTER_Y + 70 },            // Left edge bottom
+  12: { x: PADDING + 50, y: CENTER_Y - 70 }             // Left edge top
 };
 
 // Removed unused DIAMOND_FRAME constant
@@ -236,29 +237,34 @@ function processChartData(chartData) {
       throw new Error(`Invalid longitude for planet ${planet.name || 'unknown'}: ${planet.longitude}. Expected a valid number from API.`);
     }
     
-    // CRITICAL FIX: Use house cusps from housePositions for accurate house assignment
-    // Prefer API-provided house number if available and valid, otherwise calculate using house cusps
-    let house = planet.house;
+    // CRITICAL FIX: Always use house cusps for accurate Placidus house system calculation
+    // API-provided house numbers use formula-based calculation which is inaccurate for Placidus houses
+    // Recalculate using actual house cusps for precision
+    let house = null;
     
-    // Validate house number from API
-    if (!house || house < 1 || house > 12 || !Number.isInteger(house)) {
-      // Calculate house using actual house cusps (most accurate) or fallback to formula
-      try {
-        if (housePositions && Array.isArray(housePositions) && housePositions.length === 12) {
-          // Use house cusps for accurate Placidus house system calculation
-          house = calculateHouseFromCusps(planet.longitude, housePositions);
-        } else {
-          // Fallback to formula-based calculation if housePositions not available
-          console.warn(`⚠️ housePositions not available for ${planet.name}, using formula calculation`);
+    try {
+      if (housePositions && Array.isArray(housePositions) && housePositions.length === 12) {
+        // Always use house cusps for accurate Placidus house system calculation
+        house = calculateHouseFromCusps(planet.longitude, housePositions);
+      } else {
+        // Fallback to API-provided house number if housePositions not available
+        house = planet.house;
+        if (!house || house < 1 || house > 12 || !Number.isInteger(house)) {
+          // If API house also invalid, use formula-based calculation as last resort
+          console.warn(`⚠️ housePositions not available and API house invalid for ${planet.name}, using formula calculation`);
           house = calculateHouseFromLongitude(planet.longitude, chart.ascendant.longitude);
         }
-      } catch (calcError) {
-        console.warn(`⚠️ Failed to calculate house for planet ${planet.name}:`, calcError.message);
+      }
+    } catch (calcError) {
+      console.warn(`⚠️ Failed to calculate house from cusps for ${planet.name}:`, calcError.message);
+      // Fallback to API-provided house number
+      house = planet.house;
+      if (!house || house < 1 || house > 12 || !Number.isInteger(house)) {
         // Last resort: try formula-based calculation
         try {
           house = calculateHouseFromLongitude(planet.longitude, chart.ascendant.longitude);
         } catch (fallbackError) {
-          console.error(`❌ Both house cusp and formula calculations failed for ${planet.name}:`, fallbackError.message);
+          console.error(`❌ All house calculation methods failed for ${planet.name}:`, fallbackError.message);
           house = null;
         }
       }
@@ -472,6 +478,93 @@ function calculateHouseFromLongitude(planetLongitude, ascendantLongitude) {
   const validHouse = Math.max(1, Math.min(12, houseNumber));
 
   return validHouse;
+}
+
+/**
+ * Calculate precise planetary position to match kundli template exactly
+ * Implements template-validated corner positioning with clustering prevention
+ * @param {Object} housePosition - Base house coordinates
+ * @param {Object} planet - Planet data
+ * @param {Array} allPlanetsInHouse - All planets in this house
+ * @param {number} houseNumber - House number (1-12)
+ * @returns {Object} Precise x, y coordinates for planet
+ */
+function calculatePrecisePlanetPosition(housePosition, planet, allPlanetsInHouse, houseNumber) {
+  // Template-validated corner offsets for perfect alignment
+  const CORNER_OFFSETS = {
+    primary: { x: 65, y: 60 },    // Primary corner placement
+    secondary: { x: 65, y: -60 }, // Secondary corner
+    tertiary: { x: -65, y: 60 },  // Tertiary corner
+    quaternary: { x: -65, y: -60 } // Quaternary corner
+  };
+
+  // Minimum spacing between planets to prevent clustering (reserved for future enhancements)
+  // const MIN_PLANET_SPACING = 18;
+  
+  let textX = housePosition.x;
+  let textY = housePosition.y;
+
+  // Special handling for Ascendant - always centered in its position
+  if (planet.name === 'Ascendant' || planet.code === 'As') {
+    return { x: textX, y: textY };
+  }
+
+  // Separate Ascendant from other planets for positioning
+  const nonAscendantPlanets = allPlanetsInHouse.filter(p => p.name !== 'Ascendant' && p.code !== 'As');
+  // const hasAscendant = nonAscendantPlanets.length !== allPlanetsInHouse.length && allPlanetsInHouse.some(p => p.name === 'Ascendant' || p.code === 'As');
+  
+  // Get index among non-ascendant planets only
+  const planetIndex = nonAscendantPlanets.findIndex(p => 
+    (p.name === planet.name && p.code === planet.code) ||
+    (p.house === planet.house && Math.abs(p.degrees - planet.degrees) < 0.01)
+  );
+
+  // Template-validated positioning patterns
+  if (nonAscendantPlanets.length === 1) {
+    // Single planet: Position in primary corner (top-right)
+    textX += CORNER_OFFSETS.primary.x;
+    textY += CORNER_OFFSETS.primary.y;
+  } else if (nonAscendantPlanets.length === 2) {
+    // Two planets: Use diagonal corners to maximize spacing
+    if (planetIndex === 0) {
+      textX += CORNER_OFFSETS.primary.x;
+      textY += CORNER_OFFSETS.primary.y; // top-right
+    } else {
+      textX += CORNER_OFFSETS.tertiary.x;
+      textY += CORNER_OFFSETS.tertiary.y; // bottom-left
+    }
+  } else if (nonAscendantPlanets.length === 3) {
+    // Three planets: Use triangular corner arrangement
+    const positions = [
+      CORNER_OFFSETS.primary,   // top-right
+      CORNER_OFFSETS.secondary, // top-left  
+      CORNER_OFFSETS.tertiary   // bottom-left
+    ];
+    const offset = positions[planetIndex % 3];
+    textX += offset.x;
+    textY += offset.y;
+  } else if (nonAscendantPlanets.length >= 4) {
+    // Four or more planets: Use all four corners with layering
+    const positions = [
+      CORNER_OFFSETS.primary,   // top-right
+      CORNER_OFFSETS.secondary, // top-left
+      CORNER_OFFSETS.tertiary,  // bottom-left
+      CORNER_OFFSETS.quaternary // bottom-right
+    ];
+    const primaryIndex = planetIndex % 4;
+    const offset = positions[primaryIndex];
+    textX += offset.x;
+    textY += offset.y;
+    
+    // For 5+ planets, add secondary layering
+    if (planetIndex >= 4) {
+      const layerOffset = Math.floor(planetIndex / 4);
+      textX += (layerOffset % 2 === 0 ? 15 : -15); // Alternating horizontal offset
+      textY += (primaryIndex < 2 ? 15 : -15);      // Vertical offset based on corner
+    }
+  }
+
+  return { x: textX, y: textY };
 }
 
 /**
@@ -804,37 +897,23 @@ export default function VedicChartDisplay({
           })}
 
 
-          {/* Planetary Positions - improved spacing to prevent overlapping */}
+          {/* Planetary Positions - Template-validated positioning for perfect kundli alignment */}
           {Object.entries(houseGroups).map(([houseNum, planetsInHouse]) => {
             if (planetsInHouse.length === 0) return null;
 
             const housePosition = HOUSE_POSITIONS[parseInt(houseNum)];
-            const housePlanetCount = planetsInHouse.length;
+            const houseNumber = parseInt(houseNum);
 
             return (
               <g key={`house-planets-${houseNum}`}>
                 {planetsInHouse.map((planet, index) => {
-                  // Improved positioning logic to prevent overlapping
-                  let textX = housePosition.x;
-                  let textY = housePosition.y;
-
-                  // For multiple planets in same house, arrange them in a grid pattern
-                  if (housePlanetCount === 1) {
-                    // Single planet - center it below house number
-                    textY += 25;
-                  } else if (housePlanetCount === 2) {
-                    // Two planets - stack vertically with proper spacing
-                    textY += 20 + (index * 25);
-                  } else if (housePlanetCount === 3) {
-                    // Three planets - increased spacing to prevent overlap
-                    textY += 15 + (index * 24);
-                  } else {
-                    // Four or more planets - use 2x2 grid layout with better spacing
-                    const col = index % 2;
-                    const row = Math.floor(index / 2);
-                    textX += (col === 0 ? -35 : 35); // Increased horizontal offset
-                    textY += 20 + (row * 22); // Increased vertical spacing
-                  }
+                  // Use the new precise positioning function for template alignment
+                  const { x: textX, y: textY } = calculatePrecisePlanetPosition(
+                    housePosition, 
+                    planet, 
+                    planetsInHouse, 
+                    houseNumber
+                  );
 
                   return (
                     <text
@@ -884,6 +963,7 @@ export {
   processChartData,
   calculateHouseFromLongitude,
   groupPlanetsByHouse,
+  calculatePrecisePlanetPosition,
   formatPlanetText,
   generateCulturalContext,
   getZodiacMeaning,
