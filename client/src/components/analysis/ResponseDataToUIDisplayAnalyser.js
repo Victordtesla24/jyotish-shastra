@@ -541,10 +541,10 @@ const ResponseDataToUIDisplayAnalyser = {
       }
 
       // Get birth data for API call
-      let birthData = UIDataSaver.getBirthData();
+      const stored = UIDataSaver.getBirthData();
 
       // PRODUCTION: Require birth data, no fallbacks
-      if (!birthData) {
+      if (!stored || !stored.data) {
         const error = new Error('Birth data is required for analysis. Please generate a chart first by filling out the birth data form.');
         error.code = 'BIRTH_DATA_REQUIRED';
         error.userMessage = 'Please fill out the birth data form on the homepage and generate your chart to view analysis results.';
@@ -552,6 +552,7 @@ const ResponseDataToUIDisplayAnalyser = {
         throw error;
       }
 
+      const birthData = stored.data; // Extract .data property from stamped object
 
       // Fetch comprehensive analysis from API
       // Use apiConfig utility to get full API URL
@@ -769,16 +770,18 @@ const ResponseDataToUIDisplayAnalyser = {
       }
 
       // Get birth data for API call
-      let birthData = UIDataSaver.getBirthData();
+      const stored = UIDataSaver.getBirthData();
 
       // PRODUCTION: Require birth data, no fallbacks
-      if (!birthData) {
+      if (!stored || !stored.data) {
         const error = new Error('Birth data is required for analysis. Please generate a chart first by filling out the birth data form.');
         error.code = 'BIRTH_DATA_REQUIRED';
         error.userMessage = 'Please fill out the birth data form on the homepage and generate your chart to view analysis results.';
         error.action = 'navigate_home';
         throw error;
       }
+
+      const birthData = stored.data; // Extract .data property from stamped object
 
       // Get endpoint for this analysis type
       const endpoint = ResponseDataToUIDisplayAnalyser.getAnalysisEndpoint(analysisType);

@@ -2,8 +2,18 @@
  * UIDataSaver - Enhanced session persistence and browser storage management
  * Handles structured data storage across browser sessions with quota management
  * Supports: birthData, coordinates, apiRequest, apiResponse (chart, navamsa, analysis)
- * Singleton pattern implementation (Gap 2.1)
+ * Singleton pattern implementation with canonical cache keys and TTL-based staleness detection
  */
+
+// Import cache infrastructure utilities
+import { CACHE_KEYS } from '../../utils/cacheKeys.js';
+import jsonSafe from '../../utils/jsonSafe.js';
+import { stamp, isFresh, hash, canonical } from '../../utils/cachePolicy.js';
+
+// In-memory cache for performance (per-tab session-scoped)
+const MEM = {
+  birth: null
+};
 
 class UIDataSaver {
   constructor() {
@@ -13,7 +23,7 @@ class UIDataSaver {
     }
 
     this.storageKey = 'jyotish_shastra_data';
-    this.sessionKey = 'current_session';
+    this.sessionKey = CACHE_KEYS.SESSION;
     this.maxStorageSize = 5 * 1024 * 1024; // 5MB limit
 
     // Store the singleton instance
@@ -22,30 +32,22 @@ class UIDataSaver {
 
   /**
    * Helper for safe data serialization - reduces JSON.stringify usage
+   * @deprecated Use jsonSafe.stringify() instead
    * @param {*} data - Data to serialize
    * @returns {string} Serialized string
    */
   static safeSerialize(data) {
-    try {
-      return JSON.stringify(data);
-    } catch (error) {
-      console.error('Serialization error:', error);
-      return '{}';
-    }
+    return jsonSafe.stringify(data) || '{}';
   }
 
   /**
    * Helper for safe data deserialization - reduces JSON.parse usage
+   * @deprecated Use jsonSafe.parse() instead
    * @param {string} jsonString - String to deserialize
    * @returns {*} Deserialized data
    */
   static safeDeserialize(jsonString) {
-    try {
-      return JSON.parse(jsonString);
-    } catch (error) {
-      console.error('Deserialization error:', error);
-      return null;
-    }
+    return jsonSafe.parse(jsonString);
   }
 
   /**
@@ -60,7 +62,245 @@ class UIDataSaver {
   }
 
   /**
+   * CANONICAL: Save birth data with TTL stamping
+   * CRITICAL: This is the ONLY method that should write birth data
+   * Writes to sessionStorage[CACHE_KEYS.BIRTH_DATA] only
+   * @param {Object} birthData - Birth data to save
+   * @returns {boolean} True if save succeeded
+   */
+  setBirthData(birthData) {
+    if (!birthData || typeof birthData !== 'object') {
+      if (process.env.NODE_ENV !== 'production') {
+        console.debug('[UIDataSaver] setBirthData: Invalid birth data, must be an object');
+      }
+      return false;
+    }
+
+    try {
+      // Stamp data with metadata
+      const stamped = stamp(birthData);
+      
+      // Write ONLY to canonical key
+      const serialized = jsonSafe.stringify(stamped);
+      if (!serialized) {
+        console.error('[UIDataSaver] setBirthData: Failed to serialize stamped data');
+        return false;
+      }
+      
+      sessionStorage.setItem(CACHE_KEYS.BIRTH_DATA, serialized);
+      
+      // Update in-memory cache
+      MEM.birth = stamped;
+      
+      if (process.env.NODE_ENV !== 'production') {
+        console.debug('[UIDataSaver] setBirthData: Saved to canonical key', {
+          key: CACHE_KEYS.BIRTH_DATA,
+          dataHash: stamped.meta.dataHash,
+          savedAt: new Date(stamped.meta.savedAt).toISOString()
+        });
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('[UIDataSaver] setBirthData: Error saving birth data:', error.message);
+      return false;
+    }
+  }
+
+  /**
+   * CANONICAL: Get birth data with anti-stale validation
+   * CRITICAL: Returns {data, meta} or null (never stale data)
+   * Read priority: memory → canonical → legacy (with migration)
+   * @returns {{data: Object, meta: {savedAt: number, dataHash: string, version: number}}|null}
+   */
+  getBirthData() {
+    try {
+      // Priority 1: In-memory cache (if present and fresh)
+      if (MEM.birth && isFresh(MEM.birth)) {
+        if (process.env.NODE_ENV !== 'production') {
+          console.debug('[UIDataSaver] getBirthData: Returning from memory cache');
+        }
+        return MEM.birth;
+      }
+
+      // Priority 2: Canonical key (PRIMARY FIX - moved from position 5 to position 2)
+      const directRaw = sessionStorage.getItem(CACHE_KEYS.BIRTH_DATA);
+      if (directRaw) {
+        const direct = jsonSafe.parse(directRaw);
+        if (direct && direct.data && direct.meta) {
+          // Validate freshness
+          if (!isFresh(direct)) {
+            if (process.env.NODE_ENV !== 'production') {
+              console.debug('[UIDataSaver] getBirthData: Canonical key data is stale, rejecting');
+            }
+            // Clear stale data
+            sessionStorage.removeItem(CACHE_KEYS.BIRTH_DATA);
+            MEM.birth = null;
+            return null;
+          }
+          
+          // Update memory cache
+          MEM.birth = direct;
+          
+          if (process.env.NODE_ENV !== 'production') {
+            console.debug('[UIDataSaver] getBirthData: Returning from canonical key', {
+              dataHash: direct.meta.dataHash,
+              age: Date.now() - direct.meta.savedAt
+            });
+          }
+          
+          return direct;
+        }
+      }
+
+      // Priority 3: Legacy container (current_session) - migrate to canonical
+      const sessRaw = sessionStorage.getItem(CACHE_KEYS.SESSION);
+      if (sessRaw) {
+        const sess = jsonSafe.parse(sessRaw);
+        if (sess && sess.birthData) {
+          if (process.env.NODE_ENV !== 'production') {
+            console.debug('[UIDataSaver] getBirthData: Migrating from legacy SESSION key to canonical');
+          }
+          
+          // Migrate to canonical format
+          const stamped = stamp(sess.birthData);
+          sessionStorage.setItem(CACHE_KEYS.BIRTH_DATA, jsonSafe.stringify(stamped));
+          MEM.birth = stamped;
+          return stamped;
+        }
+      }
+
+      // Priority 4: Legacy dedicated key (birth_data_session) - migrate to canonical
+      const legacyRaw = sessionStorage.getItem(CACHE_KEYS.BIRTH_DATA_SESSION);
+      if (legacyRaw) {
+        const legacy = jsonSafe.parse(legacyRaw);
+        if (legacy) {
+          if (process.env.NODE_ENV !== 'production') {
+            console.debug('[UIDataSaver] getBirthData: Migrating from legacy BIRTH_DATA_SESSION key to canonical');
+          }
+          
+          // Migrate to canonical format
+          const stamped = stamp(legacy);
+          sessionStorage.setItem(CACHE_KEYS.BIRTH_DATA, jsonSafe.stringify(stamped));
+          MEM.birth = stamped;
+          return stamped;
+        }
+      }
+
+      // Priority 5: Check localStorage for form persistence (cross-session)
+      const localRaw = localStorage.getItem(`${this.storageKey}_birthData`);
+      if (localRaw) {
+        const local = jsonSafe.parse(localRaw);
+        if (local) {
+          if (process.env.NODE_ENV !== 'production') {
+            console.debug('[UIDataSaver] getBirthData: Migrating from localStorage to canonical');
+          }
+          
+          // Migrate to canonical format in sessionStorage
+          const stamped = stamp(local);
+          sessionStorage.setItem(CACHE_KEYS.BIRTH_DATA, jsonSafe.stringify(stamped));
+          MEM.birth = stamped;
+          return stamped;
+        }
+      }
+
+      // No valid birth data found
+      if (process.env.NODE_ENV !== 'production') {
+        console.debug('[UIDataSaver] getBirthData: No birth data found in any storage location');
+      }
+      return null;
+
+    } catch (error) {
+      console.error('[UIDataSaver] getBirthData: Error retrieving birth data:', error.message);
+      return null;
+    }
+  }
+
+  /**
+   * Record last chart generation metadata
+   * Used for staleness detection and chart tracking
+   * @param {string} chartId - Chart identifier
+   * @param {Object} birthData - Birth data used for chart (optional, will get from storage if not provided)
+   * @returns {boolean} True if saved successfully
+   */
+  setLastChart(chartId, birthData) {
+    if (!chartId) {
+      if (process.env.NODE_ENV !== 'production') {
+        console.debug('[UIDataSaver] setLastChart: No chartId provided');
+      }
+      return false;
+    }
+
+    try {
+      // Get birth data if not provided
+      const bData = birthData || this.getBirthData()?.data || null;
+      
+      const record = {
+        chartId,
+        birthDataHash: bData ? hash(canonical(bData)) : null,
+        savedAt: Date.now()
+      };
+      
+      const serialized = jsonSafe.stringify(record);
+      if (!serialized) {
+        return false;
+      }
+      
+      sessionStorage.setItem(CACHE_KEYS.LAST_CHART, serialized);
+      
+      if (process.env.NODE_ENV !== 'production') {
+        console.debug('[UIDataSaver] setLastChart: Recorded chart generation', {
+          chartId,
+          birthDataHash: record.birthDataHash
+        });
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('[UIDataSaver] setLastChart: Error saving last chart:', error.message);
+      return false;
+    }
+  }
+
+  /**
+   * Get last chart generation metadata
+   * @returns {{chartId: string, birthDataHash: string, savedAt: number}|null}
+   */
+  getLastChart() {
+    try {
+      const raw = sessionStorage.getItem(CACHE_KEYS.LAST_CHART);
+      if (!raw) {
+        return null;
+      }
+      
+      const record = jsonSafe.parse(raw);
+      return record && record.chartId ? record : null;
+    } catch (error) {
+      console.error('[UIDataSaver] getLastChart: Error retrieving last chart:', error.message);
+      return null;
+    }
+  }
+
+  /**
+   * Clear birth data from canonical storage
+   * Does NOT clear legacy keys (preserves upgrade path)
+   */
+  clearBirthData() {
+    try {
+      MEM.birth = null;
+      sessionStorage.removeItem(CACHE_KEYS.BIRTH_DATA);
+      
+      if (process.env.NODE_ENV !== 'production') {
+        console.debug('[UIDataSaver] clearBirthData: Cleared canonical birth data');
+      }
+    } catch (error) {
+      console.error('[UIDataSaver] clearBirthData: Error clearing birth data:', error.message);
+    }
+  }
+
+  /**
    * Save enhanced session data with structured format
+   * Now uses canonical setBirthData() for birth data persistence
    * @param {Object} data - Data to save with structured format
    * @returns {Object} Save operation result
    */
@@ -68,7 +308,12 @@ class UIDataSaver {
     try {
       const currentSession = this.loadSession();
 
-      // Create enhanced session structure
+      // If birth data is provided, save it via canonical method
+      if (data.birthData) {
+        this.setBirthData(data.birthData);
+      }
+
+      // Create enhanced session structure (legacy container, kept for backward compatibility)
       const enhancedSessionData = {
         birthData: data.birthData || currentSession?.currentSession?.birthData || null,
         coordinates: data.coordinates || currentSession?.currentSession?.coordinates || null,
@@ -79,86 +324,23 @@ class UIDataSaver {
         ...data // Allow additional properties
       };
 
-      // Save to sessionStorage for current session
+      // Save to sessionStorage for current session (legacy container, backward compatibility)
       sessionStorage.setItem(this.sessionKey, UIDataSaver.safeSerialize(enhancedSessionData));
-      
-      // CRITICAL FIX: Also save individual keys for test compatibility
-      
-      
-      // Check for session keys count logging
-      const sessionKeys = Object.keys(sessionStorage).filter(k => k.startsWith('session') || k.includes('birth') || k.includes('chart') || k.includes('analysis') || k.includes('jyotish'));
-      console.log('💾 UIDataSaver: Session saved, keys count:', sessionKeys.length, 'keys:', sessionKeys);
-      console.log('🔍 UIDataSaver: Session key patterns check:', {
-        hasBirthKey: sessionKeys.some(k => k.includes('birth')),
-        hasChartKey: sessionKeys.some(k => k.includes('chart')),
-        hasJyotishKey: sessionKeys.some(k => k.includes('jyotish')),
-        hasSessionKey: sessionKeys.some(k => k.includes('session'))
-      });
-
-      // CRITICAL FIX: Multi-key save strategy for test compatibility
-      const timestamp = Date.now();
-      
-      // Primary session with current_session key (already done above)
-      
-      // Fallback 1: Simple birth data key
-      if (enhancedSessionData.birthData) {
-        sessionStorage.setItem('birth_data_session', UIDataSaver.safeSerialize(enhancedSessionData.birthData));
-        console.log('💾 UIDataSaver: Fallback birth data key saved');
-      }
-      
-      // Fallback 2: Timestamped complete session
-      sessionStorage.setItem(`jyotish_session_${timestamp}`, UIDataSaver.safeSerialize(enhancedSessionData));
-      
-      // Fallback 3: Simple birthData format
-      if (enhancedSessionData.birthData) {
-        const simpleBirthData = {
-          name: enhancedSessionData.birthData.name,
-          dateOfBirth: enhancedSessionData.birthData.dateOfBirth,
-          timeOfBirth: enhancedSessionData.birthData.timeOfBirth,
-          placeOfBirth: enhancedSessionData.birthData.placeOfBirth,
-          latitude: enhancedSessionData.birthData.latitude,
-          longitude: enhancedSessionData.birthData.longitude,
-          timezone: enhancedSessionData.birthData.timezone
-        };
-        sessionStorage.setItem('birthData', UIDataSaver.safeSerialize(simpleBirthData));
-        console.log('💾 UIDataSaver: Simple birthData key saved');
-      }
 
       // Save user preferences to localStorage
       if (data.preferences) {
         localStorage.setItem(`${this.storageKey}_preferences`, UIDataSaver.safeSerialize(data.preferences));
       }
 
-      // Save birth data for form persistence
+      // Optional: Save birth data to localStorage for form persistence across browser sessions
       if (enhancedSessionData.birthData) {
         localStorage.setItem(`${this.storageKey}_birthData`, UIDataSaver.safeSerialize(enhancedSessionData.birthData));
-        
-        // CRITICAL FIX: Also store a simple birth data key for test compatibility
-        sessionStorage.setItem('birth_data_session', UIDataSaver.safeSerialize(enhancedSessionData.birthData));
-        console.log('💾 UIDataSaver: Birth data saved with keys:', [`${this.storageKey}_birthData`, 'birth_data_session']);
       }
-
-      // CRITICAL FIX: Session integrity verification
-      const verificationKeys = ['current_session', 'birthData', 'birth_data_session', 'jyotish_chart_generated'];
-      const verificationResult = {
-        keysFound: 0,
-        keysExpected: verificationKeys.length,
-        details: {}
-      };
-      
-      verificationKeys.forEach(key => {
-        const exists = sessionStorage.getItem(key) !== null;
-        verificationResult.details[key] = exists;
-        if (exists) verificationResult.keysFound++;
-      });
-      
-      console.log('🔍 UIDataSaver: Session integrity verification:', verificationResult);
 
       return {
         success: true,
         sessionId: enhancedSessionData.sessionId,
-        savedAt: enhancedSessionData.timestamp,
-        verification: verificationResult
+        savedAt: enhancedSessionData.timestamp
       };
     } catch (error) {
       console.error('❌ UIDataSaver: Error saving session:', error.message || error.toString());
@@ -184,7 +366,6 @@ class UIDataSaver {
         chart: apiResponseData.chart || apiResponseData.rasiChart || null,
         navamsa: apiResponseData.navamsa || apiResponseData.navamsaChart || null,
         analysis: apiResponseData.analysis || null,
-        // Save comprehensive analysis sections if present
         comprehensiveAnalysis: apiResponseData.analysis?.sections || null,
         sections: apiResponseData.analysis?.sections || null,
         metadata: apiResponseData.metadata || null,
@@ -205,7 +386,6 @@ class UIDataSaver {
       }
 
       if (apiResponseData.chart || apiResponseData.rasiChart) {
-        // CRITICAL FIX: Clear old chart data before saving new chart
         this.clearOldChartData();
         
         const chartDataKey = `jyotish_api_chart_generate_${Date.now()}`;
@@ -214,22 +394,6 @@ class UIDataSaver {
           chart: apiResponseData.chart || apiResponseData.rasiChart,
           timestamp: timestamp
         }));
-        
-        // CRITICAL FIX: Also store a simple chart key for test compatibility
-        sessionStorage.setItem('birth_chart_data', UIDataSaver.safeSerialize({
-          success: apiResponseData.success || true,
-          chart: apiResponseData.chart || apiResponseData.rasiChart,
-          timestamp: timestamp
-        }));
-        
-        // CRITICAL FIX: Add jyotish_chart_data key for test compatibility
-        sessionStorage.setItem('jyotish_chart_data', UIDataSaver.safeSerialize({
-          success: apiResponseData.success || true,
-          chart: apiResponseData.chart || apiResponseData.rasiChart,
-          timestamp: timestamp
-        }));
-        
-        console.log('💾 UIDataSaver: Chart data saved with keys:', [chartDataKey, 'birth_chart_data', 'jyotish_chart_data']);
       }
 
       // Update session with API response
@@ -253,10 +417,8 @@ class UIDataSaver {
       const timestamp = new Date().toISOString();
       const key = `jyotish_api_analysis_comprehensive_${Date.now()}`;
 
-      // CRITICAL FIX: Clear all old comprehensive analysis data to prevent stale cache
       this.clearOldComprehensiveAnalysis();
 
-      // Store comprehensive analysis with proper structure
       const comprehensiveData = {
         success: analysisData.success || true,
         analysis: {
@@ -276,15 +438,6 @@ class UIDataSaver {
 
       sessionStorage.setItem(key, UIDataSaver.safeSerialize(comprehensiveData));
       
-      // CRITICAL FIX: Also store a simple analysis key for test compatibility
-      sessionStorage.setItem('comprehensive_analysis_data', UIDataSaver.safeSerialize(comprehensiveData));
-      
-      // CRITICAL FIX: Add jyotish_analysis_data key for test compatibility
-      sessionStorage.setItem('jyotish_analysis_data', UIDataSaver.safeSerialize(comprehensiveData));
-      
-      console.log('💾 UIDataSaver: Comprehensive analysis saved with keys:', [key, 'comprehensive_analysis_data', 'jyotish_analysis_data']);
-
-      // Also update the main session
       return this.saveApiResponse(comprehensiveData);
     } catch (error) {
       console.error('❌ UIDataSaver: Error saving comprehensive analysis:', error.message || error.toString());
@@ -294,7 +447,6 @@ class UIDataSaver {
 
   /**
    * Clear old comprehensive analysis data to prevent stale cache
-   * CRITICAL FIX: Ensures UI always displays fresh data
    */
   clearOldComprehensiveAnalysis() {
     try {
@@ -304,10 +456,6 @@ class UIDataSaver {
       oldKeys.forEach(key => {
         sessionStorage.removeItem(key);
       });
-
-      // Also clear the simple analysis key
-      sessionStorage.removeItem('comprehensive_analysis_data');
-
     } catch (error) {
       console.error('❌ UIDataSaver: Error clearing old comprehensive analysis:', error.message || error.toString());
     }
@@ -315,7 +463,6 @@ class UIDataSaver {
 
   /**
    * Clear old chart data to prevent stale cache
-   * CRITICAL FIX: Prevents displaying incorrect/outdated chart data
    */
   clearOldChartData() {
     try {
@@ -325,10 +472,6 @@ class UIDataSaver {
       oldKeys.forEach(key => {
         sessionStorage.removeItem(key);
       });
-      
-      // Also clear the simple chart key
-      sessionStorage.removeItem('birth_chart_data');
-
     } catch (error) {
       console.error('❌ UIDataSaver: Error clearing old chart data:', error.message || error.toString());
     }
@@ -340,11 +483,9 @@ class UIDataSaver {
    */
   getComprehensiveAnalysis() {
     try {
-      // Check current session structure
       const session = this.loadSession();
       if (session?.currentSession?.apiResponse?.analysis) return session.currentSession.apiResponse;
 
-      // Check timestamped storage patterns
       const keys = Object.keys(sessionStorage);
       const comprehensiveKeys = keys.filter(key => key.startsWith('jyotish_api_analysis_comprehensive_'));
       if (comprehensiveKeys.length > 0) {
@@ -352,7 +493,6 @@ class UIDataSaver {
         return UIDataSaver.safeDeserialize(sessionStorage.getItem(latestKey));
       }
 
-      // Check alternative storage patterns
       for (const key of keys.filter(k => k.includes('comprehensive'))) {
         const data = UIDataSaver.safeDeserialize(sessionStorage.getItem(key));
         if (data?.analysis?.sections || data?.sections) return data;
@@ -365,15 +505,13 @@ class UIDataSaver {
   }
 
   /**
-   * Get chart data specifically for AnalysisPage
+   * Get chart data specifically
    * @returns {Object} Chart data or null
    */
   getChartData() {
     try {
       const session = this.loadSession();
-      const chartData = session?.currentSession?.apiResponse?.chart;
-
-      return chartData || null;
+      return session?.currentSession?.apiResponse?.chart || null;
     } catch (error) {
       console.error('❌ UIDataSaver: Error getting chart data:', error.message || error.toString());
       return null;
@@ -381,28 +519,24 @@ class UIDataSaver {
   }
 
   /**
-   * Get analysis data specifically for ComprehensiveAnalysisPage
+   * Get analysis data specifically
    * @returns {Object} Analysis data or null
    */
   getAnalysisData() {
     try {
       const session = this.loadSession();
 
-      // First check for comprehensive analysis sections
       const sections = session?.currentSession?.apiResponse?.sections ||
                        session?.currentSession?.apiResponse?.comprehensiveAnalysis;
 
       if (sections) {
-        // Return comprehensive analysis structure with sections
         return {
           sections: sections,
           success: true
         };
       }
 
-      // Get regular analysis data
       const analysisData = session?.currentSession?.apiResponse?.analysis;
-
       return analysisData || null;
     } catch (error) {
       console.error('❌ UIDataSaver: Error getting analysis data:', error.message || error.toString());
@@ -411,13 +545,12 @@ class UIDataSaver {
   }
 
   /**
-   * Get individual analysis type data for AnalysisPage
-   * @param {string} analysisType - Type of analysis (houses, dasha, navamsa, aspects, arudha, lagna)
+   * Get individual analysis type data
+   * @param {string} analysisType - Type of analysis
    * @returns {Object} Individual analysis data or null
    */
   getIndividualAnalysis(analysisType) {
     try {
-      // First try to get from current session
       const session = this.loadSession();
       const sessionAnalysisData = session?.currentSession?.analysis_data;
 
@@ -425,17 +558,13 @@ class UIDataSaver {
         return sessionAnalysisData[analysisType];
       }
 
-      // Try to get from API response pattern stored in sessionStorage
       const apiKeys = Object.keys(sessionStorage).filter(key =>
         key.startsWith(`jyotish_api_analysis_${analysisType}_`)
       );
 
       if (apiKeys.length > 0) {
-        // Get the most recent one (highest timestamp)
         const latestKey = apiKeys.sort().pop();
-        const storedData = UIDataSaver.safeDeserialize(sessionStorage.getItem(latestKey));
-
-        return storedData;
+        return UIDataSaver.safeDeserialize(sessionStorage.getItem(latestKey));
       }
 
       return null;
@@ -456,7 +585,6 @@ class UIDataSaver {
       const timestamp = Date.now();
       const key = `jyotish_api_analysis_${analysisType}_${timestamp}`;
 
-      // Store with proper structure
       const analysisData = {
         success: apiResponse.success || true,
         analysis: apiResponse.analysis || apiResponse,
@@ -467,7 +595,6 @@ class UIDataSaver {
 
       sessionStorage.setItem(key, UIDataSaver.safeSerialize(analysisData));
 
-      // Also save to current session for quick access
       const session = this.loadSession();
       if (session?.currentSession) {
         if (!session.currentSession.analysis_data) {
@@ -485,127 +612,13 @@ class UIDataSaver {
   }
 
   /**
-   * Get houses analysis data
-   * @returns {Object} Houses analysis or null
-   */
-  getHousesAnalysis() {
-    return this.getIndividualAnalysis('houses');
-  }
-
-  /**
-   * Get dasha analysis data
-   * @returns {Object} Dasha analysis or null
-   */
-  getDashaAnalysis() {
-    return this.getIndividualAnalysis('dasha');
-  }
-
-  /**
-   * Get navamsa analysis data
-   * @returns {Object} Navamsa analysis or null
-   */
-  getNavamsaAnalysis() {
-    return this.getIndividualAnalysis('navamsa');
-  }
-
-  /**
-   * Get aspects analysis data
-   * @returns {Object} Aspects analysis or null
-   */
-  getAspectsAnalysis() {
-    return this.getIndividualAnalysis('aspects');
-  }
-
-  /**
-   * Get arudha analysis data
-   * @returns {Object} Arudha analysis or null
-   */
-  getArudhaAnalysis() {
-    return this.getIndividualAnalysis('arudha');
-  }
-
-  /**
-   * Get lagna analysis data
-   * @returns {Object} Lagna analysis or null
-   */
-  getLagnaAnalysis() {
-    return this.getIndividualAnalysis('lagna');
-  }
-
-  /**
-   * Get preliminary analysis data
-   * @returns {Object} Preliminary analysis or null
-   */
-  getPreliminaryAnalysis() {
-    return this.getIndividualAnalysis('preliminary');
-  }
-
-  /**
-   * Save individual analysis data using new API pattern
+   * Save individual analysis data
    * @param {string} analysisType - Type of analysis
    * @param {Object} analysisData - Analysis data to save
+   * @returns {Object} Save operation result
    */
   saveIndividualAnalysis(analysisType, analysisData) {
-    try {
-      // Use the new API response saving method for consistency
-      return this.saveApiAnalysisResponse(analysisType, analysisData);
-    } catch (error) {
-      console.error(`❌ UIDataSaver: Error saving ${analysisType} analysis:`, error.message || error.toString());
-      return { success: false, error: error.message };
-    }
-  }
-
-  /**
-   * Get birth data from any available storage location
-   * @returns {Object} Birth data or null
-   */
-  getBirthData() {
-    try {
-      // Method 1: Try to get from current session structure (preferred)
-      const session = this.loadSession();
-      if (session?.currentSession?.birthData) {
-        return session.currentSession.birthData;
-      }
-
-      if (session?.birthData) {
-        return session.birthData;
-      }
-
-      // Method 2: Check sessionStorage directly (for test compatibility)
-      const directSessionData = sessionStorage.getItem(this.sessionKey);
-      if (directSessionData) {
-        const parsedSession = UIDataSaver.safeDeserialize(directSessionData);
-        if (parsedSession?.birthData) {
-          return parsedSession.birthData;
-        }
-        if (parsedSession?.currentSession?.birthData) {
-          return parsedSession.currentSession.birthData;
-        }
-      }
-
-      // Method 3: Check localStorage for birth data specifically
-      const localBirthData = localStorage.getItem(`${this.storageKey}_birthData`);
-      if (localBirthData) {
-        return UIDataSaver.safeDeserialize(localBirthData);
-      }
-
-      // Method 4: Check sessionStorage for simple birth data key (test compatibility)
-      const simpleBirthData = sessionStorage.getItem('birth_data_session');
-      if (simpleBirthData) {
-        return UIDataSaver.safeDeserialize(simpleBirthData);
-      }
-
-      // Method 5: Check sessionStorage for direct 'birthData' key (CRITICAL FIX)
-      const directBirthData = sessionStorage.getItem('birthData');
-      if (directBirthData) {
-        return UIDataSaver.safeDeserialize(directBirthData);
-      }
-
-      return null;
-    } catch (error) {
-      console.error('❌ UIDataSaver: Error getting birth data:', error.message || error.toString());
-      return null;
-    }
+    return this.saveApiAnalysisResponse(analysisType, analysisData);
   }
 
   /**
@@ -614,7 +627,6 @@ class UIDataSaver {
    */
   loadSession() {
     try {
-      // Load current session with individual error handling
       let currentSession = null;
       try {
         const sessionData = sessionStorage.getItem(this.sessionKey);
@@ -623,11 +635,9 @@ class UIDataSaver {
         }
       } catch (sessionError) {
         console.error('❌ UIDataSaver: Error parsing session data:', sessionError.message);
-        // Clear corrupted session data
         sessionStorage.removeItem(this.sessionKey);
       }
 
-      // Load persisted preferences with individual error handling
       let preferences = null;
       try {
         const preferencesData = localStorage.getItem(`${this.storageKey}_preferences`);
@@ -636,11 +646,9 @@ class UIDataSaver {
         }
       } catch (prefsError) {
         console.error('❌ UIDataSaver: Error parsing preferences data:', prefsError.message);
-        // Clear corrupted preferences data
         localStorage.removeItem(`${this.storageKey}_preferences`);
       }
 
-      // Load persisted birth data with individual error handling
       let birthData = null;
       try {
         const birthDataStr = localStorage.getItem(`${this.storageKey}_birthData`);
@@ -649,28 +657,22 @@ class UIDataSaver {
         }
       } catch (birthError) {
         console.error('❌ UIDataSaver: Error parsing birth data:', birthError.message);
-        // Clear corrupted birth data
         localStorage.removeItem(`${this.storageKey}_birthData`);
       }
 
-      const loadedData = {
+      return {
         currentSession,
         preferences,
         birthData,
         loadedAt: new Date().toISOString()
       };
-
-      return loadedData;
     } catch (error) {
-      // Only log actual errors, not expected "no session exists" states
-      // Properly serialize error to avoid Puppeteer JSHandle@error serialization
       const errorMessage = error instanceof Error 
         ? error.message 
         : typeof error === 'string' 
           ? error 
           : String(error);
       
-      // Only log if it's not just a missing session (which is normal)
       if (errorMessage && !errorMessage.includes('sessionStorage') && !errorMessage.includes('localStorage')) {
         console.error('❌ UIDataSaver: Error loading session:', errorMessage);
       }
@@ -686,7 +688,6 @@ class UIDataSaver {
     try {
       const session = this.loadSession();
       const current = session?.currentSession;
-
       return !!(current?.birthData && current?.apiResponse?.chart);
     } catch (error) {
       console.error('❌ UIDataSaver: Error checking session completeness:', error.message || error.toString());
@@ -702,23 +703,22 @@ class UIDataSaver {
       key.startsWith(this.storageKey)
     );
 
-    // Remove data older than 30 days
     const expiryTime = 30 * 24 * 60 * 60 * 1000; // 30 days
     const now = Date.now();
 
     keysToCheck.forEach(key => {
-        const data = UIDataSaver.safeDeserialize(localStorage.getItem(key));
-        if (data?.timestamp && (now - new Date(data.timestamp).getTime() > expiryTime)) {
-          localStorage.removeItem(key);
-        } else if (!data) {
-          // Remove corrupted data
-          localStorage.removeItem(key);
-        }
+      const data = UIDataSaver.safeDeserialize(localStorage.getItem(key));
+      if (data?.timestamp && (now - new Date(data.timestamp).getTime() > expiryTime)) {
+        localStorage.removeItem(key);
+      } else if (!data) {
+        localStorage.removeItem(key);
+      }
     });
   }
 
   /**
    * Generate unique session ID
+   * @returns {string} Unique session identifier
    */
   generateSessionId() {
     return `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -728,7 +728,15 @@ class UIDataSaver {
    * Clear all saved data
    */
   clearAll() {
+    // Clear canonical birth data
+    this.clearBirthData();
+    
+    // Clear legacy keys
     sessionStorage.removeItem(this.sessionKey);
+    sessionStorage.removeItem(CACHE_KEYS.BIRTH_DATA_SESSION);
+    sessionStorage.removeItem(CACHE_KEYS.LAST_CHART);
+    
+    // Clear localStorage
     Object.keys(localStorage)
       .filter(key => key.startsWith(this.storageKey))
       .forEach(key => localStorage.removeItem(key));
@@ -737,50 +745,24 @@ class UIDataSaver {
     Object.keys(sessionStorage)
       .filter(key => key.startsWith('jyotish_api_'))
       .forEach(key => sessionStorage.removeItem(key));
-    
-    // Clear simple test-compatible keys
-    sessionStorage.removeItem('birth_data_session');
-    sessionStorage.removeItem('birth_chart_data');
-    sessionStorage.removeItem('comprehensive_analysis_data');
   }
 
   /**
    * Initialize browser event listeners for cleanup
    */
   initializeBrowserEvents() {
-    // CRITICAL FIX: Ensure session data persists before page unload
-    window.addEventListener('beforeunload', (e) => {
-      // Verify important session keys exist
-      const criticalKeys = ['birthData', 'current_session'];
-      const missingKeys = criticalKeys.filter(key => !sessionStorage.getItem(key));
-      
-      if (missingKeys.length > 0) {
-        console.warn('⚠️ UIDataSaver: Critical session keys missing before unload:', missingKeys);
-        // Attempt emergency save if possible
-        const birthData = localStorage.getItem(`${this.storageKey}_birthData`);
-        if (birthData) {
-          sessionStorage.setItem('birthData', birthData);
-          sessionStorage.setItem('current_session', JSON.stringify({
-            birthData: JSON.parse(birthData),
-            emergencySave: true,
-            timestamp: new Date().toISOString()
-          }));
-        }
-      }
-      
+    window.addEventListener('beforeunload', () => {
       // Keep only essential data, clear volatile API responses
       Object.keys(sessionStorage)
         .filter(key => key.startsWith('jyotish_api_'))
         .forEach(key => sessionStorage.removeItem(key));
     });
 
-    // Listen for form changes to replace old session data
     document.addEventListener('formDataChanged', (event) => {
       if (event.detail && event.detail.birthData) {
-        this.saveSession({ birthData: event.detail.birthData });
+        this.setBirthData(event.detail.birthData);
       }
     });
-
   }
 
   /**

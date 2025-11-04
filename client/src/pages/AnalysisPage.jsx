@@ -2598,6 +2598,22 @@ const AnalysisPage = () => {
         setLoading(true);
         setError(null);
 
+        // CRITICAL: Check for birth data before any analysis calls
+        const stored = UIDataSaver.getBirthData();
+        if (!stored) {
+          const errorObj = {
+            message: 'Please generate a chart first.',
+            code: 'BIRTH_DATA_REQUIRED',
+            action: 'navigate_chart',
+            requiresNavigation: true
+          };
+          setError(errorObj);
+          setTimeout(() => {
+            navigate('/chart');
+          }, 2000);
+          return;
+        }
+
         // Use the data layer to load comprehensive analysis
         const result = await ResponseDataToUIDisplayAnalyser.loadFromComprehensiveAnalysis();
 
@@ -2746,13 +2762,14 @@ const AnalysisPage = () => {
       }
 
       // 2. Get birth data validation (following ComprehensiveAnalysisPage pattern)
-      const birthData = UIDataSaver.getBirthData();
-      if (!birthData) {
-        console.error('❌ No birth data found, redirecting to home');
-        navigate('/');
+      const stored = UIDataSaver.getBirthData();
+      if (!stored || !stored.data) {
+        console.error('❌ No birth data found, redirecting to chart');
+        navigate('/chart');
         return;
       }
 
+      const birthData = stored.data; // Extract .data property from stamped object
 
       // 3. Call individual analysis API
       const endpointUrl = analysisEndpoints[analysisType]?.url;

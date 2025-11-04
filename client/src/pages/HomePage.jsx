@@ -80,6 +80,21 @@ const HomePage = () => {
 
       console.log('💾 HomePage: Chart API response saved to UIDataSaver:', apiResponseSaveResult);
 
+      // CRITICAL: Save birth data to canonical key with staleness guards
+      const birthDataSaved = UIDataSaver.setBirthData(formData);
+      if (!birthDataSaved) {
+        console.warn('⚠️ HomePage: Failed to save birth data to canonical key');
+      }
+
+      // Get chart ID for last chart tracking
+      const chartId = chartData.data?.chartId || chartData.chartId || `chart_${Date.now()}`;
+      
+      // CRITICAL: Save last chart metadata with birth data hash
+      const lastChartSaved = UIDataSaver.setLastChart(chartId, formData);
+      if (!lastChartSaved) {
+        console.warn('⚠️ HomePage: Failed to save last chart metadata');
+      }
+
       // Production-grade: Save session data after successful API responses
       // Save complete session with all data for persistence
       const completeSessionData = {
@@ -100,12 +115,12 @@ const HomePage = () => {
         },
         chart: {
           displayed: true,
-          chartId: chartData.data?.chartId || chartData.chartId,
+          chartId: chartId,
           generatedAt: new Date().toISOString()
         }
       };
       
-      // Save session using UIDataSaver
+      // Save session using UIDataSaver (legacy support)
       const sessionSaveResult = UIDataSaver.saveSession(completeSessionData);
       console.log('💾 HomePage: Session saved after successful chart generation:', sessionSaveResult);
 

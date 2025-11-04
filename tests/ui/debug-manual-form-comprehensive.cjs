@@ -302,15 +302,40 @@ class EnhancedComprehensiveDebugger {
     console.log('📊 Capturing user-entered birth data...');
 
     const sessionData = await this.page.evaluate(() => {
-      const birthData = {};
+      let birthData = {};
 
-      // Try to get data from UIDataSaver
+      // Try to get data from UIDataSaver with stamped structure support
       if (window.UIDataSaver) {
         const uiDataSaver = window.UIDataSaver.getInstance ? window.UIDataSaver.getInstance() : window.UIDataSaver;
         const savedBirthData = uiDataSaver.getBirthData ? uiDataSaver.getBirthData() : null;
 
         if (savedBirthData) {
-          Object.assign(birthData, savedBirthData);
+          // Handle stamped structure: {data, meta} or raw data
+          if (savedBirthData.data && savedBirthData.meta) {
+            // New stamped format
+            Object.assign(birthData, savedBirthData.data);
+          } else {
+            // Legacy raw format
+            Object.assign(birthData, savedBirthData);
+          }
+        }
+      }
+
+      // Fallback: Check sessionStorage directly for stamped or raw data
+      if (!birthData.name) {
+        const rawBirthData = sessionStorage.getItem('birthData');
+        if (rawBirthData) {
+          try {
+            const parsed = JSON.parse(rawBirthData);
+            // Handle stamped format
+            if (parsed.data && parsed.meta) {
+              Object.assign(birthData, parsed.data);
+            } else {
+              Object.assign(birthData, parsed);
+            }
+          } catch (e) {
+            // Ignore parse errors
+          }
         }
       }
 
@@ -1851,9 +1876,27 @@ class EnhancedComprehensiveDebugger {
       dataPersistence: false
     };
 
-    // Set session data first
+    // Set session data first with stamped structure for UIDataSaver compatibility
     await this.page.evaluate((data) => {
-      sessionStorage.setItem('birthData', JSON.stringify(data));
+      // Use UIDataSaver if available
+      if (window.UIDataSaver) {
+        const saver = window.UIDataSaver.getInstance ? window.UIDataSaver.getInstance() : window.UIDataSaver;
+        if (saver.setBirthData) {
+          saver.setBirthData(data);
+        }
+      } else {
+        // Fallback: set stamped structure manually
+        const stamped = {
+          data: data,
+          meta: {
+            savedAt: Date.now(),
+            dataHash: `h${Math.random().toString(16).substring(2, 10)}`,
+            version: 1
+          }
+        };
+        sessionStorage.setItem('birthData', JSON.stringify(stamped));
+      }
+      // Also set legacy keys for backward compatibility
       sessionStorage.setItem('jyotish_birth_data', JSON.stringify(data));
     }, birthData);
 
@@ -2068,14 +2111,28 @@ class EnhancedComprehensiveDebugger {
     const details = {};
 
     try {
-      // Step 1: Save session data
+      // Step 1: Save session data using UIDataSaver canonical method
       console.log('📍 Step 1: Saving session data');
       await this.page.evaluate((data) => {
         if (window.UIDataSaver) {
           const saver = window.UIDataSaver.getInstance ? window.UIDataSaver.getInstance() : window.UIDataSaver;
+          if (saver.setBirthData) {
+            saver.setBirthData(data);
+          }
           if (saver.saveSession) {
             saver.saveSession({ birthData: data });
           }
+        } else {
+          // Fallback: use stamped structure
+          const stamped = {
+            data: data,
+            meta: {
+              savedAt: Date.now(),
+              dataHash: `h${Math.random().toString(16).substring(2, 10)}`,
+              version: 1
+            }
+          };
+          sessionStorage.setItem('birthData', JSON.stringify(stamped));
         }
         sessionStorage.setItem('jyotish_birth_data', JSON.stringify(data));
       }, birthData);
