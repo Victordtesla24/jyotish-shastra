@@ -18,10 +18,6 @@ const ComprehensiveAnalysisDisplay = ({ analysisData }) => {
 
   // Process and validate incoming analysis data
   const { sectionsData, sectionOrder, sectionNames } = useMemo(() => {
-    console.log('🔍 [ComprehensiveAnalysisDisplay] Processing analysis data...');
-    console.log('📊 [ComprehensiveAnalysisDisplay] Received analysisData:', analysisData);
-    console.log('📊 [ComprehensiveAnalysisDisplay] AnalysisData type:', typeof analysisData);
-    console.log('📊 [ComprehensiveAnalysisDisplay] AnalysisData keys:', analysisData ? Object.keys(analysisData) : 'null');
 
     if (!analysisData) {
       throw new Error('Analysis data is required. Expected processed data from ResponseDataToUIDisplayAnalyser.processComprehensiveAnalysis().');
@@ -30,10 +26,8 @@ const ComprehensiveAnalysisDisplay = ({ analysisData }) => {
     // Extract sections from processed data structure
     let sections = {};
     if (analysisData.sections) {
-      console.log('✅ [ComprehensiveAnalysisDisplay] Found sections in analysisData.sections');
       sections = analysisData.sections;
     } else if (analysisData.analysis?.sections) {
-      console.log('✅ [ComprehensiveAnalysisDisplay] Found sections in analysisData.analysis.sections');
       sections = analysisData.analysis.sections;
     } else {
       throw new Error('Sections data is missing from analysis data. Expected analysisData.sections or analysisData.analysis.sections with 8 sections (section1-section8).');
@@ -43,7 +37,7 @@ const ComprehensiveAnalysisDisplay = ({ analysisData }) => {
       throw new Error('Sections data is empty. Expected analysisData.sections with 8 sections (section1-section8) from API.');
     }
 
-    console.log('📊 [ComprehensiveAnalysisDisplay] Extracted sections:', {
+      console.log('Sections validation:', {
       sectionsType: typeof sections,
       sectionsKeys: Object.keys(sections),
       sectionsCount: Object.keys(sections).length
@@ -54,7 +48,7 @@ const ComprehensiveAnalysisDisplay = ({ analysisData }) => {
 
     const names = ResponseDataToUIDisplayAnalyser.getSectionNames();
 
-    console.log('✅ [ComprehensiveAnalysisDisplay] Final processed data:', {
+      console.log('Analysis sections details:', {
       sectionsCount: Object.keys(sections).length,
       sectionOrder: order,
       availableSections: Object.keys(sections)
@@ -1024,7 +1018,6 @@ const ComprehensiveAnalysisDisplay = ({ analysisData }) => {
                 // Try to fetch fresh data
                 const birthData = localStorage.getItem('birthData');
                 if (birthData) {
-                  console.log('🔄 Attempting to reload comprehensive analysis...');
                   window.location.href = '/comprehensive-analysis';
                 } else {
                   window.location.href = '/';

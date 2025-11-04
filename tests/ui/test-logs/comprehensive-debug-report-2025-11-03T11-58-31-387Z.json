@@ -1,0 +1,3138 @@
+{
+  "timestamp": "2025-11-03T11:53:32.244Z",
+  "userEnteredData": {},
+  "apiValidation": {
+    "/api/v1/chart/generate": {
+      "success": true,
+      "response": {
+        "success": true,
+        "data": {
+          "chartId": "e5c60bfb-b1c9-49fc-b10b-2f4e8a85d12e",
+          "birthData": {
+            "name": "Test User 3",
+            "dateOfBirth": "1985-06-15T00:00:00.000Z",
+            "timeOfBirth": "08:45",
+            "placeOfBirth": "Delhi, India",
+            "latitude": 28.6139,
+            "longitude": 77.209,
+            "timezone": "Asia/Kolkata",
+            "gender": "female",
+            "geocodingInfo": {
+              "service": "user_provided",
+              "accuracy": "high",
+              "formattedAddress": "Delhi, India"
+            }
+          },
+          "rasiChart": {
+            "id": "63f8fde9-f9a4-404a-8761-4be0df0c6046",
+            "ascendant": {
+              "longitude": 103.72659188287771,
+              "signIndex": 3,
+              "signName": "Cancer",
+              "signId": 4,
+              "longitudeTropical": 127.38048263341985,
+              "ayanamsa": 23.653890750542132,
+              "degree": 13.726591882877713,
+              "degreeInSign": 13.726591882877713,
+              "sign": "Cancer"
+            },
+            "planets": [
+              {
+                "name": "Sun",
+                "longitude": 83.97240722793407,
+                "degree": 23.97240722793407,
+                "sign": "Gemini",
+                "signId": 3,
+                "latitude": -0.0000400319370153034,
+                "distance": 1.0158380941477523,
+                "speed": 0.955364961154697,
+                "isRetrograde": false,
+                "isCombust": false,
+                "dignity": "neutral"
+              },
+              {
+                "name": "Moon",
+                "longitude": 46.293487356434184,
+                "degree": 16.293487356434184,
+                "sign": "Taurus",
+                "signId": 2,
+                "latitude": -0.1434720468649134,
+                "distance": 0.0026997821101439117,
+                "speed": 11.885545684823194,
+                "isRetrograde": false,
+                "isCombust": false,
+                "dignity": "exalted"
+              },
+              {
+                "name": "Mars",
+                "longitude": 93.07767713894992,
+                "degree": 3.077677138949923,
+                "sign": "Cancer",
+                "signId": 4,
+                "latitude": 1.7065744787284753,
+                "distance": 1.2826814604491255,
+                "speed": 2.0865153447087814,
+                "isRetrograde": false,
+                "isCombust": true,
+                "dignity": "debilitated"
+              },
+              {
+                "name": "Mercury",
+                "longitude": 38.2459265986659,
+                "degree": 8.245926598665903,
+                "sign": "Taurus",
+                "signId": 2,
+                "latitude": -2.7248980231860545,
+                "distance": 0.7200230355683302,
+                "speed": 0.9718814317810881,
+                "isRetrograde": false,
+                "isCombust": false,
+                "dignity": "neutral"
+              },
+              {
+                "name": "Jupiter",
+                "longitude": 93.78824618327747,
+                "degree": 3.788246183277465,
+                "sign": "Cancer",
+                "signId": 4,
+                "latitude": 0.8812182152361604,
+                "distance": 2.585555800465826,
+                "speed": 0.6642435218396726,
+                "isRetrograde": false,
+                "isCombust": true,
+                "dignity": "exalted"
+              },
+              {
+                "name": "Venus",
+                "longitude": 316.7977159184709,
+                "degree": 16.797715918470885,
+                "sign": "Aquarius",
+                "signId": 11,
+                "latitude": -0.6910438631809523,
+                "distance": 4.4193061076495574,
+                "speed": -0.03247025440468321,
+                "isRetrograde": true,
+                "isCombust": false,
+                "dignity": "neutral"
+              },
+              {
+                "name": "Saturn",
+                "longitude": 232.72899309649415,
+                "degree": 22.72899309649415,
+                "sign": "Scorpio",
+                "signId": 8,
+                "latitude": 2.3080291464985634,
+                "distance": 9.058193635059164,
+                "speed": -0.058147389231196084,
+                "isRetrograde": true,
+                "isCombust": false,
+                "dignity": "neutral"
+              },
+              {
+                "name": "Rahu",
+                "longitude": 46.40370202686074,
+                "degree": 16.403702026860742,
+                "sign": "Taurus",
+                "signId": 2,
+                "latitude": 0,
+                "distance": 0.00256955528979999,
+                "speed": -0.05294578223982514,
+                "isRetrograde": true,
+                "isCombust": false,
+                "dignity": "neutral"
+              },
+              {
+                "name": "Ketu",
+                "longitude": 226.40370202686074,
+                "degree": 16.403702026860742,
+                "sign": "Scorpio",
+                "signId": 8,
+                "latitude": 0,
+                "distance": 0.00256955528979999,
+                "speed": 0.05294578223982514,
+                "isRetrograde": false,
+                "dignity": "neutral"
+              }
+            ],
+            "planetaryPositions": {
+              "sun": {
+                "longitude": 83.97240722793407,
+                "degree": 23.97240722793407,
+                "sign": "Gemini",
+                "signId": 3,
+                "latitude": -0.0000400319370153034,
+                "distance": 1.0158380941477523,
+                "speed": 0.955364961154697,
+                "isRetrograde": false,
+                "isCombust": false,
+                "dignity": "neutral"
+              },
+              "moon": {
+                "longitude": 46.293487356434184,
+                "degree": 16.293487356434184,
+                "sign": "Taurus",
+                "signId": 2,
+                "latitude": -0.1434720468649134,
+                "distance": 0.0026997821101439117,
+                "speed": 11.885545684823194,
+                "isRetrograde": false,
+                "isCombust": false,
+                "dignity": "exalted"
+              },
+              "mars": {
+                "longitude": 93.07767713894992,
+                "degree": 3.077677138949923,
+                "sign": "Cancer",
+                "signId": 4,
+                "latitude": 1.7065744787284753,
+                "distance": 1.2826814604491255,
+                "speed": 2.0865153447087814,
+                "isRetrograde": false,
+                "isCombust": true,
+                "dignity": "debilitated"
+              },
+              "mercury": {
+                "longitude": 38.2459265986659,
+                "degree": 8.245926598665903,
+                "sign": "Taurus",
+                "signId": 2,
+                "latitude": -2.7248980231860545,
+                "distance": 0.7200230355683302,
+                "speed": 0.9718814317810881,
+                "isRetrograde": false,
+                "isCombust": false,
+                "dignity": "neutral"
+              },
+              "jupiter": {
+                "longitude": 93.78824618327747,
+                "degree": 3.788246183277465,
+                "sign": "Cancer",
+                "signId": 4,
+                "latitude": 0.8812182152361604,
+                "distance": 2.585555800465826,
+                "speed": 0.6642435218396726,
+                "isRetrograde": false,
+                "isCombust": true,
+                "dignity": "exalted"
+              },
+              "venus": {
+                "longitude": 316.7977159184709,
+                "degree": 16.797715918470885,
+                "sign": "Aquarius",
+                "signId": 11,
+                "latitude": -0.6910438631809523,
+                "distance": 4.4193061076495574,
+                "speed": -0.03247025440468321,
+                "isRetrograde": true,
+                "isCombust": false,
+                "dignity": "neutral"
+              },
+              "saturn": {
+                "longitude": 232.72899309649415,
+                "degree": 22.72899309649415,
+                "sign": "Scorpio",
+                "signId": 8,
+                "latitude": 2.3080291464985634,
+                "distance": 9.058193635059164,
+                "speed": -0.058147389231196084,
+                "isRetrograde": true,
+                "isCombust": false,
+                "dignity": "neutral"
+              },
+              "rahu": {
+                "longitude": 46.40370202686074,
+                "degree": 16.403702026860742,
+                "sign": "Taurus",
+                "signId": 2,
+                "latitude": 0,
+                "distance": 0.00256955528979999,
+                "speed": -0.05294578223982514,
+                "isRetrograde": true,
+                "isCombust": false,
+                "dignity": "neutral"
+              },
+              "ketu": {
+                "longitude": 226.40370202686074,
+                "degree": 16.403702026860742,
+                "sign": "Scorpio",
+                "signId": 8,
+                "latitude": 0,
+                "distance": 0.00256955528979999,
+                "speed": 0.05294578223982514,
+                "isRetrograde": false,
+                "dignity": "neutral"
+              }
+            },
+            "housePositions": [
+              {
+                "houseNumber": 1,
+                "degree": 127.38048263341983,
+                "sign": "Leo",
+                "signId": 5,
+                "longitude": 127.38048263341983
+              },
+              {
+                "houseNumber": 2,
+                "degree": 151.3423846111633,
+                "sign": "Virgo",
+                "signId": 6,
+                "longitude": 151.3423846111633
+              },
+              {
+                "houseNumber": 3,
+                "degree": 179.30551753648956,
+                "sign": "Virgo",
+                "signId": 6,
+                "longitude": 179.30551753648956
+              },
+              {
+                "houseNumber": 4,
+                "degree": 211.46566721930867,
+                "sign": "Scorpio",
+                "signId": 8,
+                "longitude": 211.46566721930867
+              },
+              {
+                "houseNumber": 5,
+                "degree": 245.30792463189766,
+                "sign": "Sagittarius",
+                "signId": 9,
+                "longitude": 245.30792463189766
+              },
+              {
+                "houseNumber": 6,
+                "degree": 277.65703056861616,
+                "sign": "Capricorn",
+                "signId": 10,
+                "longitude": 277.65703056861616
+              },
+              {
+                "houseNumber": 7,
+                "degree": 307.3804826334199,
+                "sign": "Aquarius",
+                "signId": 11,
+                "longitude": 307.3804826334199
+              },
+              {
+                "houseNumber": 8,
+                "degree": 331.3423846111633,
+                "sign": "Pisces",
+                "signId": 12,
+                "longitude": 331.3423846111633
+              },
+              {
+                "houseNumber": 9,
+                "degree": 359.30551753648956,
+                "sign": "Pisces",
+                "signId": 12,
+                "longitude": 359.30551753648956
+              },
+              {
+                "houseNumber": 10,
+                "degree": 31.46566721930867,
+                "sign": "Taurus",
+                "signId": 2,
+                "longitude": 31.46566721930867
+              },
+              {
+                "houseNumber": 11,
+                "degree": 65.30792463189766,
+                "sign": "Gemini",
+                "signId": 3,
+                "longitude": 65.30792463189766
+              },
+              {
+                "houseNumber": 12,
+                "degree": 97.65703056861616,
+                "sign": "Cancer",
+                "signId": 4,
+                "longitude": 97.65703056861616
+              }
+            ],
+            "nakshatra": {
+              "name": "Rohini",
+              "number": 4,
+              "pada": 2,
+              "degree": 6.293488356434185
+            },
+            "aspects": {
+              "conjunctions": [
+                {
+                  "planet1": "sun",
+                  "planet2": "mars",
+                  "distance": 9.105269911015853,
+                  "orb": 9.105269911015853
+                },
+                {
+                  "planet1": "sun",
+                  "planet2": "jupiter",
+                  "distance": 9.815838955343395,
+                  "orb": 9.815838955343395
+                },
+                {
+                  "planet1": "moon",
+                  "planet2": "mercury",
+                  "distance": 8.04756075776828,
+                  "orb": 8.04756075776828
+                },
+                {
+                  "planet1": "moon",
+                  "planet2": "rahu",
+                  "distance": 0.11021467042655786,
+                  "orb": 0.11021467042655786
+                },
+                {
+                  "planet1": "mars",
+                  "planet2": "jupiter",
+                  "distance": 0.7105690443275421,
+                  "orb": 0.7105690443275421
+                },
+                {
+                  "planet1": "mercury",
+                  "planet2": "rahu",
+                  "distance": 8.157775428194839,
+                  "orb": 8.157775428194839
+                },
+                {
+                  "planet1": "saturn",
+                  "planet2": "ketu",
+                  "distance": 6.325291069633408,
+                  "orb": 6.325291069633408
+                }
+              ],
+              "oppositions": [
+                {
+                  "planet1": "moon",
+                  "planet2": "saturn",
+                  "distance": 186.43550574005997,
+                  "orb": 6.435505740059966
+                },
+                {
+                  "planet1": "moon",
+                  "planet2": "ketu",
+                  "distance": 180.11021467042656,
+                  "orb": 0.11021467042655786
+                },
+                {
+                  "planet1": "saturn",
+                  "planet2": "rahu",
+                  "distance": 186.3252910696334,
+                  "orb": 6.325291069633408
+                },
+                {
+                  "planet1": "rahu",
+                  "planet2": "ketu",
+                  "distance": 180,
+                  "orb": 0
+                }
+              ],
+              "trines": [],
+              "squares": [
+                {
+                  "planet1": "venus",
+                  "planet2": "saturn",
+                  "distance": 84.06872282197673,
+                  "orb": 5.931277178023265
+                },
+                {
+                  "planet1": "venus",
+                  "planet2": "ketu",
+                  "distance": 90.39401389161014,
+                  "orb": 0.3940138916101432
+                }
+              ],
+              "specialAspects": []
+            },
+            "jd": 2446231.6354166665,
+            "birthData": {
+              "name": "Test User 3",
+              "dateOfBirth": "1985-06-15T00:00:00.000Z",
+              "timeOfBirth": "08:45",
+              "placeOfBirth": "Delhi, India",
+              "latitude": 28.6139,
+              "longitude": 77.209,
+              "timezone": "Asia/Kolkata",
+              "gender": "female",
+              "geocodingInfo": {
+                "service": "user_provided",
+                "accuracy": "high",
+                "formattedAddress": "Delhi, India"
+              }
+            }
+          },
+          "navamsaChart": {
+            "ascendant": {
+              "longitude": 223.33333333333334,
+              "sign": "Scorpio",
+              "signId": 8,
+              "degree": 13.333333333333334,
+              "rasiSign": "Cancer",
+              "rasiSignId": 4
+            },
+            "planetaryPositions": {
+              "sun": {
+                "longitude": 53.333333333333336,
+                "sign": "Taurus",
+                "signId": 2,
+                "degree": 23.333333333333336,
+                "rasiSign": "Gemini",
+                "rasiSignId": 3
+              },
+              "moon": {
+                "longitude": 43.333333333333336,
+                "sign": "Taurus",
+                "signId": 2,
+                "degree": 13.333333333333334,
+                "rasiSign": "Taurus",
+                "rasiSignId": 2
+              },
+              "mars": {
+                "longitude": 90,
+                "sign": "Cancer",
+                "signId": 4,
+                "degree": 0,
+                "rasiSign": "Cancer",
+                "rasiSignId": 4
+              },
+              "mercury": {
+                "longitude": 336.6666666666667,
+                "sign": "Pisces",
+                "signId": 12,
+                "degree": 6.666666666666667,
+                "rasiSign": "Taurus",
+                "rasiSignId": 2
+              },
+              "jupiter": {
+                "longitude": 123.33333333333333,
+                "sign": "Leo",
+                "signId": 5,
+                "degree": 3.3333333333333335,
+                "rasiSign": "Cancer",
+                "rasiSignId": 4
+              },
+              "venus": {
+                "longitude": 346.6666666666667,
+                "sign": "Pisces",
+                "signId": 12,
+                "degree": 16.666666666666668,
+                "rasiSign": "Aquarius",
+                "rasiSignId": 11
+              },
+              "saturn": {
+                "longitude": 290,
+                "sign": "Capricorn",
+                "signId": 10,
+                "degree": 20,
+                "rasiSign": "Scorpio",
+                "rasiSignId": 8
+              },
+              "rahu": {
+                "longitude": 43.333333333333336,
+                "sign": "Taurus",
+                "signId": 2,
+                "degree": 13.333333333333334,
+                "rasiSign": "Taurus",
+                "rasiSignId": 2
+              },
+              "ketu": {
+                "longitude": 223.33333333333334,
+                "sign": "Scorpio",
+                "signId": 8,
+                "degree": 13.333333333333334,
+                "rasiSign": "Scorpio",
+                "rasiSignId": 8
+              }
+            },
+            "planets": [
+              {
+                "name": "sun",
+                "planet": "sun",
+                "longitude": 53.333333333333336,
+                "degree": 23.333333333333336,
+                "sign": "Taurus",
+                "signId": 2,
+                "house": 11,
+                "dignity": "neutral"
+              },
+              {
+                "name": "moon",
+                "planet": "moon",
+                "longitude": 43.333333333333336,
+                "degree": 13.333333333333334,
+                "sign": "Taurus",
+                "signId": 2,
+                "house": 10,
+                "dignity": "exalted"
+              },
+              {
+                "name": "mars",
+                "planet": "mars",
+                "longitude": 90,
+                "degree": 0,
+                "sign": "Cancer",
+                "signId": 4,
+                "house": 12,
+                "dignity": "debilitated"
+              },
+              {
+                "name": "mercury",
+                "planet": "mercury",
+                "longitude": 336.6666666666667,
+                "degree": 6.666666666666667,
+                "sign": "Pisces",
+                "signId": 12,
+                "house": 8,
+                "dignity": "neutral"
+              },
+              {
+                "name": "jupiter",
+                "planet": "jupiter",
+                "longitude": 123.33333333333333,
+                "degree": 3.3333333333333335,
+                "sign": "Leo",
+                "signId": 5,
+                "house": 1,
+                "dignity": "exalted"
+              },
+              {
+                "name": "venus",
+                "planet": "venus",
+                "longitude": 346.6666666666667,
+                "degree": 16.666666666666668,
+                "sign": "Pisces",
+                "signId": 12,
+                "house": 9,
+                "dignity": "neutral"
+              },
+              {
+                "name": "saturn",
+                "planet": "saturn",
+                "longitude": 290,
+                "degree": 20,
+                "sign": "Capricorn",
+                "signId": 10,
+                "house": 7,
+                "dignity": "neutral"
+              },
+              {
+                "name": "rahu",
+                "planet": "rahu",
+                "longitude": 43.333333333333336,
+                "degree": 13.333333333333334,
+                "sign": "Taurus",
+                "signId": 2,
+                "house": 10,
+                "dignity": "neutral"
+              },
+              {
+                "name": "ketu",
+                "planet": "ketu",
+                "longitude": 223.33333333333334,
+                "degree": 13.333333333333334,
+                "sign": "Scorpio",
+                "signId": 8,
+                "house": 4,
+                "dignity": "neutral"
+              }
+            ],
+            "housePositions": [
+              {
+                "houseNumber": 1,
+                "degree": 127.38048263341983,
+                "sign": "Leo",
+                "signId": 5,
+                "longitude": 127.38048263341983
+              },
+              {
+                "houseNumber": 2,
+                "degree": 151.3423846111633,
+                "sign": "Virgo",
+                "signId": 6,
+                "longitude": 151.3423846111633
+              },
+              {
+                "houseNumber": 3,
+                "degree": 179.30551753648956,
+                "sign": "Virgo",
+                "signId": 6,
+                "longitude": 179.30551753648956
+              },
+              {
+                "houseNumber": 4,
+                "degree": 211.46566721930867,
+                "sign": "Scorpio",
+                "signId": 8,
+                "longitude": 211.46566721930867
+              },
+              {
+                "houseNumber": 5,
+                "degree": 245.30792463189766,
+                "sign": "Sagittarius",
+                "signId": 9,
+                "longitude": 245.30792463189766
+              },
+              {
+                "houseNumber": 6,
+                "degree": 277.65703056861616,
+                "sign": "Capricorn",
+                "signId": 10,
+                "longitude": 277.65703056861616
+              },
+              {
+                "houseNumber": 7,
+                "degree": 307.3804826334199,
+                "sign": "Aquarius",
+                "signId": 11,
+                "longitude": 307.3804826334199
+              },
+              {
+                "houseNumber": 8,
+                "degree": 331.3423846111633,
+                "sign": "Pisces",
+                "signId": 12,
+                "longitude": 331.3423846111633
+              },
+              {
+                "houseNumber": 9,
+                "degree": 359.30551753648956,
+                "sign": "Pisces",
+                "signId": 12,
+                "longitude": 359.30551753648956
+              },
+              {
+                "houseNumber": 10,
+                "degree": 31.46566721930867,
+                "sign": "Taurus",
+                "signId": 2,
+                "longitude": 31.46566721930867
+              },
+              {
+                "houseNumber": 11,
+                "degree": 65.30792463189766,
+                "sign": "Gemini",
+                "signId": 3,
+                "longitude": 65.30792463189766
+              },
+              {
+                "houseNumber": 12,
+                "degree": 97.65703056861616,
+                "sign": "Cancer",
+                "signId": 4,
+                "longitude": 97.65703056861616
+              }
+            ],
+            "rasiChart": {
+              "id": "63f8fde9-f9a4-404a-8761-4be0df0c6046",
+              "ascendant": {
+                "longitude": 103.72659188287771,
+                "signIndex": 3,
+                "signName": "Cancer",
+                "signId": 4,
+                "longitudeTropical": 127.38048263341985,
+                "ayanamsa": 23.653890750542132,
+                "degree": 13.726591882877713,
+                "degreeInSign": 13.726591882877713,
+                "sign": "Cancer"
+              },
+              "planets": [
+                {
+                  "name": "Sun",
+                  "longitude": 83.97240722793407,
+                  "degree": 23.97240722793407,
+                  "sign": "Gemini",
+                  "signId": 3,
+                  "latitude": -0.0000400319370153034,
+                  "distance": 1.0158380941477523,
+                  "speed": 0.955364961154697,
+                  "isRetrograde": false,
+                  "isCombust": false,
+                  "dignity": "neutral"
+                },
+                {
+                  "name": "Moon",
+                  "longitude": 46.293487356434184,
+                  "degree": 16.293487356434184,
+                  "sign": "Taurus",
+                  "signId": 2,
+                  "latitude": -0.1434720468649134,
+                  "distance": 0.0026997821101439117,
+                  "speed": 11.885545684823194,
+                  "isRetrograde": false,
+                  "isCombust": false,
+                  "dignity": "exalted"
+                },
+                {
+                  "name": "Mars",
+                  "longitude": 93.07767713894992,
+                  "degree": 3.077677138949923,
+                  "sign": "Cancer",
+                  "signId": 4,
+                  "latitude": 1.7065744787284753,
+                  "distance": 1.2826814604491255,
+                  "speed": 2.0865153447087814,
+                  "isRetrograde": false,
+                  "isCombust": true,
+                  "dignity": "debilitated"
+                },
+                {
+                  "name": "Mercury",
+                  "longitude": 38.2459265986659,
+                  "degree": 8.245926598665903,
+                  "sign": "Taurus",
+                  "signId": 2,
+                  "latitude": -2.7248980231860545,
+                  "distance": 0.7200230355683302,
+                  "speed": 0.9718814317810881,
+                  "isRetrograde": false,
+                  "isCombust": false,
+                  "dignity": "neutral"
+                },
+                {
+                  "name": "Jupiter",
+                  "longitude": 93.78824618327747,
+                  "degree": 3.788246183277465,
+                  "sign": "Cancer",
+                  "signId": 4,
+                  "latitude": 0.8812182152361604,
+                  "distance": 2.585555800465826,
+                  "speed": 0.6642435218396726,
+                  "isRetrograde": false,
+                  "isCombust": true,
+                  "dignity": "exalted"
+                },
+                {
+                  "name": "Venus",
+                  "longitude": 316.7977159184709,
+                  "degree": 16.797715918470885,
+                  "sign": "Aquarius",
+                  "signId": 11,
+                  "latitude": -0.6910438631809523,
+                  "distance": 4.4193061076495574,
+                  "speed": -0.03247025440468321,
+                  "isRetrograde": true,
+                  "isCombust": false,
+                  "dignity": "neutral"
+                },
+                {
+                  "name": "Saturn",
+                  "longitude": 232.72899309649415,
+                  "degree": 22.72899309649415,
+                  "sign": "Scorpio",
+                  "signId": 8,
+                  "latitude": 2.3080291464985634,
+                  "distance": 9.058193635059164,
+                  "speed": -0.058147389231196084,
+                  "isRetrograde": true,
+                  "isCombust": false,
+                  "dignity": "neutral"
+                },
+                {
+                  "name": "Rahu",
+                  "longitude": 46.40370202686074,
+                  "degree": 16.403702026860742,
+                  "sign": "Taurus",
+                  "signId": 2,
+                  "latitude": 0,
+                  "distance": 0.00256955528979999,
+                  "speed": -0.05294578223982514,
+                  "isRetrograde": true,
+                  "isCombust": false,
+                  "dignity": "neutral"
+                },
+                {
+                  "name": "Ketu",
+                  "longitude": 226.40370202686074,
+                  "degree": 16.403702026860742,
+                  "sign": "Scorpio",
+                  "signId": 8,
+                  "latitude": 0,
+                  "distance": 0.00256955528979999,
+                  "speed": 0.05294578223982514,
+                  "isRetrograde": false,
+                  "dignity": "neutral"
+                }
+              ],
+              "planetaryPositions": {
+                "sun": {
+                  "longitude": 83.97240722793407,
+                  "degree": 23.97240722793407,
+                  "sign": "Gemini",
+                  "signId": 3,
+                  "latitude": -0.0000400319370153034,
+                  "distance": 1.0158380941477523,
+                  "speed": 0.955364961154697,
+                  "isRetrograde": false,
+                  "isCombust": false,
+                  "dignity": "neutral"
+                },
+                "moon": {
+                  "longitude": 46.293487356434184,
+                  "degree": 16.293487356434184,
+                  "sign": "Taurus",
+                  "signId": 2,
+                  "latitude": -0.1434720468649134,
+                  "distance": 0.0026997821101439117,
+                  "speed": 11.885545684823194,
+                  "isRetrograde": false,
+                  "isCombust": false,
+                  "dignity": "exalted"
+                },
+                "mars": {
+                  "longitude": 93.07767713894992,
+                  "degree": 3.077677138949923,
+                  "sign": "Cancer",
+                  "signId": 4,
+                  "latitude": 1.7065744787284753,
+                  "distance": 1.2826814604491255,
+                  "speed": 2.0865153447087814,
+                  "isRetrograde": false,
+                  "isCombust": true,
+                  "dignity": "debilitated"
+                },
+                "mercury": {
+                  "longitude": 38.2459265986659,
+                  "degree": 8.245926598665903,
+                  "sign": "Taurus",
+                  "signId": 2,
+                  "latitude": -2.7248980231860545,
+                  "distance": 0.7200230355683302,
+                  "speed": 0.9718814317810881,
+                  "isRetrograde": false,
+                  "isCombust": false,
+                  "dignity": "neutral"
+                },
+                "jupiter": {
+                  "longitude": 93.78824618327747,
+                  "degree": 3.788246183277465,
+                  "sign": "Cancer",
+                  "signId": 4,
+                  "latitude": 0.8812182152361604,
+                  "distance": 2.585555800465826,
+                  "speed": 0.6642435218396726,
+                  "isRetrograde": false,
+                  "isCombust": true,
+                  "dignity": "exalted"
+                },
+                "venus": {
+                  "longitude": 316.7977159184709,
+                  "degree": 16.797715918470885,
+                  "sign": "Aquarius",
+                  "signId": 11,
+                  "latitude": -0.6910438631809523,
+                  "distance": 4.4193061076495574,
+                  "speed": -0.03247025440468321,
+                  "isRetrograde": true,
+                  "isCombust": false,
+                  "dignity": "neutral"
+                },
+                "saturn": {
+                  "longitude": 232.72899309649415,
+                  "degree": 22.72899309649415,
+                  "sign": "Scorpio",
+                  "signId": 8,
+                  "latitude": 2.3080291464985634,
+                  "distance": 9.058193635059164,
+                  "speed": -0.058147389231196084,
+                  "isRetrograde": true,
+                  "isCombust": false,
+                  "dignity": "neutral"
+                },
+                "rahu": {
+                  "longitude": 46.40370202686074,
+                  "degree": 16.403702026860742,
+                  "sign": "Taurus",
+                  "signId": 2,
+                  "latitude": 0,
+                  "distance": 0.00256955528979999,
+                  "speed": -0.05294578223982514,
+                  "isRetrograde": true,
+                  "isCombust": false,
+                  "dignity": "neutral"
+                },
+                "ketu": {
+                  "longitude": 226.40370202686074,
+                  "degree": 16.403702026860742,
+                  "sign": "Scorpio",
+                  "signId": 8,
+                  "latitude": 0,
+                  "distance": 0.00256955528979999,
+                  "speed": 0.05294578223982514,
+                  "isRetrograde": false,
+                  "dignity": "neutral"
+                }
+              },
+              "housePositions": [
+                {
+                  "houseNumber": 1,
+                  "degree": 127.38048263341983,
+                  "sign": "Leo",
+                  "signId": 5,
+                  "longitude": 127.38048263341983
+                },
+                {
+                  "houseNumber": 2,
+                  "degree": 151.3423846111633,
+                  "sign": "Virgo",
+                  "signId": 6,
+                  "longitude": 151.3423846111633
+                },
+                {
+                  "houseNumber": 3,
+                  "degree": 179.30551753648956,
+                  "sign": "Virgo",
+                  "signId": 6,
+                  "longitude": 179.30551753648956
+                },
+                {
+                  "houseNumber": 4,
+                  "degree": 211.46566721930867,
+                  "sign": "Scorpio",
+                  "signId": 8,
+                  "longitude": 211.46566721930867
+                },
+                {
+                  "houseNumber": 5,
+                  "degree": 245.30792463189766,
+                  "sign": "Sagittarius",
+                  "signId": 9,
+                  "longitude": 245.30792463189766
+                },
+                {
+                  "houseNumber": 6,
+                  "degree": 277.65703056861616,
+                  "sign": "Capricorn",
+                  "signId": 10,
+                  "longitude": 277.65703056861616
+                },
+                {
+                  "houseNumber": 7,
+                  "degree": 307.3804826334199,
+                  "sign": "Aquarius",
+                  "signId": 11,
+                  "longitude": 307.3804826334199
+                },
+                {
+                  "houseNumber": 8,
+                  "degree": 331.3423846111633,
+                  "sign": "Pisces",
+                  "signId": 12,
+                  "longitude": 331.3423846111633
+                },
+                {
+                  "houseNumber": 9,
+                  "degree": 359.30551753648956,
+                  "sign": "Pisces",
+                  "signId": 12,
+                  "longitude": 359.30551753648956
+                },
+                {
+                  "houseNumber": 10,
+                  "degree": 31.46566721930867,
+                  "sign": "Taurus",
+                  "signId": 2,
+                  "longitude": 31.46566721930867
+                },
+                {
+                  "houseNumber": 11,
+                  "degree": 65.30792463189766,
+                  "sign": "Gemini",
+                  "signId": 3,
+                  "longitude": 65.30792463189766
+                },
+                {
+                  "houseNumber": 12,
+                  "degree": 97.65703056861616,
+                  "sign": "Cancer",
+                  "signId": 4,
+                  "longitude": 97.65703056861616
+                }
+              ],
+              "nakshatra": {
+                "name": "Rohini",
+                "number": 4,
+                "pada": 2,
+                "degree": 6.293488356434185
+              },
+              "aspects": {
+                "conjunctions": [
+                  {
+                    "planet1": "sun",
+                    "planet2": "mars",
+                    "distance": 9.105269911015853,
+                    "orb": 9.105269911015853
+                  },
+                  {
+                    "planet1": "sun",
+                    "planet2": "jupiter",
+                    "distance": 9.815838955343395,
+                    "orb": 9.815838955343395
+                  },
+                  {
+                    "planet1": "moon",
+                    "planet2": "mercury",
+                    "distance": 8.04756075776828,
+                    "orb": 8.04756075776828
+                  },
+                  {
+                    "planet1": "moon",
+                    "planet2": "rahu",
+                    "distance": 0.11021467042655786,
+                    "orb": 0.11021467042655786
+                  },
+                  {
+                    "planet1": "mars",
+                    "planet2": "jupiter",
+                    "distance": 0.7105690443275421,
+                    "orb": 0.7105690443275421
+                  },
+                  {
+                    "planet1": "mercury",
+                    "planet2": "rahu",
+                    "distance": 8.157775428194839,
+                    "orb": 8.157775428194839
+                  },
+                  {
+                    "planet1": "saturn",
+                    "planet2": "ketu",
+                    "distance": 6.325291069633408,
+                    "orb": 6.325291069633408
+                  }
+                ],
+                "oppositions": [
+                  {
+                    "planet1": "moon",
+                    "planet2": "saturn",
+                    "distance": 186.43550574005997,
+                    "orb": 6.435505740059966
+                  },
+                  {
+                    "planet1": "moon",
+                    "planet2": "ketu",
+                    "distance": 180.11021467042656,
+                    "orb": 0.11021467042655786
+                  },
+                  {
+                    "planet1": "saturn",
+                    "planet2": "rahu",
+                    "distance": 186.3252910696334,
+                    "orb": 6.325291069633408
+                  },
+                  {
+                    "planet1": "rahu",
+                    "planet2": "ketu",
+                    "distance": 180,
+                    "orb": 0
+                  }
+                ],
+                "trines": [],
+                "squares": [
+                  {
+                    "planet1": "venus",
+                    "planet2": "saturn",
+                    "distance": 84.06872282197673,
+                    "orb": 5.931277178023265
+                  },
+                  {
+                    "planet1": "venus",
+                    "planet2": "ketu",
+                    "distance": 90.39401389161014,
+                    "orb": 0.3940138916101432
+                  }
+                ],
+                "specialAspects": []
+              },
+              "jd": 2446231.6354166665,
+              "birthData": {
+                "name": "Test User 3",
+                "dateOfBirth": "1985-06-15T00:00:00.000Z",
+                "timeOfBirth": "08:45",
+                "placeOfBirth": "Delhi, India",
+                "latitude": 28.6139,
+                "longitude": 77.209,
+                "timezone": "Asia/Kolkata",
+                "gender": "female",
+                "geocodingInfo": {
+                  "service": "user_provided",
+                  "accuracy": "high",
+                  "formattedAddress": "Delhi, India"
+                }
+              }
+            }
+          },
+          "analysis": {
+            "personality": {
+              "lagnaSign": "Cancer",
+              "moonSign": "Taurus",
+              "sunSign": "Gemini",
+              "keyTraits": [
+                "Emotional",
+                "Protective",
+                "Intuitive",
+                "Patient",
+                "Reliable",
+                "Practical"
+              ],
+              "strengths": [
+                "Natural leadership",
+                "Strong willpower",
+                "Creative thinking"
+              ],
+              "challenges": [
+                "Impatience",
+                "Over-ambition",
+                "Need for control"
+              ]
+            },
+            "health": {
+              "generalHealth": "Generally good health with attention to stress management",
+              "potentialIssues": [
+                "Digestive issues",
+                "Stress-related conditions"
+              ],
+              "recommendations": [
+                "Regular exercise",
+                "Meditation",
+                "Balanced diet"
+              ]
+            },
+            "career": {
+              "suitableProfessions": [
+                "Management",
+                "Technology",
+                "Consulting"
+              ],
+              "careerStrengths": [
+                "Leadership",
+                "Strategic thinking",
+                "Communication"
+              ],
+              "timing": "Peak career period between 35-50 years"
+            },
+            "relationships": {
+              "marriageIndications": "Strong marriage indications with some delays",
+              "partnerCharacteristics": "Intelligent, supportive, and career-oriented partner",
+              "timing": "Marriage likely between 28-32 years"
+            },
+            "finances": {
+              "wealthIndicators": "Good wealth accumulation potential through career",
+              "incomeSources": [
+                "Primary career",
+                "Investments",
+                "Consulting"
+              ],
+              "financialTiming": "Financial growth accelerates after 35 years"
+            },
+            "spirituality": {
+              "spiritualIndicators": "Natural inclination towards spirituality and philosophy",
+              "spiritualPath": "Meditation and self-study recommended"
+            },
+            "timing": {
+              "majorPeriods": "Jupiter period (2020-2036) brings wisdom and growth",
+              "favorableTiming": "2024-2026: Excellent for career and relationships",
+              "challengingPeriods": "2027-2029: Period of transformation and change"
+            }
+          },
+          "dashaInfo": {
+            "birthDasha": "Moon",
+            "currentDasha": {
+              "planet": "Jupiter",
+              "startAge": 35,
+              "endAge": 51,
+              "period": 16,
+              "remainingYears": 10.61260081137349
+            },
+            "dashaPeriods": {
+              "sun": 6,
+              "moon": 10,
+              "mars": 7,
+              "mercury": 17,
+              "jupiter": 16,
+              "venus": 20,
+              "saturn": 19,
+              "rahu": 18,
+              "ketu": 7
+            },
+            "nakshatraLord": "moon",
+            "dashaSequence": [
+              {
+                "planet": "Moon",
+                "startAge": 0,
+                "endAge": 10,
+                "period": 10,
+                "isCurrent": false,
+                "remainingYears": null
+              },
+              {
+                "planet": "Mars",
+                "startAge": 10,
+                "endAge": 17,
+                "period": 7,
+                "isCurrent": false,
+                "remainingYears": null
+              },
+              {
+                "planet": "Rahu",
+                "startAge": 17,
+                "endAge": 35,
+                "period": 18,
+                "isCurrent": false,
+                "remainingYears": null
+              },
+              {
+                "planet": "Jupiter",
+                "startAge": 35,
+                "endAge": 51,
+                "period": 16,
+                "isCurrent": true,
+                "remainingYears": 10.61260081137349
+              },
+              {
+                "planet": "Saturn",
+                "startAge": 51,
+                "endAge": 70,
+                "period": 19,
+                "isCurrent": false,
+                "remainingYears": null
+              },
+              {
+                "planet": "Mercury",
+                "startAge": 70,
+                "endAge": 87,
+                "period": 17,
+                "isCurrent": false,
+                "remainingYears": null
+              },
+              {
+                "planet": "Ketu",
+                "startAge": 87,
+                "endAge": 94,
+                "period": 7,
+                "isCurrent": false,
+                "remainingYears": null
+              },
+              {
+                "planet": "Venus",
+                "startAge": 94,
+                "endAge": 114,
+                "period": 20,
+                "isCurrent": false,
+                "remainingYears": null
+              },
+              {
+                "planet": "Sun",
+                "startAge": 114,
+                "endAge": 120,
+                "period": 6,
+                "isCurrent": false,
+                "remainingYears": null
+              }
+            ],
+            "summary": {
+              "currentPeriod": "Jupiter Mahadasha",
+              "nextAntardasha": {
+                "mahadasha": "Jupiter",
+                "antardasha": "Ketu",
+                "startAge": 41.93333333333333,
+                "endAge": 42.86666666666666,
+                "period": 0.9333333333333333,
+                "effects": {
+                  "activatedHouses": [
+                    11,
+                    2
+                  ],
+                  "houseEffects": [
+                    {
+                      "house": 11,
+                      "significations": [
+                        "gains",
+                        "income",
+                        "friends",
+                        "fulfillment"
+                      ],
+                      "activation": "Active during this period"
+                    },
+                    {
+                      "house": 2,
+                      "significations": [
+                        "wealth",
+                        "family",
+                        "speech",
+                        "food"
+                      ],
+                      "activation": "Active during this period"
+                    }
+                  ],
+                  "relationship": {
+                    "type": "neutral",
+                    "strength": "Good",
+                    "strengthScore": 60,
+                    "effects": [
+                      "Jupiter and Ketu have neutral interaction"
+                    ],
+                    "compatibility": {
+                      "natural": "neutral",
+                      "sign": 10,
+                      "aspectual": 0,
+                      "house": 0
+                    },
+                    "recommendations": [
+                      "Regular spiritual practices to harmonize planetary energies"
+                    ]
+                  },
+                  "periodNature": "Mixed",
+                  "keyThemes": [
+                    "gains",
+                    "income",
+                    "friends",
+                    "fulfillment",
+                    "wealth",
+                    "family",
+                    "speech",
+                    "food"
+                  ],
+                  "predictions": {
+                    "general": "Period of Jupiter and Ketu influence",
+                    "specific": [
+                      "Focus on gains, income, friends, fulfillment",
+                      "Focus on wealth, family, speech, food"
+                    ],
+                    "timing": "Throughout the period"
+                  }
+                },
+                "events": [
+                  {
+                    "type": "FINANCE",
+                    "probability": "Moderate to High",
+                    "timing": "Mid to late period",
+                    "description": "Financial gains, property acquisition, or wealth accumulation during Jupiter-Ketu period"
+                  }
+                ],
+                "strength": {
+                  "strength": 6,
+                  "factors": [
+                    "Trikona placement"
+                  ],
+                  "dignity": "Neutral",
+                  "house": 5,
+                  "functionalNature": "Neutral"
+                },
+                "description": "Jupiter MD - Ketu AD (0.9 years)"
+              },
+              "upcomingPeriods": [
+                {
+                  "dasha": "Saturn",
+                  "startAge": 51,
+                  "endAge": 70,
+                  "period": 19,
+                  "generalTenor": "Saturn period brings discipline, service, delays, old age",
+                  "keyThemes": [
+                    "discipline",
+                    "service",
+                    "delays",
+                    "old age"
+                  ],
+                  "lifeFocus": "",
+                  "challenges": [
+                    "Delays",
+                    "Obstacles",
+                    "Health issues"
+                  ],
+                  "opportunities": [
+                    "Learning opportunities",
+                    "Character building"
+                  ]
+                },
+                {
+                  "dasha": "Mercury",
+                  "startAge": 70,
+                  "endAge": 87,
+                  "period": 17,
+                  "generalTenor": "Mercury period brings communication, business, education",
+                  "keyThemes": [
+                    "communication",
+                    "business",
+                    "education"
+                  ],
+                  "lifeFocus": "",
+                  "challenges": [
+                    "Minimal challenges"
+                  ],
+                  "opportunities": [
+                    "Learning opportunities",
+                    "Character building"
+                  ]
+                }
+              ],
+              "overallAssessment": "Period analysis complete"
+            }
+          },
+          "birthDataAnalysis": {
+            "section": "1. Birth Data Collection and Chart Casting",
+            "timestamp": "2025-11-03T11:56:28.636Z",
+            "analyses": {
+              "birthDetails": {
+                "question": "Have you gathered the exact birth date, time, and place (latitude/longitude) of the individual?",
+                "answer": "Yes, all critical birth details have been gathered: exact birth date, time, and precise location coordinates. This data allows for accurate calculation of the Ascendant and planetary positions.",
+                "details": {
+                  "dateOfBirth": {
+                    "value": "1985-06-15T00:00:00.000Z",
+                    "status": "present",
+                    "precision": "exact"
+                  },
+                  "timeOfBirth": {
+                    "value": "08:45",
+                    "status": "present",
+                    "precision": "exact"
+                  },
+                  "coordinates": {
+                    "latitude": 28.6139,
+                    "longitude": 77.209,
+                    "status": "present",
+                    "precision": "exact",
+                    "source": "user_provided"
+                  }
+                },
+                "completeness": 100,
+                "missing": []
+              },
+              "chartGeneration": {
+                "question": "Can you cast the Vedic birth chart (Kundli) with Rasi (D1) and Navamsa (D9) charts?",
+                "answer": "Yes, both essential charts have been successfully generated: Rasi (D1) and Navamsa (D9). The Rasi chart shows planetary positions in the 12 signs/houses at birth, while the Navamsa chart provides finer detail for marriage and destiny analysis.",
+                "details": {
+                  "rasiChart": {
+                    "status": "generated",
+                    "ascendant": {
+                      "longitude": 103.72659188287771,
+                      "signIndex": 3,
+                      "signName": "Cancer",
+                      "signId": 4,
+                      "longitudeTropical": 127.38048263341985,
+                      "ayanamsa": 23.653890750542132,
+                      "degree": 13.726591882877713,
+                      "degreeInSign": 13.726591882877713,
+                      "sign": "Cancer"
+                    },
+                    "planetaryCount": 9,
+                    "housesCalculated": true
+                  },
+                  "navamsaChart": {
+                    "status": "generated",
+                    "ascendant": {
+                      "longitude": 223.33333333333334,
+                      "sign": "Scorpio",
+                      "signId": 8,
+                      "degree": 13.333333333333334,
+                      "rasiSign": "Cancer",
+                      "rasiSignId": 4
+                    },
+                    "planetaryCount": 9,
+                    "housesCalculated": true
+                  }
+                },
+                "chartsGenerated": [
+                  "Rasi (D1)",
+                  "Navamsa (D9)"
+                ],
+                "status": "complete"
+              },
+              "ascendant": {
+                "question": "What is the Ascendant (Lagna) at birth?",
+                "answer": "The Ascendant (Lagna) is Cancer at 13.73°. This sign was rising on the eastern horizon at the birth time/location, setting House 1 of the chart and anchoring the entire house structure.",
+                "details": {
+                  "ascendant": {
+                    "sign": "Cancer",
+                    "degree": 13.726591882877713,
+                    "longitude": 103.72659188287771,
+                    "house": 1,
+                    "significance": "Sets House 1 and anchors the entire house structure"
+                  }
+                },
+                "lagnaSign": "Cancer",
+                "lagnaDegree": 13.726591882877713
+              },
+              "planetaryPositions": {
+                "question": "Which signs and houses are each of the nine planets in at birth?",
+                "answer": "All nine planets have been calculated: sun in Gemini (12th house), moon in Taurus (11th house), mars in Cancer (12th house), mercury in Taurus (10th house), jupiter in Cancer (12th house), venus in Aquarius (8th house), saturn in Scorpio (5th house), rahu in Taurus (11th house), ketu in Scorpio (5th house). This forms the natal chart blueprint. Missing planets: Sun, Moon, Mars, Mercury, Jupiter, Venus, Saturn, Rahu, Ketu.",
+                "details": {},
+                "planetaryPositions": {
+                  "sun": {
+                    "sign": "Gemini",
+                    "degree": 23.97240722793407,
+                    "longitude": 83.97240722793407,
+                    "house": 12,
+                    "dignity": "neutral",
+                    "isRetrograde": false,
+                    "isCombust": false
+                  },
+                  "moon": {
+                    "sign": "Taurus",
+                    "degree": 16.293487356434184,
+                    "longitude": 46.293487356434184,
+                    "house": 11,
+                    "dignity": "exalted",
+                    "isRetrograde": false,
+                    "isCombust": false
+                  },
+                  "mars": {
+                    "sign": "Cancer",
+                    "degree": 3.077677138949923,
+                    "longitude": 93.07767713894992,
+                    "house": 12,
+                    "dignity": "debilitated",
+                    "isRetrograde": false,
+                    "isCombust": true
+                  },
+                  "mercury": {
+                    "sign": "Taurus",
+                    "degree": 8.245926598665903,
+                    "longitude": 38.2459265986659,
+                    "house": 10,
+                    "dignity": "neutral",
+                    "isRetrograde": false,
+                    "isCombust": false
+                  },
+                  "jupiter": {
+                    "sign": "Cancer",
+                    "degree": 3.788246183277465,
+                    "longitude": 93.78824618327747,
+                    "house": 12,
+                    "dignity": "exalted",
+                    "isRetrograde": false,
+                    "isCombust": true
+                  },
+                  "venus": {
+                    "sign": "Aquarius",
+                    "degree": 16.797715918470885,
+                    "longitude": 316.7977159184709,
+                    "house": 8,
+                    "dignity": "neutral",
+                    "isRetrograde": true,
+                    "isCombust": false
+                  },
+                  "saturn": {
+                    "sign": "Scorpio",
+                    "degree": 22.72899309649415,
+                    "longitude": 232.72899309649415,
+                    "house": 5,
+                    "dignity": "neutral",
+                    "isRetrograde": true,
+                    "isCombust": false
+                  },
+                  "rahu": {
+                    "sign": "Taurus",
+                    "degree": 16.403702026860742,
+                    "longitude": 46.40370202686074,
+                    "house": 11,
+                    "dignity": "neutral",
+                    "isRetrograde": true,
+                    "isCombust": false
+                  },
+                  "ketu": {
+                    "sign": "Scorpio",
+                    "degree": 16.403702026860742,
+                    "longitude": 226.40370202686074,
+                    "house": 5,
+                    "dignity": "neutral",
+                    "isRetrograde": false,
+                    "isCombust": false
+                  }
+                },
+                "missingPlanets": [
+                  "Sun",
+                  "Moon",
+                  "Mars",
+                  "Mercury",
+                  "Jupiter",
+                  "Venus",
+                  "Saturn",
+                  "Rahu",
+                  "Ketu"
+                ]
+              },
+              "mahadasha": {
+                "question": "Which Mahadasha is the person running from birth and what is the sequence of planetary periods?",
+                "answer": "Based on Moon's nakshatra (Rohini), the person started with Venus Mahadasha. Currently running Mars Mahadasha (2.6 years remaining). Next: Rahu Mahadasha starting at age 43.0. The complete 120-year Vimshottari cycle includes all 9 planets.",
+                "details": {
+                  "nakshatra": "Rohini",
+                  "nakshatraLord": "Venus",
+                  "startingDasha": "Venus",
+                  "currentDasha": {
+                    "planet": "Mars",
+                    "startAge": 36,
+                    "endAge": 43,
+                    "remainingYears": 2.6141418808492674
+                  },
+                  "ageInYears": 40.38585811915073,
+                  "dashaSequence": [
+                    {
+                      "planet": "Venus",
+                      "startAge": 0,
+                      "endAge": 20,
+                      "period": 20,
+                      "isCurrent": false,
+                      "remainingYears": null
+                    },
+                    {
+                      "planet": "Sun",
+                      "startAge": 20,
+                      "endAge": 26,
+                      "period": 6,
+                      "isCurrent": false,
+                      "remainingYears": null
+                    },
+                    {
+                      "planet": "Moon",
+                      "startAge": 26,
+                      "endAge": 36,
+                      "period": 10,
+                      "isCurrent": false,
+                      "remainingYears": null
+                    },
+                    {
+                      "planet": "Mars",
+                      "startAge": 36,
+                      "endAge": 43,
+                      "period": 7,
+                      "isCurrent": true,
+                      "remainingYears": 2.6141418808492674
+                    },
+                    {
+                      "planet": "Rahu",
+                      "startAge": 43,
+                      "endAge": 61,
+                      "period": 18,
+                      "isCurrent": false,
+                      "remainingYears": null
+                    },
+                    {
+                      "planet": "Jupiter",
+                      "startAge": 61,
+                      "endAge": 77,
+                      "period": 16,
+                      "isCurrent": false,
+                      "remainingYears": null
+                    },
+                    {
+                      "planet": "Saturn",
+                      "startAge": 77,
+                      "endAge": 96,
+                      "period": 19,
+                      "isCurrent": false,
+                      "remainingYears": null
+                    }
+                  ]
+                },
+                "currentDasha": {
+                  "planet": "Mars",
+                  "startAge": 36,
+                  "endAge": 43,
+                  "remainingYears": 2.6141418808492674
+                },
+                "dashaSequence": [
+                  {
+                    "planet": "Venus",
+                    "startAge": 0,
+                    "endAge": 20,
+                    "period": 20,
+                    "isCurrent": false,
+                    "remainingYears": null
+                  },
+                  {
+                    "planet": "Sun",
+                    "startAge": 20,
+                    "endAge": 26,
+                    "period": 6,
+                    "isCurrent": false,
+                    "remainingYears": null
+                  },
+                  {
+                    "planet": "Moon",
+                    "startAge": 26,
+                    "endAge": 36,
+                    "period": 10,
+                    "isCurrent": false,
+                    "remainingYears": null
+                  },
+                  {
+                    "planet": "Mars",
+                    "startAge": 36,
+                    "endAge": 43,
+                    "period": 7,
+                    "isCurrent": true,
+                    "remainingYears": 2.6141418808492674
+                  },
+                  {
+                    "planet": "Rahu",
+                    "startAge": 43,
+                    "endAge": 61,
+                    "period": 18,
+                    "isCurrent": false,
+                    "remainingYears": null
+                  },
+                  {
+                    "planet": "Jupiter",
+                    "startAge": 61,
+                    "endAge": 77,
+                    "period": 16,
+                    "isCurrent": false,
+                    "remainingYears": null
+                  },
+                  {
+                    "planet": "Saturn",
+                    "startAge": 77,
+                    "endAge": 96,
+                    "period": 19,
+                    "isCurrent": false,
+                    "remainingYears": null
+                  }
+                ],
+                "totalPeriod": 120
+              }
+            },
+            "summary": {
+              "status": "complete",
+              "completeness": 100,
+              "chartsGenerated": 2,
+              "ascendantCalculated": true,
+              "planetsCalculated": 9,
+              "dashaCalculated": true,
+              "readyForAnalysis": {
+                "planet": "Mars",
+                "startAge": 36,
+                "endAge": 43,
+                "remainingYears": 2.6141418808492674
+              }
+            }
+          },
+          "generatedAt": "2025-11-03T11:56:28.635Z"
+        }
+      },
+      "timestamp": "2025-11-03T11:56:28.638Z",
+      "responseSize": 30918,
+      "hasAnalysisData": false
+    },
+    "/api/v1/analysis/comprehensive": {
+      "success": false,
+      "response": {
+        "success": false,
+        "error": {
+          "message": "Failed to perform comprehensive analysis",
+          "details": "Chart generation failed: ChartGenerationServiceSingleton.getInstance is not a function",
+          "code": "ANALYSIS_ERROR",
+          "timestamp": "2025-11-03T11:54:26.245Z"
+        }
+      },
+      "timestamp": "2025-11-03T11:54:26.246Z",
+      "responseSize": 242,
+      "hasAnalysisData": false
+    },
+    "/api/v1/rectification/with-events": {
+      "success": false,
+      "response": {
+        "success": false,
+        "error": "Validation failed",
+        "message": "Request validation failed",
+        "details": [
+          {
+            "field": "birthData",
+            "path": [
+              "birthData"
+            ],
+            "message": "\"birthData\" is required"
+          },
+          {
+            "field": "name",
+            "path": [
+              "name"
+            ],
+            "message": "\"name\" is not allowed",
+            "value": "Farhan Ahmed"
+          },
+          {
+            "field": "dateOfBirth",
+            "path": [
+              "dateOfBirth"
+            ],
+            "message": "\"dateOfBirth\" is not allowed",
+            "value": "1997-12-18"
+          },
+          {
+            "field": "timeOfBirth",
+            "path": [
+              "timeOfBirth"
+            ],
+            "message": "\"timeOfBirth\" is not allowed",
+            "value": "02:30"
+          },
+          {
+            "field": "placeOfBirth",
+            "path": [
+              "placeOfBirth"
+            ],
+            "message": "\"placeOfBirth\" is not allowed",
+            "value": "Sialkot, Pakistan"
+          },
+          {
+            "field": "latitude",
+            "path": [
+              "latitude"
+            ],
+            "message": "\"latitude\" is not allowed",
+            "value": 32.4935378
+          },
+          {
+            "field": "longitude",
+            "path": [
+              "longitude"
+            ],
+            "message": "\"longitude\" is not allowed",
+            "value": 74.5411575
+          },
+          {
+            "field": "timezone",
+            "path": [
+              "timezone"
+            ],
+            "message": "\"timezone\" is not allowed",
+            "value": "Asia/Karachi"
+          },
+          {
+            "field": "gender",
+            "path": [
+              "gender"
+            ],
+            "message": "\"gender\" is not allowed",
+            "value": "male"
+          }
+        ],
+        "errors": [
+          {
+            "field": "birthData",
+            "path": [
+              "birthData"
+            ],
+            "message": "\"birthData\" is required"
+          },
+          {
+            "field": "name",
+            "path": [
+              "name"
+            ],
+            "message": "\"name\" is not allowed",
+            "value": "Farhan Ahmed"
+          },
+          {
+            "field": "dateOfBirth",
+            "path": [
+              "dateOfBirth"
+            ],
+            "message": "\"dateOfBirth\" is not allowed",
+            "value": "1997-12-18"
+          },
+          {
+            "field": "timeOfBirth",
+            "path": [
+              "timeOfBirth"
+            ],
+            "message": "\"timeOfBirth\" is not allowed",
+            "value": "02:30"
+          },
+          {
+            "field": "placeOfBirth",
+            "path": [
+              "placeOfBirth"
+            ],
+            "message": "\"placeOfBirth\" is not allowed",
+            "value": "Sialkot, Pakistan"
+          },
+          {
+            "field": "latitude",
+            "path": [
+              "latitude"
+            ],
+            "message": "\"latitude\" is not allowed",
+            "value": 32.4935378
+          },
+          {
+            "field": "longitude",
+            "path": [
+              "longitude"
+            ],
+            "message": "\"longitude\" is not allowed",
+            "value": 74.5411575
+          },
+          {
+            "field": "timezone",
+            "path": [
+              "timezone"
+            ],
+            "message": "\"timezone\" is not allowed",
+            "value": "Asia/Karachi"
+          },
+          {
+            "field": "gender",
+            "path": [
+              "gender"
+            ],
+            "message": "\"gender\" is not allowed",
+            "value": "male"
+          }
+        ],
+        "timestamp": "2025-11-03T11:54:30.363Z"
+      },
+      "timestamp": "2025-11-03T11:54:30.364Z",
+      "responseSize": 1961,
+      "hasAnalysisData": false
+    },
+    "/api/v1/geocoding/location": {
+      "success": true,
+      "response": {
+        "success": true,
+        "data": {
+          "latitude": 28.6138954,
+          "longitude": 77.2090057,
+          "timezone": "Asia/Kolkata",
+          "service_used": "opencage",
+          "accuracy": "high",
+          "formatted_address": "New Delhi, India"
+        }
+      },
+      "timestamp": "2025-11-03T11:56:40.699Z",
+      "responseSize": 179,
+      "hasAnalysisData": false
+    },
+    "/api/v1/chart/render/svg": {
+      "success": true,
+      "response": {
+        "success": true,
+        "data": {
+          "svg": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<svg width=\"800\" height=\"800\" viewBox=\"0 0 800 800\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"800\" height=\"800\" fill=\"#FFF8E1\" />\n  <line x1=\"0\" y1=\"0\" x2=\"800\" y2=\"0\" stroke=\"black\" stroke-width=\"2\" />\n<line x1=\"800\" y1=\"0\" x2=\"800\" y2=\"800\" stroke=\"black\" stroke-width=\"2\" />\n<line x1=\"800\" y1=\"800\" x2=\"0\" y2=\"800\" stroke=\"black\" stroke-width=\"2\" />\n<line x1=\"0\" y1=\"800\" x2=\"0\" y2=\"0\" stroke=\"black\" stroke-width=\"2\" />\n<line x1=\"400\" y1=\"0\" x2=\"800\" y2=\"400\" stroke=\"black\" stroke-width=\"2\" />\n<line x1=\"800\" y1=\"400\" x2=\"400\" y2=\"800\" stroke=\"black\" stroke-width=\"2\" />\n<line x1=\"400\" y1=\"800\" x2=\"0\" y2=\"400\" stroke=\"black\" stroke-width=\"2\" />\n<line x1=\"0\" y1=\"400\" x2=\"400\" y2=\"0\" stroke=\"black\" stroke-width=\"2\" />\n<line x1=\"0\" y1=\"0\" x2=\"800\" y2=\"800\" stroke=\"black\" stroke-width=\"2\" />\n<line x1=\"800\" y1=\"0\" x2=\"0\" y2=\"800\" stroke=\"black\" stroke-width=\"2\" />\n  <text x=\"400\" y=\"304\" font-family=\"monospace\" font-size=\"12.8\" text-anchor=\"middle\" dominant-baseline=\"central\">7</text>\n  <text x=\"200\" y=\"160\" font-family=\"monospace\" font-size=\"12.8\" text-anchor=\"middle\" dominant-baseline=\"central\">8</text>\n  <text x=\"160\" y=\"200\" font-family=\"monospace\" font-size=\"12.8\" text-anchor=\"middle\" dominant-baseline=\"central\">9</text>\n  <text x=\"80\" y=\"184\" font-family=\"monospace\" font-size=\"9.600000000000001\" text-anchor=\"middle\" dominant-baseline=\"central\">Su 25</text>\n  <text x=\"80\" y=\"195.2\" font-family=\"monospace\" font-size=\"9.600000000000001\" text-anchor=\"middle\" dominant-baseline=\"central\">Ma 24</text>\n  <text x=\"320\" y=\"400\" font-family=\"monospace\" font-size=\"12.8\" text-anchor=\"middle\" dominant-baseline=\"central\">11</text>\n  <text x=\"160\" y=\"400\" font-family=\"monospace\" font-size=\"9.600000000000001\" text-anchor=\"middle\" dominant-baseline=\"central\">Me 2</text>\n  <text x=\"160\" y=\"411.2\" font-family=\"monospace\" font-size=\"9.600000000000001\" text-anchor=\"middle\" dominant-baseline=\"central\">Ju 29↓</text>\n  <text x=\"144\" y=\"624\" font-family=\"monospace\" font-size=\"12.8\" text-anchor=\"middle\" dominant-baseline=\"central\">12</text>\n  <text x=\"80\" y=\"624\" font-family=\"monospace\" font-size=\"9.600000000000001\" text-anchor=\"middle\" dominant-baseline=\"central\">Ve 19</text>\n  <text x=\"200\" y=\"640\" font-family=\"monospace\" font-size=\"12.8\" text-anchor=\"middle\" dominant-baseline=\"central\">1</text>\n  <text x=\"200\" y=\"760\" font-family=\"monospace\" font-size=\"9.600000000000001\" text-anchor=\"middle\" dominant-baseline=\"central\">Ke 14</text>\n  <text x=\"400\" y=\"464\" font-family=\"monospace\" font-size=\"12.8\" text-anchor=\"middle\" dominant-baseline=\"central\">1</text>\n  <text x=\"400\" y=\"640\" font-family=\"monospace\" font-size=\"9.600000000000001\" text-anchor=\"middle\" dominant-baseline=\"central\">Sa 13↓</text>\n  <text x=\"624\" y=\"640\" font-family=\"monospace\" font-size=\"12.8\" text-anchor=\"middle\" dominant-baseline=\"central\">2</text>\n  <text x=\"640\" y=\"624\" font-family=\"monospace\" font-size=\"12.8\" text-anchor=\"middle\" dominant-baseline=\"central\">3</text>\n  <text x=\"464\" y=\"400\" font-family=\"monospace\" font-size=\"12.8\" text-anchor=\"middle\" dominant-baseline=\"central\">5</text>\n  <text x=\"640\" y=\"200\" font-family=\"monospace\" font-size=\"12.8\" text-anchor=\"middle\" dominant-baseline=\"central\">6</text>\n  <text x=\"760\" y=\"176\" font-family=\"monospace\" font-size=\"9.600000000000001\" text-anchor=\"middle\" dominant-baseline=\"central\">Mo 11</text>\n  <text x=\"624\" y=\"162.4\" font-family=\"monospace\" font-size=\"12.8\" text-anchor=\"middle\" dominant-baseline=\"central\">7</text>\n  <text x=\"624\" y=\"72\" font-family=\"monospace\" font-size=\"9.600000000000001\" text-anchor=\"middle\" dominant-baseline=\"central\">Ra 14</text>\n</svg>"
+        },
+        "metadata": {
+          "width": 800,
+          "renderedAt": "2025-11-03T11:54:57.728Z",
+          "service": "ChartRenderingService",
+          "warnings": []
+        }
+      },
+      "timestamp": "2025-11-03T11:54:57.730Z",
+      "responseSize": 4236,
+      "hasAnalysisData": false
+    }
+  },
+  "uiValidation": {
+    "analysisPage": {
+      "success": false,
+      "data": {
+        "hasTabNavigation": false,
+        "visibleTabs": [],
+        "activeTabContent": "",
+        "hasJsonStringify": false,
+        "hasRealData": false,
+        "errorMessages": [],
+        "loadingIndicators": 0
+      },
+      "timestamp": "2025-11-03T11:56:46.744Z"
+    },
+    "comprehensiveAnalysisPage": {
+      "success": false,
+      "data": {
+        "hasSections": false,
+        "sectionCount": 0,
+        "visibleSections": [],
+        "hasRealData": false,
+        "hasJsonStringify": false,
+        "errorMessages": [],
+        "loadingIndicators": 0,
+        "contentLength": 313
+      },
+      "timestamp": "2025-11-03T11:56:53.015Z"
+    },
+    "allPagesTest": {
+      "pagesTested": [
+        {
+          "name": "HomePage",
+          "path": "/",
+          "loaded": true,
+          "contentLength": 641,
+          "hasRealData": false,
+          "hasMockData": false,
+          "hasErrors": false,
+          "hasApiData": false
+        },
+        {
+          "name": "ChartPage",
+          "path": "/chart",
+          "loaded": true,
+          "contentLength": 641,
+          "hasRealData": false,
+          "hasMockData": false,
+          "hasErrors": false,
+          "hasApiData": true
+        },
+        {
+          "name": "AnalysisPage",
+          "path": "/analysis",
+          "loaded": true,
+          "contentLength": 436,
+          "hasRealData": false,
+          "hasMockData": false,
+          "hasErrors": false,
+          "hasApiData": true
+        },
+        {
+          "name": "ComprehensiveAnalysisPage",
+          "path": "/comprehensive-analysis",
+          "loaded": true,
+          "contentLength": 313,
+          "hasRealData": false,
+          "hasMockData": false,
+          "hasErrors": false,
+          "hasApiData": true
+        },
+        {
+          "name": "ReportPage",
+          "path": "/report",
+          "loaded": true,
+          "contentLength": 276,
+          "hasRealData": false,
+          "hasMockData": false,
+          "hasErrors": false,
+          "hasApiData": true
+        },
+        {
+          "name": "BirthTimeRectificationPage",
+          "path": "/birth-time-rectification",
+          "loaded": true,
+          "contentLength": 1534,
+          "hasRealData": false,
+          "hasMockData": false,
+          "hasErrors": false,
+          "hasApiData": false
+        }
+      ],
+      "allPagesLoaded": true,
+      "allPagesHaveRealData": false
+    },
+    "coreComponentsTest": {
+      "componentsTested": [
+        {
+          "name": "BirthDataForm",
+          "found": true,
+          "required": true
+        },
+        {
+          "name": "VedicChartDisplay",
+          "found": true,
+          "required": true
+        },
+        {
+          "name": "UIDataSaver",
+          "found": true,
+          "required": true
+        },
+        {
+          "name": "ResponseDataToUIDisplayAnalyser",
+          "found": false,
+          "required": true
+        },
+        {
+          "name": "UIToAPIDataInterpreter",
+          "found": false,
+          "required": true
+        },
+        {
+          "name": "ComprehensiveAnalysisDisplay",
+          "found": false,
+          "required": true
+        },
+        {
+          "name": "ErrorBoundary",
+          "found": false,
+          "required": false
+        },
+        {
+          "name": "Header",
+          "found": true,
+          "required": true
+        },
+        {
+          "name": "Footer",
+          "found": true,
+          "required": true
+        }
+      ],
+      "allRequiredComponentsFound": false
+    }
+  },
+  "screenshots": [
+    {
+      "filename": "2025-11-03T11-54-30-163Z-flow3-btr-page.png",
+      "path": "/Users/Shared/cursor/jjyotish-shastra/tests/ui/test-logs/2025-11-03T11-54-30-163Z-flow3-btr-page.png",
+      "description": "BTR page loaded",
+      "timestamp": "2025-11-03T11:54:30.350Z",
+      "size": 156592
+    },
+    {
+      "filename": "2025-11-03T11-54-34-630Z-page-homepage.png",
+      "path": "/Users/Shared/cursor/jjyotish-shastra/tests/ui/test-logs/2025-11-03T11-54-34-630Z-page-homepage.png",
+      "description": "HomePage loaded",
+      "timestamp": "2025-11-03T11:54:34.818Z",
+      "size": 156592
+    },
+    {
+      "filename": "2025-11-03T11-54-38-879Z-page-chartpage.png",
+      "path": "/Users/Shared/cursor/jjyotish-shastra/tests/ui/test-logs/2025-11-03T11-54-38-879Z-page-chartpage.png",
+      "description": "ChartPage loaded",
+      "timestamp": "2025-11-03T11:54:39.065Z",
+      "size": 156592
+    },
+    {
+      "filename": "2025-11-03T11-54-43-127Z-page-analysispage.png",
+      "path": "/Users/Shared/cursor/jjyotish-shastra/tests/ui/test-logs/2025-11-03T11-54-43-127Z-page-analysispage.png",
+      "description": "AnalysisPage loaded",
+      "timestamp": "2025-11-03T11:54:43.325Z",
+      "size": 149951
+    },
+    {
+      "filename": "2025-11-03T11-54-47-378Z-page-comprehensiveanalysispage.png",
+      "path": "/Users/Shared/cursor/jjyotish-shastra/tests/ui/test-logs/2025-11-03T11-54-47-378Z-page-comprehensiveanalysispage.png",
+      "description": "ComprehensiveAnalysisPage loaded",
+      "timestamp": "2025-11-03T11:54:47.558Z",
+      "size": 156592
+    },
+    {
+      "filename": "2025-11-03T11-54-51-619Z-page-reportpage.png",
+      "path": "/Users/Shared/cursor/jjyotish-shastra/tests/ui/test-logs/2025-11-03T11-54-51-619Z-page-reportpage.png",
+      "description": "ReportPage loaded",
+      "timestamp": "2025-11-03T11:54:51.805Z",
+      "size": 127296
+    },
+    {
+      "filename": "2025-11-03T11-54-55-871Z-page-birthtimerectificationpage.png",
+      "path": "/Users/Shared/cursor/jjyotish-shastra/tests/ui/test-logs/2025-11-03T11-54-55-871Z-page-birthtimerectificationpage.png",
+      "description": "BirthTimeRectificationPage loaded",
+      "timestamp": "2025-11-03T11:54:56.046Z",
+      "size": 156592
+    },
+    {
+      "filename": "2025-11-03T11-56-46-457Z-03-analysis-page.png",
+      "path": "/Users/Shared/cursor/jjyotish-shastra/tests/ui/test-logs/2025-11-03T11-56-46-457Z-03-analysis-page.png",
+      "description": "Analysis page loaded",
+      "timestamp": "2025-11-03T11:56:46.641Z",
+      "size": 149951
+    },
+    {
+      "filename": "2025-11-03T11-56-52-525Z-04-comprehensive-analysis-page.png",
+      "path": "/Users/Shared/cursor/jjyotish-shastra/tests/ui/test-logs/2025-11-03T11-56-52-525Z-04-comprehensive-analysis-page.png",
+      "description": "Comprehensive analysis page loaded",
+      "timestamp": "2025-11-03T11:56:52.913Z",
+      "size": 595641
+    },
+    {
+      "filename": "2025-11-03T11-56-56-765Z-05-analysis-full-page.png",
+      "path": "/Users/Shared/cursor/jjyotish-shastra/tests/ui/test-logs/2025-11-03T11-56-56-765Z-05-analysis-full-page.png",
+      "description": "Analysis page - full view",
+      "timestamp": "2025-11-03T11:56:56.958Z",
+      "size": 149951
+    },
+    {
+      "filename": "2025-11-03T11-57-03-969Z-07-comprehensive-full-page.png",
+      "path": "/Users/Shared/cursor/jjyotish-shastra/tests/ui/test-logs/2025-11-03T11-57-03-969Z-07-comprehensive-full-page.png",
+      "description": "Comprehensive analysis - full view",
+      "timestamp": "2025-11-03T11:57:04.357Z",
+      "size": 596072
+    },
+    {
+      "filename": "2025-11-03T11-57-11-454Z-phase9-homepage.png",
+      "path": "/Users/Shared/cursor/jjyotish-shastra/tests/ui/test-logs/2025-11-03T11-57-11-454Z-phase9-homepage.png",
+      "description": "HomePage - API data display",
+      "timestamp": "2025-11-03T11:57:11.630Z",
+      "size": 155149
+    },
+    {
+      "filename": "2025-11-03T11-57-17-485Z-phase9-chartpage.png",
+      "path": "/Users/Shared/cursor/jjyotish-shastra/tests/ui/test-logs/2025-11-03T11-57-17-485Z-phase9-chartpage.png",
+      "description": "ChartPage - API data display",
+      "timestamp": "2025-11-03T11:57:17.673Z",
+      "size": 155149
+    },
+    {
+      "filename": "2025-11-03T11-57-23-524Z-phase9-analysispage.png",
+      "path": "/Users/Shared/cursor/jjyotish-shastra/tests/ui/test-logs/2025-11-03T11-57-23-524Z-phase9-analysispage.png",
+      "description": "AnalysisPage - API data display",
+      "timestamp": "2025-11-03T11:57:23.718Z",
+      "size": 149951
+    },
+    {
+      "filename": "2025-11-03T11-57-29-606Z-phase9-comprehensiveanalysispage.png",
+      "path": "/Users/Shared/cursor/jjyotish-shastra/tests/ui/test-logs/2025-11-03T11-57-29-606Z-phase9-comprehensiveanalysispage.png",
+      "description": "ComprehensiveAnalysisPage - API data display",
+      "timestamp": "2025-11-03T11:57:29.991Z",
+      "size": 595134
+    },
+    {
+      "filename": "2025-11-03T11-57-35-846Z-phase9-reportpage.png",
+      "path": "/Users/Shared/cursor/jjyotish-shastra/tests/ui/test-logs/2025-11-03T11-57-35-846Z-phase9-reportpage.png",
+      "description": "ReportPage - API data display",
+      "timestamp": "2025-11-03T11:57:36.036Z",
+      "size": 127296
+    },
+    {
+      "filename": "2025-11-03T11-57-41-912Z-phase9-birthtimerectificationpage.png",
+      "path": "/Users/Shared/cursor/jjyotish-shastra/tests/ui/test-logs/2025-11-03T11-57-41-912Z-phase9-birthtimerectificationpage.png",
+      "description": "BirthTimeRectificationPage - API data display",
+      "timestamp": "2025-11-03T11:57:42.371Z",
+      "size": 829803
+    },
+    {
+      "filename": "2025-11-03T11-57-54-805Z-enhanced-homepage-full.png",
+      "path": "/Users/Shared/cursor/jjyotish-shastra/tests/ui/test-logs/2025-11-03T11-57-54-805Z-enhanced-homepage-full.png",
+      "description": "HomePage - Full page",
+      "timestamp": "2025-11-03T11:57:54.987Z",
+      "size": 155149
+    },
+    {
+      "filename": "2025-11-03T11-58-00-740Z-enhanced-chartpage-full.png",
+      "path": "/Users/Shared/cursor/jjyotish-shastra/tests/ui/test-logs/2025-11-03T11-58-00-740Z-enhanced-chartpage-full.png",
+      "description": "ChartPage - Full page",
+      "timestamp": "2025-11-03T11:58:00.924Z",
+      "size": 155149
+    },
+    {
+      "filename": "2025-11-03T11-58-02-154Z-enhanced-chart-rendering.png",
+      "path": "/Users/Shared/cursor/jjyotish-shastra/tests/ui/test-logs/2025-11-03T11-58-02-154Z-enhanced-chart-rendering.png",
+      "description": "Chart rendering component",
+      "timestamp": "2025-11-03T11:58:02.338Z",
+      "size": 155884
+    },
+    {
+      "filename": "2025-11-03T11-58-04-442Z-enhanced-chartpage-error-state.png",
+      "path": "/Users/Shared/cursor/jjyotish-shastra/tests/ui/test-logs/2025-11-03T11-58-04-442Z-enhanced-chartpage-error-state.png",
+      "description": "ChartPage - Error state",
+      "timestamp": "2025-11-03T11:58:04.631Z",
+      "size": 154111
+    },
+    {
+      "filename": "2025-11-03T11-58-10-385Z-enhanced-analysispage-full.png",
+      "path": "/Users/Shared/cursor/jjyotish-shastra/tests/ui/test-logs/2025-11-03T11-58-10-385Z-enhanced-analysispage-full.png",
+      "description": "AnalysisPage - Full page",
+      "timestamp": "2025-11-03T11:58:10.575Z",
+      "size": 149951
+    },
+    {
+      "filename": "2025-11-03T11-58-17-585Z-enhanced-comprehensiveanalysispage-full.png",
+      "path": "/Users/Shared/cursor/jjyotish-shastra/tests/ui/test-logs/2025-11-03T11-58-17-585Z-enhanced-comprehensiveanalysispage-full.png",
+      "description": "ComprehensiveAnalysisPage - Full page",
+      "timestamp": "2025-11-03T11:58:17.974Z",
+      "size": 596072
+    },
+    {
+      "filename": "2025-11-03T11-58-24-963Z-enhanced-reportpage-full.png",
+      "path": "/Users/Shared/cursor/jjyotish-shastra/tests/ui/test-logs/2025-11-03T11-58-24-963Z-enhanced-reportpage-full.png",
+      "description": "ReportPage - Full page",
+      "timestamp": "2025-11-03T11:58:25.145Z",
+      "size": 127296
+    },
+    {
+      "filename": "2025-11-03T11-58-30-934Z-enhanced-birthtimerectificationpage-full.png",
+      "path": "/Users/Shared/cursor/jjyotish-shastra/tests/ui/test-logs/2025-11-03T11-58-30-934Z-enhanced-birthtimerectificationpage-full.png",
+      "description": "BirthTimeRectificationPage - Full page",
+      "timestamp": "2025-11-03T11:58:31.386Z",
+      "size": 830167
+    }
+  ],
+  "errors": [
+    {
+      "type": "console",
+      "level": "error",
+      "message": "Failed to load saved session: No birth data found. Please generate your birth chart first to proceed with Birth Time Rectification.",
+      "timestamp": "2025-11-03T11:54:26.583Z",
+      "source": "frontend"
+    },
+    {
+      "type": "console",
+      "level": "error",
+      "message": "Failed to load saved session: No birth data found. Please generate your birth chart first to proceed with Birth Time Rectification.",
+      "timestamp": "2025-11-03T11:54:26.583Z",
+      "source": "frontend"
+    },
+    {
+      "type": "console",
+      "level": "error",
+      "message": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+      "timestamp": "2025-11-03T11:54:47.784Z",
+      "source": "frontend"
+    },
+    {
+      "type": "console",
+      "level": "error",
+      "message": "Error fetching report data: JSHandle@error",
+      "timestamp": "2025-11-03T11:54:47.784Z",
+      "source": "frontend"
+    },
+    {
+      "type": "console",
+      "level": "error",
+      "message": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+      "timestamp": "2025-11-03T11:54:47.784Z",
+      "source": "frontend"
+    },
+    {
+      "type": "console",
+      "level": "error",
+      "message": "Error fetching report data: JSHandle@error",
+      "timestamp": "2025-11-03T11:54:47.784Z",
+      "source": "frontend"
+    },
+    {
+      "type": "console",
+      "level": "error",
+      "message": "Failed to load saved session: No birth data found. Please generate your birth chart first to proceed with Birth Time Rectification.",
+      "timestamp": "2025-11-03T11:54:52.039Z",
+      "source": "frontend"
+    },
+    {
+      "type": "console",
+      "level": "error",
+      "message": "Failed to load saved session: No birth data found. Please generate your birth chart first to proceed with Birth Time Rectification.",
+      "timestamp": "2025-11-03T11:54:52.039Z",
+      "source": "frontend"
+    },
+    {
+      "phase": "api-validation",
+      "error": "No birth data available for API testing"
+    },
+    {
+      "type": "console",
+      "level": "error",
+      "message": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+      "timestamp": "2025-11-03T11:56:46.980Z",
+      "source": "frontend"
+    },
+    {
+      "type": "console",
+      "level": "error",
+      "message": "❌ [ComprehensiveAnalysisPage] Error fetching comprehensive analysis: JSHandle@error",
+      "timestamp": "2025-11-03T11:56:46.980Z",
+      "source": "frontend"
+    },
+    {
+      "type": "console",
+      "level": "error",
+      "message": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+      "timestamp": "2025-11-03T11:56:46.980Z",
+      "source": "frontend"
+    },
+    {
+      "type": "console",
+      "level": "error",
+      "message": "❌ [ComprehensiveAnalysisPage] Error fetching comprehensive analysis: JSHandle@error",
+      "timestamp": "2025-11-03T11:56:46.980Z",
+      "source": "frontend"
+    },
+    {
+      "type": "console",
+      "level": "error",
+      "message": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+      "timestamp": "2025-11-03T11:56:58.428Z",
+      "source": "frontend"
+    },
+    {
+      "type": "console",
+      "level": "error",
+      "message": "❌ [ComprehensiveAnalysisPage] Error fetching comprehensive analysis: JSHandle@error",
+      "timestamp": "2025-11-03T11:56:58.428Z",
+      "source": "frontend"
+    },
+    {
+      "type": "console",
+      "level": "error",
+      "message": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+      "timestamp": "2025-11-03T11:56:58.428Z",
+      "source": "frontend"
+    },
+    {
+      "type": "console",
+      "level": "error",
+      "message": "❌ [ComprehensiveAnalysisPage] Error fetching comprehensive analysis: JSHandle@error",
+      "timestamp": "2025-11-03T11:56:58.428Z",
+      "source": "frontend"
+    },
+    {
+      "type": "console",
+      "level": "error",
+      "message": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+      "timestamp": "2025-11-03T11:57:23.953Z",
+      "source": "frontend"
+    },
+    {
+      "type": "console",
+      "level": "error",
+      "message": "❌ [ComprehensiveAnalysisPage] Error fetching comprehensive analysis: JSHandle@error",
+      "timestamp": "2025-11-03T11:57:23.953Z",
+      "source": "frontend"
+    },
+    {
+      "type": "console",
+      "level": "error",
+      "message": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+      "timestamp": "2025-11-03T11:57:23.954Z",
+      "source": "frontend"
+    },
+    {
+      "type": "console",
+      "level": "error",
+      "message": "❌ [ComprehensiveAnalysisPage] Error fetching comprehensive analysis: JSHandle@error",
+      "timestamp": "2025-11-03T11:57:23.954Z",
+      "source": "frontend"
+    },
+    {
+      "type": "console",
+      "level": "error",
+      "message": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+      "timestamp": "2025-11-03T11:57:30.222Z",
+      "source": "frontend"
+    },
+    {
+      "type": "console",
+      "level": "error",
+      "message": "Error fetching report data: JSHandle@error",
+      "timestamp": "2025-11-03T11:57:30.222Z",
+      "source": "frontend"
+    },
+    {
+      "type": "console",
+      "level": "error",
+      "message": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+      "timestamp": "2025-11-03T11:57:30.222Z",
+      "source": "frontend"
+    },
+    {
+      "type": "console",
+      "level": "error",
+      "message": "Error fetching report data: JSHandle@error",
+      "timestamp": "2025-11-03T11:57:30.222Z",
+      "source": "frontend"
+    },
+    {
+      "type": "console",
+      "level": "error",
+      "message": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+      "timestamp": "2025-11-03T11:58:12.042Z",
+      "source": "frontend"
+    },
+    {
+      "type": "console",
+      "level": "error",
+      "message": "❌ [ComprehensiveAnalysisPage] Error fetching comprehensive analysis: JSHandle@error",
+      "timestamp": "2025-11-03T11:58:12.042Z",
+      "source": "frontend"
+    },
+    {
+      "type": "console",
+      "level": "error",
+      "message": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+      "timestamp": "2025-11-03T11:58:12.042Z",
+      "source": "frontend"
+    },
+    {
+      "type": "console",
+      "level": "error",
+      "message": "❌ [ComprehensiveAnalysisPage] Error fetching comprehensive analysis: JSHandle@error",
+      "timestamp": "2025-11-03T11:58:12.042Z",
+      "source": "frontend"
+    },
+    {
+      "type": "console",
+      "level": "error",
+      "message": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+      "timestamp": "2025-11-03T11:58:19.444Z",
+      "source": "frontend"
+    },
+    {
+      "type": "console",
+      "level": "error",
+      "message": "Error fetching report data: JSHandle@error",
+      "timestamp": "2025-11-03T11:58:19.444Z",
+      "source": "frontend"
+    },
+    {
+      "type": "console",
+      "level": "error",
+      "message": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+      "timestamp": "2025-11-03T11:58:19.444Z",
+      "source": "frontend"
+    },
+    {
+      "type": "console",
+      "level": "error",
+      "message": "Error fetching report data: JSHandle@error",
+      "timestamp": "2025-11-03T11:58:19.444Z",
+      "source": "frontend"
+    }
+  ],
+  "productionAudit": {
+    "client/src/pages/AnalysisPage.jsx": {
+      "exists": true,
+      "fileSize": 165914,
+      "lineCount": 3535,
+      "mockDataPatterns": [],
+      "hasJsonStringify": true,
+      "hasMockData": false,
+      "suspiciousPatterns": [],
+      "jsonStringifyCount": 1
+    },
+    "client/src/pages/ComprehensiveAnalysisPage.jsx": {
+      "exists": true,
+      "fileSize": 10371,
+      "lineCount": 251,
+      "mockDataPatterns": [],
+      "hasJsonStringify": true,
+      "hasMockData": false,
+      "suspiciousPatterns": [],
+      "jsonStringifyCount": 1
+    },
+    "client/src/components/reports/ComprehensiveAnalysisDisplay.js": {
+      "exists": true,
+      "fileSize": 42880,
+      "lineCount": 1089,
+      "mockDataPatterns": [],
+      "hasJsonStringify": false,
+      "hasMockData": false,
+      "suspiciousPatterns": []
+    },
+    "client/src/components/analysis/ResponseDataToUIDisplayAnalyser.js": {
+      "exists": true,
+      "fileSize": 34090,
+      "lineCount": 879,
+      "mockDataPatterns": [],
+      "hasJsonStringify": true,
+      "hasMockData": true,
+      "suspiciousPatterns": [
+        {
+          "name": "fallback placeholder",
+          "matches": 2,
+          "examples": [
+            "fallback",
+            "fallback"
+          ]
+        }
+      ],
+      "jsonStringifyCount": 2
+    },
+    "client/src/components/forms/UIDataSaver.js": {
+      "exists": true,
+      "fileSize": 23560,
+      "lineCount": 704,
+      "mockDataPatterns": [],
+      "hasJsonStringify": true,
+      "hasMockData": false,
+      "suspiciousPatterns": [],
+      "jsonStringifyCount": 11
+    },
+    "client/src/components/forms/UIToAPIDataInterpreter.js": {
+      "exists": true,
+      "fileSize": 15835,
+      "lineCount": 422,
+      "mockDataPatterns": [],
+      "hasJsonStringify": false,
+      "hasMockData": false,
+      "suspiciousPatterns": []
+    }
+  },
+  "flowTests": {
+    "flow1": {
+      "success": true,
+      "details": {
+        "chartApiSuccess": true,
+        "chartDisplayed": true,
+        "sessionPersisted": true,
+        "sessionDetails": {
+          "sessionStorageKeys": true,
+          "localStorageKeys": true,
+          "sessionKeyCount": 4,
+          "localKeyCount": 1,
+          "allKeys": [
+            "jyotish_birth_data",
+            "birthData",
+            "birth_data_session",
+            "current_session",
+            "jyotish_shastra_data_birthData"
+          ]
+        },
+        "executionTime": 46149
+      }
+    },
+    "flow2": {
+      "success": false,
+      "details": {
+        "comprehensiveApiSuccess": false,
+        "has8Sections": false,
+        "tabsFound": 0,
+        "has8Tabs": false,
+        "allTabsHaveContent": true,
+        "executionTime": 5882
+      }
+    },
+    "flow3": {
+      "success": false,
+      "details": {
+        "btrApiSuccess": false,
+        "formExists": true,
+        "navigationResults": {
+          "pagesTested": [
+            {
+              "name": "HomePage",
+              "path": "/",
+              "loaded": true,
+              "loadTime": 3753,
+              "dataPersists": true,
+              "hasErrors": false
+            },
+            {
+              "name": "ChartPage",
+              "path": "/chart",
+              "loaded": true,
+              "loadTime": 3755,
+              "dataPersists": true,
+              "hasErrors": false
+            },
+            {
+              "name": "AnalysisPage",
+              "path": "/analysis",
+              "loaded": true,
+              "loadTime": 3755,
+              "dataPersists": true,
+              "hasErrors": false
+            },
+            {
+              "name": "ComprehensiveAnalysisPage",
+              "path": "/comprehensive-analysis",
+              "loaded": true,
+              "loadTime": 3746,
+              "dataPersists": true,
+              "hasErrors": false
+            },
+            {
+              "name": "ReportPage",
+              "path": "/report",
+              "loaded": true,
+              "loadTime": 3754,
+              "dataPersists": true,
+              "hasErrors": false
+            },
+            {
+              "name": "BirthTimeRectificationPage",
+              "path": "/birth-time-rectification",
+              "loaded": true,
+              "loadTime": 3759,
+              "dataPersists": true,
+              "hasErrors": false
+            }
+          ],
+          "allPagesWork": true,
+          "dataPersistence": true
+        },
+        "executionTime": 29696
+      }
+    },
+    "flow4": {
+      "success": true,
+      "details": {
+        "geocodingApiSuccess": true,
+        "hasCoordinates": true,
+        "hasTimezone": true,
+        "executionTime": 1962
+      }
+    },
+    "flow5": {
+      "success": true,
+      "details": {
+        "chartApiSuccess": true,
+        "renderApiSuccess": true,
+        "hasSvg": true,
+        "chartDisplayed": true,
+        "executionTime": 5889
+      }
+    },
+    "flow6": {
+      "success": true,
+      "details": {
+        "sessionRecovered": true,
+        "hasUIDataSaver": true,
+        "executionTime": 1065
+      }
+    },
+    "flow7": {
+      "success": "Validation failed",
+      "details": {
+        "hasErrorHandling": "Validation failed",
+        "apiResponseStructure": {
+          "hasResponse": true,
+          "hasError": true,
+          "successValue": false,
+          "hasStatusCode": false
+        },
+        "hasUserFriendlyErrors": false,
+        "executionTime": 118
+      }
+    },
+    "flow8": {
+      "success": true,
+      "details": {
+        "firstCallTime": 17,
+        "secondCallTime": 19,
+        "performanceImprovement": false,
+        "performanceImproved": false,
+        "cacheVerified": true,
+        "firstResponseId": "8bbc6be6-35dd-47db-8e8a-4618d0f0e85d",
+        "secondResponseId": "8bbc6be6-35dd-47db-8e8a-4618d0f0e85d",
+        "executionTime": 1037
+      }
+    }
+  },
+  "performance": {
+    "pageLoadTime": null,
+    "apiResponseTime": null,
+    "chartRenderingTime": null,
+    "memoryUsage": null
+  },
+  "consoleMonitoring": {
+    "backend": {
+      "errors": [],
+      "warnings": []
+    },
+    "frontend": {
+      "errors": [
+        {
+          "type": "console",
+          "level": "error",
+          "message": "Failed to load saved session: No birth data found. Please generate your birth chart first to proceed with Birth Time Rectification.",
+          "timestamp": "2025-11-03T11:54:26.583Z",
+          "source": "frontend"
+        },
+        {
+          "type": "console",
+          "level": "error",
+          "message": "Failed to load saved session: No birth data found. Please generate your birth chart first to proceed with Birth Time Rectification.",
+          "timestamp": "2025-11-03T11:54:26.583Z",
+          "source": "frontend"
+        },
+        {
+          "type": "console",
+          "level": "error",
+          "message": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+          "timestamp": "2025-11-03T11:54:47.784Z",
+          "source": "frontend"
+        },
+        {
+          "type": "console",
+          "level": "error",
+          "message": "Error fetching report data: JSHandle@error",
+          "timestamp": "2025-11-03T11:54:47.784Z",
+          "source": "frontend"
+        },
+        {
+          "type": "console",
+          "level": "error",
+          "message": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+          "timestamp": "2025-11-03T11:54:47.784Z",
+          "source": "frontend"
+        },
+        {
+          "type": "console",
+          "level": "error",
+          "message": "Error fetching report data: JSHandle@error",
+          "timestamp": "2025-11-03T11:54:47.784Z",
+          "source": "frontend"
+        },
+        {
+          "type": "console",
+          "level": "error",
+          "message": "Failed to load saved session: No birth data found. Please generate your birth chart first to proceed with Birth Time Rectification.",
+          "timestamp": "2025-11-03T11:54:52.039Z",
+          "source": "frontend"
+        },
+        {
+          "type": "console",
+          "level": "error",
+          "message": "Failed to load saved session: No birth data found. Please generate your birth chart first to proceed with Birth Time Rectification.",
+          "timestamp": "2025-11-03T11:54:52.039Z",
+          "source": "frontend"
+        },
+        {
+          "type": "console",
+          "level": "error",
+          "message": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+          "timestamp": "2025-11-03T11:56:46.980Z",
+          "source": "frontend"
+        },
+        {
+          "type": "console",
+          "level": "error",
+          "message": "❌ [ComprehensiveAnalysisPage] Error fetching comprehensive analysis: JSHandle@error",
+          "timestamp": "2025-11-03T11:56:46.980Z",
+          "source": "frontend"
+        },
+        {
+          "type": "console",
+          "level": "error",
+          "message": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+          "timestamp": "2025-11-03T11:56:46.980Z",
+          "source": "frontend"
+        },
+        {
+          "type": "console",
+          "level": "error",
+          "message": "❌ [ComprehensiveAnalysisPage] Error fetching comprehensive analysis: JSHandle@error",
+          "timestamp": "2025-11-03T11:56:46.980Z",
+          "source": "frontend"
+        },
+        {
+          "type": "console",
+          "level": "error",
+          "message": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+          "timestamp": "2025-11-03T11:56:58.428Z",
+          "source": "frontend"
+        },
+        {
+          "type": "console",
+          "level": "error",
+          "message": "❌ [ComprehensiveAnalysisPage] Error fetching comprehensive analysis: JSHandle@error",
+          "timestamp": "2025-11-03T11:56:58.428Z",
+          "source": "frontend"
+        },
+        {
+          "type": "console",
+          "level": "error",
+          "message": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+          "timestamp": "2025-11-03T11:56:58.428Z",
+          "source": "frontend"
+        },
+        {
+          "type": "console",
+          "level": "error",
+          "message": "❌ [ComprehensiveAnalysisPage] Error fetching comprehensive analysis: JSHandle@error",
+          "timestamp": "2025-11-03T11:56:58.428Z",
+          "source": "frontend"
+        },
+        {
+          "type": "console",
+          "level": "error",
+          "message": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+          "timestamp": "2025-11-03T11:57:23.953Z",
+          "source": "frontend"
+        },
+        {
+          "type": "console",
+          "level": "error",
+          "message": "❌ [ComprehensiveAnalysisPage] Error fetching comprehensive analysis: JSHandle@error",
+          "timestamp": "2025-11-03T11:57:23.953Z",
+          "source": "frontend"
+        },
+        {
+          "type": "console",
+          "level": "error",
+          "message": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+          "timestamp": "2025-11-03T11:57:23.954Z",
+          "source": "frontend"
+        },
+        {
+          "type": "console",
+          "level": "error",
+          "message": "❌ [ComprehensiveAnalysisPage] Error fetching comprehensive analysis: JSHandle@error",
+          "timestamp": "2025-11-03T11:57:23.954Z",
+          "source": "frontend"
+        },
+        {
+          "type": "console",
+          "level": "error",
+          "message": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+          "timestamp": "2025-11-03T11:57:30.222Z",
+          "source": "frontend"
+        },
+        {
+          "type": "console",
+          "level": "error",
+          "message": "Error fetching report data: JSHandle@error",
+          "timestamp": "2025-11-03T11:57:30.222Z",
+          "source": "frontend"
+        },
+        {
+          "type": "console",
+          "level": "error",
+          "message": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+          "timestamp": "2025-11-03T11:57:30.222Z",
+          "source": "frontend"
+        },
+        {
+          "type": "console",
+          "level": "error",
+          "message": "Error fetching report data: JSHandle@error",
+          "timestamp": "2025-11-03T11:57:30.222Z",
+          "source": "frontend"
+        },
+        {
+          "type": "console",
+          "level": "error",
+          "message": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+          "timestamp": "2025-11-03T11:58:12.042Z",
+          "source": "frontend"
+        },
+        {
+          "type": "console",
+          "level": "error",
+          "message": "❌ [ComprehensiveAnalysisPage] Error fetching comprehensive analysis: JSHandle@error",
+          "timestamp": "2025-11-03T11:58:12.042Z",
+          "source": "frontend"
+        },
+        {
+          "type": "console",
+          "level": "error",
+          "message": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+          "timestamp": "2025-11-03T11:58:12.042Z",
+          "source": "frontend"
+        },
+        {
+          "type": "console",
+          "level": "error",
+          "message": "❌ [ComprehensiveAnalysisPage] Error fetching comprehensive analysis: JSHandle@error",
+          "timestamp": "2025-11-03T11:58:12.042Z",
+          "source": "frontend"
+        },
+        {
+          "type": "console",
+          "level": "error",
+          "message": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+          "timestamp": "2025-11-03T11:58:19.444Z",
+          "source": "frontend"
+        },
+        {
+          "type": "console",
+          "level": "error",
+          "message": "Error fetching report data: JSHandle@error",
+          "timestamp": "2025-11-03T11:58:19.444Z",
+          "source": "frontend"
+        },
+        {
+          "type": "console",
+          "level": "error",
+          "message": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+          "timestamp": "2025-11-03T11:58:19.444Z",
+          "source": "frontend"
+        },
+        {
+          "type": "console",
+          "level": "error",
+          "message": "Error fetching report data: JSHandle@error",
+          "timestamp": "2025-11-03T11:58:19.444Z",
+          "source": "frontend"
+        }
+      ],
+      "warnings": [
+        {
+          "type": "console",
+          "level": "warn",
+          "message": "⚠️ BTR Page: No birthDataForBTR found in sessionStorage",
+          "timestamp": "2025-11-03T11:54:26.583Z",
+          "source": "frontend"
+        },
+        {
+          "type": "console",
+          "level": "warn",
+          "message": "⚠️ BTR Page: No birthDataForBTR found in sessionStorage",
+          "timestamp": "2025-11-03T11:54:26.583Z",
+          "source": "frontend"
+        },
+        {
+          "type": "console",
+          "level": "warn",
+          "message": "⚠️ BTR Page: No birthDataForBTR found in sessionStorage",
+          "timestamp": "2025-11-03T11:54:52.039Z",
+          "source": "frontend"
+        },
+        {
+          "type": "console",
+          "level": "warn",
+          "message": "⚠️ BTR Page: No birthDataForBTR found in sessionStorage",
+          "timestamp": "2025-11-03T11:54:52.039Z",
+          "source": "frontend"
+        },
+        {
+          "type": "console",
+          "level": "warn",
+          "message": "⚠️ BTR Page: No birthDataForBTR found in sessionStorage",
+          "timestamp": "2025-11-03T11:57:36.264Z",
+          "source": "frontend"
+        },
+        {
+          "type": "console",
+          "level": "warn",
+          "message": "⚠️ BTR Page: No birthDataForBTR found in sessionStorage",
+          "timestamp": "2025-11-03T11:57:36.264Z",
+          "source": "frontend"
+        },
+        {
+          "type": "console",
+          "level": "warn",
+          "message": "⚠️ BTR Page: No birthDataForBTR found in sessionStorage",
+          "timestamp": "2025-11-03T11:58:25.375Z",
+          "source": "frontend"
+        },
+        {
+          "type": "console",
+          "level": "warn",
+          "message": "⚠️ BTR Page: No birthDataForBTR found in sessionStorage",
+          "timestamp": "2025-11-03T11:58:25.375Z",
+          "source": "frontend"
+        }
+      ]
+    }
+  },
+  "successCriteria": {
+    "noTestDataInProduction": false,
+    "realApiDataDisplay": false,
+    "zeroErrorsWarnings": false,
+    "completeFeatureImplementation": false,
+    "rootCauseAnalysis": false,
+    "screenshotAnalysis": true,
+    "allFlowsPassed": false,
+    "performanceThresholdsMet": true
+  },
+  "backendHealth": {
+    "status": "OK",
+    "timestamp": "2025-11-03T11:53:32.261Z",
+    "uptime": 8.697004,
+    "environment": "production",
+    "version": "1.0.0",
+    "services": {
+      "geocoding": "active",
+      "chartGeneration": "active",
+      "analysis": "active"
+    }
+  },
+  "frontendHealth": {
+    "status": "healthy"
+  },
+  "finalValidationChecklist": {
+    "all8FlowsPassed": false,
+    "all6UIPagesTested": true,
+    "allPagesHaveRealData": false,
+    "allCoreComponentsFound": false,
+    "zeroErrorsInConsole": false,
+    "performanceThresholdsMet": true,
+    "noMockDataInProduction": false,
+    "screenshotsCaptured": true,
+    "apiEndpointsValidated": false
+  },
+  "finalAnalysis": {
+    "totalApiEndpoints": 17,
+    "successfulApiEndpoints": 3,
+    "productionFilesAudited": 6,
+    "filesWithMockData": 1,
+    "screenshotsCaptured": 25,
+    "totalErrors": 33,
+    "overallSuccess": false
+  }
+}

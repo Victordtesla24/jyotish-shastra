@@ -17,6 +17,10 @@ router.post('/analysis/birth-data', chartController.getBirthDataAnalysis.bind(ch
 router.get('/:id', chartController.getChart.bind(chartController));
 router.get('/:id/navamsa', chartController.getNavamsaChart.bind(chartController));
 
+// Chart rendering endpoints
+router.post('/render', chartController.renderChart.bind(chartController));
+router.post('/render/svg', chartController.renderChartSVG.bind(chartController));
+
 // Analysis endpoints
 router.post('/analysis/lagna', chartController.analyzeLagna.bind(chartController));
 router.post('/analysis/house/:houseNumber', chartController.analyzeHouse.bind(chartController));

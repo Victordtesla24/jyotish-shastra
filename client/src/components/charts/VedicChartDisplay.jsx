@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import VedicLoadingSpinner from '../ui/VedicLoadingSpinner.jsx';
+import chartService from '../../services/chartService.js';
 
 /**
  * Enhanced Vedic Chart Display - Cultural Design System Integration
@@ -14,9 +15,6 @@ import VedicLoadingSpinner from '../ui/VedicLoadingSpinner.jsx';
 
 // Chart dimensions with cultural design system integration
 const CHART_SIZE = 500;
-const PADDING = 60;
-const CENTER_X = CHART_SIZE / 2;
-const CENTER_Y = CHART_SIZE / 2;
 
 // Cultural planetary codes and Sanskrit terminology
 const PLANET_CODES = {
@@ -55,59 +53,9 @@ const DIGNITY_SYMBOLS = {
   neutral: { symbol: '○', sanskrit: 'निर', meaning: 'Neutral' }
 };
 
-// Rasi (Zodiac Sign) to Number mapping - Using real API sign names
-const RASI_NUMBERS = {
-  'Aries': 1, 'Taurus': 2, 'Gemini': 3, 'Cancer': 4,
-  'Leo': 5, 'Virgo': 6, 'Libra': 7, 'Scorpio': 8,
-  'Sagittarius': 9, 'Capricorn': 10, 'Aquarius': 11, 'Pisces': 12
-};
 
-/**
- * Get Rasi number from API sign name
- */
-function getRasiNumberFromSign(signName) {
-  if (!signName || typeof signName !== 'string') {
-    throw new Error(`Invalid sign name: ${signName}. Expected a valid zodiac sign name.`);
-  }
-  
-  const rasiNumber = RASI_NUMBERS[signName];
-  if (!rasiNumber || rasiNumber < 1 || rasiNumber > 12) {
-    throw new Error(`Invalid sign name "${signName}". Expected one of: Aries, Taurus, Gemini, Cancer, Leo, Virgo, Libra, Scorpio, Sagittarius, Capricorn, Aquarius, Pisces`);
-  }
-  
-  return rasiNumber;
-}
 
-/**
- * Calculate which Rasi occupies each house position based on ascendant
- * Uses authentic Vedic calculation: each house spans one Rasi (30°)
- * CORRECTED for proper North Indian chart sequence
- */
-function calculateRasiForHouse(houseNumber, ascendantRasi) {
-  if (!ascendantRasi || houseNumber < 1 || houseNumber > 12) {
-    return houseNumber; // Return house number when data is invalid
-  }
 
-  // CORRECT Vedic calculation:
-  // House 1 = ascendant Rasi (e.g., if ascendant is Libra=7, house 1 = 7)
-  // House 2 = next Rasi (house 2 = 8)
-  // House 3 = next Rasi (house 3 = 9), etc.
-
-  // Simple formula: (ascendantRasi + houseNumber - 1 - 1) % 12 + 1
-  let rasiNumber = (ascendantRasi + houseNumber - 2) % 12 + 1;
-
-  // Handle wrap-around: if result is 0 or negative, add 12
-  if (rasiNumber <= 0) {
-    rasiNumber += 12;
-  }
-
-  // Ensure final result is in 1-12 range
-  if (rasiNumber > 12) {
-    rasiNumber = rasiNumber - 12;
-  }
-
-  return rasiNumber;
-}
 
 
 // North Indian chart house positions (diamond layout) - Template-calibrated coordinates
@@ -152,59 +100,76 @@ const RASI_NUMBER_POSITIONS = {
  * Handles direct chart data structure (rasiChart or navamsaChart)
  */
 function processChartData(chartData) {
+  // Production-grade: Require valid chart data
   if (!chartData) {
     throw new Error('Chart data is required for processing. Expected rasiChart or navamsaChart data from API.');
   }
 
-  // CRITICAL DEBUG: Log incoming chart data for validation
-  console.log('🔍 VedicChartDisplay: Processing chart data', {
-    hasChartData: !!chartData,
-    hasAscendant: !!chartData.ascendant,
-    ascendantSign: chartData.ascendant?.sign,
-    ascendantDegree: chartData.ascendant?.degree,
-    ascendantLongitude: chartData.ascendant?.longitude,
-    hasPlanets: !!chartData.planets || !!chartData.planetaryPositions,
-    planetCount: chartData.planets?.length || Object.keys(chartData.planetaryPositions || {}).length,
-    hasHousePositions: !!chartData.housePositions && Array.isArray(chartData.housePositions)
-  });
+  // Validate required chart components
+  if (!chartData.ascendant || typeof chartData.ascendant.longitude !== 'number') {
+    throw new Error('Ascendant data is required with longitude. Expected chart.ascendant.longitude from API.');
+  }
 
   // Handle direct chart data structure (chartData is rasiChart or navamsaChart directly)
   const chart = chartData;
 
-  // Extract housePositions from chartData - CRITICAL for accurate rasi number display
-  const housePositions = chart.housePositions || null;
-  
-  // Validate housePositions array structure
+  // Production-grade: Require house positions array
+  const housePositions = chart.housePositions;
   if (!housePositions || !Array.isArray(housePositions)) {
-    console.warn('⚠️ VedicChartDisplay: housePositions not found or invalid. Expected array from API.');
+    throw new Error('House positions array is required. Expected chart.housePositions array from API.');
   }
   
-  // Create mapping from house number to rasi sign for quick lookup
+  if (housePositions.length !== 12) {
+    throw new Error(`Invalid house positions array length. Expected 12 houses, got ${housePositions.length}.`);
+  }
+  
+  // PRODUCTION-GRADE: Create mapping from house number to rasi sign for quick lookup
+  // Ensure all 12 houses are extracted correctly with signId (preferred) or sign name
   const houseToRasiMap = {};
   if (housePositions && Array.isArray(housePositions) && housePositions.length > 0) {
     housePositions.forEach(house => {
       // Validate house structure
       if (!house || typeof house !== 'object') {
-        console.warn('⚠️ VedicChartDisplay: Invalid house object in housePositions array:', house);
+        console.error('❌ VedicChartDisplay: Invalid house object in housePositions array:', house);
         return;
       }
       
-      const houseNumber = house.houseNumber || house.house;
-      if (houseNumber >= 1 && houseNumber <= 12 && house.sign) {
-        houseToRasiMap[houseNumber] = {
-          sign: house.sign,
-          signId: house.signId,
-          longitude: house.longitude || house.degree,
-          degree: house.degree || (house.longitude ? house.longitude % 30 : null)
-        };
-      } else {
-        console.warn(`⚠️ VedicChartDisplay: Invalid house data - houseNumber: ${houseNumber}, sign: ${house.sign}`);
+      const houseNumber = house.houseNumber || house.house || house.number;
+      
+      // Validate house number is valid
+      if (!houseNumber || houseNumber < 1 || houseNumber > 12) {
+        console.error(`❌ VedicChartDisplay: Invalid house number ${houseNumber}. Expected 1-12.`);
+        return;
       }
+      
+      // Extract sign information - prefer signId (numeric) over sign name (string)
+      const signId = house.signId || house.signIndex || null;
+      const sign = house.sign || null;
+      
+      // Must have at least signId or sign
+      if (!signId && !sign) {
+        console.error(`❌ VedicChartDisplay: House ${houseNumber} missing both signId and sign. Cannot map to rasi.`);
+        return;
+      }
+      
+      houseToRasiMap[houseNumber] = {
+        sign: sign,
+        signId: signId,
+        longitude: house.longitude || house.degree || null,
+        degree: house.degree || (house.longitude ? house.longitude % 30 : null)
+      };
     });
     
-    // Validate that we have all 12 houses
-    if (Object.keys(houseToRasiMap).length < 12) {
-      console.warn(`⚠️ VedicChartDisplay: Only ${Object.keys(houseToRasiMap).length} houses found in houseToRasiMap. Expected 12.`);
+    // PRODUCTION-GRADE: Validate that we have all 12 houses - this is critical
+    const extractedHouses = Object.keys(houseToRasiMap).map(k => parseInt(k, 10));
+    if (extractedHouses.length < 12) {
+      const missingHouses = Array.from({ length: 12 }, (_, i) => i + 1).filter(h => !extractedHouses.includes(h));
+      console.error(`❌ VedicChartDisplay: Missing houses in housePositions. Expected 12, found ${extractedHouses.length}. Missing: ${missingHouses.join(', ')}`);
+    }
+    
+    // Validate no duplicate house numbers
+    if (extractedHouses.length !== new Set(extractedHouses).size) {
+      console.error('❌ VedicChartDisplay: Duplicate house numbers detected in housePositions array. This is a data source error.');
     }
   }
 
@@ -822,50 +787,82 @@ export default function VedicChartDisplay({
   className = "",
   style = {},
   showDetails = true,
-  onError
+  onError,
+  useBackendRendering = true,
+  birthData = null
 }) {
-  const [processedData, setProcessedData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [svgContent, setSvgContent] = useState(null);
 
-  // Memoized chart data processing to prevent unnecessary reprocessing
-  const processedChartData = useMemo(() => {
-    if (!chartData) {
-      return null;
-    }
+  
 
-    try {
-      const { planets, ascendant, housePositions, houseToRasiMap } = processChartData(chartData);
-      const houseGroups = groupPlanetsByHouse(planets, ascendant);
-      
-      return { planets, ascendant, houseGroups, housePositions, houseToRasiMap };
-    } catch (err) {
-      console.error('Chart data processing error:', err);
-      return null;
-    }
-  }, [chartData]);
-
-  // Process chart data - simplified state management
+  // PRODUCTION-GRADE: Backend rendering only with proper error handling
   useEffect(() => {
-    if (!processedChartData) {
-      setProcessedData(null);
+    if (!birthData) {
+      setError(new Error('Birth data is required for chart rendering'));
       setLoading(false);
-      setError(null);
       return;
     }
 
-    setProcessedData(processedChartData);
-    setLoading(false);
-    setError(null);
-  }, [processedChartData]); // Only depend on memoized processed data
+    const renderWithBackend = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        console.log('🔄 VedicChartDisplay: Rendering chart with backend service...');
+        
+        const result = await chartService.renderChartSVG(birthData, {
+          width: CHART_SIZE,
+          includeData: false
+        });
 
-  // Handle errors from memoized processing
-  useEffect(() => {
-    if (!processedChartData && chartData) {
-      setError('Failed to process chart data. Please check the chart data format.');
-      setLoading(false);
-    }
-  }, [processedChartData, chartData]);
+        if (!result || !result.svg) {
+          throw new Error('No SVG content received from backend rendering service');
+        }
+
+        console.log('✅ VedicChartDisplay: Backend rendering successful', {
+          svgLength: result.svg.length,
+          hasBackground: result.svg.includes('#FFF8E1'),
+          lineCount: (result.svg.match(/<line/g) || []).length
+        });
+
+        setSvgContent(result.svg);
+        setLoading(false);
+        
+        if (onError) {
+          onError(null);
+        }
+      } catch (err) {
+        // Production-grade:Throw error explicitly - no fallback rendering
+        const errorMessage = err?.response?.data?.error || err?.response?.data?.message || err?.message || 'Failed to render chart';
+        const errorDetails = err?.response?.data?.errors || [];
+        
+        console.error('❌ VedicChartDisplay: Backend rendering failed', {
+          error: errorMessage,
+          errorDetails,
+          errorType: err.constructor.name,
+          status: err?.response?.status,
+          stack: err.stack,
+          fullError: err
+        });
+        
+        const displayError = new Error(errorMessage);
+        if (errorDetails.length > 0) {
+          displayError.details = errorDetails;
+        }
+        
+        setError(displayError);
+        setLoading(false);
+        
+        if (onError) {
+          onError(displayError);
+        }
+      }
+    };
+
+    renderWithBackend();
+  }, [useBackendRendering, birthData, onError]);
 
   // Loading state
   if (loading) {
@@ -876,16 +873,29 @@ export default function VedicChartDisplay({
     );
   }
 
-  // Error state
+  // PRODUCTION-GRADE: Error state - no fallback rendering
   if (error) {
+    const errorMessage = error.message || 'Failed to render chart';
+    const errorDetails = error.details || [];
+    
     return (
       <div className={`bg-red-50 border-2 border-red-200 rounded-lg p-6 text-center ${className}`} style={style}>
-        <div className="text-red-600 mb-4">⚠️</div>
-        <h3 className="text-lg font-semibold text-red-800 mb-2">Chart Display Error</h3>
-        <p className="text-red-700 mb-4">{error}</p>
+        <div className="text-red-600 mb-4">❌</div>
+        <h3 className="text-lg font-semibold text-red-800 mb-2">Chart Rendering Error</h3>
+        <p className="text-red-700 mb-2">{errorMessage}</p>
+        {errorDetails.length > 0 && (
+          <div className="text-red-600 text-sm mb-4 mt-2">
+            <p className="font-semibold mb-1">Details:</p>
+            <ul className="list-disc list-inside text-left">
+              {errorDetails.map((detail, idx) => (
+                <li key={idx}>{detail}</li>
+              ))}
+            </ul>
+          </div>
+        )}
         <button
           onClick={() => window.location.reload()}
-          className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors"
+          className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors mt-4"
         >
           Refresh Page
         </button>
@@ -893,234 +903,79 @@ export default function VedicChartDisplay({
     );
   }
 
-  // No data state
-  if (!processedData) {
+  // PRODUCTION-GRADE: Require valid birth data for backend rendering
+  if (!birthData) {
     return (
-      <div className={`bg-yellow-50 border-2 border-yellow-200 rounded-lg p-6 text-center ${className}`} style={style}>
-        <div className="text-yellow-600 mb-4">📊</div>
-        <h3 className="text-lg font-semibold text-yellow-800 mb-2">No Chart Data</h3>
-        <p className="text-yellow-700">Please generate a birth chart first.</p>
+      <div className={`bg-red-50 border-2 border-red-200 rounded-lg p-6 text-center ${className}`} style={style}>
+        <div className="text-red-600 mb-4">❌</div>
+        <h3 className="text-lg font-semibold text-red-800 mb-2">Missing Birth Data</h3>
+        <p className="text-red-700">Birth data is required for chart rendering.</p>
       </div>
     );
   }
 
-  const { houseGroups, ascendant, houseToRasiMap } = processedData;
+  // Render backend SVG if available and successful
+  if (svgContent) {
+    return (
+      <div
+        className={`rounded-lg p-6 ${className}`}
+        style={{
+          ...style,
+          backgroundColor: '#FFF8E1',
+          border: '2px solid #8B4513',
+          minWidth: `${CHART_SIZE + 100}px`,
+          width: 'max-content',
+          display: 'inline-block'
+        }}
+        role="article"
+        aria-label="Traditional Vedic Birth Chart (North Indian Style) - Backend Rendered"
+      >
+        {/* Chart Title with Sanskrit */}
+        <div className="text-center mb-6">
+          <h2 className="text-xl font-bold" style={{ color: '#2F1B14' }}>
+            {chartType === "navamsa" ?
+              "नवांश चक्र (Navamsa Chart) - D9" :
+              "राशि चक्र लग्न चक्र (Lagna Chart) - D1"
+            }
+          </h2>
+        </div>
 
-  return (
-    <div
-      className={`rounded-lg p-6 ${className}`}
-      style={{
-        ...style,
-        backgroundColor: '#FFF8E1', // Cream/beige background to match template
-        border: '2px solid #8B4513', // Brown border to match traditional kundli
-        minWidth: `${CHART_SIZE + 100}px`, // Add padding for container
-        width: 'max-content', // Ensure container doesn't shrink
-        display: 'inline-block' // Prevent flex shrinking
-      }}
-      role="article"
-      aria-label="Traditional Vedic Birth Chart (North Indian Style)"
-    >
-      {/* Chart Title with Sanskrit */}
-          <div className="text-center mb-6">
-            <h2 className="text-xl font-bold" style={{ color: '#2F1B14' }}>
-              {chartType === "navamsa" ?
-                "नवांश चक्र (Navamsa Chart) - D9" :
-                "राशि चक्र लग्न चक्र (Lagna Chart) - D1"
-              }
-            </h2>
-        {ascendant && (
-          <p className="text-sm mt-1" style={{ color: '#5D4037' }}>
-            लग्न (Lagna): {ascendant.sign} {ascendant.degrees}°{ascendant.minutes}'
-          </p>
-        )}
-      </div>
-
-      {/* Traditional Diamond Chart */}
-      <div className="flex justify-center" style={{
-        minWidth: `${CHART_SIZE}px`,
-        minHeight: `${CHART_SIZE}px`,
-        width: `${CHART_SIZE}px`,
-        height: `${CHART_SIZE}px`
-      }}>
-        <svg
-          width={CHART_SIZE}
-          height={CHART_SIZE}
-          viewBox={`0 0 ${CHART_SIZE} ${CHART_SIZE}`}
+        {/* Backend-rendered SVG Chart */}
+        <div 
+          className="flex justify-center"
           style={{
-            width: `${CHART_SIZE}px`,
-            height: `${CHART_SIZE}px`,
             minWidth: `${CHART_SIZE}px`,
             minHeight: `${CHART_SIZE}px`,
-            display: 'block',
-            flexShrink: 0,
-            backgroundColor: '#FFF8E1' // Cream background for SVG
+            width: `${CHART_SIZE}px`,
+            height: `${CHART_SIZE}px`
           }}
-          className="border-none" // Remove default border since we're styling the container
-          role="img"
-          aria-label="Traditional North Indian Kundli Chart"
-        >
-          {/* Background fill for the entire chart */}
-          <rect width={CHART_SIZE} height={CHART_SIZE} fill="#FFF8E1" />
+          dangerouslySetInnerHTML={{ __html: svgContent }}
+        />
 
-          {/* Chart Frame - Authentic North Indian Diamond Structure */}
-          <g stroke="#000000" strokeWidth="2" fill="none">
-            {/* Outer square border */}
-            <rect
-              x={PADDING}
-              y={PADDING}
-              width={CHART_SIZE - 2*PADDING}
-              height={CHART_SIZE - 2*PADDING}
-              fill="none"
-              stroke="#000000"
-              strokeWidth="2"
-            />
-
-            {/* Corner-to-corner diagonal lines creating X pattern */}
-            <line x1={PADDING} y1={PADDING} x2={CHART_SIZE - PADDING} y2={CHART_SIZE - PADDING} />
-            <line x1={CHART_SIZE - PADDING} y1={PADDING} x2={PADDING} y2={CHART_SIZE - PADDING} />
-
-            {/* Inner diamond connecting midpoints of square sides */}
-            <line x1={CENTER_X} y1={PADDING} x2={CHART_SIZE - PADDING} y2={CENTER_Y} />
-            <line x1={CHART_SIZE - PADDING} y1={CENTER_Y} x2={CENTER_X} y2={CHART_SIZE - PADDING} />
-            <line x1={CENTER_X} y1={CHART_SIZE - PADDING} x2={PADDING} y2={CENTER_Y} />
-            <line x1={PADDING} y1={CENTER_Y} x2={CENTER_X} y2={PADDING} />
-          </g>
-
-          {/* Rasi Numbers - positioned inside houses, one per house, one unique rasi number 1-12 */}
-          {(() => {
-            // Build map of houseNumber -> rasiNumber first, ensuring uniqueness
-            const houseToRasiMapping = {};
-            const usedRasiNumbers = new Set();
-            
-            // First pass: build mapping from houseToRasiMap (authoritative source)
-            for (let houseNumber = 1; houseNumber <= 12; houseNumber++) {
-              const housePosition = HOUSE_POSITIONS[houseNumber];
-              if (!housePosition) continue;
-              
-              let rasiNumber;
-              
-              // CRITICAL: Use houseToRasiMap from API housePositions - this is the authoritative source
-              if (houseToRasiMap && houseToRasiMap[houseNumber]) {
-                const houseSign = houseToRasiMap[houseNumber].sign;
-                try {
-                  rasiNumber = getRasiNumberFromSign(houseSign);
-                } catch (error) {
-                  console.error(`❌ Error getting rasi number for house ${houseNumber} with sign ${houseSign}:`, error);
-                  if (ascendant) {
-                    const ascendantRasi = getRasiNumberFromSign(ascendant.sign);
-                    rasiNumber = calculateRasiForHouse(houseNumber, ascendantRasi);
-                  } else {
-                    continue;
-                  }
-                }
-              } else if (ascendant) {
-                const ascendantRasi = getRasiNumberFromSign(ascendant.sign);
-                rasiNumber = calculateRasiForHouse(houseNumber, ascendantRasi);
-              } else {
-                continue;
-              }
-              
-              // Validate rasi number is in valid range
-              if (!rasiNumber || rasiNumber < 1 || rasiNumber > 12) {
-                continue;
-              }
-              
-              // ENSURE UNIQUENESS: If this rasi number already used, skip it
-              if (usedRasiNumbers.has(rasiNumber)) {
-                console.warn(`⚠️ Duplicate rasi number ${rasiNumber} detected for house ${houseNumber}. Skipping to maintain uniqueness.`);
-                continue;
-              }
-              
-              houseToRasiMapping[houseNumber] = rasiNumber;
-              usedRasiNumbers.add(rasiNumber);
-            }
-            
-            // Second pass: render rasi numbers
-            return Array.from({ length: 12 }, (_, i) => i + 1).map((houseNumber) => {
-              const housePosition = HOUSE_POSITIONS[houseNumber];
-              if (!housePosition) return null;
-              
-              const rasiNumber = houseToRasiMapping[houseNumber];
-              if (!rasiNumber) {
-                // No valid rasi number for this house - skip rendering
-                return null;
-              }
-              
-              const rasiPosition = calculateRasiPositionForHouse(houseNumber, housePosition);
-              
-              return (
-                <text
-                  key={`rasi-house-${houseNumber}`}
-                  x={rasiPosition.x}
-                  y={rasiPosition.y}
-                  textAnchor="middle"
-                  fontSize="14"
-                  fill="#000000"
-                  fontWeight="bold"
-                  fontFamily="Arial, sans-serif"
-                >
-                  {rasiNumber}
-                </text>
-              );
-            }).filter(Boolean);
-          })()}
-
-
-          {/* Planetary Positions - Template-validated positioning for perfect kundli alignment */}
-          {Object.entries(houseGroups).map(([houseNum, planetsInHouse]) => {
-            if (planetsInHouse.length === 0) return null;
-
-            const housePosition = HOUSE_POSITIONS[parseInt(houseNum)];
-            const houseNumber = parseInt(houseNum);
-
-            return (
-              <g key={`house-planets-${houseNum}`}>
-                {planetsInHouse.map((planet, index) => {
-                  // Use the new precise positioning function for template alignment
-                  const { x: textX, y: textY } = calculatePrecisePlanetPosition(
-                    housePosition, 
-                    planet, 
-                    planetsInHouse, 
-                    houseNumber
-                  );
-
-                  return (
-                    <text
-                      key={`${houseNum}-${planet.name}-${index}`}
-                      x={textX}
-                      y={textY}
-                      textAnchor="middle"
-                      fontSize="12"
-                      fill="#000000"
-                      fontFamily="Arial, sans-serif"
-                      fontWeight="bold"
-                      style={{
-                        textShadow: '1px 1px 1px rgba(255,255,255,0.8)' // Add subtle shadow for clarity
-                      }}
-                    >
-                      {formatPlanetText(planet)}
-                    </text>
-                  );
-                })}
-              </g>
-            );
-          })}
-        </svg>
-      </div>
-
-      {/* Legend with Sanskrit Terms */}
-      <div className="mt-6 text-xs text-center space-y-2" style={{ color: '#5D4037' }}>
-        <div>
-          <p className="font-medium mb-1">ग्रह (Graha) - Planetary Codes:</p>
-          <p>Su=सूर्य(Sun), Mo=चन्द्र(Moon), Ma=मंगल(Mars), Me=बुध(Mercury), Ju=गुरु(Jupiter)</p>
-          <p>Ve=शुक्र(Venus), Sa=शनि(Saturn), Ra=राहु(Rahu), Ke=केतु(Ketu), As=लग्न(Ascendant)</p>
-        </div>
-        <div>
-          <p className="font-medium mb-1">वैदिक चिह्न (Vedic Symbols):</p>
-          <p>↑=उच्च(Exalted), ↓=नीच(Debilitated), ℞=वक्री(Retrograde), ☉=अस्त(Combust)</p>
-          <p>Format: Planet Position°Minutes' with dignity symbols</p>
+        {/* Legend with Sanskrit Terms */}
+        <div className="mt-6 text-xs text-center space-y-2" style={{ color: '#5D4037' }}>
+          <div>
+            <p className="font-medium mb-1">ग्रह (Graha) - Planetary Codes:</p>
+            <p>Su=सूर्य(Sun), Mo=चन्द्र(Moon), Ma=मंगल(Mars), Me=बुध(Mercury), Ju=गुरु(Jupiter)</p>
+            <p>Ve=शुक्र(Venus), Sa=शनि(Saturn), Ra=राहु(Rahu), Ke=केतु(Ketu), As=लग्न(Ascendant)</p>
+          </div>
+          <div>
+            <p className="font-medium mb-1">वैदिक चिह्न (Vedic Symbols):</p>
+            <p>↑=उच्च(Exalted), ↓=नीच(Debilitated), ℞=वक्री(Retrograde), ☉=अस्त(Combust)</p>
+            <p>Format: Planet Position°Minutes' with dignity symbols</p>
+          </div>
         </div>
       </div>
+    );
+  }
+
+  // PRODUCTION-GRADE: Default return - should not reach here in normal flow
+  // If we reach here, it means there's an unexpected state (no error, no loading, no svgContent)
+  return (
+    <div className={`bg-yellow-50 border-2 border-yellow-200 rounded-lg p-6 text-center ${className}`} style={style}>
+      <div className="text-yellow-600 mb-4">⏳</div>
+      <h3 className="text-lg font-semibold text-yellow-800 mb-2">Initializing Chart Renderer</h3>
+      <p className="text-yellow-700">Please wait while the chart is being rendered...</p>
     </div>
   );
 }

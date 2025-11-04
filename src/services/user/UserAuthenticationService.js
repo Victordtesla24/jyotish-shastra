@@ -11,9 +11,13 @@ const fetch = require('node-fetch');
 
 class UserAuthenticationService {
   constructor() {
-    this.jwtSecret = process.env.JWT_SECRET || 'jyotish-shastra-secret';
+    this.jwtSecret = process.env.JWT_SECRET;
     this.jwtExpiresIn = process.env.JWT_EXPIRES_IN || '7d';
     this.refreshTokenExpiresIn = process.env.REFRESH_TOKEN_EXPIRES_IN || '30d';
+    
+    if (!this.jwtSecret) {
+      throw new Error('JWT_SECRET environment variable is not set. This is required for production security.');
+    }
   }
 
   /**

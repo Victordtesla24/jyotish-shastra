@@ -1,8 +1,5 @@
-// jest-dom adds custom jest matchers for asserting on DOM nodes.
+// jest-dom adds custom jest matchers for asserting on DOM nodes
 import '@testing-library/jest-dom';
-
-// Production-grade test setup with real implementations
-// Replaces mocks with production-ready test environment
 
 // Set up real window scroll behavior for testing
 global.scrollTo = jest.fn((x, y) => {

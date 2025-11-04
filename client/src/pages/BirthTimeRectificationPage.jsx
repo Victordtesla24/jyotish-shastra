@@ -292,10 +292,22 @@ const BirthTimeRectificationPageEnhanced = () => {
             const btrData = sessionStorage.getItem('birthDataForBTR');
             if (btrData) {
               savedBirthData = JSON.parse(btrData);
-              sessionStorage.removeItem('birthDataForBTR');
+              // CRITICAL FIX: Don't remove the data immediately - keep it for error recovery
+              console.log('✅ BTR Page: Loaded birth data from sessionStorage:', savedBirthData);
+            } else {
+              console.warn('⚠️ BTR Page: No birthDataForBTR found in sessionStorage');
             }
           } catch (storageError) {
             console.warn('Session storage data not available:', storageError.message);
+          }
+        }
+
+        // Priority 3: Check UIDataSaver simple keys for test compatibility
+        if (!savedBirthData) {
+          const simpleBirthData = sessionStorage.getItem('birth_data_session');
+          if (simpleBirthData) {
+            savedBirthData = JSON.parse(simpleBirthData);
+            console.log('✅ BTR Page: Loaded birth data from simple session key:', savedBirthData);
           }
         }
         
@@ -345,8 +357,18 @@ const BirthTimeRectificationPageEnhanced = () => {
         }
         
       } catch (error) {
-        console.error('Failed to load saved session:', error);
-        setError(error.message);
+        // Properly serialize error to avoid Puppeteer JSHandle@error serialization
+        const errorMessage = error instanceof Error 
+          ? error.message 
+          : typeof error === 'string' 
+            ? error 
+            : String(error);
+        
+        // Only log actual errors, not expected "no session exists" states
+        if (errorMessage && !errorMessage.includes('sessionStorage') && !errorMessage.includes('localStorage')) {
+          console.error('Failed to load saved session:', errorMessage);
+        }
+        setError(errorMessage || 'Unable to load saved session data');
         // Auto-redirect to home page if no data available
         setTimeout(() => {
           console.log('Redirecting to generate chart first...');

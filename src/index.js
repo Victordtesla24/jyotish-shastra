@@ -57,9 +57,12 @@ app.use(helmet({
   crossOriginEmbedderPolicy: false,
 }));
 
+// Determine if we're in development environment (for local testing)
+const isLocalTesting = !process.env.RENDER && process.env.NODE_ENV === 'production';
+
 // CORS configuration for Render deployment
 const corsOptions = {
-  origin: isProduction
+  origin: isProduction && !isLocalTesting
     ? [
         process.env.FRONTEND_URL,
         'https://jjyotish-shastra-frontend.onrender.com',
@@ -73,6 +76,9 @@ const corsOptions = {
         'http://127.0.0.1:3002',
         'http://127.0.0.1:3000',
         'http://127.0.0.1:3003',
+        'http://localhost:8080',
+        'http://127.0.0.1:8080',
+        'http://0.0.0.0:8080',
       ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -86,6 +92,9 @@ if (isProduction) {
 }
 
 app.use(cors(corsOptions));
+
+// Add explicit preflight handling
+app.options('*', cors(corsOptions));
 
 // Compression middleware
 app.use(compression());

@@ -20,21 +20,16 @@ const ComprehensiveAnalysisPage = () => {
   const dataInterpreter = useMemo(() => new UIToAPIDataInterpreter(), []);
 
   const fetchComprehensiveAnalysis = useCallback(async () => {
+
     try {
       setLoading(true);
       setError(null);
 
-      console.log('🔄 [ComprehensiveAnalysisPage] Starting comprehensive analysis fetch...');
 
       // First try to get cached data from UIDataSaver
       const cachedData = UIDataSaver.getComprehensiveAnalysis();
       if (cachedData && (cachedData.sections || cachedData.analysis?.sections)) {
-        console.log('✅ [ComprehensiveAnalysisPage] Using cached comprehensive analysis from UIDataSaver');
-        console.log('📊 [ComprehensiveAnalysisPage] Cached data structure:', Object.keys(cachedData));
-        console.log('📊 [ComprehensiveAnalysisPage] Data has sections:', !!cachedData.sections);
-        console.log('📊 [ComprehensiveAnalysisPage] Data has analysis.sections:', !!cachedData.analysis?.sections);
         const processedData = ResponseDataToUIDisplayAnalyser.processComprehensiveAnalysis(cachedData);
-        console.log('✅ [ComprehensiveAnalysisPage] Processed cached data:', processedData);
         setAnalysisData(processedData);
         setLoading(false);
         return;
@@ -43,16 +38,21 @@ const ComprehensiveAnalysisPage = () => {
       // Get birth data for API call
       const rawBirthData = UIDataSaver.getBirthData();
       if (!rawBirthData) {
-        console.error('❌ [ComprehensiveAnalysisPage] No birth data found, redirecting to home');
+        const errorMessage = 'Birth data is required for analysis. Please generate a chart first by filling out the birth data form.';
+        setError(errorMessage);
+        setLoading(false);
+        // CRITICAL FIX: Navigate only once, don't retry
+        setTimeout(() => {
           navigate('/');
-          return;
-        }
+        }, 2000);
+        return;
+      }
 
-      console.log('🔄 [ComprehensiveAnalysisPage] Found birth data, formatting for API...', {
-        name: rawBirthData.name,
-        dateOfBirth: rawBirthData.dateOfBirth,
-        timeOfBirth: rawBirthData.timeOfBirth
-      });
+        console.log('Raw birth data from session:', {
+          name: rawBirthData.name,
+          dateOfBirth: rawBirthData.dateOfBirth,
+          timeOfBirth: rawBirthData.timeOfBirth
+        });
 
       // CRITICAL FIX: Format birth data to meet API validation requirements
       // Validate and format birth data before sending to API
@@ -66,7 +66,7 @@ const ComprehensiveAnalysisPage = () => {
       const formattedData = dataInterpreter.formatForAPI(validationResult.validatedData);
       const apiRequestData = formattedData.apiRequest || formattedData;
 
-      console.log('✅ [ComprehensiveAnalysisPage] Birth data formatted for API:', {
+        console.log('API request validation:', {
         hasDate: !!apiRequestData.dateOfBirth,
         hasTime: !!apiRequestData.timeOfBirth,
         hasCoordinates: !!(apiRequestData.latitude && apiRequestData.longitude),
@@ -80,7 +80,7 @@ const ComprehensiveAnalysisPage = () => {
           headers: {
             'Content-Type': 'application/json',
           },
-        body: JSON.stringify(apiRequestData)
+        body: JSON.stringify(apiRequestData) // Required for API calls - not in UI
         });
 
         if (!response.ok) {
@@ -88,8 +88,7 @@ const ComprehensiveAnalysisPage = () => {
         }
 
       const apiData = await response.json();
-      console.log('✅ [ComprehensiveAnalysisPage] Comprehensive analysis API response received');
-      console.log('📊 [ComprehensiveAnalysisPage] API data structure:', {
+        console.log('API response received:', {
         success: apiData.success,
         hasAnalysis: !!apiData.analysis,
         hasSections: !!apiData.analysis?.sections,
@@ -112,7 +111,7 @@ const ComprehensiveAnalysisPage = () => {
 
       // Process data with ResponseDataToUIDisplayAnalyser
       const processedData = ResponseDataToUIDisplayAnalyser.processComprehensiveAnalysis(apiData);
-      console.log('✅ [ComprehensiveAnalysisPage] Data processed:', {
+        console.log('Processed data validation:', {
         processedSuccess: !!processedData,
         hasSections: !!processedData?.sections,
         sectionCount: processedData?.sections ? Object.keys(processedData.sections).length : 0
@@ -124,10 +123,8 @@ const ComprehensiveAnalysisPage = () => {
 
       // Save to UIDataSaver for future use
       UIDataSaver.saveComprehensiveAnalysis(apiData);
-      console.log('💾 [ComprehensiveAnalysisPage] Comprehensive analysis saved to UIDataSaver');
 
       setAnalysisData(processedData);
-      console.log('✅ [ComprehensiveAnalysisPage] Analysis data set to state:', !!processedData);
 
     } catch (err) {
       console.error('❌ [ComprehensiveAnalysisPage] Error fetching comprehensive analysis:', err);
@@ -140,9 +137,30 @@ const ComprehensiveAnalysisPage = () => {
     }
   }, [navigate, dataInterpreter]);
 
+  // CRITICAL FIX: Prevent infinite retries - only run once on mount
   useEffect(() => {
-    fetchComprehensiveAnalysis();
-  }, [fetchComprehensiveAnalysis]);
+    let mounted = true;
+    let hasRun = false;
+    
+    const loadData = async () => {
+      // Prevent multiple concurrent calls
+      if (hasRun || !mounted) {
+        return;
+      }
+      hasRun = true;
+      
+      if (mounted) {
+        await fetchComprehensiveAnalysis();
+      }
+    };
+    
+    loadData();
+    
+    return () => {
+      mounted = false;
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty array - only run on mount
 
   if (loading) {
     return (

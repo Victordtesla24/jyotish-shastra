@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="800" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="800" fill="#FFF8E1" />
+  <line x1="0" y1="0" x2="800" y2="0" stroke="black" stroke-width="2" />
+<line x1="800" y1="0" x2="800" y2="800" stroke="black" stroke-width="2" />
+<line x1="800" y1="800" x2="0" y2="800" stroke="black" stroke-width="2" />
+<line x1="0" y1="800" x2="0" y2="0" stroke="black" stroke-width="2" />
+<line x1="400" y1="0" x2="800" y2="400" stroke="black" stroke-width="2" />
+<line x1="800" y1="400" x2="400" y2="800" stroke="black" stroke-width="2" />
+<line x1="400" y1="800" x2="0" y2="400" stroke="black" stroke-width="2" />
+<line x1="0" y1="400" x2="400" y2="0" stroke="black" stroke-width="2" />
+<line x1="0" y1="0" x2="800" y2="800" stroke="black" stroke-width="2" />
+<line x1="800" y1="0" x2="0" y2="800" stroke="black" stroke-width="2" />
+  <text x="400" y="304" font-family="monospace" font-size="12.8" text-anchor="middle" dominant-baseline="central">2</text>
+  <text x="400" y="162.4" font-family="monospace" font-size="9.600000000000001" text-anchor="middle" dominant-baseline="central">Ma 12</text>
+  <text x="400" y="173.6" font-family="monospace" font-size="9.600000000000001" text-anchor="middle" dominant-baseline="central">Me 22</text>
+  <text x="400" y="184.8" font-family="monospace" font-size="9.600000000000001" text-anchor="middle" dominant-baseline="central">Ju 29</text>
+  <text x="200" y="160" font-family="monospace" font-size="12.8" text-anchor="middle" dominant-baseline="central">3</text>
+  <text x="200" y="64" font-family="monospace" font-size="9.600000000000001" text-anchor="middle" dominant-baseline="central">Ra 21</text>
+  <text x="160" y="200" font-family="monospace" font-size="12.8" text-anchor="middle" dominant-baseline="central">3</text>
+  <text x="320" y="400" font-family="monospace" font-size="12.8" text-anchor="middle" dominant-baseline="central">4</text>
+  <text x="144" y="624" font-family="monospace" font-size="12.8" text-anchor="middle" dominant-baseline="central">5</text>
+  <text x="200" y="640" font-family="monospace" font-size="12.8" text-anchor="middle" dominant-baseline="central">6</text>
+  <text x="400" y="464" font-family="monospace" font-size="12.8" text-anchor="middle" dominant-baseline="central">8</text>
+  <text x="624" y="640" font-family="monospace" font-size="12.8" text-anchor="middle" dominant-baseline="central">9</text>
+  <text x="624" y="760" font-family="monospace" font-size="9.600000000000001" text-anchor="middle" dominant-baseline="central">Sa 28</text>
+  <text x="624" y="771.2" font-family="monospace" font-size="9.600000000000001" text-anchor="middle" dominant-baseline="central">Ke 21</text>
+  <text x="640" y="624" font-family="monospace" font-size="12.8" text-anchor="middle" dominant-baseline="central">9</text>
+  <text x="464" y="400" font-family="monospace" font-size="12.8" text-anchor="middle" dominant-baseline="central">10</text>
+  <text x="640" y="400" font-family="monospace" font-size="9.600000000000001" text-anchor="middle" dominant-baseline="central">Mo 11</text>
+  <text x="640" y="411.2" font-family="monospace" font-size="9.600000000000001" text-anchor="middle" dominant-baseline="central">Ve 7</text>
+  <text x="640" y="200" font-family="monospace" font-size="12.8" text-anchor="middle" dominant-baseline="central">11</text>
+  <text x="624" y="162.4" font-family="monospace" font-size="12.8" text-anchor="middle" dominant-baseline="central">12</text>
+  <text x="624" y="72" font-family="monospace" font-size="9.600000000000001" text-anchor="middle" dominant-baseline="central">Su 24</text>
+</svg>

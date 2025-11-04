@@ -1,0 +1,40 @@
+---
+alwaysApply: true
+---
+
+# Production-Grade Error-Fixing Guard-Rails
+
+## Scope & Evidence
+- Touch only code directly implicated by failing tests, stack traces, or typed errors; no speculative edits.
+- Align strictly with Architecture, API, and UI documentation; never invent shapes/endpoints/states.
+
+## No Fake Green
+- No mocks/placeholders/fallbacks in **runtime** paths. Tests may use proper doubles; app code must be real.
+- Do not “fix” by weakening tests unless the behavior matches documented contracts and user flows.
+
+## Error Trail (must append every attempt)
+- Append to `tests/ui/test-logs/manual-form-comprehensive-error-logs-YYYY-MM-DD.md`
+  - If the folder/file doesn’t exist, **create it** and use **today’s date**.
+  - Sections (all required): **Symptom**, **Root Cause**, **Impacted Modules**, **Evidence** (file:line/stack),
+    **Fix Summary**, **Files Touched**, **Why This Works**, **Verification Evidence** (commands + key outputs).
+
+## Repeat-Error Research Escalation
+- If a **similar class of error** persists for **≥ 3 attempts**, perform a **Research Pass**:
+  - Use only **official, pre-indexed docs** (`@` docs) or approved internal docs; cite exact sections.
+  - If needed docs aren’t indexed, **pause and request** adding them before continuing.
+
+## Verification Gates (all required before declaring a failure resolved)
+- Run project verification from repo root:
+  - **UI flow script** (manual form comprehensive)
+  - **Unit/Integration tests**
+  - **Typecheck**
+  - **Lint**
+  - **Production build**
+- Only mark “resolved” when **all** gates pass with no regressions.
+
+## Completion Policy
+- Do **not** declare “complete” until **all** failures from the current test summary are resolved,
+  **and** verification gates pass.
+
+
+

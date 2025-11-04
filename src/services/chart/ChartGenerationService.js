@@ -51,6 +51,10 @@ class ChartGenerationService {
     // Initialize swisseph references - will be updated when initialization completes
     this.swisseph = null;
     this.swissephAvailable = false;
+    
+    // Add caching for performance optimization
+    this.chartCache = new Map();
+    this.maxCacheSize = 100;
   }
 
   /**
@@ -83,6 +87,56 @@ class ChartGenerationService {
   }
 
   /**
+   * Generate cache key for birth data
+   * @param {Object} birthData - Birth details
+   * @returns {string} Cache key
+   */
+  generateCacheKey(birthData) {
+    const keyData = {
+      dateOfBirth: birthData.dateOfBirth,
+      timeOfBirth: birthData.timeOfBirth,
+      latitude: birthData.latitude,
+      longitude: birthData.longitude,
+      timezone: birthData.timezone
+    };
+    return JSON.stringify(keyData);
+  }
+
+  /**
+   * Get cached chart data
+   * @param {string} cacheKey - Cache key
+   * @returns {Object|null} Cached chart data or null
+   */
+  getCachedChart(cacheKey) {
+    const cached = this.chartCache.get(cacheKey);
+    if (cached) {
+      // Move to end (LRU behavior)
+      this.chartCache.delete(cacheKey);
+      this.chartCache.set(cacheKey, cached);
+      return cached;
+    }
+    return null;
+  }
+
+  /**
+   * Cache chart data with LRU eviction
+   * @param {string} cacheKey - Cache key
+   * @param {Object} chartData - Chart data to cache
+   */
+  cacheChart(cacheKey, chartData) {
+    // Evict oldest if at capacity
+    if (this.chartCache.size >= this.maxCacheSize) {
+      const firstKey = this.chartCache.keys().next().value;
+      this.chartCache.delete(firstKey);
+    }
+    
+    this.chartCache.set(cacheKey, {
+      data: chartData,
+      timestamp: Date.now()
+    });
+  }
+
+  /**
    * Initialize Swiss Ephemeris with required settings
    */
   async initializeSwissEphemeris() {
@@ -108,17 +162,32 @@ class ChartGenerationService {
    * @returns {Object} Complete chart data
    */
   async generateComprehensiveChart(birthData) {
+    // Generate cache key
+    const cacheKey = this.generateCacheKey(birthData);
+    
+    // Check cache first
+    const cachedChart = this.getCachedChart(cacheKey);
+    if (cachedChart) {
+      console.log('🎯 Chart cache hit for:', birthData.name || 'Unknown');
+      return cachedChart.data;
+    }
+    
     // Ensure swisseph is initialized
     await this.ensureSwissephInitialized();
+
+    console.log('🔨 Computing new chart for:', birthData.name || 'Unknown');
 
     try {
       // Initialize Swiss Ephemeris before any calculations
       await this.initializeSwissEphemeris();
 
       // Validate birth data
-      const isValid = this.validateBirthData(birthData);
-      if (!isValid) {
-        throw new Error('Birth data validation failed');
+      const validationResult = this.validateBirthData(birthData);
+      if (!validationResult.isValid) {
+        const errorMessage = validationResult.errors.length > 0 
+          ? `Birth data validation failed: ${validationResult.errors.join('; ')}`
+          : 'Birth data validation failed';
+        throw new Error(errorMessage);
       }
 
       // Geocode location if coordinates not provided
@@ -144,6 +213,9 @@ class ChartGenerationService {
         analysis,
         generatedAt: new Date().toISOString()
       };
+
+      // Cache the result
+      this.cacheChart(cacheKey, result);
 
       return result;
     } catch (error) {
@@ -1388,52 +1460,110 @@ class ChartGenerationService {
   }
 
   /**
-   * Validate birth data
+   * Validate birth data with detailed error reporting
    * @param {Object} birthData - Birth data
-   * @returns {boolean} Validation result
+   * @returns {Object} Validation result with { isValid: boolean, errors: array[] }
    */
   validateBirthData(birthData) {
-    // Check for required fields first
-    const required = ['dateOfBirth', 'timeOfBirth'];
+    try {
+      // PRODUCTION-GRADE: Enhanced validation with detailed logging
+      console.log('🔍 ChartGenerationService: Validating birth data', {
+        hasBirthData: !!birthData,
+        birthDataKeys: birthData ? Object.keys(birthData) : [],
+        hasDateOfBirth: !!birthData?.dateOfBirth,
+        hasTimeOfBirth: !!birthData?.timeOfBirth,
+        dateString: birthData?.dateOfBirth,
+        timeString: birthData?.timeOfBirth
+      });
 
-    for (const field of required) {
-      if (!birthData[field]) {
-        return false;
+      const errors = [];
+      
+      // Check for required fields first
+      const required = ['dateOfBirth', 'timeOfBirth'];
+
+      for (const field of required) {
+        if (!birthData || !birthData[field]) {
+          errors.push(`Missing required field: ${field}`);
+        }
       }
-    }
 
-    // Validate date format - must be YYYY-MM-DD
-    if (!moment(birthData.dateOfBirth, 'YYYY-MM-DD', true).isValid()) {
-      return false;
-    }
-
-    // Validate time format - accept both HH:mm and HH:mm:ss for astronomical precision
-    const isValidTimeFormat = moment(birthData.timeOfBirth, 'HH:mm', true).isValid() ||
-                             moment(birthData.timeOfBirth, 'HH:mm:ss', true).isValid();
-
-    if (!isValidTimeFormat) {
-      return false;
-    }
-
-    // Check if either coordinates or place information is provided
-    const hasCoordinates = birthData.latitude && birthData.longitude;
-    const hasPlace = birthData.placeOfBirth || (birthData.city && birthData.country) || birthData.city;
-
-    if (!hasCoordinates && !hasPlace) {
-      return false;
-    }
-
-    // Validate coordinates if provided
-    if (hasCoordinates) {
-      const lat = parseFloat(birthData.latitude);
-      const lon = parseFloat(birthData.longitude);
-
-      if (isNaN(lat) || isNaN(lon) || lat < -90 || lat > 90 || lon < -180 || lon > 180) {
-        return false;
+      if (errors.length > 0) {
+        console.error('❌ ChartGenerationService: Required fields validation failed', errors);
+        return { isValid: false, errors };
       }
-    }
 
-    return true;
+      // Validate date format - support YYYY-MM-DD string and Date objects
+      const dateOfBirth = birthData.dateOfBirth;
+      let isValidDate = false;
+      
+      if (typeof dateOfBirth === 'string') {
+        isValidDate = moment(dateOfBirth, 'YYYY-MM-DD', true).isValid();
+        // Also try parsing ISO format (in case frontend sends ISO date)
+        if (!isValidDate) {
+          // Try parsing moment created from ISO
+          const isoDate = moment(dateOfBirth);
+          if (isoDate.isValid()) {
+            isValidDate = true;
+          }
+        }
+      } else if (dateOfBirth instanceof Date) {
+        isValidDate = moment(dateOfBirth).isValid();
+      }
+
+      if (!isValidDate) {
+        errors.push(`Invalid date format: ${dateOfBirth}. Expected YYYY-MM-DD format or valid Date object`);
+      }
+
+      // Validate time format - accept both HH:mm and HH:mm:ss for astronomical precision
+      const timeOfBirth = birthData.timeOfBirth;
+      const isValidTimeFormat = moment(timeOfBirth, 'HH:mm', true).isValid() ||
+                               moment(timeOfBirth, 'HH:mm:ss', true).isValid();
+
+      if (!isValidTimeFormat) {
+        errors.push(`Invalid time format: ${timeOfBirth}. Expected HH:mm or HH:mm:ss format (24-hour)`);
+      }
+
+      // Check if either coordinates or place information is provided
+      const hasCoordinates = birthData.latitude && birthData.longitude;
+      const hasPlace = birthData.placeOfBirth || (birthData.city && birthData.country) || birthData.city;
+
+      if (!hasCoordinates && !hasPlace) {
+        errors.push('Location information required: provide either coordinates (latitude, longitude) or placeOfBirth');
+      }
+
+      // Validate coordinates if provided
+      if (hasCoordinates) {
+        const lat = parseFloat(birthData.latitude);
+        const lon = parseFloat(birthData.longitude);
+
+        if (isNaN(lat) || isNaN(lon)) {
+          errors.push(`Invalid coordinates format: latitude=${birthData.latitude}, longitude=${birthData.longitude}`);
+        } else if (lat < -90 || lat > 90) {
+          errors.push(`Invalid latitude: ${lat}. Must be between -90 and 90 degrees`);
+        } else if (lon < -180 || lon > 180) {
+          errors.push(`Invalid longitude: ${lon}. Must be between -180 and 180 degrees`);
+        }
+      }
+
+      const result = {
+        isValid: errors.length === 0,
+        errors
+      };
+
+      if (result.isValid) {
+        console.log('✅ ChartGenerationService: Birth data validation passed');
+      } else {
+        console.error('❌ ChartGenerationService: Birth data validation failed', errors);
+      }
+
+      return result;
+    } catch (error) {
+      console.error('❌ ChartGenerationService: Validation error:', error.message);
+      return { 
+        isValid: false, 
+        errors: [`Validation system error: ${error.message}`] 
+      };
+    }
   }
 
 
@@ -1497,5 +1627,5 @@ class ChartGenerationServiceSingleton {
 }
 
 // Export both the class and the singleton instance getter
-export { ChartGenerationService };
+export { ChartGenerationService, ChartGenerationServiceSingleton };
 export default ChartGenerationServiceSingleton;

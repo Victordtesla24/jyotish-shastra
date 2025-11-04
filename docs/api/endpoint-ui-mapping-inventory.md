@@ -2,7 +2,7 @@
 
 ## Generated: 2025-01-15  
 **Last Updated**: January 2025  
-**Total Endpoints**: 38+ active endpoints
+**Total Endpoints**: 40+ active endpoints
 
 This document maps all API endpoints to their corresponding UI components and verifies data structure compatibility.
 
@@ -90,7 +90,29 @@ This document maps all API endpoints to their corresponding UI components and ve
 - **Output:** Navamsa chart data
 - **Status:** ⚠️ Not called by UI (may use cached data instead)
 
-### 11. POST /api/v1/chart/analysis/lagna
+### 11. POST /api/v1/chart/render
+- **Method:** POST
+- **UI Component:** None (metadata endpoint)
+- **Input:** Birth data object + optional `includeData` flag
+- **Output:** `{ success: true, data: { chartData, renderData, chartSpec } }`
+- **Status:** ✅ Available for metadata extraction
+
+### 12. POST /api/v1/chart/render/svg ✅ **NEW PRODUCTION-GRADE**
+- **Method:** POST
+- **UI Component:** `VedicChartDisplay.jsx` (via `chartService.js`)
+- **Input:** Birth data object + optional `width` (default: 800), `includeData` (default: false)
+- **Output:** `{ success: true, data: { svg: string, chartData?, renderData? }, metadata: { width, renderedAt, service, warnings } }`
+- **Status:** ✅ Mapped - Production-grade backend rendering service
+- **Backend Service:** ChartRenderingService.js ✅ **PRODUCTION-READY**
+- **Features:** 
+  - 18+ data set extraction including nested structures
+  - Template matching with `@kundli-template.png`
+  - Data joining strategy implementation
+  - Performance-optimized singleton integration
+- **Usage:** Called by `chartService.renderChartSVG()` method
+- **Fallback:** If backend rendering fails, `VedicChartDisplay` falls back to client-side rendering
+
+### 13. POST /api/v1/chart/analysis/lagna
 - **Method:** POST
 - **UI Component:** `AnalysisPage.jsx` (uses comprehensive endpoint as fallback)
 - **Input:** Birth data object
@@ -312,10 +334,10 @@ This document maps all API endpoints to their corresponding UI components and ve
 ## Summary
 
 ### Mapping Status:
-- ✅ **Mapped and Used:** 18 endpoints (actively called by UI components)
+- ✅ **Mapped and Used:** 20 endpoints (actively called by UI components)
 - ⚠️ **Not Called by UI:** 15 endpoints (may use cached data or be API-only)
 - ℹ️ **Info/Debug:** 5 endpoints (health checks, info endpoints)
-- **Total:** 38+ endpoints documented
+- **Total:** 40+ endpoints documented
 
 ### Critical Endpoints (Must Work):
 1. ✅ POST /api/v1/chart/generate - Chart generation
@@ -327,6 +349,7 @@ This document maps all API endpoints to their corresponding UI components and ve
 7. ✅ POST /api/v1/analysis/houses - House-by-house analysis
 8. ✅ POST /api/v1/analysis/dasha - Dasha timeline analysis
 9. ✅ POST /api/v1/analysis/navamsa - Navamsa chart analysis
+10. ✅ POST /api/v1/chart/render/svg - **NEW** Production-grade backend rendering
 
 ### BTR Endpoints Status:
 - ✅ **10 BTR endpoints** implemented and documented

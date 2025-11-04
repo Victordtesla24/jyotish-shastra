@@ -13,7 +13,7 @@ import ArudhaAnalysisService from './ArudhaAnalysisService.js';
 import NavamsaAnalysisService from '../../core/analysis/divisional/NavamsaAnalysisService.js';
 import DetailedDashaAnalysisService from './DetailedDashaAnalysisService.js';
 import YogaDetectionService from './YogaDetectionService.js';
-import ChartGenerationService from '../chart/ChartGenerationService.js';
+import ChartGenerationServiceSingleton, { ChartGenerationService } from '../chart/ChartGenerationService.js';
 import GeocodingService from '../geocoding/GeocodingService.js';
 
 class MasterAnalysisOrchestrator {
@@ -50,8 +50,7 @@ class MasterAnalysisOrchestrator {
    */
   async getChartService() {
     if (!this.chartService) {
-      const ChartGenerationServiceSingleton = await import('../../services/chart/ChartGenerationService.js');
-      this.chartService = await ChartGenerationServiceSingleton.default.getInstance();
+      this.chartService = await ChartGenerationServiceSingleton.getInstance();
     }
     return this.chartService;
   }
@@ -691,7 +690,8 @@ class MasterAnalysisOrchestrator {
       }
 
       const chartService = await this.getChartService();
-      const rasiChart = await chartService.generateRasiChart(finalBirthData);
+      const chartData = await chartService.generateComprehensiveChart(finalBirthData);
+      const rasiChart = chartData.rasiChart;
       const navamsaChart = await chartService.generateNavamsaChart(finalBirthData);
       return { rasiChart, navamsaChart };
     } catch (error) {

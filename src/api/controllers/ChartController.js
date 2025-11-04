@@ -133,8 +133,11 @@ class ChartController {
         processedBirthData.longitude = longitude;
       }
 
+      // Initialize chart service if not already initialized
+      const chartService = await this.getChartService();
+
       // Generate comprehensive chart
-      const chartData = await this.chartService.generateComprehensiveChart(processedBirthData);
+      const chartData = await chartService.generateComprehensiveChart(processedBirthData);
 
       // Generate birth data analysis for the frontend
       const birthDataAnalysis = this.birthDataAnalysisService.analyzeBirthDataCollection(
@@ -464,8 +467,11 @@ class ChartController {
           });
         }
 
+        // Initialize chart service if not already initialized
+        const chartService = await this.getChartService();
+        
         // Generate chart for house analysis
-        chartData = await this.chartService.generateComprehensiveChart(validationResult.data);
+        chartData = await chartService.generateComprehensiveChart(validationResult.data);
       }
 
       const houseNumberInt = parseInt(houseNumber);
@@ -546,8 +552,11 @@ class ChartController {
           processedBirthData.longitude = longitude;
         }
 
+        // Initialize chart service if not already initialized
+        const chartService = await this.getChartService();
+        
         // Generate comprehensive chart
-        const generatedChart = await this.chartService.generateComprehensiveChart(processedBirthData);
+        const generatedChart = await chartService.generateComprehensiveChart(processedBirthData);
         
         // Validate chart structure
         if (!generatedChart || !generatedChart.rasiChart) {
@@ -824,6 +833,314 @@ class ChartController {
    */
 
   /**
+   * Render chart as SVG (new rendering service)
+   * @param {Object} req - Express request object
+   * @param {Object} res - Express response object
+   */
+  async renderChartSVG(req, res) {
+    try {
+      // PRODUCTION-GRADE: Detailed request logging for debugging
+      console.log('🔍 renderChartSVG: Request received');
+      console.log('📦 Request body keys:', Object.keys(req.body || {}));
+      console.log('📦 Request body:', JSON.stringify(req.body, null, 2));
+      console.log('📦 Request headers:', JSON.stringify(req.headers, null, 2));
+
+      // Extract rendering options from request body
+      const { width = 800, includeData = false, ...birthData } = req.body;
+
+      console.log('🔍 Extracted rendering options:', { width, includeData });
+      console.log('🔍 Extracted birth data keys:', Object.keys(birthData));
+      console.log('🔍 Extracted birth data:', JSON.stringify(birthData, null, 2));
+
+      // PRODUCTION-GRADE: Preprocess birth data for compatibility
+      // Ensure frontend chartService output is compatible with ChartGenerationService expectations
+      const preprocessedBirthData = this.preprocessBirthDataForGeneration(birthData);
+      console.log('🔍 Preprocessed birth data:', {
+        originalKeys: Object.keys(birthData),
+        preprocessedKeys: Object.keys(preprocessedBirthData),
+        hasCorrectDateFormat: !!preprocessedBirthData.dateOfBirth,
+        hasCorrectTimeFormat: !!preprocessedBirthData.timeOfBirth
+      });
+
+      // PRODUCTION-GRADE: Handle different request formats
+      // Some requests may include pre-generated chart data, others need full generation
+      let chartDataToRender = null;
+      let birthDataForGeneration = null;
+
+      // Check if request includes pre-generated chart data
+      if (preprocessedBirthData.chartData || preprocessedBirthData.rasiChart) {
+        chartDataToRender = preprocessedBirthData.chartData || preprocessedBirthData;
+        console.log('🔍 renderChartSVG: Using provided chart data');
+      } else {
+        // Generate chart from preprocessed birth data
+        birthDataForGeneration = preprocessedBirthData;
+        console.log('🔍 renderChartSVG: Will generate chart from preprocessed birth data');
+      }
+
+      // Validate birth data if generation is needed
+      if (birthDataForGeneration) {
+        const validationResult = validateChartRequest(birthDataForGeneration);
+        
+        console.log('🔍 Validation result:', {
+          isValid: validationResult.isValid,
+          errorsCount: validationResult.errors?.length || 0,
+          errors: validationResult.errors
+        });
+        if (!validationResult.isValid) {
+          return res.status(400).json({
+            success: false,
+            message: 'Invalid birth data provided',
+            errors: validationResult.errors
+          });
+        }
+      }
+
+      // Get or generate chart data
+      const chartService = await this.getChartService();
+      let chartData;
+      try {
+        if (chartDataToRender) {
+          // Use provided chart data
+          chartData = chartDataToRender;
+          console.log('✅ renderChartSVG: Using provided chart data', {
+            hasRasiChart: !!chartData.rasiChart,
+            hasNavamsaChart: !!chartData.navamsaChart,
+            hasBirthData: !!chartData.birthData
+          });
+        } else if (birthDataForGeneration) {
+          // Generate chart from birth data
+          chartData = await chartService.generateComprehensiveChart(birthDataForGeneration);
+          console.log('✅ renderChartSVG: Chart data generated successfully', {
+            hasRasiChart: !!chartData.rasiChart,
+            hasNavamsaChart: !!chartData.navamsaChart,
+            hasBirthData: !!chartData.birthData
+          });
+        } else {
+          throw new Error('No chart data or birth data provided for rendering');
+        }
+      } catch (error) {
+        console.error('❌ renderChartSVG: Chart data processing failed:', error);
+        console.error('Error stack:', error.stack);
+        throw new Error(`Chart data processing failed: ${error.message}`);
+      }
+
+      // CRITICAL: Generate birthDataAnalysis for house number extraction
+      // ChartRenderingService requires birthDataAnalysis to extract house numbers from nested structure
+      console.log('🔍 renderChartSVG: Generating birthDataAnalysis...');
+      let birthDataAnalysis;
+      try {
+        // Use available birthData from chart or fall back to original request
+        const birthDataForAnalysis = chartData.birthData || birthDataForGeneration || {};
+        birthDataAnalysis = this.birthDataAnalysisService.analyzeBirthDataCollection(
+          birthDataForAnalysis,
+          chartData.rasiChart,
+          chartData.navamsaChart
+        );
+        console.log('✅ renderChartSVG: birthDataAnalysis generated successfully', {
+          hasAnalyses: !!birthDataAnalysis?.analyses,
+          hasPlanetaryPositions: !!birthDataAnalysis?.analyses?.planetaryPositions
+        });
+      } catch (error) {
+        console.error('❌ renderChartSVG: birthDataAnalysis generation failed:', error);
+        console.error('Error stack:', error.stack);
+        throw new Error(`birthDataAnalysis generation failed: ${error.message}`);
+      }
+
+      // Attach birthDataAnalysis to chartData for ChartRenderingService
+      const enhancedChartData = {
+        ...chartData,
+        birthDataAnalysis: birthDataAnalysis
+      };
+
+      // PRODUCTION-GRADE: Ensure complete house positions data
+      // Check if housePositions is present and complete
+      console.log('🔍 renderChartSVG: Validating house positions data...');
+      const housePositions = chartData.rasiChart?.housePositions || chartData.housePositions;
+      if (!housePositions || !Array.isArray(housePositions) || housePositions.length !== 12) {
+        console.error('❌ renderChartSVG: Incomplete house positions data', {
+          hasHousePositions: !!housePositions,
+          isArray: Array.isArray(housePositions),
+          length: housePositions?.length,
+          expected: 12
+        });
+        throw new Error('Complete house positions data is required for rendering. Expected array of 12 houses with signId.');
+      }
+
+      // Validate each house has required data
+      const houseValidationErrors = [];
+      housePositions.forEach((house, index) => {
+        const houseNumber = index + 1;
+        if (!house) {
+          houseValidationErrors.push(`House ${houseNumber} is missing`);
+        } else {
+          const signId = typeof house === 'object' ? house.signId : house;
+          if (!signId || signId < 1 || signId > 12) {
+            houseValidationErrors.push(`House ${houseNumber} has invalid signId: ${signId}`);
+          }
+        }
+      });
+
+      if (houseValidationErrors.length > 0) {
+        console.error('❌ renderChartSVG: House validation errors:', houseValidationErrors);
+        throw new Error(`House validation failed: ${houseValidationErrors.join(', ')}`);
+      }
+
+      console.log('✅ renderChartSVG: House positions validation passed');
+
+      // Import rendering service dynamically to avoid import issues
+      console.log('🔍 renderChartSVG: Importing ChartRenderingService...');
+      let renderingService;
+      try {
+        const { default: ChartRenderingService } = await import('../../services/chart/ChartRenderingService.js');
+        renderingService = new ChartRenderingService();
+        console.log('✅ renderChartSVG: ChartRenderingService imported successfully');
+      } catch (error) {
+        console.error('❌ renderChartSVG: ChartRenderingService import failed:', error);
+        console.error('Error stack:', error.stack);
+        throw new Error(`ChartRenderingService import failed: ${error.message}`);
+      }
+
+      // Validate chart data
+      console.log('🔍 renderChartSVG: Validating chart data...');
+      let validation;
+      try {
+        validation = renderingService.validateChartData(enhancedChartData);
+        console.log('✅ renderChartSVG: Chart data validation result:', {
+          valid: validation.valid,
+          errorsCount: validation.errors?.length || 0,
+          warningsCount: validation.warnings?.length || 0
+        });
+        if (!validation.valid) {
+          console.error('❌ renderChartSVG: Validation errors:', validation.errors);
+          return res.status(500).json({
+            success: false,
+            message: 'Chart data validation failed',
+            errors: validation.errors,
+            warnings: validation.warnings
+          });
+        }
+      } catch (error) {
+        console.error('❌ renderChartSVG: Validation process failed:', error);
+        console.error('Error stack:', error.stack);
+        throw new Error(`Chart data validation process failed: ${error.message}`);
+      }
+
+      // Generate SVG
+      console.log('🔍 renderChartSVG: Rendering SVG...');
+      let svgContent;
+      try {
+        svgContent = renderingService.renderChartSVG(enhancedChartData, { width: parseInt(width) });
+        console.log('✅ renderChartSVG: SVG generated successfully', {
+          svgLength: svgContent?.length || 0,
+          hasBackground: svgContent?.includes('#FFF8E1'),
+          lineCount: (svgContent?.match(/<line/g) || []).length
+        });
+      } catch (error) {
+        console.error('❌ renderChartSVG: SVG rendering failed:', error);
+        console.error('Error stack:', error.stack);
+        console.error('Enhanced chart data structure:', {
+          hasRasiChart: !!enhancedChartData.rasiChart,
+          hasBirthDataAnalysis: !!enhancedChartData.birthDataAnalysis,
+          rasiChartKeys: Object.keys(enhancedChartData.rasiChart || {})
+        });
+        throw new Error(`SVG rendering failed: ${error.message}`);
+      }
+
+      const response = { svg: svgContent };
+      
+      if (includeData) {
+        response.chartData = enhancedChartData;
+        response.renderData = renderingService.transformToRenderFormat(enhancedChartData);
+      }
+
+      res.status(200).json({
+        success: true,
+        data: response,
+        metadata: {
+          width: parseInt(width),
+          renderedAt: new Date().toISOString(),
+          service: 'ChartRenderingService',
+          warnings: validation.warnings
+        }
+      });
+
+    } catch (error) {
+      console.error('Chart rendering error:', error);
+      console.error('Error stack:', error.stack);
+      console.error('Request body:', JSON.stringify(req.body, null, 2));
+      res.status(500).json({
+        success: false,
+        message: 'Failed to render chart',
+        error: error.message,
+        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      });
+    }
+  }
+
+  /**
+   * Render chart metadata (without SVG)
+   * @param {Object} req - Express request object
+   * @param {Object} res - Express response object
+   */
+  async renderChart(req, res) {
+    try {
+      const birthData = req.body;
+
+      // Validate birth data
+      const validationResult = validateChartRequest(birthData);
+      if (!validationResult.isValid) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid birth data provided',
+          errors: validationResult.errors
+        });
+      }
+
+      // Generate chart data
+      const chartService = await this.getChartService();
+      const chartData = await chartService.generateComprehensiveChart(birthData);
+
+      // Import rendering service dynamically
+      const { default: ChartRenderingService } = await import('../../services/chart/ChartRenderingService.js');
+      const renderingService = new ChartRenderingService();
+
+      // Validate and transform
+      const validation = renderingService.validateChartData(chartData);
+      if (!validation.valid) {
+        return res.status(500).json({
+          success: false,
+          message: 'Chart data validation failed',
+          errors: validation.errors
+        });
+      }
+
+      const renderData = renderingService.transformToRenderFormat(chartData);
+
+      res.status(200).json({
+        success: true,
+        data: {
+          chartData,
+          renderData,
+          chartSpec: renderingService.getChartSpec()
+        },
+        metadata: {
+          renderedAt: new Date().toISOString(),
+          service: 'ChartRenderingService',
+          warnings: validation.warnings
+        }
+      });
+
+    } catch (error) {
+      console.error('Chart render metadata error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to prepare chart for rendering',
+        error: error.message
+      });
+    }
+  }
+
+  /**
    * Get systematic birth data analysis (Section 1 questions)
    * @param {Object} req - Express request object
    * @param {Object} res - Express response object
@@ -867,6 +1184,73 @@ class ChartController {
         message: 'Failed to analyze birth data',
         error: error.message
       });
+    }
+  }
+
+  /**
+   * Preprocess birth data for compatibility between frontend and backend
+   * Simplified preprocessing for better reliability
+   * @param {Object} birthData - Raw birth data from frontend
+   * @returns {Object} Preprocessed birth data ready for ChartGenerationService
+   */
+  preprocessBirthDataForGeneration(birthData) {
+    try {
+      // Create a clean copy to avoid mutation
+      const processed = { ...birthData };
+
+      // Fix date format compatibility
+      if (processed.dateOfBirth && typeof processed.dateOfBirth === 'string') {
+        // If it's an ISO date string, extract just the date part
+        if (processed.dateOfBirth.includes('T')) {
+          processed.dateOfBirth = processed.dateOfBirth.split('T')[0];
+        }
+      } else if (processed.dateOfBirth instanceof Date) {
+        // Convert Date to YYYY-MM-DD string
+        processed.dateOfBirth = processed.dateOfBirth.toISOString().split('T')[0];
+      }
+
+      // Ensure time format compatibility
+      if (processed.timeOfBirth && typeof processed.timeOfBirth === 'string') {
+        // Remove AM/PM if present and clean up format
+        processed.timeOfBirth = processed.timeOfBirth.trim().replace(/\s*(AM|PM)$/i, '');
+      }
+
+      // Ensure coordinates are numbers
+      if (processed.latitude && processed.longitude) {
+        processed.latitude = parseFloat(processed.latitude);
+        processed.longitude = parseFloat(processed.longitude);
+      }
+
+      // Handle placeOfBirth format - multiple format support
+      if (processed.placeOfBirth) {
+        if (typeof processed.placeOfBirth === 'object' && processed.placeOfBirth.name) {
+          processed.placeOfBirth = processed.placeOfBirth.name;
+        } else if (typeof processed.placeOfBirth === 'string') {
+          // Keep string as-is (backend geocoder will handle)
+        }
+      }
+
+      // CRITICAL FIX: Set default timezone if missing for chart generation
+      if (!processed.timezone && processed.placeOfBirth) {
+        // Default to Asia/Kolkata for India, or use UTC for other locations
+        processed.timezone = 'Asia/Kolkata';
+      } else if (!processed.timezone) {
+        processed.timezone = 'UTC';
+      }
+
+      console.log('✅ preprocessBirthDataForGeneration: Processed data', {
+        hasDate: !!processed.dateOfBirth,
+        hasTime: !!processed.timeOfBirth,
+        hasPlace: !!processed.placeOfBirth,
+        hasCoordinates: !!(processed.latitude && processed.longitude),
+        hasTimezone: !!processed.timezone
+      });
+
+      return processed;
+    } catch (error) {
+      console.error('❌ preprocessBirthDataForGeneration: Processing error:', error.message);
+      // Return original data if preprocessing fails
+      return birthData;
     }
   }
 }

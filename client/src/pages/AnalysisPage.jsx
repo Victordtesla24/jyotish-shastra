@@ -100,7 +100,7 @@ const SummaryDisplay = ({ summary, title = '', compact = false }) => {
               <div key={nestedKey} className="flex justify-between">
                 <span className="text-secondary">{nestedKey.replace(/([A-Z])/g, ' $1').trim()}:</span>
                 <span className="font-semibold text-primary">
-                  {typeof nestedValue === 'object' ? JSON.stringify(nestedValue) : String(nestedValue)}
+                  {typeof nestedValue === 'object' ? String(nestedValue) : String(nestedValue)}
                 </span>
               </div>
             ))}
@@ -315,7 +315,7 @@ const LagnaDisplay = ({ data }) => {
                 <div className="flex items-center gap-4 p-4 bg-exalted/10 rounded-lg hover:bg-exalted/20 transition-all duration-300 hover:transform hover:scale-105">
                   <span className="text-exalted group-hover:animate-pulse">💪</span>
                   <span className="text-secondary group-hover:text-primary transition-colors duration-300">
-                    {typeof strength === 'object' ? JSON.stringify(strength) : strength}
+                    {typeof strength === 'object' ? String(strength) : strength}
                   </span>
                 </div>
               </div>
@@ -333,7 +333,7 @@ const LagnaDisplay = ({ data }) => {
               {lagna.challenges.map((challenge, index) => (
                 <div key={index} className="challenge-item">
                   <span className="challenge-icon">⚡</span>
-                  <span>{typeof challenge === 'object' ? JSON.stringify(challenge) : challenge}</span>
+                  <span>{typeof challenge === 'object' ? String(challenge) : challenge}</span>
                 </div>
               ))}
             </div>
@@ -347,7 +347,7 @@ const LagnaDisplay = ({ data }) => {
               {lagna.personalityTraits.map((trait, index) => (
                 <div key={index} className="characteristic-item">
                   <span className="trait-icon">✨</span>
-                  <span className="characteristic-text">{typeof trait === 'object' ? JSON.stringify(trait) : trait}</span>
+                  <span className="characteristic-text">{typeof trait === 'object' ? String(trait) : trait}</span>
                 </div>
               ))}
             </div>
@@ -582,12 +582,8 @@ const HouseDisplay = ({ houseNumber, data }) => {
 
 const AspectsDisplay = ({ data }) => {
   // DEBUG: Log the data structure being received
-  console.log('🔗 AspectsDisplay received data:', data);
-  console.log('🔗 AspectsDisplay data type:', typeof data);
-  console.log('🔗 AspectsDisplay data keys:', data ? Object.keys(data) : 'null');
 
   if (!data) {
-    console.log('🔗 AspectsDisplay: No data provided');
     return (
       <div className="card-cosmic text-center animate-pulse">
         <div className="text-6xl mb-4 animate-float">🔗</div>
@@ -598,21 +594,10 @@ const AspectsDisplay = ({ data }) => {
 
   // Handle the actual API data structure
   const aspects = data.aspects || data.analysis || data;
-  console.log('🔗 AspectsDisplay aspects object:', aspects);
-  console.log('🔗 AspectsDisplay aspects keys:', aspects ? Object.keys(aspects) : 'null');
 
   const allAspects = aspects.allAspects || aspects.majorAspects || [];
   const patterns = aspects.patterns || [];
   const yogas = aspects.yogas || [];
-
-  console.log('🔗 AspectsDisplay extracted data:', {
-    allAspectsLength: allAspects.length,
-    patternsLength: patterns.length,
-    yogasLength: yogas.length,
-    allAspects,
-    patterns,
-    yogas
-  });
 
   // Categorize aspects by nature
   const beneficAspects = allAspects.filter(aspect => aspect.nature === 'benefic');
@@ -797,7 +782,7 @@ const AspectsDisplay = ({ data }) => {
         <div className="text-center text-muted">
           <p className="text-lg">Planetary aspects analysis will be available once comprehensive data is loaded.</p>
           <pre className="text-xs mt-2 bg-gray-100 p-2 rounded">
-            Data structure: {JSON.stringify(Object.keys(aspects), null, 2)}
+            Data structure: {String(Object.keys(aspects), null, 2)}
           </pre>
         </div>
       )}
@@ -1136,7 +1121,7 @@ const ArudhaDisplay = ({ data }) => {
                 </h5>
                 <div className="space-y-2">
                   {imageStability.stabilityFactors.map((factor, index) => {
-                    const factorText = typeof factor === 'object' ? (factor.name || factor.description || factor.text || JSON.stringify(factor)) : factor;
+                    const factorText = typeof factor === 'object' ? (factor.name || factor.description || factor.text || String(factor)) : factor;
                     return (
                       <div key={index} className="flex items-center gap-2 p-2 bg-exalted/10 rounded">
                         <span className="text-exalted">✓</span>
@@ -1155,7 +1140,7 @@ const ArudhaDisplay = ({ data }) => {
                 </h5>
                 <div className="space-y-2">
                   {imageStability.volatilityFactors.map((factor, index) => {
-                    const factorText = typeof factor === 'object' ? (factor.name || factor.description || factor.text || JSON.stringify(factor)) : factor;
+                    const factorText = typeof factor === 'object' ? (factor.name || factor.description || factor.text || String(factor)) : factor;
                     return (
                       <div key={index} className="flex items-center gap-2 p-2 bg-enemy/10 rounded">
                         <span className="text-enemy">⚠</span>
@@ -1235,7 +1220,7 @@ const ArudhaDisplay = ({ data }) => {
                   {cycleObj.characteristics && Array.isArray(cycleObj.characteristics) && cycleObj.characteristics.length > 0 && (
                     <div className="flex flex-wrap gap-2 mt-3">
                       {cycleObj.characteristics.map((char, i) => {
-                        const charText = typeof char === 'object' ? (char.name || char.text || JSON.stringify(char)) : char;
+                        const charText = typeof char === 'object' ? (char.name || char.text || String(char)) : char;
                         return (
                           <span key={i} className="badge-vedic bg-friendly/20 text-friendly text-xs px-2 py-1 rounded">
                             {charText}
@@ -2254,7 +2239,7 @@ const DashaDisplay = ({ data }) => {
           <div className="text-center text-muted">
             <p>Dasha analysis will be available once comprehensive data is loaded.</p>
             <pre className="text-xs mt-2 bg-gray-100 p-2 rounded">
-              Available data: {JSON.stringify(Object.keys(dasha), null, 2)}
+              Available data: {String(Object.keys(dasha), null, 2)}
             </pre>
           </div>
         )}
@@ -2327,7 +2312,7 @@ const PreliminaryDisplay = ({ data }) => {
                 <div key={index} className="bg-white/50 backdrop-blur-sm p-4 rounded-lg border border-green/20 hover:border-green/40 transition-all duration-300">
                   <div className="flex items-start gap-3">
                     <span className="text-xl">✨</span>
-                    <span className="text-secondary leading-relaxed flex-1">{typeof strength === 'object' ? JSON.stringify(strength) : strength}</span>
+                    <span className="text-secondary leading-relaxed flex-1">{typeof strength === 'object' ? String(strength) : strength}</span>
                   </div>
                 </div>
               ))}
@@ -2346,7 +2331,7 @@ const PreliminaryDisplay = ({ data }) => {
                 <div key={index} className="bg-white/50 backdrop-blur-sm p-4 rounded-lg border border-orange/20 hover:border-orange/40 transition-all duration-300">
                   <div className="flex items-start gap-3">
                     <span className="text-xl">⚠️</span>
-                    <span className="text-secondary leading-relaxed flex-1">{typeof challenge === 'object' ? JSON.stringify(challenge) : challenge}</span>
+                    <span className="text-secondary leading-relaxed flex-1">{typeof challenge === 'object' ? String(challenge) : challenge}</span>
                   </div>
                 </div>
               ))}
@@ -2365,7 +2350,7 @@ const PreliminaryDisplay = ({ data }) => {
                 <div key={index} className="bg-white/50 backdrop-blur-sm p-4 rounded-lg border border-purple/20 hover:border-purple/40 transition-all duration-300">
                   <div className="flex items-start gap-3">
                     <span className="text-xl">💡</span>
-                    <span className="text-secondary leading-relaxed flex-1">{typeof rec === 'object' ? JSON.stringify(rec) : rec}</span>
+                    <span className="text-secondary leading-relaxed flex-1">{typeof rec === 'object' ? String(rec) : rec}</span>
                   </div>
                 </div>
               ))}
@@ -2595,12 +2580,17 @@ const AnalysisPage = () => {
 
   // Load analysis data on component mount using the data layer
   useEffect(() => {
+    let mounted = true;
+    let hasRun = false;
+
     const initializeDataLoading = async () => {
-      console.log('🎯 AnalysisPage: Initializing data loading...');
+      // Prevent multiple concurrent calls
+      if (hasRun || !mounted) {
+        return;
+      }
 
       // Ensure activeSection is set to lagna as default if not already set
       if (!activeSection) {
-        console.log('🔧 AnalysisPage: Setting activeSection to lagna (was:', activeSection, ')');
         setActiveSection('lagna');
       }
 
@@ -2611,33 +2601,29 @@ const AnalysisPage = () => {
         // Use the data layer to load comprehensive analysis
         const result = await ResponseDataToUIDisplayAnalyser.loadFromComprehensiveAnalysis();
 
-                if (result.success) {
-          console.log('✅ AnalysisPage: Data loaded successfully from', result.source);
-          console.log('📊 AnalysisPage: Available data sections:', Object.keys(result.data));
-          console.log('🔍 AnalysisPage: Data structure preview:', {
-            hasLagna: !!result.data.lagna,
-            hasHouses: !!result.data.houses,
-            hasAspects: !!result.data.aspects,
-            dataKeys: Object.keys(result.data)
-          });
-
+        if (result.success) {
           setAnalysisData(result.data);
 
           // Verify state update worked
           setTimeout(() => {
-            console.log('🔍 AnalysisPage: State updated - analysisData keys:', Object.keys(result.data));
           }, 100);
         } else {
           console.error('❌ AnalysisPage: Failed to load data:', result.error);
           
           // PRODUCTION: Handle BIRTH_DATA_REQUIRED error with proper user guidance
           if (result.error?.code === 'BIRTH_DATA_REQUIRED') {
-            setError({
+            const errorObj = {
               message: result.error.userMessage || result.error.message || 'Birth data is required for analysis. Please fill out the birth data form first.',
               code: result.error.code,
               action: result.error.action || 'navigate_home',
               requiresNavigation: true
-            });
+            };
+            setError(errorObj);
+            // CRITICAL FIX: Navigate only once, prevent retry loop
+            setTimeout(() => {
+              navigate('/');
+            }, 2000);
+            return; // Exit early to prevent further processing
           } else {
             // CRITICAL FIX: Ensure error is always a user-friendly message
             const errorMessage = typeof result.error === 'string' 
@@ -2655,12 +2641,18 @@ const AnalysisPage = () => {
         
         // PRODUCTION: Handle birth data required error
         if (error.code === 'BIRTH_DATA_REQUIRED') {
-          setError({
+          const errorObj = {
             message: error.userMessage || 'Birth data is required for analysis. Please fill out the birth data form first.',
             code: error.code,
             action: error.action || 'navigate_home',
             requiresNavigation: true
-          });
+          };
+          setError(errorObj);
+          // CRITICAL FIX: Navigate only once, prevent retry loop
+          setTimeout(() => {
+            navigate('/');
+          }, 2000);
+          return; // Exit early to prevent further processing
         } else {
           // CRITICAL FIX: Ensure error is always a user-friendly message
           const errorMessage = error.message || error.toString() || 'Failed to load analysis data. Please try again or generate your birth chart first.';
@@ -2671,11 +2663,25 @@ const AnalysisPage = () => {
           });
         }
       } finally {
-        setLoading(false);
+        if (mounted) {
+          setLoading(false);
+        }
       }
     };
 
-    initializeDataLoading();
+    // Prevent multiple concurrent calls
+    const loadData = async () => {
+      if (!hasRun && mounted) {
+        hasRun = true;
+        await initializeDataLoading();
+      }
+    };
+    
+    loadData();
+    
+    return () => {
+      mounted = false;
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Empty dependency array for mount-only execution - dependencies handled internally
 
@@ -2731,7 +2737,6 @@ const AnalysisPage = () => {
       const cachedData = UIDataSaver.getIndividualAnalysis(analysisType);
 
       if (cachedData && cachedData.analysis) {
-        console.log(`✅ Using cached ${analysisType} analysis from UIDataSaver`);
         const processedData = ResponseDataToUIDisplayAnalyser[`process${analysisType.charAt(0).toUpperCase() + analysisType.slice(1)}Analysis`]?.(cachedData) ||
                              ResponseDataToUIDisplayAnalyser.processGenericAnalysis(cachedData, analysisType);
 
@@ -2748,7 +2753,6 @@ const AnalysisPage = () => {
         return;
       }
 
-      console.log(`🔄 Fetching ${analysisType} analysis from API...`);
 
       // 3. Call individual analysis API
       const endpointUrl = analysisEndpoints[analysisType]?.url;
@@ -2759,7 +2763,7 @@ const AnalysisPage = () => {
       const response = await fetch(endpointUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(birthData)
+        body: JSON.stringify(birthData) // Required for API calls - not in UI
       });
 
       if (!response.ok) {
@@ -2767,7 +2771,6 @@ const AnalysisPage = () => {
       }
 
       const apiData = await response.json();
-      console.log(`✅ ${analysisType} analysis API response received`);
 
       // 4. Process data with ResponseDataToUIDisplayAnalyser
       const processMethod = `process${analysisType.charAt(0).toUpperCase() + analysisType.slice(1)}Analysis`;
@@ -2780,7 +2783,6 @@ const AnalysisPage = () => {
 
       // 5. Save to UIDataSaver using new API pattern
       UIDataSaver.saveApiAnalysisResponse(analysisType, apiData);
-      console.log(`💾 ${analysisType} analysis saved to UIDataSaver`);
 
       setAnalysisData(prev => ({ ...prev, [analysisType]: processedData }));
 
@@ -2800,19 +2802,11 @@ const AnalysisPage = () => {
       setLoading(true);
       setError(null);
 
-      console.log('🔄 Loading analysis data for ALL endpoints...');
 
       // 1. Try to get comprehensive analysis data first
       const comprehensiveData = UIDataSaver.getComprehensiveAnalysis();
-      console.log('🔍 Comprehensive data check:', {
-        hasData: !!comprehensiveData,
-        hasSections: !!comprehensiveData?.sections,
-        keys: comprehensiveData ? Object.keys(comprehensiveData) : [],
-        sectionKeys: comprehensiveData?.sections ? Object.keys(comprehensiveData.sections) : []
-      });
 
       if (comprehensiveData && comprehensiveData.sections) {
-        console.log('✅ Using comprehensive analysis data for individual sections');
 
         // Extract individual analysis types from comprehensive sections
         const extractedData = {};
@@ -2823,7 +2817,6 @@ const AnalysisPage = () => {
             analysis: comprehensiveData.sections.section1,
             success: true
           };
-          console.log('✅ Extracted preliminary data from section1');
         }
 
         // SECTION 2: Preliminary Chart Analysis: Lagna, Luminaries, and Overall Patterns
@@ -2873,13 +2866,8 @@ const AnalysisPage = () => {
             };
 
             extractedData.lagna = formattedLagnaData;
-            console.log('✅ Extracted lagna data from section2:', {
-              sign: formattedLagnaData.analysis.sign,
-              hasDescription: !!formattedLagnaData.analysis.description,
-              characteristicsCount: formattedLagnaData.analysis.characteristics.length
-            });
           } else if (comprehensiveData.sections.section2) {
-            // Extract lagna data from section2 structure with fallback formatting
+            // Extract lagna data from section2 structure with format handling
             const section2 = comprehensiveData.sections.section2;
             const formattedLagnaData = {
               analysis: {
@@ -2896,10 +2884,6 @@ const AnalysisPage = () => {
               success: true
             };
             extractedData.lagna = formattedLagnaData;
-            console.log('✅ Extracted lagna data from section2 (fallback):', {
-              sign: formattedLagnaData.analysis.sign,
-              hasDescription: !!formattedLagnaData.analysis.description
-            });
           }
         }
 
@@ -2916,7 +2900,6 @@ const AnalysisPage = () => {
             };
 
             extractedData.houses = formattedHousesData;
-            console.log('✅ Extracted houses data from section3:', Object.keys(rawHousesData));
           } else if (comprehensiveData.sections.section3) {
             // Extract houses data from section3 structure
             extractedData.houses = { analysis: comprehensiveData.sections.section3, success: true };
@@ -2937,7 +2920,6 @@ const AnalysisPage = () => {
             success: true
           };
           extractedData.aspects = aspectsData;
-          console.log('✅ Extracted aspects data from section4');
         }
 
         // SECTION 5: Arudha Lagna Analysis (Perception & Public Image)
@@ -2948,7 +2930,6 @@ const AnalysisPage = () => {
             success: true
           };
           extractedData.arudha = arudhaData;
-          console.log('✅ Extracted arudha data from section5');
         }
 
         // SECTION 6: Navamsa Chart Analysis (D9) - Soul and Marriage
@@ -2959,7 +2940,6 @@ const AnalysisPage = () => {
             success: true
           };
           extractedData.navamsa = navamsaData;
-          console.log('✅ Extracted navamsa data from section6');
         }
 
         // SECTION 7: Dasha Analysis: Timeline of Life Events
@@ -2970,7 +2950,6 @@ const AnalysisPage = () => {
             success: true
           };
           extractedData.dasha = dashaData;
-          console.log('✅ Extracted dasha data from section7');
         }
 
         // SECTION 8: Synthesis: From Analysis to Comprehensive Report
@@ -2981,17 +2960,14 @@ const AnalysisPage = () => {
             success: true
           };
           extractedData.comprehensive = comprehensiveAnalysisData;
-          console.log('✅ Extracted comprehensive data from section8');
         }
 
         setAnalysisData(extractedData);
-        console.log('📊 Analysis data loaded from comprehensive analysis:', Object.keys(extractedData));
         setLoading(false);
         return;
       }
 
       // 2. Try to get individual analysis data from UIDataSaver for ALL endpoints
-      console.log('🔍 Checking for individual analysis data for ALL endpoints...');
       const individualData = {};
       const analysisTypes = ['lagna', 'houses', 'aspects', 'arudha', 'navamsa', 'dasha', 'preliminary', 'comprehensive'];
 
@@ -3001,14 +2977,11 @@ const AnalysisPage = () => {
           const data = UIDataSaver.getIndividualAnalysis(type);
           if (data && (data.analysis || data.success)) {
             individualData[type] = data;
-            console.log(`✅ Found ${type} analysis data from UIDataSaver`);
             return { type, data, success: true };
           } else {
-            console.log(`⚠️ No ${type} analysis data found in UIDataSaver`);
             return { type, data: null, success: false };
           }
         } catch (error) {
-          console.log(`⚠️ Could not load ${type} analysis:`, error.message);
           return { type, data: null, success: false, error: error.message };
         }
       });
@@ -3018,18 +2991,15 @@ const AnalysisPage = () => {
       // 3. If we have individual data, use it
       if (Object.keys(individualData).length > 0) {
         setAnalysisData(individualData);
-        console.log('📊 Analysis data loaded from individual sources:', Object.keys(individualData));
         setLoading(false);
         return;
       }
 
       // 4. Try to get data from session storage directly
-      console.log('🔍 Checking session storage directly...');
       try {
         const sessionKeys = Object.keys(sessionStorage);
         const analysisDataFromSession = {};
 
-        console.log('📝 All sessionStorage keys:', sessionKeys);
 
         sessionKeys.forEach(key => {
           if (key.includes('jyotish_api_analysis_')) {
@@ -3041,12 +3011,10 @@ const AnalysisPage = () => {
                 const analysisType = keyParts[3]; // Position after jyotish_api_analysis_
 
                 if (analysisType && ['lagna', 'houses', 'aspects', 'arudha', 'navamsa', 'dasha', 'preliminary', 'comprehensive'].includes(analysisType)) {
-                  console.log(`✅ Found ${analysisType} analysis in session storage:`, key);
                   analysisDataFromSession[analysisType] = data;
                 } else if (key.includes('_comprehensive_')) {
                   // Handle comprehensive analysis specially
                   if (data.analysis?.sections) {
-                    console.log('✅ Found comprehensive data in session storage');
                     const sections = data.analysis.sections;
                     if (sections.section1) analysisDataFromSession.preliminary = { analysis: sections.section1, success: true };
                     if (sections.section2) {
@@ -3068,23 +3036,19 @@ const AnalysisPage = () => {
                 }
               }
             } catch (err) {
-              console.log(`⚠️ Error parsing session data for ${key}:`, err.message);
             }
           }
         });
 
         if (Object.keys(analysisDataFromSession).length > 0) {
           setAnalysisData(analysisDataFromSession);
-          console.log('📊 Analysis data loaded from session storage:', Object.keys(analysisDataFromSession));
           setLoading(false);
           return;
         }
       } catch (err) {
-        console.log('⚠️ Error reading session storage:', err.message);
       }
 
       // 5. No analysis data found - show error state
-      console.log('❌ No analysis data found, showing error state');
       setError({
         message: 'Analysis data is not available. Please generate your birth chart first by filling out the birth data form.',
         code: 'NO_ANALYSIS_DATA',
@@ -3117,7 +3081,6 @@ const AnalysisPage = () => {
       const comprehensiveResult = await ResponseDataToUIDisplayAnalyser.loadFromComprehensiveAnalysis();
 
       if (comprehensiveResult.success) {
-        console.log('✅ Comprehensive data loaded from', comprehensiveResult.source);
         setAnalysisData(comprehensiveResult.data);
 
         // Mark all loaded types as completed
@@ -3131,7 +3094,6 @@ const AnalysisPage = () => {
         });
         setLoadingStages(prev => ({ ...prev, ...completedStages }));
       } else {
-        console.log('No comprehensive data found, fetching individual analyses...');
 
         // Fetch individual analyses using data layer
         for (const analysisType of Object.keys(analysisEndpoints)) {
@@ -3164,14 +3126,11 @@ const AnalysisPage = () => {
 
     // Handle tab switching - use already loaded comprehensive data
   const handleTabChange = (tabKey) => {
-    console.log(`🔄 AnalysisPage: Switching to ${tabKey} tab`);
     setActiveSection(tabKey);
 
     // Log available data for debugging
     if (analysisData[tabKey]) {
-      console.log(`✅ AnalysisPage: ${tabKey} data is available`);
     } else {
-      console.log(`⚠️ AnalysisPage: ${tabKey} data not found. Available data:`, Object.keys(analysisData));
     }
   };
 
@@ -3281,13 +3240,6 @@ const AnalysisPage = () => {
 
   // Render current tab content
   const renderTabContent = () => {
-    console.log(`🎯 AnalysisPage: renderTabContent called for activeSection: ${activeSection}`);
-    console.log(`🎯 AnalysisPage: analysisData keys:`, Object.keys(analysisData));
-    console.log(`🎯 AnalysisPage: Rendering content for ${activeSection}`, {
-      hasData: !!analysisData[activeSection],
-      dataStructure: analysisData[activeSection] ? Object.keys(analysisData[activeSection]) : null
-    });
-
     // Helper function to show no data message
     const NoDataMessage = ({ analysisType }) => (
       <div className="no-data-message text-center py-8">
@@ -3319,7 +3271,6 @@ const AnalysisPage = () => {
                   <button
                     key={house.key}
                     onClick={() => {
-                      console.log(`🏠 AnalysisPage: Switching to house ${house.number}`);
                       setActiveHouse(house.number);
                     }}
                     className={`tab-vedic flex flex-col items-center gap-1 ${activeHouse === house.number ? 'active' : ''}`}
@@ -3345,10 +3296,6 @@ const AnalysisPage = () => {
         );
 
             case 'aspects':
-        console.log('🔗 renderTabContent: aspects case triggered');
-        console.log('🔗 renderTabContent: analysisData.aspects exists?', !!analysisData.aspects);
-        console.log('🔗 renderTabContent: analysisData.aspects structure:', analysisData.aspects);
-        console.log('🔗 renderTabContent: data being passed to AspectsDisplay:', analysisData.aspects?.analysis || analysisData.aspects);
 
         return analysisData.aspects ?
           <AspectsDisplay data={analysisData.aspects?.analysis || analysisData.aspects} /> :
@@ -3404,7 +3351,6 @@ const AnalysisPage = () => {
               <div className="mb-8">
                 <BirthTimeRectification 
                   onRectificationComplete={(rectifiedData, results) => {
-                    console.log('BTR completed:', rectifiedData, results);
                     // Update analysis data if rectification was successful
                     if (rectifiedData) {
                       // Trigger re-analysis with rectified time

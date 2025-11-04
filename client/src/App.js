@@ -185,7 +185,12 @@ function App() {
 
   return (
     <ErrorBoundary>
-      <BrowserRouter>
+      <BrowserRouter
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true
+        }}
+      >
         <ThemeProvider defaultTheme="system">
           <ChartProvider>
             <AnalysisProvider>

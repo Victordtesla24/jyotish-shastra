@@ -63,20 +63,17 @@ class UIToAPIDataInterpreter {
         }
         
         // CRITICAL FIX: Standardize default timezone logic
-        // Priority: provided timezone > inferred from coordinates > place name > default
+        // Priority: provided timezone > inferred from coordinates > place name geocoding
         if (formData.timezone) {
           validatedData.timezone = formData.timezone;
         } else if ((hasCoordinates || hasNestedPlace) && !validatedData.timezone) {
-          // If coordinates are available but no timezone, try to infer from coordinates
-          // For now, default to Asia/Kolkata (most common use case for Vedic astrology)
+          // If coordinates are available but no timezone, use Asia/Kolkata (most common for Vedic astrology)
           validatedData.timezone = 'Asia/Kolkata';
         } else if (!hasCoordinates && !hasNestedPlace && hasPlaceString && !validatedData.timezone) {
-          // Place name only - default to UTC (will be corrected by geocoding)
-          validatedData.timezone = 'UTC';
-        } else if (!validatedData.timezone) {
-          // Final fallback - use UTC as safe default
+          // Place name only - use UTC temporarily (geocoding will provide correct timezone)
           validatedData.timezone = 'UTC';
         }
+        // Note: If timezone is still missing after above checks, geocoding service will determine it
       }
 
       if (formData.gender && ['male', 'female', 'other'].includes(formData.gender)) {

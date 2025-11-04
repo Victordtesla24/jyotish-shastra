@@ -1,7 +1,11 @@
 import jwt from 'jsonwebtoken';
 
 // JWT secret should be set in environment variables
-const JWT_SECRET = process.env.JWT_SECRET || 'your-default-secret';
+const JWT_SECRET = process.env.JWT_SECRET;
+
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable is not set. This is required for production security.');
+}
 
 function required(req, res, next) {
   const authHeader = req.headers['authorization'];

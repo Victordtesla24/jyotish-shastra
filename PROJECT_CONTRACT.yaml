@@ -1,0 +1,36 @@
+architecture:
+  layers:
+    - ui: client/src/**
+    - api: src/api/**
+    - services: src/services/**
+    - core: src/core/**
+    - data: src/data/**
+  rules:
+    - from: ui
+      allow: [ui, services]         # UI may talk to services, not to core/data directly
+    - from: services
+      allow: [services, core, data]
+    - from: api
+      allow: [api, services]
+    - from: core
+      allow: [core]
+    - from: data
+      allow: [data]
+
+runtime:
+  backend: { port: 3001 }
+  frontend: { port: 3002 }          # we’ll target 3002 in CI smoke
+
+policies:
+  banInProd:
+    patterns: ["\\bmock\\b","\\bplaceholder\\b","\\bfallback\\b","__mocks__", "msw", "MockAdapter"]
+    allowedDirs: ["**/__tests__/**","**/test/**","**/scripts/**","**/fixtures/**"]
+
+endpoints:
+  health: "/api/v1/health"
+  renderSVG: "/api/v1/chart/render/svg"
+  analysisComprehensive: "/api/v1/analysis/comprehensive"
+docs:
+  must_update_if:
+    - paths: ["src/api/routes/**", "src/services/**"]
+      docs: ["docs/endpoint-ui-mapping-inventory.md","docs/user-data-flows.md","docs/system-architecture.md","docs/detailed-ui-architecture.md","docs/validation-guide.md"]

@@ -5,11 +5,32 @@
  */
 
 import axios from 'axios';
-import { APIError } from '../utils/APIResponseInterpreter';
+import { APIError } from '../utils/APIResponseInterpreter.js';
 
 class ChartService {
   constructor() {
-    this.api = axios;
+    // PRODUCTION-GRADE: Use axios instance with proper baseURL configuration
+    // Proxy in package.json forwards /api/* to http://localhost:3001 in development
+    // In production, REACT_APP_API_URL should be set to backend URL
+    // PRODUCTION-GRADE: Configure baseURL to avoid double /api/api issue
+    const apiBaseUrlRaw = process.env.REACT_APP_API_URL || '';
+    let baseURL;
+    
+    if (apiBaseUrlRaw) {
+      // Production: Remove trailing slash and /api suffix if present to avoid duplication
+      baseURL = apiBaseUrlRaw.replace(/\/$/, '').replace(/\/api$/, '');
+    } else {
+      // Development: Use undefined to allow relative paths (works with proxy)
+      baseURL = undefined;
+    }
+    
+    this.api = axios.create({
+      baseURL: baseURL, // undefined uses relative paths (works with proxy), otherwise uses baseURL
+      timeout: 30000,
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
     this.cache = new Map();
   }
 
@@ -43,16 +64,58 @@ class ChartService {
       throw new Error('Location is required - provide either coordinates or place name');
     }
 
-    // Return clean data structure
-    return {
-      name: birthData.name || 'Unknown',
-      dateOfBirth: birthData.dateOfBirth,
-      timeOfBirth: birthData.timeOfBirth,
-      placeOfBirth: birthData.placeOfBirth,
-      latitude: birthData.latitude,
-      longitude: birthData.longitude,
-      timezone: birthData.timezone || 'auto'
+    // PRODUCTION-GRADE: Return clean data structure matching backend expectations exactly
+    // Backend expects: top-level latitude/longitude/timezone OR placeOfBirth object/string
+    // Never send undefined/null fields - only include what's actually present
+    
+    // PRODUCTION-GRADE: Convert dateOfBirth from ISO string to date string format
+    // Backend validator expects date string (YYYY-MM-DD), not ISO string (YYYY-MM-DDTHH:mm:ss.sssZ)
+    let dateOfBirthFormatted = birthData.dateOfBirth;
+    if (dateOfBirthFormatted && typeof dateOfBirthFormatted === 'string') {
+      // If ISO format (contains 'T' or 'Z'), extract just the date part
+      if (dateOfBirthFormatted.includes('T')) {
+        dateOfBirthFormatted = dateOfBirthFormatted.split('T')[0];
+      } else if (dateOfBirthFormatted.includes('Z')) {
+        dateOfBirthFormatted = dateOfBirthFormatted.split('Z')[0].split('T')[0];
+      }
+    } else if (dateOfBirthFormatted instanceof Date) {
+      // If Date object, format as YYYY-MM-DD
+      dateOfBirthFormatted = dateOfBirthFormatted.toISOString().split('T')[0];
+    }
+    
+    const prepared = {
+      dateOfBirth: dateOfBirthFormatted,
+      timeOfBirth: birthData.timeOfBirth
     };
+
+    // Name is optional - only include if present
+    if (birthData.name) {
+      prepared.name = birthData.name;
+    }
+
+    // Gender is optional - only include if present
+    if (birthData.gender) {
+      prepared.gender = birthData.gender;
+    }
+
+    // Location: prefer top-level coordinates if available (backend validation prefers this)
+    if (birthData.latitude !== undefined && birthData.longitude !== undefined) {
+      prepared.latitude = birthData.latitude;
+      prepared.longitude = birthData.longitude;
+      
+      // Timezone is required with coordinates
+      if (birthData.timezone || birthData.geocodingInfo?.timezone) {
+        prepared.timezone = birthData.timezone || birthData.geocodingInfo.timezone;
+      }
+    }
+
+    // If placeOfBirth is provided (string or object), include it
+    // Backend validator accepts both formats
+    if (birthData.placeOfBirth) {
+      prepared.placeOfBirth = birthData.placeOfBirth;
+    }
+
+    return prepared;
   }
 
   /**
@@ -254,16 +317,24 @@ class ChartService {
     // Layer 1: Essential validation
     const validatedData = this.validateAndPrepareInput(birthData);
 
+    // Generate consistent cache key for identical requests
+    const dataString = JSON.stringify(validatedData, Object.keys(validatedData).sort());
+    const cacheKey = `chart_${dataString}`;
+    
     // Check cache first (Layer 3 optimization)
-    const cacheKey = `chart_${JSON.stringify(validatedData)}`;
     const cached = this.cacheGet(cacheKey);
     if (cached) {
+      console.log('🎯 Cache hit for chart generation');
       return cached;
     }
+    
+    console.log('🔄 Cache miss - generating new chart');
 
     // Layer 2: API call + direct transformation
     try {
-      const response = await this.api.post('/api/v1/chart/generate', validatedData);
+      // PRODUCTION-GRADE: Use direct endpoint path - baseURL is configured in axios instance
+      const endpoint = '/api/v1/chart/generate';
+      const response = await this.api.post(endpoint, validatedData);
       const transformedData = await this.transformApiResponse(response.data);
 
       // Layer 3: Cache results
@@ -273,6 +344,110 @@ class ChartService {
     } catch (error) {
       console.error('Chart generation error:', error);
       throw error;
+    }
+  }
+
+  /**
+   * Render chart as SVG using backend rendering service
+   * @param {Object} birthData - Birth data for chart generation
+   * @param {Object} options - Rendering options
+   * @param {number} options.width - Chart width in pixels (default: 800)
+   * @param {boolean} options.includeData - Include chart data in response (default: false)
+   * @returns {Promise<Object>} SVG content and metadata
+   */
+  async renderChartSVG(birthData, options = {}) {
+    const { width = 800, includeData = false } = options;
+
+    // Validate birth data
+    const validatedData = this.validateAndPrepareInput(birthData);
+
+    try {
+      // PRODUCTION-GRADE: Log request payload for debugging
+      console.log('🔍 chartService.renderChartSVG: Sending request', {
+        validatedDataKeys: Object.keys(validatedData),
+        validatedData: JSON.stringify(validatedData, null, 2),
+        width,
+        includeData
+      });
+
+      // Call backend rendering endpoint
+      const requestPayload = {
+        ...validatedData,
+        width,
+        includeData
+      };
+      
+      console.log('🔍 chartService.renderChartSVG: Request payload', JSON.stringify(requestPayload, null, 2));
+
+      // PRODUCTION-GRADE: Use direct endpoint path since baseURL is configured in axios instance
+      // getApiUrl handles baseURL resolution - if baseURL is set in axios, use relative path
+      const endpoint = '/api/v1/chart/render/svg';
+      
+      const response = await this.api.post(endpoint, requestPayload);
+
+      if (!response.data || !response.data.success) {
+        throw new APIError(response.data?.message || 'Chart rendering failed');
+      }
+
+      const result = {
+        svg: response.data.data?.svg || null,
+        chartData: includeData ? response.data.data?.chartData : null,
+        renderData: includeData ? response.data.data?.renderData : null,
+        metadata: {
+          width: response.data.metadata?.width || width,
+          renderedAt: response.data.metadata?.renderedAt || new Date().toISOString(),
+          service: response.data.metadata?.service || 'ChartRenderingService',
+          warnings: response.data.metadata?.warnings || []
+        }
+      };
+
+      if (!result.svg) {
+        throw new APIError('No SVG content received from rendering service');
+      }
+
+      return result;
+    } catch (error) {
+      console.error('Chart rendering error:', error);
+      
+      // Production-grade: Throw proper errors instead of fallback SVGs
+      if (error.response) {
+        // Backend returned an error response
+        const status = error.response.status;
+        const errorData = error.response.data;
+        const errorMessage = errorData?.message || errorData?.error || `Chart rendering failed (HTTP ${status})`;
+        const errorDetails = errorData?.errors || errorData?.stack || null;
+        
+        console.error('❌ chartService.renderChartSVG: Backend error response', {
+          status,
+          message: errorMessage,
+          errors: errorDetails
+        });
+        
+        // Create enhanced error with details
+        const renderError = new Error(errorMessage);
+        renderError.status = status;
+        renderError.details = errorDetails;
+        renderError.type = 'backend_error';
+        
+        throw renderError;
+      }
+      
+      if (error.request) {
+        // Network error - no response received
+        console.error('❌ chartService.renderChartSVG: Network error - no response received');
+        const networkError = new Error('Network error: Unable to connect to rendering service');
+        networkError.type = 'network_error';
+        networkError.code = 'NETWORK_ERROR';
+        
+        throw networkError;
+      }
+      
+      // Other errors
+      console.error('❌ chartService.renderChartSVG: Unexpected error', error.message);
+      const unexpectedError = new Error(error.message || 'Chart rendering service error');
+      unexpectedError.type = 'unexpected_error';
+      
+      throw unexpectedError;
     }
   }
 

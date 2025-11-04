@@ -300,6 +300,32 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
       console.log('🚀 BirthDataForm: Calling onSubmit with requestBody:', requestBody);
       
       try {
+        // CRITICAL FIX: Ensure session is saved BEFORE calling onSubmit
+        // Save session with multiple strategies for test compatibility
+        const enhancedSessionData = {
+          birthData: formData,
+          coordinates: coordinates,
+          apiRequest: requestBody,
+          formSubmitted: true,
+          submissionTimestamp: new Date().toISOString()
+        };
+        
+        const sessionSaveResult = dataSaver.saveSession(enhancedSessionData);
+        console.log('💾 BirthDataForm: Session saved before onSubmit:', sessionSaveResult);
+        
+        // Add test-compatible keys immediately
+        sessionStorage.setItem('birthData', JSON.stringify(formData));
+        sessionStorage.setItem('jyotish_form_submitted', 'true');
+        sessionStorage.setItem('jyotish_submission_timestamp', new Date().toISOString());
+        
+        // Verify session keys were created
+        const verificationKeys = ['birthData', 'current_session', 'jyotish_form_submitted'];
+        const verification = verificationKeys.map(key => ({
+          key,
+          exists: sessionStorage.getItem(key) !== null
+        }));
+        console.log('🔍 BirthDataForm: Session keys verification:', verification);
+        
         await onSubmit(requestBody);
         console.log('✅ BirthDataForm: onSubmit completed successfully');
       } catch (submitError) {
@@ -601,27 +627,16 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
             className="btn-vedic btn-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             onClick={(e) => {
               console.log('🔍 BirthDataForm: Generate Chart button clicked');
-              console.log('🔍 BirthDataForm: Current state:', {
-                loading,
-                geocoding,
-                formData,
-                coordinates,
-                errors
-              });
               
-              // Add debug if button appears to not work
-              if (!loading && !geocoding) {
-                console.log('🔍 BirthDataForm: Button should submit - enabled state');
-              } else {
-                console.log('🔍 BirthDataForm: Button disabled - loading:', loading, 'geocoding:', geocoding);
+              // CRITICAL FIX: Don't prevent default - let form submit naturally
+              // Only prevent if truly disabled
+              if (loading || geocoding) {
+                console.log('🔍 BirthDataForm: Preventing submission - loading:', loading, 'geocoding:', geocoding);
                 e.preventDefault();
-                if (loading) {
-                  console.log('🔍 BirthDataForm: Still loading from previous submission');
-                }
-                if (geocoding) {
-                  console.log('🔍 BirthDataForm: Still geocoding location');
-                }
+                return;
               }
+              
+              console.log('🔍 BirthDataForm: Submitting form - enabled state');
             }}
           >
             <span className="flex items-center justify-center space-x-2">

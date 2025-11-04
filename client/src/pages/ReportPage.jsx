@@ -16,7 +16,7 @@ const ReportPage = () => {
     const fetchReportData = async () => {
       try {
         // First try to get comprehensive analysis from session storage
-        const comprehensiveAnalysisStr = sessionStorage.getItem('comprehensiveAnalysis');
+        const comprehensiveAnalysisStr = sessionStorage.getItem('comprehensive_analysis_data');
         if (comprehensiveAnalysisStr) {
           const data = JSON.parse(comprehensiveAnalysisStr);
           setReportData(data);
@@ -24,34 +24,68 @@ const ReportPage = () => {
           return;
         }
 
-        // If not in session storage, get birth data and fetch from API
-        const birthDataStr = sessionStorage.getItem('birthData');
-        if (!birthDataStr) {
-          navigate('/');
-          return;
+        // If not in session storage, get birth data from UIDataSaver
+        const dataSaver = await import('../components/forms/UIDataSaver.js');
+        const birthData = dataSaver.default.getBirthData();
+        
+        if (!birthData) {
+          // Try fallback session keys
+          const birthDataStr = sessionStorage.getItem('birth_data_session') || sessionStorage.getItem('birthData');
+          if (!birthDataStr) {
+            setError('No birth data found. Please generate your birth chart first.');
+            setLoading(false);
+            return;
+          }
+          const birthDataParsed = JSON.parse(birthDataStr);
+          
+          // Call comprehensive analysis API with correct v1 endpoint
+          const response = await fetch('/api/v1/analysis/comprehensive', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({birthData: birthDataParsed}),
+          });
+
+          if (!response.ok) {
+            if (response.status === 500) {
+              throw new Error('Server error during report generation. Please try again.');
+            }
+            const errorData = await response.json();
+            throw new Error(errorData.error?.message || `HTTP error! status: ${response.status}`);
+          }
+
+          const data = await response.json();
+
+          // Store for future use
+          sessionStorage.setItem('comprehensive_analysis_data', JSON.stringify(data));
+
+          setReportData(data);
+        } else {
+          // Call comprehensive analysis API with correct v1 endpoint
+          const response = await fetch('/api/v1/analysis/comprehensive', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({birthData: birthData}),
+          });
+
+          if (!response.ok) {
+            if (response.status === 500) {
+              throw new Error('Server error during report generation. Please try again.');
+            }
+            const errorData = await response.json();
+            throw new Error(errorData.error?.message || `HTTP error! status: ${response.status}`);
+          }
+
+          const data = await response.json();
+
+          // Store for future use
+          sessionStorage.setItem('comprehensive_analysis_data', JSON.stringify(data));
+
+          setReportData(data);
         }
-
-        const birthData = JSON.parse(birthDataStr);
-
-        // Call comprehensive analysis API with correct v1 endpoint
-        const response = await fetch('/api/v1/analysis/comprehensive', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(birthData),
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-
-        // Store for future use
-        sessionStorage.setItem('comprehensiveAnalysis', JSON.stringify(data));
-
-        setReportData(data);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching report data:', error);

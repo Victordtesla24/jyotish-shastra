@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { VedicLoadingSpinner } from '../components/ui';
+import VedicLoadingSpinner from '../components/ui';
 import VedicChartDisplay from '../components/charts/VedicChartDisplay.jsx';
 import { useChart } from '../contexts/ChartContext.js';
 import UIDataSaver from '../components/forms/UIDataSaver.js';
@@ -24,68 +24,6 @@ class ChartPageErrorBoundary extends React.Component {
       errorInfo: errorInfo
     });
   }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div className="min-h-screen bg-gradient-vedic-primary relative overflow-hidden flex items-center justify-center p-4">
-          {/* Cosmic Background Elements */}
-          <div className="absolute inset-0 pattern-mandala opacity-10"></div>
-          <div className="absolute top-20 left-10 symbol-om text-6xl animate-om-rotation opacity-20"></div>
-          <div className="absolute bottom-20 right-12 text-3xl opacity-20 animate-float">✦</div>
-
-          <div className="card-cosmic backdrop-vedic border-2 border-white/20 shadow-mandala p-8 rounded-3xl max-w-md w-full text-center relative z-10">
-            <div className="text-red-400 text-6xl mb-6 animate-sacred-pulse">📊⚠️</div>
-            <h2 className="text-2xl font-cinzel font-bold text-gradient-vedic mb-4">Chart Display Error</h2>
-            <p className="text-white/80 mb-6 font-devanagari">
-              An unexpected cosmic disturbance occurred while rendering the birth chart.
-            </p>
-            <details className="text-left text-xs text-white/60 mb-6 bg-white/10 rounded-lg p-3">
-              <summary className="cursor-pointer font-medium text-white/80">Technical Details</summary>
-              <pre className="mt-2 whitespace-pre-wrap break-words">
-                {this.state.error && this.state.error.toString()}
-              </pre>
-            </details>
-            <div className="space-y-3">
-              <button
-                onClick={() => {
-                  // Clear chart data to resolve potential data corruption
-                  try {
-                    const chartKeys = Object.keys(sessionStorage).filter(key =>
-                      key.includes('chart') || key.includes('vedic') || key.includes('birth')
-                    );
-                    chartKeys.forEach(key => sessionStorage.removeItem(key));
-                    localStorage.removeItem('vedicChartData');
-                    console.log('✅ Chart data cleared');
-                  } catch (e) {
-                    console.warn('Failed to clear chart data:', e);
-                  }
-                  window.location.reload();
-                }}
-                className="btn-primary w-full"
-              >
-                <span className="flex items-center justify-center space-x-2">
-                  <span>🔄</span>
-                  <span>Clear Chart Data & Reload</span>
-                </span>
-              </button>
-              <button
-                onClick={() => window.location.href = '/'}
-                className="btn-secondary w-full"
-              >
-                <span className="flex items-center justify-center space-x-2">
-                  <span>🏠</span>
-                  <span>Generate New Chart</span>
-                </span>
-              </button>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    return this.props.children;
-  }
 }
 
 const ChartPage = () => {
@@ -103,6 +41,22 @@ const ChartPage = () => {
     const apiResponse = currentChart.chartData;
     console.log('🔍 ChartPage: Full currentChart data:', currentChart);
     console.log('🔍 ChartPage: API Response:', apiResponse);
+
+    // Production-grade: Verify minimal session requirements
+    const sessionKeys = Object.keys(sessionStorage);
+    const hasGenerated = sessionKeys.includes('jyotish_chart_generated');
+    
+    console.log('🔍 ChartPage: Session verification:', {
+      hasGenerated,
+      hasCurrentChart: !!currentChart
+    });
+
+    // Check navigation requirements - if no currentChart, redirect
+    if (!currentChart || !currentChart.chartData) {
+      console.warn('⚠️ ChartPage: No chart data available, redirecting to home');
+      navigate('/');
+      return;
+    }
 
     // Enhanced response extraction with comprehensive fallback checks
     if (apiResponse && apiResponse.success) {
@@ -290,6 +244,7 @@ const ChartPage = () => {
                       chartId: chartData?.chartId
                     };
                     sessionStorage.setItem('birthDataForBTR', JSON.stringify(birthDataForBTR));
+                    console.log('💾 ChartPage: Saved birth data for BTR:', birthDataForBTR);
                     navigate('/birth-time-rectification');
                   } catch (error) {
                     console.error('Failed to save data for BTR:', error);
@@ -335,6 +290,8 @@ const ChartPage = () => {
                   chartData={chartData?.rasiChart || chartData}
                   chartType="rasi"
                   showDetails={true}
+                  useBackendRendering={true}
+                  birthData={chartData?.birthData || null}
                 />
               </div>
             </div>
@@ -359,6 +316,8 @@ const ChartPage = () => {
                     chartData={chartData.navamsaChart}
                     chartType="navamsa"
                     showDetails={true}
+                    useBackendRendering={true}
+                    birthData={chartData?.birthData || null}
                   />
                 </div>
               </div>

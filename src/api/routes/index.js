@@ -108,6 +108,8 @@ router.get('/', (req, res) => {
         generateComprehensive: 'POST /v1/chart/generate/comprehensive',
         get: 'GET /v1/chart/:id',
         navamsa: 'GET /v1/chart/:id/navamsa',
+        render: 'POST /v1/chart/render',
+        renderSVG: 'POST /v1/chart/render/svg',
         analysis: {
           lagna: 'POST /v1/chart/analysis/lagna',
           house: 'POST /v1/chart/analysis/house/:houseNumber',

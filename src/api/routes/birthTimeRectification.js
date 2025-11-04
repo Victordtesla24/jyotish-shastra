@@ -37,22 +37,42 @@ const normalizeCoordinates = (req, res, next) => {
       const longitude = birthData.longitude || birthData.placeOfBirth?.longitude;
       const timezone = birthData.timezone || birthData.placeOfBirth?.timezone || 'UTC';
       
-      // Create normalized, consistent structure for validation
-      req.body.birthData = {
-        ...birthData,
-        latitude,
-        longitude,
-        timezone: timezone
-      };
-      
-      // Preserve placeOfBirth as string only to avoid validation confusion
-      if (birthData.placeOfBirth && typeof birthData.placeOfBirth === 'object') {
-        // If we have a nested object, preserve only the name as string
-        req.body.birthData.placeOfBirth = birthData.placeOfBirth.name || birthData.placeOfBirth;
+      // CRITICAL FIX: Validate coordinates as numbers
+      if (latitude && longitude && 
+          typeof latitude === 'number' && typeof longitude === 'number' &&
+          !isNaN(latitude) && !isNaN(longitude)) {
+        
+        // Create normalized, consistent structure for validation
+        req.body.birthData = {
+          ...birthData,
+          latitude,
+          longitude,
+          timezone: timezone
+        };
+        
+        // Preserve placeOfBirth as string only to avoid validation confusion
+        if (birthData.placeOfBirth && typeof birthData.placeOfBirth === 'object') {
+          // If we have a nested object, preserve only the name as string
+          req.body.birthData.placeOfBirth = birthData.placeOfBirth.name || birthData.placeOfBirth;
+        }
+        
+        console.log('✅ Coordinate Normalization: Successfully normalized coords:', {
+          latitude,
+          longitude,
+          timezone,
+          endpoint: req.path
+        });
+      } else {
+        console.warn('⚠️ Coordinate Normalization: Invalid or missing coordinates:', {
+          latitude,
+          longitude,
+          timezone,
+          endpoint: req.path,
+          hasLat: typeof latitude === 'number' && !isNaN(latitude),
+          hasLng: typeof longitude === 'number' && !isNaN(longitude)
+        });
+        // Continue with original data - validation will catch this
       }
-      
-      // Normalize coordinates for BTR analysis
-      // Birth data coordinates validated above
     }
     next();
   } catch (error) {
@@ -142,8 +162,23 @@ router.post('/analyze', normalizeCoordinates, validation(rectificationAnalyzeReq
  */
 router.post('/with-events', normalizeCoordinates, validation(rectificationWithEventsRequestSchema), async (req, res) => {
     try {
-        // Use validated body from middleware
-        const { birthData, lifeEvents, options } = req.validatedBody || req.body || {};
+        // CRITICAL FIX: Better error handling and validation
+        console.log('🔄 BTR with-events endpoint called');
+        
+        // Use validated body from middleware with fallback
+        const requestBody = req.validatedBody || req.body || {};
+        const { birthData, lifeEvents, options } = requestBody;
+
+        // Validate required request structure
+        if (!birthData || typeof birthData !== 'object') {
+            return res.status(400).json({
+                success: false,
+                error: 'Validation failed',
+                message: 'Birth data is required',
+                details: [{ field: 'birthData', message: 'Birth data object is required' }],
+                timestamp: new Date().toISOString()
+            });
+        }
 
         // CRITICAL FIX: Extract and flatten coordinates BEFORE validation 
         const latitude = birthData.latitude || birthData.placeOfBirth?.latitude;
@@ -168,7 +203,17 @@ router.post('/with-events', normalizeCoordinates, validation(rectificationWithEv
                 error: 'Validation failed',
                 message: 'Latitude and longitude are required. Please provide birth location coordinates.',
                 details: [{ field: 'location', message: 'Birth location coordinates are required for rectification' }],
-                errors: [{ field: 'location', message: 'Birth location coordinates are required for rectification' }],
+                timestamp: new Date().toISOString()
+            });
+        }
+
+        // Validate life events if provided
+        if (lifeEvents && (!Array.isArray(lifeEvents) || lifeEvents.length === 0)) {
+            return res.status(400).json({
+                success: false,
+                error: 'Validation failed',
+                message: 'At least one life event is required for event correlation analysis',
+                details: [{ field: 'lifeEvents', message: 'Life events array is required and must not be empty' }],
                 timestamp: new Date().toISOString()
             });
         }
@@ -250,7 +295,9 @@ router.post('/quick', normalizeCoordinates, validation(rectificationQuickRequest
             timeOfBirth: proposedTime
         };
         
-        const chart = await btrService.chartService.generateRasiChart(candidateData);
+        const chartService = await btrService.chartServiceInstance.getInstance();
+        const chartData = await chartService.generateComprehensiveChart(candidateData);
+        const chart = chartData.rasiChart;
         if (!chart) {
             throw new Error('Chart generation failed for proposed time');
         }

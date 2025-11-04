@@ -4,7 +4,7 @@
  * Following the mathematical approach using Praanapada, Moon, and Gulika methods
  */
 
-import ChartGenerationService from '../chart/ChartGenerationService.js';
+import { ChartGenerationServiceSingleton, ChartGenerationService } from '../chart/ChartGenerationService.js';
 import DetailedDashaAnalysisService from './DetailedDashaAnalysisService.js';
  import ConditionalDashaService from './dasha/ConditionalDashaService.js';
 import BPHSEventClassifier from './eventClassification/BPHSEventClassifier.js';
@@ -17,7 +17,8 @@ import { computeGulikaLongitude } from '../../core/calculations/rectification/gu
 
 class BirthTimeRectificationService {
   constructor() {
-    this.chartService = new ChartGenerationService();
+    // Initialize singleton and store reference
+    this.chartServiceInstance = ChartGenerationServiceSingleton;
     this.dashaService = new DetailedDashaAnalysisService();
     
     // NEW: Initialize enhanced BPHS modules
@@ -80,7 +81,8 @@ class BirthTimeRectificationService {
         longitude: birthData.longitude || birthData.placeOfBirth?.longitude,
         timezone: birthData.timezone || birthData.placeOfBirth?.timezone
       };
-      const rasiChart = await this.chartService.generateRasiChart(flatBirthData);
+      const chartService = await this.chartServiceInstance.getInstance();
+      const rasiChart = await chartService.generateComprehensiveChart(flatBirthData);
       if (!rasiChart) {
         throw new Error('Unable to generate base Rasi chart for Hora analysis');
       }
@@ -227,7 +229,10 @@ class BirthTimeRectificationService {
         longitude: birthData.longitude || birthData.placeOfBirth?.longitude,
         timezone: birthData.timezone || birthData.placeOfBirth?.timezone
       };
-      const chart = await this.chartService.generateRasiChart(flatBirthData);
+      // Initialize singleton if needed and get chart data
+      const chartService = await this.chartServiceInstance.getInstance();
+      const chartData = await chartService.generateComprehensiveChart(flatBirthData);
+      const chart = chartData.rasiChart;
       if (!chart) {
         throw new Error('Unable to generate chart for conditional dasha analysis');
       }
@@ -514,29 +519,42 @@ class BirthTimeRectificationService {
    */
   validateBirthData(birthData, analysis) {
     // Handle both nested and flat data structures
-    const dateOfBirth = birthData.dateOfBirth || (birthData.placeOfBirth ? null : birthData.dateOfBirth);
+    const dateOfBirth = birthData.dateOfBirth;
     const placeOfBirth = birthData.placeOfBirth || birthData.placeOfBirth?.name || '';
-    const timeOfBirth = birthData.timeOfBirth || (birthData.placeOfBirth ? null : birthData.timeOfBirth);
+    const timeOfBirth = birthData.timeOfBirth;
     
     // Support both nested coordinates and top-level coordinates
     const latitude = birthData.latitude || birthData.placeOfBirth?.latitude;
     const longitude = birthData.longitude || birthData.placeOfBirth?.longitude;
-    const timezone = birthData.timezone || birthData.placeOfBirth?.timezone;
+    const timezone = birthData.timezone || birthData.placeOfBirth?.timezone || 'UTC';
 
     if (!dateOfBirth) {
       throw new Error('Date of birth is required for birth time rectification');
+    }
+    
+    if (!timeOfBirth) {
+      throw new Error('Time of birth is required for birth time rectification');
     }
     
     if (!placeOfBirth) {
       throw new Error('Place of birth is required for birth time rectification');
     }
 
-    if (!latitude || !longitude) {
-      analysis && analysis.analysisLog && analysis.analysisLog.push('Coordinates missing - will use geocoded data');
+    // CRITICAL FIX: Better coordinate validation
+    if (!latitude || !longitude || typeof latitude !== 'number' || typeof longitude !== 'number' || 
+        isNaN(latitude) || isNaN(longitude)) {
+      throw new Error('Valid latitude and longitude coordinates are required for birth time rectification. Please ensure coordinates are provided as numbers.');
     }
 
-    // Log validation
-    analysis && analysis.analysisLog && analysis.analysisLog.push(`Birth data validation: ${dateOfBirth}, ${placeOfBirth}`);
+    // Validate timezone
+    if (!timezone || typeof timezone !== 'string') {
+      throw new Error('Valid timezone is required for birth time rectification');
+    }
+
+    // Log validation with details
+    analysis && analysis.analysisLog && analysis.analysisLog.push(
+      `Birth data validation passed: date=${dateOfBirth}, place=${placeOfBirth}, coords=(${latitude}, ${longitude}), tz=${timezone}`
+    );
   }
 
   /**
@@ -599,7 +617,9 @@ class BirthTimeRectificationService {
           longitude: birthData.longitude || birthData.placeOfBirth?.longitude,
           timezone: birthData.timezone || birthData.placeOfBirth?.timezone
         };
-        const chart = await this.chartService.generateRasiChart(candidateData);
+        const chartService = await this.chartServiceInstance.getInstance();
+        const chartData = await chartService.generateComprehensiveChart(candidateData);
+        const chart = chartData.rasiChart;
 
         if (!chart) {
           analysis.analysisLog.push(`Failed to generate chart for ${candidate.time}`);
@@ -660,7 +680,9 @@ class BirthTimeRectificationService {
           longitude: birthData.longitude || birthData.placeOfBirth?.longitude,
           timezone: birthData.timezone || birthData.placeOfBirth?.timezone
         };
-        const chart = await this.chartService.generateRasiChart(candidateData);
+        const chartService = await this.chartServiceInstance.getInstance();
+        const chartData = await chartService.generateComprehensiveChart(candidateData);
+        const chart = chartData.rasiChart;
 
         if (!chart) continue;
 
@@ -726,7 +748,9 @@ class BirthTimeRectificationService {
           longitude: birthData.longitude || birthData.placeOfBirth?.longitude,
           timezone: birthData.timezone || birthData.placeOfBirth?.timezone
         };
-        const chart = await this.chartService.generateRasiChart(candidateData);
+        const chartService = await this.chartServiceInstance.getInstance();
+        const chartData = await chartService.generateComprehensiveChart(candidateData);
+        const chart = chartData.rasiChart;
 
         if (!chart) continue;
 
@@ -813,7 +837,9 @@ class BirthTimeRectificationService {
         };
         
         // Generate charts and dasha analysis
-        const chart = await this.chartService.generateRasiChart(candidateData);
+        const chartService = await this.chartServiceInstance.getInstance();
+        const chartData = await chartService.generateComprehensiveChart(candidateData);
+        const chart = chartData.rasiChart;
         if (!chart) continue;
 
         const dashaAnalysis = this.dashaService.analyzeAllDashas(chart);

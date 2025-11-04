@@ -28,9 +28,10 @@ This document provides comprehensive validation requirements for all API endpoin
 | Endpoint | Test Method | Response | Status |
 |----------|-------------|----------|--------|
 | **Chart Generation** | `POST /v1/chart/generate` | `{"success":true}` | ✅ **FUNCTIONAL** |
+| **Chart Rendering** | `POST /v1/chart/render/svg` | `{"success":true,"data":{"svg":"..."}}` | ✅ **FUNCTIONAL** |
 | **Comprehensive Analysis** | `POST /v1/analysis/comprehensive` | `{"success":true}` | ✅ **FUNCTIONAL** |
 | **Health Check** | `GET /health` | `{"status":"healthy"}` | ✅ **FUNCTIONAL** |
-| **Total Available** | **Multiple Tests** | **38+ endpoints** | ✅ **EXTENSIVE** |
+| **Total Available** | **Multiple Tests** | **40+ endpoints** | ✅ **EXTENSIVE** |
 
 ## 🔄 **IMPORTANT: Recent Validation Standardization (2024)**
 
@@ -124,6 +125,69 @@ You can provide location information in any of these formats:
   "timezone": "Asia/Kolkata"
 }
 ```
+
+#### POST /v1/chart/render/svg
+**Purpose**: Render birth chart as SVG using production-grade backend rendering service ✅ **NEW**
+**Validation Schema**: `chartGenerationSchema` (same as chart generation)
+**Backend Service**: ChartRenderingService.js ✅ **PRODUCTION-READY**
+
+**Required Fields**:
+- `dateOfBirth`
+- `timeOfBirth`
+- Location (coordinates or place)
+
+**Optional Fields**:
+- `name` ✅ **OPTIONAL** (standardized)
+- `width` (default: 800) - Chart width in pixels
+- `includeData` (default: false) - Include chart data and render data in response
+
+**Example Request**:
+```json
+{
+  "name": "Test User",
+  "dateOfBirth": "1997-12-18",
+  "timeOfBirth": "02:30",
+  "latitude": 32.4935378,
+  "longitude": 74.5411575,
+  "timezone": "Asia/Karachi",
+  "width": 800,
+  "includeData": false
+}
+```
+
+**Example Response**:
+```json
+{
+  "success": true,
+  "data": {
+    "svg": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><svg width=\"800\" height=\"800\"...",
+    "chartData": { /* Optional if includeData=true */ },
+    "renderData": { /* Optional if includeData=true */ }
+  },
+  "metadata": {
+    "width": 800,
+    "renderedAt": "2025-01-15T12:00:00.000Z",
+    "service": "ChartRenderingService",
+    "warnings": []
+  }
+}
+```
+
+**Backend Rendering Features** ✅ **PRODUCTION-GRADE**:
+- **18+ Data Set Extraction**: Extracts all data sets including nested structures
+- **Data Joining Strategy**: Joins data sets according to house and planetary mapping
+- **Template Matching**: Uses `vedic_chart_xy_spec.json` for accurate positioning
+- **Temporal Storage**: Saves extracted and joined data sets to `temp-data/`
+- **House Number Extraction**: Extracts house numbers from `birthDataAnalysis.analyses.planetaryPositions.planetaryPositions`
+
+**Rendering Output Specifications**:
+- **Template Compliance**: SVG chart matching `@kundli-template.png` template requirements
+- **Background Color**: #FFF8E1 (light yellow) - traditional Vedic styling
+- **Line Specifications**: Stroke width 2.0 * scale for all lines
+- **Structure**: 24-slot structure (2 slots per house: rasi slot + planet slot)
+- **House Placement**: Anti-clockwise house placement from ascendant (House 1→2→3→4→5→6→7→8→9→10→11→12)
+- **Planet Codes**: Standard abbreviations (Su, Mo, Ma, Me, Ju, Ve, Sa, Ra, Ke) with degree display
+- **Dignity Symbols**: Exalted ↑ and Debilitated ↓ markers displayed with planets
 
 ### Analysis Endpoints
 

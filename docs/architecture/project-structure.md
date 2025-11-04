@@ -116,8 +116,10 @@ jyotish-shastra/
   - `FeatureFlags.js`: Feature flag management for BTR methods
 - **analysis/dasha/**: Dasha-related services
   - `ConditionalDashaService.js`: Conditional dasha verification for BTR ✅ **NEW**
-- **chart/**: Chart-related business logic
-  - `ChartGenerationService.js`: Core chart generation service
+- **chart/**: Chart-related business logic ✅ **SINGLETON PATTERN IMPLEMENTED**
+  - `ChartGenerationService.js`: Core chart generation service with singleton pattern
+  - `ChartGenerationServiceSingleton.js`: Performance-optimized singleton instance
+  - `ChartRenderingService.js`: ✅ **NEW** Production-grade backend SVG rendering
   - `EnhancedChartService.js`: Enhanced chart with geocoding
 - **geocoding/**: Location services
   - `GeocodingService.js`: Location coordinate resolution

@@ -34,7 +34,7 @@ const ResponseDataToUIDisplayAnalyser = {
       throw error;
     }
 
-    // Handle multiple response formats with enhanced fallback logic
+    // Handle multiple response formats with format detection logic
     let analysis;
     if (apiResponse.analysis) {
       analysis = apiResponse.analysis; // Standard: {success: true, analysis: {sections: {}}}
@@ -95,7 +95,6 @@ const ResponseDataToUIDisplayAnalyser = {
     }
 
     const { analysis } = apiResponse;
-    console.log('Processing houses analysis data:', Object.keys(analysis.houses || {}));
 
     return {
       success: apiResponse.success,
@@ -120,7 +119,6 @@ const ResponseDataToUIDisplayAnalyser = {
     }
 
     const { analysis } = apiResponse;
-    console.log('Processing dasha analysis data:', Object.keys(analysis.dashaAnalysis || {}));
 
     return {
       success: apiResponse.success,
@@ -147,7 +145,6 @@ const ResponseDataToUIDisplayAnalyser = {
     }
 
     const { analysis } = apiResponse;
-    console.log('Processing navamsa analysis data:', Object.keys(analysis.navamsaAnalysis || {}));
 
     return {
       success: apiResponse.success,
@@ -172,7 +169,6 @@ const ResponseDataToUIDisplayAnalyser = {
     }
 
     const { analysis } = apiResponse;
-    console.log('Processing aspects analysis data:', Object.keys(analysis.aspects || {}));
 
     // Handle empty aspects (common case)
     const aspects = analysis.aspects || {};
@@ -214,7 +210,6 @@ const ResponseDataToUIDisplayAnalyser = {
     }
 
     const { analysis } = apiResponse;
-    console.log('Processing arudha analysis data:', Object.keys(analysis.arudhaAnalysis || {}));
 
     // Handle empty arudha analysis (common case)
     const arudhaAnalysis = analysis.arudhaAnalysis || {};
@@ -257,7 +252,6 @@ const ResponseDataToUIDisplayAnalyser = {
     }
 
     const { analysis } = apiResponse;
-    console.log('Processing lagna analysis data:', Object.keys(analysis));
 
     return {
       success: apiResponse.success,
@@ -281,7 +275,6 @@ const ResponseDataToUIDisplayAnalyser = {
     }
 
     const { analysis } = apiResponse;
-    console.log('Processing preliminary analysis data:', Object.keys(analysis));
 
     return {
       success: apiResponse.success,
@@ -320,7 +313,6 @@ const ResponseDataToUIDisplayAnalyser = {
       throw new Error(`Invalid ${analysisType} analysis API response structure. Expected apiResponse.analysis or apiResponse with success status.`);
     }
 
-    console.log(`Processing ${analysisType} analysis data:`, apiResponse);
 
     return {
       success: apiResponse.success || true,
@@ -335,14 +327,12 @@ const ResponseDataToUIDisplayAnalyser = {
    * @returns {Promise<Object>} Comprehensive analysis data ready for UI
    */
   loadFromComprehensiveAnalysis: async () => {
-    console.log('🔄 [ResponseDataToUIDisplayAnalyser] Loading comprehensive analysis data...');
 
     try {
       // First try to get cached data from UIDataSaver
       const cachedData = UIDataSaver.getComprehensiveAnalysis();
 
       if (cachedData && (cachedData.sections || cachedData.analysis?.sections || cachedData.comprehensiveAnalysis?.analysis?.sections)) {
-        console.log('✅ [ResponseDataToUIDisplayAnalyser] Using cached comprehensive analysis');
 
         // Extract individual analysis types from the comprehensive data
         const loadedData = {};
@@ -353,7 +343,6 @@ const ResponseDataToUIDisplayAnalyser = {
                         cachedData.comprehensiveAnalysis?.analysis?.sections;
 
         if (sections) {
-          console.log('✅ [ResponseDataToUIDisplayAnalyser] Extracting individual analysis types from sections');
 
           // SECTION 1: Birth Data Collection and Chart Casting
           if (sections.section1) {
@@ -361,7 +350,6 @@ const ResponseDataToUIDisplayAnalyser = {
               analysis: sections.section1,
               success: true
             };
-            console.log('✅ [ResponseDataToUIDisplayAnalyser] Extracted preliminary data from section1');
           }
 
           // SECTION 2: Preliminary Chart Analysis: Lagna, Luminaries, and Overall Patterns - FIXED
@@ -385,7 +373,6 @@ const ResponseDataToUIDisplayAnalyser = {
               success: true
             };
             loadedData.lagna = formattedLagnaData;
-            console.log('✅ [ResponseDataToUIDisplayAnalyser] Extracted lagna data from section2');
           } else if (sections.section2) {
             // PRODUCTION: Extract lagna data from section2 if structured correctly
             const rawLagnaData = sections.section2.analyses?.lagna || sections.section2.lagna;
@@ -408,7 +395,6 @@ const ResponseDataToUIDisplayAnalyser = {
               success: true
             };
             loadedData.lagna = formattedLagnaData;
-            console.log('✅ [ResponseDataToUIDisplayAnalyser] Extracted lagna data from section2');
           } else {
             throw new Error('Lagna analysis data not found. Required in sections.section2.analyses.lagna or sections.section1');
           }
@@ -419,7 +405,6 @@ const ResponseDataToUIDisplayAnalyser = {
               analysis: sections.section3.houses,
               success: true
             };
-            console.log('✅ [ResponseDataToUIDisplayAnalyser] Extracted houses data from section3');
           }
 
           // SECTION 4: Planetary Aspects and Interrelationships
@@ -436,7 +421,6 @@ const ResponseDataToUIDisplayAnalyser = {
               },
               success: true
             };
-            console.log('✅ [ResponseDataToUIDisplayAnalyser] Extracted aspects data from section4');
           }
 
           // SECTION 5: Arudha Lagna Analysis (Perception & Public Image)
@@ -455,7 +439,6 @@ const ResponseDataToUIDisplayAnalyser = {
               },
               success: true
             };
-            console.log('✅ [ResponseDataToUIDisplayAnalyser] Extracted arudha data from section5');
           }
 
           // SECTION 6: Navamsa Chart Analysis (D9) - Soul and Marriage
@@ -475,7 +458,6 @@ const ResponseDataToUIDisplayAnalyser = {
               },
               success: true
             };
-            console.log('✅ [ResponseDataToUIDisplayAnalyser] Extracted navamsa data from section6');
           }
 
           // SECTION 7: Dasha Analysis: Timeline of Life Events
@@ -494,7 +476,6 @@ const ResponseDataToUIDisplayAnalyser = {
               },
               success: true
             };
-            console.log('✅ [ResponseDataToUIDisplayAnalyser] Extracted dasha data from section7');
           }
 
           // SECTION 8: Synthesis: From Analysis to Comprehensive Report
@@ -513,7 +494,6 @@ const ResponseDataToUIDisplayAnalyser = {
               },
               success: true
             };
-            console.log('✅ [ResponseDataToUIDisplayAnalyser] Extracted comprehensive data from section8');
           }
         }
 
@@ -540,7 +520,6 @@ const ResponseDataToUIDisplayAnalyser = {
         throw error;
       }
 
-      console.log('🔄 [ResponseDataToUIDisplayAnalyser] No cached data found, fetching from API...');
 
       // Fetch comprehensive analysis from API
       // Use apiConfig utility to get full API URL
@@ -558,7 +537,6 @@ const ResponseDataToUIDisplayAnalyser = {
       }
 
       const apiData = await response.json();
-      console.log('✅ [ResponseDataToUIDisplayAnalyser] Comprehensive analysis API response received');
 
       // Save to UIDataSaver for future use
       UIDataSaver.saveComprehensiveAnalysis(apiData);
@@ -570,7 +548,6 @@ const ResponseDataToUIDisplayAnalyser = {
       const sections = apiData.sections || apiData.analysis?.sections;
 
       if (sections) {
-        console.log('🔍 [ResponseDataToUIDisplayAnalyser] Extracting individual analysis types from API response');
 
         // SECTION 1: Birth Data Collection and Chart Casting
         if (sections.section1) {
@@ -578,7 +555,6 @@ const ResponseDataToUIDisplayAnalyser = {
             analysis: sections.section1,
             success: true
           };
-          console.log('✅ [ResponseDataToUIDisplayAnalyser] Extracted preliminary data from API section1');
         }
 
         // SECTION 2: Preliminary Chart Analysis: Lagna, Luminaries, and Overall Patterns - FIXED
@@ -602,7 +578,6 @@ const ResponseDataToUIDisplayAnalyser = {
             success: true
           };
           loadedData.lagna = formattedLagnaData;
-          console.log('✅ [ResponseDataToUIDisplayAnalyser] Extracted lagna data from API section2');
         } else if (sections.section2) {
           // Extract lagna data from section2 structure
           loadedData.lagna = {
@@ -613,7 +588,6 @@ const ResponseDataToUIDisplayAnalyser = {
             },
             success: true
           };
-          console.log('✅ [ResponseDataToUIDisplayAnalyser] Extracted lagna data from section2');
         }
 
         // SECTION 3: House-by-House Examination (1st-12th Bhavas)
@@ -622,7 +596,6 @@ const ResponseDataToUIDisplayAnalyser = {
             analysis: sections.section3.houses,
             success: true
           };
-          console.log('✅ [ResponseDataToUIDisplayAnalyser] Extracted houses data from API section3');
         }
 
         // SECTION 4: Planetary Aspects and Interrelationships
@@ -639,7 +612,6 @@ const ResponseDataToUIDisplayAnalyser = {
             },
             success: true
           };
-          console.log('✅ [ResponseDataToUIDisplayAnalyser] Extracted aspects data from API section4');
         }
 
         // SECTION 5: Arudha Lagna Analysis (Perception & Public Image)
@@ -658,7 +630,6 @@ const ResponseDataToUIDisplayAnalyser = {
             },
             success: true
           };
-          console.log('✅ [ResponseDataToUIDisplayAnalyser] Extracted arudha data from API section5');
         }
 
         // SECTION 6: Navamsa Chart Analysis (D9) - Soul and Marriage
@@ -678,7 +649,6 @@ const ResponseDataToUIDisplayAnalyser = {
             },
             success: true
           };
-          console.log('✅ [ResponseDataToUIDisplayAnalyser] Extracted navamsa data from API section6');
         }
 
         // SECTION 7: Dasha Analysis: Timeline of Life Events
@@ -697,7 +667,6 @@ const ResponseDataToUIDisplayAnalyser = {
             },
             success: true
           };
-          console.log('✅ [ResponseDataToUIDisplayAnalyser] Extracted dasha data from API section7');
         }
 
         // SECTION 8: Synthesis: From Analysis to Comprehensive Report
@@ -716,7 +685,6 @@ const ResponseDataToUIDisplayAnalyser = {
             },
             success: true
           };
-          console.log('✅ [ResponseDataToUIDisplayAnalyser] Extracted comprehensive data from API section8');
         }
       }
 
@@ -731,10 +699,18 @@ const ResponseDataToUIDisplayAnalyser = {
       };
 
     } catch (error) {
-      console.error('❌ [ResponseDataToUIDisplayAnalyser] Error loading comprehensive analysis:', error);
+      const errorMessage = error?.message || error?.toString() || 'Unknown error loading comprehensive analysis';
+      const errorCode = error?.code || 'UNKNOWN_ERROR';
+      
+      // Only log non-expected errors (birth data required is expected)
+      if (errorCode !== 'BIRTH_DATA_REQUIRED') {
+        console.error('❌ [ResponseDataToUIDisplayAnalyser] Error loading comprehensive analysis:', errorMessage);
+      }
+      
       return {
         success: false,
-        error: error.message,
+        error: errorMessage,
+        errorCode: errorCode,
         data: {}
       };
     }
@@ -747,13 +723,11 @@ const ResponseDataToUIDisplayAnalyser = {
    * @returns {Promise<Object>} Individual analysis data ready for UI
    */
   fetchIndividualAnalysis: async (analysisType) => {
-    console.log(`🔄 [ResponseDataToUIDisplayAnalyser] Fetching individual ${analysisType} analysis...`);
 
     try {
       // First check if we already have cached data
       const cachedData = UIDataSaver.getIndividualAnalysis(analysisType);
       if (cachedData) {
-        console.log(`✅ [ResponseDataToUIDisplayAnalyser] Using cached ${analysisType} data`);
         const processedData = ResponseDataToUIDisplayAnalyser.processAnalysisData(cachedData, analysisType);
         return {
           success: true,
@@ -795,7 +769,6 @@ const ResponseDataToUIDisplayAnalyser = {
       }
 
       const apiData = await response.json();
-      console.log(`✅ [ResponseDataToUIDisplayAnalyser] ${analysisType} analysis API response received`);
 
       // Save to UIDataSaver
       UIDataSaver.saveIndividualAnalysis(analysisType, apiData);
@@ -810,7 +783,8 @@ const ResponseDataToUIDisplayAnalyser = {
       };
 
     } catch (error) {
-      console.error(`❌ [ResponseDataToUIDisplayAnalyser] Error fetching ${analysisType} analysis:`, error);
+      const errorMessage = error?.message || error?.toString() || `Unknown error fetching ${analysisType} analysis`;
+      console.error(`❌ [ResponseDataToUIDisplayAnalyser] Error fetching ${analysisType} analysis:`, errorMessage);
       return {
         success: false,
         error: error.message,
