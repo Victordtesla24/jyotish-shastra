@@ -2598,11 +2598,12 @@ const AnalysisPage = () => {
         setLoading(true);
         setError(null);
 
-        // CRITICAL: Check for birth data before any analysis calls
-        const stored = UIDataSaver.getBirthData();
-        if (!stored) {
+        const birthStamp = UIDataSaver.getBirthData();
+        if (!birthStamp || !birthStamp.data) {
+          const friendlyMessage = 'Please generate a chart first.';
+          sessionStorage.setItem('analysisRedirectMessage', friendlyMessage);
           const errorObj = {
-            message: 'Please generate a chart first.',
+            message: friendlyMessage,
             code: 'BIRTH_DATA_REQUIRED',
             action: 'navigate_chart',
             requiresNavigation: true
@@ -2610,7 +2611,7 @@ const AnalysisPage = () => {
           setError(errorObj);
           setTimeout(() => {
             navigate('/chart');
-          }, 2000);
+          }, 500);
           return;
         }
 
@@ -2762,14 +2763,15 @@ const AnalysisPage = () => {
       }
 
       // 2. Get birth data validation (following ComprehensiveAnalysisPage pattern)
-      const stored = UIDataSaver.getBirthData();
-      if (!stored || !stored.data) {
+      const birthStamp = UIDataSaver.getBirthData();
+      const birthData = birthStamp?.data || null;
+      if (!birthData) {
         console.error('❌ No birth data found, redirecting to chart');
+        sessionStorage.setItem('analysisRedirectMessage', 'Please generate a chart first.');
         navigate('/chart');
         return;
       }
 
-      const birthData = stored.data; // Extract .data property from stamped object
 
       // 3. Call individual analysis API
       const endpointUrl = analysisEndpoints[analysisType]?.url;

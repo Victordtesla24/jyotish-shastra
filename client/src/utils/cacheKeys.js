@@ -12,6 +12,7 @@ export const CACHE_KEYS = {
    * CRITICAL: This is the ONLY key that should be written to for birth data
    */
   BIRTH_DATA: 'birthData',
+<<<<<<< Current (Your changes)
   
   /**
    * Session container key (legacy, kept for backward compatibility)
@@ -32,6 +33,13 @@ export const CACHE_KEYS = {
    */
   LAST_CHART: 'lastChart',
 };
+=======
+  BIRTH_DATA_SESSION: 'birth_data_session',
+  LAST_CHART: 'lastChart'
+};
+
+export default CACHE_KEYS;
+>>>>>>> Incoming (Background Agent changes)
 
 /**
  * Get all legacy keys that should be checked for migration

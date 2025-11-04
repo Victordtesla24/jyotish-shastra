@@ -712,6 +712,12 @@ User Actions → UIDataSaver.saveSession() → localStorage/sessionStorage Stora
 }
 ```
 
+**Canonical Birth Data Cache**
+
+- `sessionStorage['birthData']` now stores a stamped object: `{ data: BirthData, meta: { savedAt: number, dataHash: string, version: 1 } }`.
+- Stamped entries are considered fresh for `15 minutes (CACHE_TTL_MS)`. Stale or corrupt payloads are automatically rejected and removed.
+- Legacy keys (`sessionStorage['birth_data_session']`, `sessionStorage['current_session'].birthData`) are upgraded on read, ensuring a single source of truth for analysis requests.
+
 #### Phase 3: Session Recovery
 ```
 Page Refresh/Return → UIDataSaver.loadSession() → State Restoration

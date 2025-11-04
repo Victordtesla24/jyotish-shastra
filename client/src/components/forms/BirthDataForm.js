@@ -314,7 +314,7 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
         console.log('💾 BirthDataForm: Session saved before onSubmit:', sessionSaveResult);
         
         // Add test-compatible keys immediately
-        sessionStorage.setItem('birthData', JSON.stringify(formData));
+        dataSaver.setBirthData(formData);
         sessionStorage.setItem('jyotish_form_submitted', 'true');
         sessionStorage.setItem('jyotish_submission_timestamp', new Date().toISOString());
         

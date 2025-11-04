@@ -770,7 +770,12 @@ const ResponseDataToUIDisplayAnalyser = {
       }
 
       // Get birth data for API call
+<<<<<<< Current (Your changes)
       const stored = UIDataSaver.getBirthData();
+=======
+      const birthStamp = UIDataSaver.getBirthData();
+      const birthData = birthStamp?.data || null;
+>>>>>>> Incoming (Background Agent changes)
 
       // PRODUCTION: Require birth data, no fallbacks
       if (!stored || !stored.data) {

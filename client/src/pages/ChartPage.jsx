@@ -4,6 +4,7 @@ import VedicLoadingSpinner from '../components/ui';
 import VedicChartDisplay from '../components/charts/VedicChartDisplay.jsx';
 import { useChart } from '../contexts/ChartContext.js';
 import UIDataSaver from '../components/forms/UIDataSaver.js';
+import NotificationToast from '../components/ui/NotificationToast.jsx';
 
 // Error Boundary Component for ChartPage
 class ChartPageErrorBoundary extends React.Component {
@@ -60,12 +61,33 @@ const ChartPage = () => {
   const navigate = useNavigate();
   const { currentChart, isLoading, error } = useChart();
   const [chartData, setChartData] = useState(null);
+  const [redirectToast, setRedirectToast] = useState(null);
+  const [showRedirectFallback, setShowRedirectFallback] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const message = sessionStorage.getItem('analysisRedirectMessage');
+    if (message) {
+      setRedirectToast(message);
+      sessionStorage.removeItem('analysisRedirectMessage');
+      if (!currentChart) {
+        setShowRedirectFallback(true);
+      }
+    }
+  }, [currentChart]);
 
   useEffect(() => {
     if (!currentChart) {
-      navigate('/');
+      if (!showRedirectFallback) {
+        navigate('/');
+      }
       return;
     }
+
+    setShowRedirectFallback(false);
 
     // Extract the actual chart data from the API response
     const apiResponse = currentChart.chartData;
@@ -130,6 +152,9 @@ const ChartPage = () => {
           originalResponse: apiResponse
         });
 
+        const resolvedChartId = chartData?.chartId || chartData?.data?.chartId || currentChart.id;
+        UIDataSaver.setLastChart(resolvedChartId, chartData?.birthData || chartData?.data?.birthData || null);
+
         console.log('💾 ChartPage: Chart data saved to UIDataSaver as backup');
 
         // Set chart data with validated structure
@@ -156,11 +181,45 @@ const ChartPage = () => {
       });
       throw new Error(errorMsg);
     }
-  }, [currentChart, navigate]);
+  }, [currentChart, navigate, showRedirectFallback]);
+
+  const toastNode = redirectToast ? (
+    <NotificationToast
+      type="info"
+      message={redirectToast}
+      onClose={() => setRedirectToast(null)}
+    />
+  ) : null;
+
+  if (!currentChart && showRedirectFallback) {
+    return (
+      <div className="min-h-screen bg-gradient-vedic-primary relative overflow-hidden flex items-center justify-center">
+        {toastNode}
+        <div className="absolute inset-0 pattern-mandala opacity-10" />
+        <div className="card-cosmic backdrop-vedic border-2 border-white/20 shadow-mandala p-10 rounded-3xl max-w-xl text-center relative z-10">
+          <div className="text-5xl mb-4">🔄</div>
+          <h2 className="text-3xl font-cinzel font-bold text-gradient-vedic mb-4">Fresh Chart Required</h2>
+          <p className="text-white/80 mb-6">
+            We could not find a recent chart in this browser session. Please regenerate your birth chart to explore the analysis features.
+          </p>
+          <button
+            onClick={() => navigate('/')}
+            className="btn-primary px-8 py-3 bg-gradient-to-r from-saffron to-gold text-white hover:shadow-celestial hover:-translate-y-1 transition-all duration-300 rounded-xl font-cinzel font-medium"
+          >
+            <span className="flex items-center justify-center space-x-2">
+              <span>🧭</span>
+              <span>Go to Birth Data Form</span>
+            </span>
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-vedic-primary relative overflow-hidden flex items-center justify-center">
+        {toastNode}
         {/* Cosmic Background Elements */}
         <div className="absolute inset-0 pattern-mandala opacity-10"></div>
         <div className="absolute top-20 left-10 symbol-om text-6xl animate-om-rotation opacity-20"></div>
@@ -176,6 +235,7 @@ const ChartPage = () => {
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-vedic-primary relative overflow-hidden flex items-center justify-center">
+        {toastNode}
         {/* Cosmic Background Elements */}
         <div className="absolute inset-0 pattern-mandala opacity-10"></div>
         <div className="absolute top-20 left-10 symbol-om text-6xl animate-om-rotation opacity-20"></div>
@@ -201,6 +261,7 @@ const ChartPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-vedic-primary relative overflow-hidden">
+      {toastNode}
       {/* Enhanced Cosmic Background Elements */}
       <div className="absolute inset-0 pattern-mandala opacity-10"></div>
       <div className="absolute top-20 left-10 symbol-om text-6xl animate-om-rotation opacity-20"></div>

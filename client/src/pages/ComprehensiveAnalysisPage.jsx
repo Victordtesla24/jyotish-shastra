@@ -36,15 +36,17 @@ const ComprehensiveAnalysisPage = () => {
       }
 
       // Get birth data for API call
-      const rawBirthData = UIDataSaver.getBirthData();
+      const birthStamp = UIDataSaver.getBirthData();
+      const rawBirthData = birthStamp?.data || null;
       if (!rawBirthData) {
-        const errorMessage = 'Birth data is required for analysis. Please generate a chart first by filling out the birth data form.';
+        const errorMessage = 'Please generate a chart first.';
         setError(errorMessage);
         setLoading(false);
+        sessionStorage.setItem('analysisRedirectMessage', errorMessage);
         // CRITICAL FIX: Navigate only once, don't retry
         setTimeout(() => {
-          navigate('/');
-        }, 2000);
+          navigate('/chart');
+        }, 500);
         return;
       }
 

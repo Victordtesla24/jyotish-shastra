@@ -42,6 +42,9 @@ const HomePage = () => {
 
       console.log('✅ HomePage: Chart API response received:', chartData);
 
+      // Persist birth data immediately in canonical cache
+      UIDataSaver.setBirthData(formData);
+
       // CRITICAL FIX: Also fetch comprehensive analysis data
       console.log('🔄 HomePage: Fetching comprehensive analysis...');
       const analysisResponse = await fetch(getApiUrl('/api/v1/analysis/comprehensive'), {
@@ -144,8 +147,11 @@ const HomePage = () => {
 
       // Create chart object with metadata and store in context
       // Include both raw and transformed data for maximum compatibility
+      const chartId = chartData.data?.chartId || chartData.chartId || `chart_${Date.now()}`;
+      UIDataSaver.setLastChart(chartId, formData);
+
       const chart = {
-        id: `chart_${Date.now()}`,
+        id: chartId,
         birthData: formData,
         chartData: chartData, // Raw API response for backward compatibility (ChartPage expects this)
         transformedData: chartServiceResult.transformed, // Transformed data for UI consumption

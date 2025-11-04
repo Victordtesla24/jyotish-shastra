@@ -1,155 +1,98 @@
 /**
- * Cache policy utilities for TTL-based staleness detection
- * Implements stamping, freshness validation, and hash-based change detection
- * 
- * @module cachePolicy
- */
-
-import { stringify } from './jsonSafe.js';
-
-/**
- * Cache Time-To-Live in milliseconds
- * Default: 15 minutes (reasonable for session-based birth data)
- * Adjust if product requirements change
+ * Default time-to-live for session-scoped cache entries (15 minutes).
  */
 export const CACHE_TTL_MS = 15 * 60 * 1000;
 
+const VERSION = 1;
+
+function sortValue(value) {
+  if (Array.isArray(value)) {
+    return value.map((entry) => sortValue(entry));
+  }
+
+  if (value && typeof value === 'object') {
+    const sorted = {};
+    Object.keys(value)
+      .sort()
+      .forEach((key) => {
+        sorted[key] = sortValue(value[key]);
+      });
+    return sorted;
+  }
+
+  return value;
+}
+
 /**
- * Canonicalize object to stable string representation
- * Ensures consistent hashing regardless of property order
- * @param {Object} obj - Object to canonicalize
- * @returns {string} Stable JSON string with sorted keys
+ * Canonicalize an object into a stable JSON string usable for hashing.
+ * @param {unknown} obj
+ * @returns {string}
  */
 export function canonical(obj) {
-  if (!obj || typeof obj !== 'object') {
-    return stringify(obj) || '';
+  const prepared = sortValue(obj);
+  try {
+    return JSON.stringify(prepared);
+  } catch (error) {
+    return 'null';
   }
-  
-  // Sort keys for stable serialization
-  const sortedKeys = Object.keys(obj).sort();
-  const sortedObj = {};
-  
-  for (const key of sortedKeys) {
-    sortedObj[key] = obj[key];
-  }
-  
-  return stringify(sortedObj) || '';
 }
 
 /**
- * Lightweight hash function without crypto dependencies
- * Uses DJB2 algorithm variant (fast and good distribution)
- * @param {string} str - String to hash
- * @returns {string} Hash as hex string prefixed with 'h'
+ * Lightweight non-cryptographic hash for staleness checks.
+ * @param {string} str
+ * @returns {string}
  */
 export function hash(str) {
-  if (!str || typeof str !== 'string') {
-    return 'h0';
-  }
-  
   let h = 0;
-  let i = 0;
-  const len = str.length;
-  
-  while (i < len) {
-    h = ((h << 5) - h + str.charCodeAt(i++)) | 0;
+  for (let i = 0; i < str.length; i += 1) {
+    h = (h << 5) - h + str.charCodeAt(i);
+    h |= 0; // Convert to 32bit integer
   }
-  
-  // Convert to unsigned and format as hex
-  return `h${(h >>> 0).toString(16)}`;
+  return `h${h >>> 0}`;
 }
 
 /**
- * Stamp data with metadata for staleness detection
- * Wraps payload with timestamp and hash
- * @param {*} payload - Data to stamp
- * @returns {{data: *, meta: {savedAt: number, dataHash: string, version: number}}}
+ * Wrap payload with metadata used for staleness detection.
+ * @template T
+ * @param {T} payload
+ * @returns {{ data: T, meta: { savedAt: number, dataHash: string, version: number } }}
  */
 export function stamp(payload) {
   const now = Date.now();
-  const canonicalStr = canonical(payload);
-  const dataHash = hash(canonicalStr);
-  
+  const dataHash = hash(canonical(payload));
   return {
     data: payload,
     meta: {
       savedAt: now,
-      dataHash: dataHash,
-      version: 1, // Schema version for future migrations
-    },
+      dataHash,
+      version: VERSION
+    }
   };
 }
 
 /**
- * Check if stamped data is still fresh (within TTL)
- * @param {Object} stamped - Stamped data object
- * @param {number} [ttl=CACHE_TTL_MS] - Custom TTL in milliseconds
- * @returns {boolean} True if data is fresh
+ * Determine if a stamped payload is still within freshness guarantees.
+ * @param {{ meta?: { savedAt?: number } } | null | undefined} stamped
+ * @returns {boolean}
  */
-export function isFresh(stamped, ttl = CACHE_TTL_MS) {
-  if (!stamped || typeof stamped !== 'object') {
+export function isFresh(stamped) {
+  if (!stamped || !stamped.meta) {
     return false;
   }
-  
-  const { meta } = stamped;
-  if (!meta || typeof meta.savedAt !== 'number') {
+
+  const { savedAt } = stamped.meta;
+
+  if (typeof savedAt !== 'number' || Number.isNaN(savedAt)) {
     return false;
   }
-  
-  const age = Date.now() - meta.savedAt;
-  return age <= ttl;
+
+  return Date.now() - savedAt <= CACHE_TTL_MS;
 }
 
-/**
- * Validate stamped data structure
- * @param {*} stamped - Data to validate
- * @returns {boolean} True if structure is valid
- */
-export function isValidStamped(stamped) {
-  if (!stamped || typeof stamped !== 'object') {
-    return false;
-  }
-  
-  // Must have data property
-  if (!('data' in stamped)) {
-    return false;
-  }
-  
-  // Must have meta with required fields
-  const { meta } = stamped;
-  if (!meta || typeof meta !== 'object') {
-    return false;
-  }
-  
-  if (typeof meta.savedAt !== 'number' || !meta.dataHash || !meta.version) {
-    return false;
-  }
-  
-  return true;
-}
-
-/**
- * Get age of stamped data in milliseconds
- * @param {Object} stamped - Stamped data object
- * @returns {number|null} Age in milliseconds or null if invalid
- */
-export function getAge(stamped) {
-  if (!stamped || !stamped.meta || typeof stamped.meta.savedAt !== 'number') {
-    return null;
-  }
-  
-  return Date.now() - stamped.meta.savedAt;
-}
-
-/**
- * Default export
- */
 export default {
   CACHE_TTL_MS,
   canonical,
   hash,
   stamp,
-  isFresh,
-  isValidStamped,
-  getAge,
+  isFresh
 };
