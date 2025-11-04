@@ -87,6 +87,8 @@ class ChartController {
    * @param {Object} res - Express response object
    */
   async generateChart(req, res) {
+    let processedBirthData = null; // Declare outside try block for catch block access
+    
     try {
       const birthData = req.body;
 
@@ -111,7 +113,7 @@ class ChartController {
       }
 
       // Process timezone format conversion
-      const processedBirthData = this.processTimezoneFormat(validationResult.data);
+      processedBirthData = this.processTimezoneFormat(validationResult.data);
 
       // Extract coordinates from nested or flat structure
       let latitude = processedBirthData.latitude;
@@ -125,8 +127,34 @@ class ChartController {
 
       // Geocode location only if coordinates are not provided
       if (!latitude || !longitude) {
-        const geocodedData = await this.geocodingService.geocodeLocation(processedBirthData);
-        Object.assign(processedBirthData, geocodedData);
+        try {
+          const geocodedData = await this.geocodingService.geocodeLocation(processedBirthData);
+          Object.assign(processedBirthData, geocodedData);
+        } catch (geocodingError) {
+          // Handle geocoding errors with structured response
+          const lowerCaseGeocodingError = geocodingError.message?.toLowerCase() || '';
+          const isNotFound = lowerCaseGeocodingError.includes('location not found') || 
+                           lowerCaseGeocodingError.includes('no geocoding results found');
+          
+          return res.status(isNotFound ? 404 : 400).json({
+            success: false,
+            error: isNotFound ? 'Location Not Found' : 'Geocoding Failed',
+            message: isNotFound 
+              ? 'The specified birth place could not be resolved to coordinates.'
+              : 'We were unable to determine coordinates for the provided place of birth.',
+            details: [{
+              field: 'placeOfBirth',
+              message: geocodingError.message || 'Geocoding failed',
+              providedValue: req.body.placeOfBirth || processedBirthData.placeOfBirth
+            }],
+            suggestions: [
+              'Try a more specific format like "City, State, Country".',
+              'Ensure spelling is correct.',
+              'Verify the place name exists and is accessible.'
+            ],
+            helpText: 'We could not geocode the provided location. Please provide a valid place name or coordinates directly.'
+          });
+        }
       } else {
         // Ensure flat structure for downstream processing
         processedBirthData.latitude = latitude;
@@ -139,6 +167,22 @@ class ChartController {
       // Generate comprehensive chart
       const chartData = await chartService.generateComprehensiveChart(processedBirthData);
 
+      // PHASE 2: Verify house numbers in chartData.rasiChart.planetaryPositions before analysis
+      const planetsWithHouses = Object.entries(chartData.rasiChart?.planetaryPositions || {}).filter(
+        ([name, data]) => data.house && typeof data.house === 'number' && data.house >= 1 && data.house <= 12
+      );
+      const planetsWithoutHouses = Object.entries(chartData.rasiChart?.planetaryPositions || {}).filter(
+        ([name, data]) => !data.house || typeof data.house !== 'number' || data.house < 1 || data.house > 12
+      );
+      
+      console.log(`📊 ChartController.generateChart: chartData.rasiChart.planetaryPositions - ${planetsWithHouses.length} with houses, ${planetsWithoutHouses.length} without houses`);
+      if (planetsWithoutHouses.length > 0) {
+        console.error(`❌ ChartController.generateChart: Planets missing house numbers:`, planetsWithoutHouses.map(([name]) => name));
+        console.error(`❌ ChartController.generateChart: Sample planet without house:`, planetsWithoutHouses[0]);
+      } else {
+        console.log(`✅ ChartController.generateChart: All planets have valid house numbers`);
+      }
+
       // Generate birth data analysis for the frontend
       const birthDataAnalysis = this.birthDataAnalysisService.analyzeBirthDataCollection(
         chartData.birthData,
@@ -146,21 +190,35 @@ class ChartController {
         chartData.navamsaChart
       );
 
+      // PHASE 2: Verify house numbers in chartData.rasiChart.planetaryPositions before JSON serialization
+      const planetsWithHousesAfterAnalysis = Object.entries(chartData.rasiChart?.planetaryPositions || {}).filter(
+        ([name, data]) => data.house && typeof data.house === 'number' && data.house >= 1 && data.house <= 12
+      );
+      console.log(`📊 ChartController.generateChart: After analysis - ${planetsWithHousesAfterAnalysis.length} planets with houses`);
+
       // Generate chartId for API response
       const chartId = crypto.randomUUID();
 
+      // PHASE 2: Verify house numbers in final response object before JSON serialization
+      const responseData = {
+        chartId: chartId,
+        birthData: chartData.birthData,
+        rasiChart: chartData.rasiChart,
+        navamsaChart: chartData.navamsaChart,
+        analysis: chartData.analysis,
+        dashaInfo: chartData.dashaInfo,
+        birthDataAnalysis: birthDataAnalysis,
+        generatedAt: chartData.generatedAt
+      };
+      
+      const finalPlanetsWithHouses = Object.entries(responseData.rasiChart?.planetaryPositions || {}).filter(
+        ([name, data]) => data.house && typeof data.house === 'number' && data.house >= 1 && data.house <= 12
+      );
+      console.log(`📊 ChartController.generateChart: Final response - ${finalPlanetsWithHouses.length} planets with houses`);
+
       return res.status(200).json({
         success: true,
-        data: {
-          chartId: chartId,
-          birthData: chartData.birthData,
-          rasiChart: chartData.rasiChart,
-          navamsaChart: chartData.navamsaChart,
-          analysis: chartData.analysis,
-          dashaInfo: chartData.dashaInfo,
-          birthDataAnalysis: birthDataAnalysis,
-          generatedAt: chartData.generatedAt
-        }
+        data: responseData
       });
 
     } catch (error) {
@@ -176,7 +234,23 @@ class ChartController {
         helpText: 'An unexpected error occurred. Please check the server logs for more details.'
       };
 
-      const lowerCaseErrorMessage = error.message.toLowerCase();
+      // Extract error message - handle nested error messages
+      const errorMessage = error.message || '';
+      const lowerCaseErrorMessage = errorMessage.toLowerCase();
+      
+      // Check for nested error messages (errors wrapped in "Failed to generate comprehensive chart:")
+      // Extract the last part after the last colon for nested error messages
+      const nestedErrorMessage = errorMessage.includes(':') 
+        ? errorMessage.split(':').slice(-1)[0].trim().toLowerCase()
+        : lowerCaseErrorMessage;
+      
+      // Also check if error message contains key phrases anywhere (for nested errors)
+      const hasTimezoneError = lowerCaseErrorMessage.includes('timezone is required') || 
+                              nestedErrorMessage.includes('timezone is required');
+      const hasGeocodingError = lowerCaseErrorMessage.includes('geocoding') || 
+                               lowerCaseErrorMessage.includes('no geocoding results found') ||
+                               nestedErrorMessage.includes('geocoding') ||
+                               nestedErrorMessage.includes('no geocoding results');
 
       if (lowerCaseErrorMessage.includes('validation failed')) {
         statusCode = 400;
@@ -219,6 +293,20 @@ class ChartController {
         ];
         response.suggestions = ['Provide latitude and longitude coordinates.', 'If providing a place name, ensure it can be found by the geocoding service.'];
         response.helpText = 'Please provide geographic coordinates for the birth location.';
+      } else if (hasTimezoneError) {
+        statusCode = 400;
+        response.error = 'Missing Timezone';
+        response.message = 'Timezone is required for accurate chart calculations.';
+        response.details = [{
+          field: 'timezone',
+          message: 'Timezone is required for chart generation. Please provide timezone in birth data.',
+          providedValue: req.body.timezone || null
+        }];
+        response.suggestions = [
+          'Use IANA format (e.g., "Asia/Kolkata") or UTC offset (e.g., "+05:30").',
+          'If providing a place name, timezone will be automatically determined from coordinates.'
+        ];
+        response.helpText = 'The timezone needs to be in a standard format recognized by the system.';
       } else if (lowerCaseErrorMessage.includes('moment timezone has no data')) {
         statusCode = 400;
         response.error = 'Invalid Timezone Format';
@@ -231,13 +319,29 @@ class ChartController {
         }];
         response.suggestions = ['Use IANA format (e.g., "Asia/Kolkata") or UTC offset (e.g., "+05:30").'];
         response.helpText = 'The timezone needs to be in a standard format recognized by the system.';
-      } else if (lowerCaseErrorMessage.includes('geocoding api error')) {
-        statusCode = lowerCaseErrorMessage.includes('location not found') ? 404 : 400;
-        response.error = 'Geocoding Failed';
-        response.message = error.message;
-        response.details = [{ field: 'placeOfBirth', message: error.message, providedValue: req.body.placeOfBirth }];
-        response.suggestions = ['Provide a more specific place name (e.g., "City, State, Country")', 'Verify spelling or try nearby city.'];
-        response.helpText = 'We were unable to determine coordinates for the provided place of birth.';
+      } else if (hasGeocodingError) {
+        const isNotFound = lowerCaseErrorMessage.includes('location not found') || 
+                          lowerCaseErrorMessage.includes('no geocoding results found') || 
+                          nestedErrorMessage.includes('no geocoding results');
+        statusCode = isNotFound ? 404 : 400;
+        response.error = isNotFound ? 'Location Not Found' : 'Geocoding Failed';
+        response.message = isNotFound 
+          ? 'The specified birth place could not be resolved to coordinates.'
+          : 'We were unable to determine coordinates for the provided place of birth.';
+        const errorDetailMessage = errorMessage.includes(':') 
+          ? errorMessage.split(':').slice(-1)[0].trim() 
+          : (error.message || 'Geocoding failed');
+        response.details = [{ 
+          field: 'placeOfBirth', 
+          message: errorDetailMessage, 
+          providedValue: req.body.placeOfBirth || null
+        }];
+        response.suggestions = [
+          'Try a more specific format like "City, State, Country".',
+          'Ensure spelling is correct.',
+          'Verify the place name exists and is accessible.'
+        ];
+        response.helpText = 'We could not geocode the provided location. Please provide a valid place name or coordinates directly.';
       }
 
       return res.status(statusCode).json(response);

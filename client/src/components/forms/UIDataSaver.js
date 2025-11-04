@@ -595,6 +595,12 @@ class UIDataSaver {
         return UIDataSaver.safeDeserialize(simpleBirthData);
       }
 
+      // Method 5: Check sessionStorage for direct 'birthData' key (CRITICAL FIX)
+      const directBirthData = sessionStorage.getItem('birthData');
+      if (directBirthData) {
+        return UIDataSaver.safeDeserialize(directBirthData);
+      }
+
       return null;
     } catch (error) {
       console.error('❌ UIDataSaver: Error getting birth data:', error.message || error.toString());

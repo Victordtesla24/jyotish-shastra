@@ -168,8 +168,19 @@ class ChartGenerationService {
     // Check cache first
     const cachedChart = this.getCachedChart(cacheKey);
     if (cachedChart) {
-      console.log('🎯 Chart cache hit for:', birthData.name || 'Unknown');
-      return cachedChart.data;
+      // PHASE 2: Verify cached data has house numbers - if not, regenerate
+      const cachedPlanetsWithHouses = Object.entries(cachedChart.data?.rasiChart?.planetaryPositions || {}).filter(
+        ([name, data]) => data.house && typeof data.house === 'number' && data.house >= 1 && data.house <= 12
+      );
+      
+      if (cachedPlanetsWithHouses.length === Object.keys(cachedChart.data?.rasiChart?.planetaryPositions || {}).length) {
+        console.log('🎯 Chart cache hit for:', birthData.name || 'Unknown');
+        return cachedChart.data;
+      } else {
+        console.warn('⚠️ Cached chart missing house numbers, regenerating...');
+        // Clear this cache entry to force regeneration
+        this.chartCache.delete(cacheKey);
+      }
     }
     
     // Ensure swisseph is initialized
@@ -196,14 +207,82 @@ class ChartGenerationService {
       // Generate Rasi chart
       const rasiChart = await this.generateRasiChart(geocodedData);
 
+      // PHASE 2: Verify house numbers in rasiChart.planetaryPositions
+      const planetsWithHouses = Object.entries(rasiChart.planetaryPositions || {}).filter(
+        ([name, data]) => data.house && typeof data.house === 'number' && data.house >= 1 && data.house <= 12
+      );
+      const planetsWithoutHouses = Object.entries(rasiChart.planetaryPositions || {}).filter(
+        ([name, data]) => !data.house || typeof data.house !== 'number' || data.house < 1 || data.house > 12
+      );
+      
+      console.log(`📊 generateComprehensiveChart: rasiChart.planetaryPositions - ${planetsWithHouses.length} with houses, ${planetsWithoutHouses.length} without houses`);
+      if (planetsWithoutHouses.length > 0) {
+        console.error(`❌ generateComprehensiveChart: Planets missing house numbers:`, planetsWithoutHouses.map(([name]) => name));
+        console.error(`❌ generateComprehensiveChart: Sample planet without house:`, planetsWithoutHouses[0]);
+      } else {
+        console.log(`✅ generateComprehensiveChart: All planets have valid house numbers`);
+      }
+
+      // PHASE 2: Verify house numbers before passing to generateNavamsaChart
+      const planetsWithHousesBeforeNavamsa = Object.entries(rasiChart.planetaryPositions || {}).filter(
+        ([name, data]) => data.house && typeof data.house === 'number' && data.house >= 1 && data.house <= 12
+      );
+      console.log(`📊 generateComprehensiveChart: Before Navamsa - ${planetsWithHousesBeforeNavamsa.length} planets with houses`);
+
       // Generate Navamsa chart (pass rasiChart to avoid regeneration and potential errors)
-      const navamsaChart = await this.generateNavamsaChart(geocodedData, rasiChart);
+      // PHASE 2: Create a deep copy to prevent mutations
+      const rasiChartCopy = JSON.parse(JSON.stringify(rasiChart));
+      const navamsaChart = await this.generateNavamsaChart(geocodedData, rasiChartCopy);
+      
+      // PHASE 2: Verify house numbers after generateNavamsaChart (should not modify rasiChart)
+      const planetsWithHousesAfterNavamsa = Object.entries(rasiChart.planetaryPositions || {}).filter(
+        ([name, data]) => data.house && typeof data.house === 'number' && data.house >= 1 && data.house <= 12
+      );
+      console.log(`📊 generateComprehensiveChart: After Navamsa - ${planetsWithHousesAfterNavamsa.length} planets with houses`);
+      
+      if (planetsWithHousesAfterNavamsa.length !== planetsWithHousesBeforeNavamsa.length) {
+        console.error(`❌ generateComprehensiveChart: generateNavamsaChart modified rasiChart! Before: ${planetsWithHousesBeforeNavamsa.length}, After: ${planetsWithHousesAfterNavamsa.length}`);
+      }
 
       // Calculate Dasha information
       const dashaInfo = this.calculateDashaInfo(rasiChart);
 
+      // PHASE 2: Verify house numbers before generateComprehensiveAnalysis
+      const planetsWithHousesBeforeAnalysis = Object.entries(rasiChart.planetaryPositions || {}).filter(
+        ([name, data]) => data.house && typeof data.house === 'number' && data.house >= 1 && data.house <= 12
+      );
+      console.log(`📊 generateComprehensiveChart: Before Analysis - ${planetsWithHousesBeforeAnalysis.length} planets with houses`);
+
       // Generate comprehensive analysis
       const analysis = await this.generateComprehensiveAnalysis(rasiChart, navamsaChart);
+
+      // PHASE 2: Verify house numbers after generateComprehensiveAnalysis (should not modify rasiChart)
+      const planetsWithHousesAfterAnalysis = Object.entries(rasiChart.planetaryPositions || {}).filter(
+        ([name, data]) => data.house && typeof data.house === 'number' && data.house >= 1 && data.house <= 12
+      );
+      console.log(`📊 generateComprehensiveChart: After Analysis - ${planetsWithHousesAfterAnalysis.length} planets with houses`);
+      
+      if (planetsWithHousesAfterAnalysis.length !== planetsWithHousesBeforeAnalysis.length) {
+        console.error(`❌ generateComprehensiveChart: generateComprehensiveAnalysis modified rasiChart! Before: ${planetsWithHousesBeforeAnalysis.length}, After: ${planetsWithHousesAfterAnalysis.length}`);
+      }
+
+      // PHASE 2: Ensure rasiChart.planetaryPositions has house numbers before creating result
+      // If house numbers are missing, they should have been assigned in generateRasiChart
+      // This is a safety check to ensure house numbers are preserved
+      const finalPlanetsWithHouses = Object.entries(rasiChart.planetaryPositions || {}).filter(
+        ([name, data]) => data.house && typeof data.house === 'number' && data.house >= 1 && data.house <= 12
+      );
+      
+      if (finalPlanetsWithHouses.length !== Object.keys(rasiChart.planetaryPositions || {}).length) {
+        console.error(`❌ generateComprehensiveChart: Final rasiChart missing house numbers! Expected ${Object.keys(rasiChart.planetaryPositions || {}).length}, got ${finalPlanetsWithHouses.length}`);
+        // CRITICAL: Re-assign house numbers if they're missing (should not happen, but safety check)
+        console.warn('⚠️ generateComprehensiveChart: Re-assigning house numbers as safety measure');
+        rasiChart.planetaryPositions = this.assignHousesToPlanets(
+          rasiChart.planetaryPositions,
+          rasiChart.housePositions,
+          rasiChart.ascendant.longitude
+        );
+      }
 
       const result = {
         birthData: geocodedData,
@@ -213,6 +292,17 @@ class ChartGenerationService {
         analysis,
         generatedAt: new Date().toISOString()
       };
+
+      // PHASE 2: Final verification before caching
+      const resultPlanetsWithHouses = Object.entries(result.rasiChart?.planetaryPositions || {}).filter(
+        ([name, data]) => data.house && typeof data.house === 'number' && data.house >= 1 && data.house <= 12
+      );
+      console.log(`📊 generateComprehensiveChart: Final result - ${resultPlanetsWithHouses.length} planets with houses`);
+      
+      if (resultPlanetsWithHouses.length !== Object.keys(result.rasiChart?.planetaryPositions || {}).length) {
+        console.error(`❌ generateComprehensiveChart: Result missing house numbers before caching!`);
+        throw new Error('Result verification failed: Some planets missing house numbers in final result');
+      }
 
       // Cache the result
       this.cacheChart(cacheKey, result);
@@ -343,23 +433,78 @@ class ChartGenerationService {
       // Calculate aspects
       const aspects = this.calculatePlanetaryAspects(planetaryPositions, housePositions);
 
+      // Assign house numbers to each planet based on longitude relative to house cusps
+      const planetaryPositionsWithHouses = this.assignHousesToPlanets(planetaryPositions, housePositions, ascendant.longitude);
+
+      // PHASE 1: Validate house assignment before returning
+      const planetsWithoutHouses = Object.entries(planetaryPositionsWithHouses).filter(
+        ([name, data]) => !data.house || typeof data.house !== 'number' || data.house < 1 || data.house > 12
+      );
+      
+      if (planetsWithoutHouses.length > 0) {
+        console.error('❌ generateRasiChart: Planets missing valid house numbers:', planetsWithoutHouses.map(([name]) => name));
+        throw new Error(`House assignment validation failed: ${planetsWithoutHouses.length} planets missing valid house numbers`);
+      }
+      
+      const houseAssignmentStats = {
+        total: Object.keys(planetaryPositionsWithHouses).length,
+        withHouses: Object.values(planetaryPositionsWithHouses).filter(p => p.house && p.house >= 1 && p.house <= 12).length,
+        houses: Object.values(planetaryPositionsWithHouses).map(p => p.house)
+      };
+      console.log(`✅ generateRasiChart: House assignment validated - ${houseAssignmentStats.withHouses}/${houseAssignmentStats.total} planets have valid house numbers`);
+      console.log(`📊 generateRasiChart: House distribution:`, houseAssignmentStats.houses.sort((a, b) => a - b));
+
       // Convert planetaryPositions object to planets array
-      const planetsArray = Object.entries(planetaryPositions).map(([name, data]) => ({
+      const planetsArray = Object.entries(planetaryPositionsWithHouses).map(([name, data]) => ({
         name: name.charAt(0).toUpperCase() + name.slice(1), // Capitalize first letter
         ...data
       }));
 
-      return {
+      // PHASE 1: Verify planetaryPositionsWithHouses contains house numbers before returning
+      const verifyHouseNumbers = Object.entries(planetaryPositionsWithHouses).every(([name, data]) => {
+        const hasValidHouse = data.house && typeof data.house === 'number' && data.house >= 1 && data.house <= 12;
+        if (!hasValidHouse) {
+          console.error(`❌ generateRasiChart: Planet ${name} missing valid house number:`, data);
+        }
+        return hasValidHouse;
+      });
+      
+      if (!verifyHouseNumbers) {
+        throw new Error('House assignment verification failed: Some planets missing house numbers in planetaryPositionsWithHouses');
+      }
+
+      // PHASE 1: Log sample planet to verify house number is in the object
+      const samplePlanet = Object.entries(planetaryPositionsWithHouses)[0];
+      if (samplePlanet) {
+        console.log(`✅ generateRasiChart: Sample planet ${samplePlanet[0]} has house:`, samplePlanet[1].house);
+        console.log(`✅ generateRasiChart: Sample planet keys:`, Object.keys(samplePlanet[1]));
+      }
+
+      // PHASE 1: Create explicit return object to ensure house numbers are included
+      const returnObject = {
         id: uuidv4(), // CRITICAL FIX: Generate unique ID for chart
         ascendant,
         planets: planetsArray,
-        planetaryPositions,
+        planetaryPositions: planetaryPositionsWithHouses, // Ensure this has house numbers
         housePositions,
         nakshatra,
         aspects,
         jd,
         birthData
       };
+
+      // PHASE 1: Final verification - check return object has house numbers
+      const returnPlanetsWithHouses = Object.entries(returnObject.planetaryPositions || {}).filter(
+        ([name, data]) => data.house && typeof data.house === 'number' && data.house >= 1 && data.house <= 12
+      );
+      console.log(`✅ generateRasiChart: Return object has ${returnPlanetsWithHouses.length} planets with house numbers`);
+      
+      if (returnPlanetsWithHouses.length !== Object.keys(returnObject.planetaryPositions || {}).length) {
+        console.error(`❌ generateRasiChart: Return object missing house numbers! Expected ${Object.keys(returnObject.planetaryPositions || {}).length}, got ${returnPlanetsWithHouses.length}`);
+        throw new Error('Return object verification failed: Some planets missing house numbers in return object');
+      }
+
+      return returnObject;
     } catch (error) {
       throw new Error(`Failed to generate Rasi chart: ${error.message}`);
     }
@@ -869,6 +1014,122 @@ class ChartGenerationService {
       });
     }
     return wholeSignHouses;
+  }
+
+  /**
+   * Assign house numbers to planets based on their longitude relative to house cusps
+   * @param {Object} planetaryPositions - Planetary positions with longitude
+   * @param {Array} housePositions - House positions with house cusps
+   * @param {number} ascendantLongitude - Ascendant longitude for reference
+   * @returns {Object} Planetary positions with house numbers assigned
+   */
+  assignHousesToPlanets(planetaryPositions, housePositions, ascendantLongitude) {
+    // PHASE 1: Add logging and validation
+    console.log('🔍 assignHousesToPlanets: Starting house assignment');
+    console.log('📊 assignHousesToPlanets: housePositions structure:', {
+      count: housePositions?.length || 0,
+      hasLongitude: housePositions?.length > 0 ? !!housePositions[0]?.longitude : false,
+      sample: housePositions?.length > 0 ? {
+        houseNumber: housePositions[0].houseNumber,
+        longitude: housePositions[0].longitude,
+        sign: housePositions[0].sign
+      } : null
+    });
+    console.log('📊 assignHousesToPlanets: planetaryPositions structure:', {
+      count: Object.keys(planetaryPositions || {}).length,
+      planets: Object.keys(planetaryPositions || {}),
+      sample: planetaryPositions ? Object.entries(planetaryPositions)[0]?.[1] : null
+    });
+
+    if (!housePositions || !Array.isArray(housePositions) || housePositions.length !== 12) {
+      throw new Error(`Invalid housePositions: Expected array of 12 houses, got ${housePositions?.length || 0}`);
+    }
+
+    if (!planetaryPositions || typeof planetaryPositions !== 'object') {
+      throw new Error(`Invalid planetaryPositions: Expected object, got ${typeof planetaryPositions}`);
+    }
+
+    const planetsWithHouses = {};
+    
+    // Normalize all longitudes to 0-360 range
+    const normalizeLongitude = (lon) => ((lon % 360) + 360) % 360;
+    
+    // Create array of house cusps (normalized)
+    const houseCusps = housePositions.map(hp => {
+      if (!hp || typeof hp.longitude !== 'number') {
+        throw new Error(`Invalid house position: missing longitude property. House: ${JSON.stringify(hp)}`);
+      }
+      return normalizeLongitude(hp.longitude);
+    });
+    
+    console.log('📊 assignHousesToPlanets: House cusps calculated:', houseCusps.map((cusp, i) => ({
+      house: i + 1,
+      cusp: cusp.toFixed(2)
+    })));
+    
+    // Assign house to each planet
+    let assignedCount = 0;
+    let failedCount = 0;
+    
+    for (const [planetName, planetData] of Object.entries(planetaryPositions)) {
+      if (!planetData || typeof planetData.longitude !== 'number') {
+        console.warn(`⚠️ assignHousesToPlanets: Invalid planet data for ${planetName}, skipping`);
+        failedCount++;
+        continue;
+      }
+
+      const planetLongitude = normalizeLongitude(planetData.longitude);
+      let houseNumber = 1;
+      let assigned = false;
+      
+      // Find which house this planet belongs to by comparing with house cusps
+      // House N is between cusp N-1 and cusp N (with wrap-around)
+      for (let i = 0; i < 12; i++) {
+        const currentCusp = houseCusps[i];
+        const nextCusp = houseCusps[(i + 1) % 12];
+        
+        // Handle wrap-around case (when next cusp is less than current cusp)
+        if (nextCusp < currentCusp) {
+          // Planet is in this house if it's >= current cusp OR < next cusp
+          if (planetLongitude >= currentCusp || planetLongitude < nextCusp) {
+            houseNumber = i + 1;
+            assigned = true;
+            break;
+          }
+        } else {
+          // Normal case: planet is in this house if it's between current and next cusp
+          if (planetLongitude >= currentCusp && planetLongitude < nextCusp) {
+            houseNumber = i + 1;
+            assigned = true;
+            break;
+          }
+        }
+      }
+      
+      if (!assigned) {
+        console.warn(`⚠️ assignHousesToPlanets: Could not assign house for ${planetName} (longitude: ${planetLongitude.toFixed(2)}), defaulting to house 1`);
+        failedCount++;
+      } else {
+        assignedCount++;
+        console.log(`✅ assignHousesToPlanets: ${planetName} assigned to house ${houseNumber} (longitude: ${planetLongitude.toFixed(2)})`);
+      }
+      
+      planetsWithHouses[planetName] = {
+        ...planetData,
+        house: houseNumber
+      };
+    }
+    
+    console.log(`📊 assignHousesToPlanets: House assignment complete - ${assignedCount} assigned, ${failedCount} failed`);
+    
+    // Validate all planets have house numbers
+    const missingHouses = Object.entries(planetsWithHouses).filter(([name, data]) => !data.house || data.house < 1 || data.house > 12);
+    if (missingHouses.length > 0) {
+      console.error(`❌ assignHousesToPlanets: ${missingHouses.length} planets missing valid house numbers:`, missingHouses.map(([name]) => name));
+      throw new Error(`House assignment failed for ${missingHouses.length} planets: ${missingHouses.map(([name]) => name).join(', ')}`);
+    }
+    
+    return planetsWithHouses;
   }
 
   /**

@@ -64,19 +64,51 @@ const ResponseDataToUIDisplayAnalyser = {
       throw new Error('Sections data is missing from API response. Expected analysis.sections with 8 sections (section1-section8).');
     }
 
-    // CRITICAL FIX: Validate section count (should be 8 sections) with graceful handling
+    // Enhanced schema guard: Validate section count and identify missing sections
+    const expectedSectionOrder = ['section1', 'section2', 'section3', 'section4', 'section5', 'section6', 'section7', 'section8'];
     const sectionKeys = Object.keys(sections);
+    const missingSections = expectedSectionOrder.filter(section => !sections[section]);
+    const availableSections = expectedSectionOrder.filter(section => sections[section]);
+
+    // Handle optional sections gracefully
     if (sectionKeys.length < 8) {
-      console.warn(`⚠️ [ResponseDataToUIDisplayAnalyser] Expected 8 sections but found ${sectionKeys.length}. Sections: ${sectionKeys.join(', ')}`);
+      console.warn(`⚠️ [ResponseDataToUIDisplayAnalyser] Expected 8 sections but found ${sectionKeys.length}. Missing: ${missingSections.join(', ')}`);
       // Continue processing with available sections
     }
+
+    // Validate each section structure if present
+    const sectionValidation = {};
+    expectedSectionOrder.forEach(sectionKey => {
+      if (sections[sectionKey]) {
+        const section = sections[sectionKey];
+        sectionValidation[sectionKey] = {
+          present: true,
+          hasName: !!section.name,
+          hasData: typeof section === 'object' && Object.keys(section).length > 0
+        };
+      } else {
+        sectionValidation[sectionKey] = {
+          present: false,
+          hasName: false,
+          hasData: false
+        };
+      }
+    });
 
     return {
       success: apiResponse.success || true,
       sections: sections,
-      sectionOrder: ['section1', 'section2', 'section3', 'section4', 'section5', 'section6', 'section7', 'section8'],
+      sectionOrder: expectedSectionOrder,
       synthesis: analysis.synthesis || analysis.synthesis || null,
-      recommendations: analysis.recommendations || analysis.recommendations || null
+      recommendations: analysis.recommendations || analysis.recommendations || null,
+      metadata: {
+        totalSections: sectionKeys.length,
+        expectedSections: 8,
+        missingSections: missingSections,
+        availableSections: availableSections,
+        isDegraded: sectionKeys.length < 8,
+        sectionValidation: sectionValidation
+      }
     };
   },
 

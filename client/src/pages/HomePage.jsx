@@ -5,6 +5,7 @@ import { Card } from '../components/ui';
 import { useChart } from '../contexts/ChartContext.js';
 import UIDataSaver from '../components/forms/UIDataSaver.js';
 import { getApiUrl } from '../utils/apiConfig.js';
+import chartService from '../services/chartService.js';
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -31,36 +32,13 @@ const HomePage = () => {
 
       console.log('🚀 HomePage: Starting chart generation with form data:', formData);
 
-      // Production-grade: Validate critical data before API call
-      if (!formData.dateOfBirth || !formData.timeOfBirth) {
-        throw new Error('Date of birth and time of birth are required');
-      }
-
-      // Validate coordinates or place of birth
-      const hasCoordinates = formData.latitude && formData.longitude;
-      const hasPlaceOfBirth = formData.placeOfBirth && formData.placeOfBirth.trim().length > 0;
-      
-      if (!hasCoordinates && !hasPlaceOfBirth) {
-        throw new Error('Location is required - provide either coordinates or place of birth');
-      }
-
-      // Call the chart generation API with correct v1 endpoint
-      const response = await fetch(getApiUrl('/api/v1/chart/generate'), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
+      // Use chartService for centralized validation and API call
       setProgress(30);
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const chartData = await response.json();
+      const chartServiceResult = await chartService.generateChart(formData);
       setProgress(50);
+
+      // Extract raw API response for UIDataSaver and session storage
+      const chartData = chartServiceResult.raw;
 
       console.log('✅ HomePage: Chart API response received:', chartData);
 
@@ -150,10 +128,12 @@ const HomePage = () => {
       });
 
       // Create chart object with metadata and store in context
+      // Include both raw and transformed data for maximum compatibility
       const chart = {
         id: `chart_${Date.now()}`,
         birthData: formData,
-        chartData: chartData,
+        chartData: chartData, // Raw API response for backward compatibility (ChartPage expects this)
+        transformedData: chartServiceResult.transformed, // Transformed data for UI consumption
         generatedAt: new Date().toISOString(),
         chartType: 'birth_chart'
       };

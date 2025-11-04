@@ -24,6 +24,36 @@ class ChartPageErrorBoundary extends React.Component {
       errorInfo: errorInfo
     });
   }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen bg-gradient-vedic-primary relative overflow-hidden flex items-center justify-center">
+          <div className="text-center p-8">
+            <h1 className="text-4xl font-cinzel text-gold mb-4">🔮 Cosmic Disturbance Detected</h1>
+            <p className="text-lg text-saffron mb-6">The stars seem to be misaligned. Please refresh the page to restore harmony.</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="btn-primary px-8 py-3 bg-gradient-to-r from-saffron to-gold text-white hover:shadow-celestial hover:-translate-y-1 transition-all duration-300 rounded-xl font-cinzel font-medium"
+            >
+              Restore Cosmic Balance
+            </button>
+            {this.state.error && (
+              <details className="mt-8 text-left max-w-2xl mx-auto">
+                <summary className="cursor-pointer text-saffron">Error Details</summary>
+                <pre className="mt-4 p-4 bg-black bg-opacity-30 rounded text-xs overflow-auto">
+                  {this.state.error.toString()}
+                  {this.state.errorInfo && this.state.errorInfo.componentStack}
+                </pre>
+              </details>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
 }
 
 const ChartPage = () => {

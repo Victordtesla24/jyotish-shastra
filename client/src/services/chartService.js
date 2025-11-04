@@ -135,7 +135,7 @@ class ChartService {
     }
 
     // Direct transformation to UI format
-    const result = {
+    const transformed = {
       chartId: apiResponse.data?.chartId || Date.now().toString(),
       chartData: chartData,
       planets: this.processPlanets(chartData),
@@ -148,7 +148,11 @@ class ChartService {
       }
     };
 
-    return result;
+    // Return both raw and transformed for compatibility
+    return {
+      transformed,
+      raw: apiResponse
+    };
   }
 
   /**
@@ -311,7 +315,9 @@ class ChartService {
   /**
    * Main streamlined chart generation method (3 layers total)
    * @param {Object} birthData - Raw birth data from form
-   * @returns {Object} Generated chart data
+   * @returns {Object} Generated chart data with both raw and transformed responses
+   * @returns {Object} result.transformed - Transformed chart data for UI consumption
+   * @returns {Object} result.raw - Original API response structure
    */
   async generateChart(birthData) {
     // Layer 1: Essential validation
@@ -335,12 +341,12 @@ class ChartService {
       // PRODUCTION-GRADE: Use direct endpoint path - baseURL is configured in axios instance
       const endpoint = '/api/v1/chart/generate';
       const response = await this.api.post(endpoint, validatedData);
-      const transformedData = await this.transformApiResponse(response.data);
+      const result = await this.transformApiResponse(response.data);
 
       // Layer 3: Cache results
-      this.cacheSet(cacheKey, transformedData);
+      this.cacheSet(cacheKey, result);
       
-      return transformedData;
+      return result;
     } catch (error) {
       console.error('Chart generation error:', error);
       throw error;

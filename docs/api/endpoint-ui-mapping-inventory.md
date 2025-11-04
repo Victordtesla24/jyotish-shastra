@@ -56,10 +56,11 @@ This document maps all API endpoints to their corresponding UI components and ve
 
 ### 6. POST /api/v1/chart/generate
 - **Method:** POST
-- **UI Component:** `HomePage.jsx` (line 36), `chartService.js` (line 266)
+- **UI Component:** `HomePage.jsx` (calls via `chartService.generateChart()` at ~line 37) → `chartService.js` (`generateChart()` method at ~line 322)
 - **Input:** `{ name, dateOfBirth, timeOfBirth, latitude, longitude, timezone, gender? }`
 - **Output:** `{ success: true, data: { chartId, birthData, rasiChart: { planets[], ascendant, housePositions[] } } }`
 - **Status:** ✅ Mapped
+- **Implementation:** HomePage.jsx delegates to `chartService.generateChart()` which handles validation, API call, and response transformation. Service returns both raw API response (for UIDataSaver/session storage) and transformed data (for UI consumption). Note: HomePage line numbers may vary after refactoring; the service call is the single source of truth.
 - **Issues:** Verify input structure matches API validator
 
 ### 7. POST /api/v1/chart/generate/comprehensive

@@ -835,26 +835,74 @@ class EnhancedComprehensiveDebugger {
     for (const page of pages) {
       try {
         await this.page.goto(`http://localhost:${this.frontendPort}${page.path}`, { waitUntil: 'networkidle2' });
-        await new Promise(resolve => setTimeout(resolve, 5000));
+        
+        // Wait for page-specific content to load
+        if (page.path === '/chart') {
+          // Wait for chart SVG or chart container
+          try {
+            await this.page.waitForSelector('svg[width], [class*="chart"]', { timeout: 10000 });
+            await new Promise(resolve => setTimeout(resolve, 2000)); // Additional wait for chart rendering
+          } catch (chartError) {
+            console.warn(`   ⚠️  Chart not found on ${page.path}, proceeding anyway`);
+            await new Promise(resolve => setTimeout(resolve, 3000));
+          }
+        } else if (page.path === '/analysis' || page.path === '/comprehensive-analysis') {
+          // Wait for analysis sections to load
+          try {
+            await this.page.waitForSelector('.analysis-section, .section, [data-section-id]', { timeout: 10000 });
+            await new Promise(resolve => setTimeout(resolve, 2000)); // Additional wait for content rendering
+          } catch (sectionError) {
+            console.warn(`   ⚠️  Analysis sections not found on ${page.path}, proceeding anyway`);
+            await new Promise(resolve => setTimeout(resolve, 3000));
+          }
+        } else {
+          // Default wait for other pages
+          await new Promise(resolve => setTimeout(resolve, 3000));
+        }
 
-        // Full page screenshot
-        await this.takeScreenshot(`enhanced-${page.name.toLowerCase()}-full`, `${page.name} - Full page`);
+        // Full page screenshot with content verification
+        const verifySelector = page.path === '/chart' ? 'svg[width], [class*="chart"]' : 
+                              (page.path === '/analysis' || page.path === '/comprehensive-analysis') ? '.analysis-section, .section' : 
+                              'main, body';
+        await this.takeScreenshot(
+          `enhanced-${page.name.toLowerCase()}-full`, 
+          `${page.name} - Full page`,
+          { waitForTimeout: 1000, verifyContent: true, verifySelector }
+        );
 
         // Chart rendering screenshot (if applicable)
         if (page.path === '/chart') {
-          const chartElement = await this.page.$('[class*="chart"], svg');
+          const chartElement = await this.page.$('svg[width], [class*="chart"]');
           if (chartElement) {
-            await this.takeScreenshot(`enhanced-chart-rendering`, 'Chart rendering component');
+            await this.takeScreenshot(
+              `enhanced-chart-rendering`, 
+              'Chart rendering component',
+              { waitForSelector: 'svg[width], [class*="chart"]', waitForTimeout: 2000, verifyContent: true, verifySelector: 'svg[width]' }
+            );
           }
         }
 
         // Analysis sections screenshot (if applicable)
         if (page.path === '/analysis' || page.path === '/comprehensive-analysis') {
-          const sections = await this.page.$$('.analysis-section, .section');
-          for (let i = 0; i < Math.min(sections.length, 8); i++) {
-            await sections[i].scrollIntoView();
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            await this.takeScreenshot(`enhanced-section-${i + 1}`, `Analysis section ${i + 1}`);
+          const sections = await this.page.$$('.analysis-section, .section, [data-section-id]');
+          if (sections.length > 0) {
+            for (let i = 0; i < Math.min(sections.length, 8); i++) {
+              await sections[i].scrollIntoView({ behavior: 'smooth', block: 'center' });
+              await new Promise(resolve => setTimeout(resolve, 1500)); // Wait for scroll and render
+              
+              // Verify section content is visible
+              const sectionVisible = await sections[i].evaluate(el => {
+                return el.offsetParent !== null && el.textContent.trim().length > 0;
+              });
+
+              if (sectionVisible) {
+                await this.takeScreenshot(
+                  `enhanced-section-${i + 1}`, 
+                  `Analysis section ${i + 1}`,
+                  { waitForTimeout: 500, verifyContent: true, verifySelector: `.analysis-section:nth-of-type(${i + 1}), .section:nth-of-type(${i + 1})` }
+                );
+              }
+            }
           }
         }
 
@@ -935,10 +983,22 @@ class EnhancedComprehensiveDebugger {
 
     try {
       await this.page.goto(`http://localhost:${this.frontendPort}/analysis`, { waitUntil: 'networkidle2' });
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      
+      // Wait for analysis sections to load
+      try {
+        await this.page.waitForSelector('.analysis-section, .section, [data-section-id], [role="tab"]', { timeout: 10000 });
+        await new Promise(resolve => setTimeout(resolve, 2000)); // Additional wait for content rendering
+      } catch (sectionError) {
+        console.warn(`   ⚠️  Analysis sections not found, proceeding anyway`);
+        await new Promise(resolve => setTimeout(resolve, 3000));
+      }
 
-      // Full page screenshot
-      await this.takeScreenshot('05-analysis-full-page', 'Analysis page - full view');
+      // Full page screenshot with content verification
+      await this.takeScreenshot(
+        '05-analysis-full-page', 
+        'Analysis page - full view',
+        { waitForTimeout: 1000, verifyContent: true, verifySelector: '.analysis-section, .section' }
+      );
 
       // Get tab elements and capture each tab
       const tabs = await this.page.$$('[role="tab"], .tab, .nav-tab');
@@ -946,11 +1006,29 @@ class EnhancedComprehensiveDebugger {
       for (let i = 0; i < tabs.length; i++) {
         try {
           await tabs[i].click();
+          
+          // Wait for tab content to load after clicking
           await new Promise(resolve => setTimeout(resolve, 2000));
+          
+          // Verify tab content is visible
+          const tabContentVisible = await this.page.evaluate(() => {
+            const activeTab = document.querySelector('[role="tab"][aria-selected="true"], .tab.active, .nav-tab.active');
+            if (!activeTab) return false;
+            
+            const tabPanel = document.querySelector(`[role="tabpanel"], [aria-labelledby="${activeTab.id}"]`);
+            return tabPanel && tabPanel.offsetParent !== null && tabPanel.textContent.trim().length > 0;
+          });
 
-          const tabText = await tabs[i].evaluate(el => el.textContent.trim());
-          await this.takeScreenshot(`06-analysis-tab-${i + 1}-${tabText.toLowerCase().replace(/\s+/g, '-')}`,
-                                   `Analysis page - ${tabText} tab`);
+          if (tabContentVisible) {
+            const tabText = await tabs[i].evaluate(el => el.textContent.trim());
+            await this.takeScreenshot(
+              `06-analysis-tab-${i + 1}-${tabText.toLowerCase().replace(/\s+/g, '-')}`,
+              `Analysis page - ${tabText} tab`,
+              { waitForTimeout: 1000, verifyContent: true, verifySelector: '[role="tabpanel"], .tab-content' }
+            );
+          } else {
+            console.warn(`   ⚠️  Tab ${i + 1} content not visible, skipping screenshot`);
+          }
         } catch (tabError) {
           console.warn(`⚠️  Could not capture tab ${i + 1}:`, tabError.message);
         }
@@ -966,26 +1044,51 @@ class EnhancedComprehensiveDebugger {
 
     try {
       await this.page.goto(`http://localhost:${this.frontendPort}/comprehensive-analysis`, { waitUntil: 'networkidle2' });
-      await new Promise(resolve => setTimeout(resolve, 5000));
+      
+      // Wait for comprehensive analysis sections to load
+      try {
+        await this.page.waitForSelector('[data-section-id], .analysis-section, .section', { timeout: 15000 });
+        await new Promise(resolve => setTimeout(resolve, 3000)); // Additional wait for content rendering
+      } catch (sectionError) {
+        console.warn(`   ⚠️  Comprehensive analysis sections not found, proceeding anyway`);
+        await new Promise(resolve => setTimeout(resolve, 5000));
+      }
 
-      // Full page screenshot
-      await this.takeScreenshot('07-comprehensive-full-page', 'Comprehensive analysis - full view');
+      // Full page screenshot with content verification
+      await this.takeScreenshot(
+        '07-comprehensive-full-page', 
+        'Comprehensive analysis - full view',
+        { waitForTimeout: 1000, verifyContent: true, verifySelector: '[data-section-id], .analysis-section, .section' }
+      );
 
       // Capture each section
-      const sections = await this.page.$$('.analysis-section, .section');
+      const sections = await this.page.$$('[data-section-id], .analysis-section, .section');
 
       for (let i = 0; i < sections.length; i++) {
         try {
-          await sections[i].scrollIntoView();
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          await sections[i].scrollIntoView({ behavior: 'smooth', block: 'center' });
+          await new Promise(resolve => setTimeout(resolve, 1500)); // Wait for scroll and render
+
+          // Verify section content is visible
+          const sectionVisible = await sections[i].evaluate(el => {
+            return el.offsetParent !== null && el.textContent.trim().length > 0;
+          });
+
+          if (!sectionVisible) {
+            console.warn(`   ⚠️  Section ${i + 1} not visible, skipping screenshot`);
+            continue;
+          }
 
           const sectionTitle = await sections[i].evaluate(el => {
             const title = el.querySelector('h1, h2, h3, h4, .title, .section-title');
             return title ? title.textContent.trim() : `Section ${i + 1}`;
           });
 
-          await this.takeScreenshot(`08-comprehensive-section-${i + 1}-${sectionTitle.toLowerCase().replace(/\s+/g, '-')}`,
-                                   `Comprehensive analysis - ${sectionTitle}`);
+          await this.takeScreenshot(
+            `08-comprehensive-section-${i + 1}-${sectionTitle.toLowerCase().replace(/\s+/g, '-')}`,
+            `Comprehensive analysis - ${sectionTitle}`,
+            { waitForTimeout: 500, verifyContent: true, verifySelector: `[data-section-id]:nth-of-type(${i + 1}), .analysis-section:nth-of-type(${i + 1})` }
+          );
         } catch (sectionError) {
           console.warn(`⚠️  Could not capture section ${i + 1}:`, sectionError.message);
         }
@@ -996,8 +1099,50 @@ class EnhancedComprehensiveDebugger {
     }
   }
 
-  async takeScreenshot(filename, description) {
+  async takeScreenshot(filename, description, options = {}) {
     try {
+      const {
+        waitForSelector = null,
+        waitForTimeout = 1000,
+        verifyContent = false,
+        verifySelector = null
+      } = options;
+
+      // Wait for specific selector if provided
+      if (waitForSelector) {
+        try {
+          await this.page.waitForSelector(waitForSelector, { timeout: 5000 });
+          console.log(`   ⏳ Waited for selector: ${waitForSelector}`);
+        } catch (selectorError) {
+          console.warn(`   ⚠️  Selector not found: ${waitForSelector}`);
+        }
+      }
+
+      // Wait for timeout to allow content to render
+      if (waitForTimeout > 0) {
+        await new Promise(resolve => setTimeout(resolve, waitForTimeout));
+      }
+
+      // Verify expected content is present before capturing
+      if (verifyContent && verifySelector) {
+        const contentExists = await this.page.evaluate((selector) => {
+          const element = document.querySelector(selector);
+          if (!element) return false;
+          // Check if element is visible and has meaningful content
+          const isVisible = element.offsetParent !== null;
+          const hasContent = element.textContent.trim().length > 0;
+          // For SVG/charts, check if it has width/height
+          const hasDimensions = element.tagName === 'SVG' ? 
+            (element.getAttribute('width') || element.getBoundingClientRect().width > 0) : true;
+          return isVisible && hasContent && hasDimensions;
+        }, verifySelector);
+
+        if (!contentExists) {
+          console.warn(`   ⚠️  Expected content not found for selector: ${verifySelector} - SKIPPING screenshot`);
+          return; // Skip screenshot if content doesn't exist
+        }
+      }
+
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
       const fullFilename = `${timestamp}-${filename}.png`;
       const screenshotPath = path.join(this.screenshotDir, fullFilename);
@@ -1013,7 +1158,9 @@ class EnhancedComprehensiveDebugger {
         path: screenshotPath,
         description,
         timestamp: new Date().toISOString(),
-        size: fs.statSync(screenshotPath).size
+        size: fs.statSync(screenshotPath).size,
+        waitForSelector,
+        verifyContent
       });
 
       console.log(`📸 Screenshot: ${fullFilename} (${description})`);

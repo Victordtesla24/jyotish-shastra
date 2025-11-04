@@ -17,7 +17,7 @@ const ComprehensiveAnalysisDisplay = ({ analysisData }) => {
   } = useAnalysis();
 
   // Process and validate incoming analysis data
-  const { sectionsData, sectionOrder, sectionNames } = useMemo(() => {
+  const { sectionsData, sectionOrder, sectionNames, metadata } = useMemo(() => {
 
     if (!analysisData) {
       throw new Error('Analysis data is required. Expected processed data from ResponseDataToUIDisplayAnalyser.processComprehensiveAnalysis().');
@@ -57,7 +57,8 @@ const ComprehensiveAnalysisDisplay = ({ analysisData }) => {
     return {
       sectionsData: sections,
       sectionOrder: order,
-      sectionNames: names
+      sectionNames: names,
+      metadata: analysisData.metadata || null
     };
   }, [analysisData]);
 
@@ -989,6 +990,33 @@ const ComprehensiveAnalysisDisplay = ({ analysisData }) => {
   // Return main component JSX with consistent Vedic design
   return (
     <div className="comprehensive-analysis-display max-w-6xl mx-auto">
+      {/* Degraded Analysis Warning Chip */}
+      {metadata && metadata.isDegraded && metadata.missingSections && metadata.missingSections.length > 0 && (
+        <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg shadow-sm">
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0">
+              <span className="text-2xl">⚠️</span>
+            </div>
+            <div className="flex-1">
+              <h4 className="text-lg font-semibold text-yellow-800 mb-1">
+                Degraded Analysis
+              </h4>
+              <p className="text-sm text-yellow-700 mb-2">
+                Some analysis sections are missing. The analysis may be incomplete.
+              </p>
+              <div className="text-xs text-yellow-600">
+                <strong>Available sections:</strong> {metadata.availableSections.length} of {metadata.expectedSections}
+                {metadata.missingSections.length > 0 && (
+                  <span className="ml-2">
+                    <strong>Missing:</strong> {metadata.missingSections.join(', ')}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Display when no sections available */}
       {Object.keys(sectionsData).length === 0 ? (
         <div className="card-cosmic text-center py-12">

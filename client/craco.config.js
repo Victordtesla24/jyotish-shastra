@@ -70,16 +70,26 @@ module.exports = {
       webpackConfig.resolve.fullySpecified = false;
       
       // Ensure modules array includes proper resolution paths
+      // Use relative paths from webpack config, not absolute paths
       if (!webpackConfig.resolve.modules) {
         webpackConfig.resolve.modules = ['node_modules'];
       }
       
-      // Add src directory to modules for absolute imports (if needed)
+      // Ensure node_modules is resolved from client directory
       const path = require('path');
+      const nodeModulesPath = path.resolve(__dirname, 'node_modules');
+      if (!webpackConfig.resolve.modules.includes(nodeModulesPath)) {
+        webpackConfig.resolve.modules.unshift(nodeModulesPath);
+      }
+      
+      // Add src directory to modules for absolute imports (if needed)
       const srcPath = path.resolve(__dirname, 'src');
       if (!webpackConfig.resolve.modules.includes(srcPath)) {
         webpackConfig.resolve.modules.push(srcPath);
       }
+      
+      // Fix symlinks resolution for proper module resolution
+      webpackConfig.resolve.symlinks = true;
       
       return webpackConfig;
     },

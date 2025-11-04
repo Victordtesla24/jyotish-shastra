@@ -45,10 +45,22 @@ const PLANET_CODES = {
 let chartSpec = null;
 try {
   const projectRoot = process.cwd();
-  const specPath = path.join(projectRoot, 'vedic_chart_xy_spec.json');
+  // Try user-docs/ first (canonical location), then project root as fallback
+  const userDocsPath = path.join(projectRoot, 'user-docs', 'vedic_chart_xy_spec.json');
+  const rootPath = path.join(projectRoot, 'vedic_chart_xy_spec.json');
+  
+  let specPath = null;
+  if (fs.existsSync(userDocsPath)) {
+    specPath = userDocsPath;
+  } else if (fs.existsSync(rootPath)) {
+    specPath = rootPath;
+  } else {
+    throw new Error('vedic_chart_xy_spec.json not found in user-docs/ or project root');
+  }
+  
   chartSpec = JSON.parse(fs.readFileSync(specPath, 'utf8'));
 } catch (error) {
-  console.warn('Failed to load vedic_chart_xy_spec.json, using built-in defaults');
+  console.warn('Failed to load vedic_chart_xy_spec.json, using built-in defaults:', error.message);
   chartSpec = getDefaultChartSpec();
 }
 
