@@ -1,12 +1,24 @@
 import { CACHE_KEYS } from '../../utils/cacheKeys.js';
 import { jsonSafe } from '../../utils/jsonSafe.js';
-import { CACHE_TTL_MS, stamp, isFresh, canonical, hash } from '../../utils/cachePolicy.js';
+import { canonical, hash } from '../../utils/cachePolicy.js';
 
-const MEM = { birth: null };
-const STORAGE_PREFIX = 'jyotish_shastra_data';
+const STORAGE_PREFIX = 'btr:v2';
+const TTL_MS = 15 * 60 * 1000;
+const SCHEMA_VERSION = '2';
+
+const CANONICAL_KEYS = {
+  birthData: `${STORAGE_PREFIX}:birthData`,
+  chartId: `${STORAGE_PREFIX}:chartId`,
+  updatedAt: `${STORAGE_PREFIX}:updatedAt`,
+  fingerprint: `${STORAGE_PREFIX}:fingerprint`,
+  schema: `${STORAGE_PREFIX}:schema`,
+  pageLoadId: `${STORAGE_PREFIX}:pageLoadId`
+};
 
 const isBrowser = typeof window !== 'undefined';
 const isProduction = typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'production';
+
+const CANONICAL_KEY_LIST = Object.values(CANONICAL_KEYS);
 
 const getSessionStorage = () => (isBrowser ? window.sessionStorage : null);
 const getLocalStorage = () => (isBrowser ? window.localStorage : null);
@@ -27,6 +39,184 @@ const errorLog = (...args) => {
   if (typeof console !== 'undefined' && typeof console.error === 'function') {
     console.error('[UIDataSaver]', ...args);
   }
+};
+
+const safeGet = (key) => {
+  const storage = getSessionStorage();
+  if (!storage) {
+    return null;
+  }
+  try {
+    return storage.getItem(key);
+  } catch (error) {
+    errorLog('Failed to read key', key, error);
+    return null;
+  }
+};
+
+const safeSet = (key, value) => {
+  const storage = getSessionStorage();
+  if (!storage) {
+    return;
+  }
+  try {
+    if (value === undefined || value === null) {
+      storage.removeItem(key);
+    } else {
+      storage.setItem(key, value);
+    }
+  } catch (error) {
+    errorLog('Failed to write key', key, error);
+    throw error;
+  }
+};
+
+const safeRemove = (key) => {
+  try {
+    safeSet(key, null);
+  } catch (error) {
+    errorLog('Failed to remove key', key, error);
+  }
+};
+
+const safeJSON = (text) => {
+  if (!text || typeof text !== 'string') {
+    return null;
+  }
+  try {
+    return JSON.parse(text);
+  } catch (_error) {
+    return null;
+  }
+};
+
+const nowISO = () => new Date().toISOString();
+
+const isExpired = (updatedAtISO, ttlMs = TTL_MS) => {
+  if (!updatedAtISO) {
+    return true;
+  }
+  const timestamp = Date.parse(updatedAtISO);
+  if (Number.isNaN(timestamp)) {
+    return true;
+  }
+  return Date.now() - timestamp > ttlMs;
+};
+
+const normalizeBirthData = (data) => {
+  if (!data || typeof data !== 'object') {
+    return null;
+  }
+  const { name, dateOfBirth, timeOfBirth, latitude, longitude, timezone } = data;
+  if (!dateOfBirth || !timeOfBirth || typeof timezone !== 'string' || !timezone) {
+    return null;
+  }
+  const latNum = Number(latitude);
+  const lonNum = Number(longitude);
+  if (Number.isNaN(latNum) || Number.isNaN(lonNum)) {
+    return null;
+  }
+  const normalizedName =
+    typeof name === 'string' && name.trim().length > 0 ? name.trim() : undefined;
+  return {
+    name: normalizedName,
+    dateOfBirth,
+    timeOfBirth,
+    latitude: latNum,
+    longitude: lonNum,
+    timezone
+  };
+};
+
+const prepareBirthDataForStorage = (data) => {
+  const normalized = normalizeBirthData(data);
+  if (!normalized) {
+    return null;
+  }
+  return {
+    ...data,
+    name: normalized.name ?? data.name ?? undefined,
+    dateOfBirth: normalized.dateOfBirth,
+    timeOfBirth: normalized.timeOfBirth,
+    latitude: normalized.latitude,
+    longitude: normalized.longitude,
+    timezone: normalized.timezone
+  };
+};
+
+const isValidBirthData = (data) => Boolean(normalizeBirthData(data));
+
+const fingerprintBirthData = (data) => {
+  const normalized = normalizeBirthData(data);
+  if (!normalized) {
+    return null;
+  }
+  const payload = {
+    name: normalized.name || '',
+    dateOfBirth: normalized.dateOfBirth,
+    timeOfBirth: normalized.timeOfBirth,
+    latitude: Number(normalized.latitude).toFixed(6),
+    longitude: Number(normalized.longitude).toFixed(6),
+    timezone: normalized.timezone
+  };
+  return hash(canonical(payload));
+};
+
+const removeLegacyBirthKeys = () => {
+  removeSessionKey(CACHE_KEYS.BIRTH_DATA);
+  removeSessionKey(CACHE_KEYS.BIRTH_DATA_SESSION);
+};
+
+const clearAllV2Keys = () => {
+  CANONICAL_KEY_LIST.forEach((key) => safeRemove(key));
+  removeLegacyBirthKeys();
+};
+
+const writeCanonicalBirthData = (data, fingerprint, updatedAtISO) => {
+  const operations = [
+    [CANONICAL_KEYS.birthData, JSON.stringify(data)],
+    [CANONICAL_KEYS.updatedAt, updatedAtISO],
+    [CANONICAL_KEYS.fingerprint, fingerprint],
+    [CANONICAL_KEYS.schema, SCHEMA_VERSION]
+  ];
+  try {
+    operations.forEach(([key, value]) => safeSet(key, value));
+  } catch (error) {
+    clearAllV2Keys();
+    throw error;
+  }
+};
+
+const readCanonicalBirthData = () => {
+  const birthDataRaw = safeGet(CANONICAL_KEYS.birthData);
+  const updatedAtISO = safeGet(CANONICAL_KEYS.updatedAt);
+  const fingerprint = safeGet(CANONICAL_KEYS.fingerprint);
+  const schema = safeGet(CANONICAL_KEYS.schema);
+
+  if (!birthDataRaw || !updatedAtISO || !fingerprint || schema !== SCHEMA_VERSION) {
+    return null;
+  }
+
+  if (isExpired(updatedAtISO)) {
+    clearAllV2Keys();
+    console.info('[UIDataSaver] expired birthData cleared');
+    return null;
+  }
+
+  const birthData = safeJSON(birthDataRaw);
+  if (!isValidBirthData(birthData)) {
+    clearAllV2Keys();
+    return null;
+  }
+
+  return {
+    data: birthData,
+    meta: {
+      savedAtISO: updatedAtISO,
+      fingerprint,
+      schema: SCHEMA_VERSION
+    }
+  };
 };
 
 const writeSessionKey = (key, value) => {
@@ -132,194 +322,242 @@ const ensureSession = () => {
   return {};
 };
 
-const sanitizeBirthData = (payload) => {
-  if (!payload || typeof payload !== 'object') {
-    return null;
-  }
-
-  const {
-    name,
-    dateOfBirth,
-    timeOfBirth,
-    placeOfBirth,
-    latitude,
-    longitude,
-    timezone,
-    gender,
-    chartId
-  } = payload;
-
-  const sanitized = {
-    name: name ?? null,
-    dateOfBirth: dateOfBirth ?? null,
-    timeOfBirth: timeOfBirth ?? null,
-    placeOfBirth: placeOfBirth ?? null,
-    latitude: latitude ?? null,
-    longitude: longitude ?? null,
-    timezone: timezone ?? null,
-    gender: gender ?? null
-  };
-
-  if (chartId) {
-    sanitized.chartId = chartId;
-  }
-
-  Object.keys(sanitized).forEach((key) => {
-    if (sanitized[key] === null || sanitized[key] === undefined) {
-      delete sanitized[key];
-    }
-  });
-
-  return sanitized;
-};
-
 const updateSession = (updater) => {
   const current = ensureSession();
   const draft = { ...current };
   const result = typeof updater === 'function' ? updater(draft) : draft;
   const next = result && typeof result === 'object' ? result : draft;
-  next.updatedAt = new Date().toISOString();
+  next.updatedAt = nowISO();
   writeSessionKey(CACHE_KEYS.SESSION, next);
   return next;
 };
 
-const readStampedBirthData = () => {
+const readLegacyBirthDataCandidate = () => {
   const stamped = readSessionKey(CACHE_KEYS.BIRTH_DATA);
-  if (!stamped) {
-    removeSessionKey(CACHE_KEYS.BIRTH_DATA);
-    return null;
+  if (stamped && stamped.data && isValidBirthData(stamped.data)) {
+    return {
+      data: prepareBirthDataForStorage(stamped.data),
+      fingerprint: fingerprintBirthData(stamped.data),
+      updatedAtISO: nowISO(),
+      chartId: stamped?.data?.chartId || null
+    };
   }
 
-  if (!stamped.data || !stamped.meta) {
-    removeSessionKey(CACHE_KEYS.BIRTH_DATA);
-    return null;
+  const legacyBirth = readSessionKey(CACHE_KEYS.BIRTH_DATA_SESSION);
+  if (legacyBirth && isValidBirthData(legacyBirth)) {
+    return {
+      data: prepareBirthDataForStorage(legacyBirth),
+      fingerprint: fingerprintBirthData(legacyBirth),
+      updatedAtISO: nowISO()
+    };
   }
 
-  if (!isFresh(stamped)) {
-    debugLog('Cached birth data stale, clearing canonical key.');
-    removeSessionKey(CACHE_KEYS.BIRTH_DATA);
-    return null;
+  const sessionContainer = ensureSession();
+  const sessionBirth = sessionContainer?.birthData;
+  if (sessionBirth && isValidBirthData(sessionBirth)) {
+    return {
+      data: prepareBirthDataForStorage(sessionBirth),
+      fingerprint: fingerprintBirthData(sessionBirth),
+      updatedAtISO: nowISO()
+    };
   }
 
-  return stamped;
+  return null;
 };
 
-const sessionBirthFresh = (session) => {
-  const savedAt = session?.meta?.birthDataSavedAt;
-  if (typeof savedAt !== 'number') {
-    return true;
+const migrateLegacyIfPresent = () => {
+  if (!isBrowser) {
+    return;
   }
-  return Date.now() - savedAt <= CACHE_TTL_MS;
+
+  if (readCanonicalBirthData()) {
+    return;
+  }
+
+  const candidate = readLegacyBirthDataCandidate();
+  if (!candidate || !candidate.data || !candidate.fingerprint) {
+    removeLegacyBirthKeys();
+    return;
+  }
+
+  try {
+    writeCanonicalBirthData(candidate.data, candidate.fingerprint, candidate.updatedAtISO);
+    if (candidate.chartId) {
+      safeSet(CANONICAL_KEYS.chartId, String(candidate.chartId));
+    }
+  } catch (error) {
+    errorLog('Failed to migrate legacy birth data', error);
+  } finally {
+    removeLegacyBirthKeys();
+  }
 };
+
+const generatePageLoadId = () => {
+  if (!isBrowser) {
+    return '';
+  }
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return `pl-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+};
+
+const detectReloadAndClear = () => {
+  if (!isBrowser || typeof performance === 'undefined') {
+    return;
+  }
+
+  const navEntries =
+    typeof performance.getEntriesByType === 'function'
+      ? performance.getEntriesByType('navigation')
+      : null;
+
+  const navigationEntry = navEntries && navEntries.length > 0 ? navEntries[0] : null;
+  const isReload =
+    navigationEntry?.type === 'reload' ||
+    (performance.navigation && performance.navigation.type === 1);
+
+  if (isReload) {
+    clearAllV2Keys();
+    console.info('[UIDataSaver] refresh detected → cleared session cache');
+  }
+
+  const pageLoadId = generatePageLoadId();
+  try {
+    safeSet(CANONICAL_KEYS.pageLoadId, pageLoadId);
+  } catch (error) {
+    errorLog('Failed to assign pageLoadId', error);
+  }
+};
+
+if (isBrowser) {
+  detectReloadAndClear();
+  migrateLegacyIfPresent();
+}
 
 const UIDataSaver = {
-  presentBirthData(stamped) {
-    if (!stamped || !stamped.data) {
-      return null;
-    }
-
-    const base = typeof stamped.data === 'object' ? { ...stamped.data } : {};
-    base.data = stamped.data;
-    base.meta = stamped.meta;
-    return base;
+  getMeta() {
+    const canonical = readCanonicalBirthData();
+    return canonical ? canonical.meta : null;
   },
 
-  /**
-   * Persist birth data in canonical, stamped form.
-   * @param {object} birthData
-   * @returns {boolean}
-   */
   setBirthData(birthData) {
-    if (!birthData || typeof birthData !== 'object') {
+    if (!isBrowser) {
+      return false;
+    }
+
+    const prepared = prepareBirthDataForStorage(birthData);
+    if (!prepared) {
       warnLog('Attempted to set birth data with invalid payload.');
+      this.clear();
       return false;
     }
 
-    const storage = getSessionStorage();
-    if (!storage) {
+    const fingerprint = fingerprintBirthData(prepared);
+    if (!fingerprint) {
+      warnLog('Unable to compute fingerprint for birth data.');
+      this.clear();
       return false;
     }
 
-    const stamped = stamp(birthData);
-    const serialized = jsonSafe.stringify(stamped);
-    if (!serialized) {
-      warnLog('Failed to serialize birth data for storage.');
-      return false;
-    }
-
-    const sanitized = sanitizeBirthData(birthData);
+    const previous = readCanonicalBirthData();
+    const previousFingerprint = previous?.meta?.fingerprint || null;
+    const updatedAtISO = nowISO();
 
     try {
-      storage.setItem(CACHE_KEYS.BIRTH_DATA, serialized);
-      storage.removeItem(CACHE_KEYS.BIRTH_DATA_SESSION);
-      MEM.birth = stamped;
-
-      updateSession((session) => {
-        session.birthData = birthData;
-        session.meta = {
-          ...(session.meta || {}),
-          birthDataHash: stamped.meta.dataHash,
-          birthDataSavedAt: stamped.meta.savedAt
-        };
-        return session;
-      });
-
-      writeLocalKey(`${STORAGE_PREFIX}_birthData`, birthData);
-
-      if (sanitized) {
-        writeSessionKey(CACHE_KEYS.BIRTH_DATA_SESSION, sanitized);
-        writeLocalKey('jyotish_birth_data', sanitized);
-        debugLog('Persisted legacy birth data keys', sanitized);
+      writeCanonicalBirthData(prepared, fingerprint, updatedAtISO);
+      if (previousFingerprint && previousFingerprint !== fingerprint) {
+        safeRemove(CANONICAL_KEYS.chartId);
       }
-      return true;
+      console.info('[UIDataSaver] setBirthData fp=', fingerprint, 'at', updatedAtISO);
     } catch (error) {
       errorLog('Failed to persist birth data', error);
       return false;
     }
+
+    updateSession((session) => ({
+      ...session,
+      birthData: prepared
+    }));
+
+    return true;
   },
 
-  /**
-   * @returns {{ data: object, meta: { savedAt: number, dataHash: string, version: number }} | null}
-   */
   getBirthData() {
     if (!isBrowser) {
       return null;
     }
 
-    if (MEM.birth && isFresh(MEM.birth)) {
-      return this.presentBirthData(MEM.birth);
+    let canonical = readCanonicalBirthData();
+    if (canonical) {
+      return canonical;
     }
 
-    const stamped = readStampedBirthData();
-    if (stamped) {
-      MEM.birth = stamped;
-      return this.presentBirthData(stamped);
+    migrateLegacyIfPresent();
+    canonical = readCanonicalBirthData();
+    return canonical;
+  },
+
+  setChartId(chartId) {
+    if (!isBrowser) {
+      return;
     }
 
-    const session = ensureSession();
-    if (!sessionBirthFresh(session)) {
-      debugLog('Session birth data exceeded TTL; clearing cache.');
-      this.clearBirthData();
+    if (!chartId) {
+      warnLog('setChartId called without chartId.');
+      return;
+    }
+
+    const value = String(chartId);
+    const updatedAtISO = nowISO();
+    try {
+      safeSet(CANONICAL_KEYS.chartId, value);
+      safeSet(CANONICAL_KEYS.updatedAt, updatedAtISO);
+    } catch (error) {
+      errorLog('Failed to persist chart id', error);
+      clearAllV2Keys();
+      return;
+    }
+
+    updateSession((session) => ({
+      ...session,
+      lastChartId: value
+    }));
+  },
+
+  getChartId() {
+    if (!isBrowser) {
       return null;
     }
 
-    const legacySessionBirth = session.birthData || session?.currentSession?.birthData;
-    if (legacySessionBirth && typeof legacySessionBirth === 'object') {
-      debugLog('Upgrading birth data from session container.');
-      this.setBirthData(legacySessionBirth);
-      return this.presentBirthData(MEM.birth);
+    const updatedAtISO = safeGet(CANONICAL_KEYS.updatedAt);
+    if (!updatedAtISO) {
+      return null;
     }
 
-    const legacyKeyBirth = readSessionKey(CACHE_KEYS.BIRTH_DATA_SESSION);
-    if (legacyKeyBirth && typeof legacyKeyBirth === 'object') {
-      debugLog('Upgrading birth data from legacy birth_data_session key.');
-      this.setBirthData(legacyKeyBirth);
-      removeSessionKey(CACHE_KEYS.BIRTH_DATA_SESSION);
-      return this.presentBirthData(MEM.birth);
+    if (isExpired(updatedAtISO)) {
+      clearAllV2Keys();
+      console.info('[UIDataSaver] expired birthData cleared');
+      return null;
     }
 
-    debugLog('No birth data available in storage.');
-    return null;
+    const chartId = safeGet(CANONICAL_KEYS.chartId);
+    return chartId || null;
+  },
+
+  clear() {
+    clearAllV2Keys();
+    removeLegacyBirthKeys();
+    updateSession((session) => {
+      const next = { ...session };
+      delete next.birthData;
+      delete next.lastChartId;
+      return next;
+    });
+  },
+
+  clearBirthData() {
+    this.clear();
   },
 
   setLastChart(chartId, birthData) {
@@ -328,33 +566,14 @@ const UIDataSaver = {
       return;
     }
 
+    this.setChartId(chartId);
     const payload = birthData || this.getBirthData()?.data || null;
     const record = {
-      chartId,
-      birthDataHash: payload ? hash(canonical(payload)) : null,
+      chartId: String(chartId),
+      birthDataHash: payload ? fingerprintBirthData(payload) : null,
       savedAt: Date.now()
     };
-
     writeSessionKey(CACHE_KEYS.LAST_CHART, record);
-    updateSession((session) => {
-      session.lastChart = record;
-      return session;
-    });
-  },
-
-  clearBirthData() {
-    MEM.birth = null;
-    removeSessionKey(CACHE_KEYS.BIRTH_DATA);
-    removeSessionKey(CACHE_KEYS.BIRTH_DATA_SESSION);
-    updateSession((session) => {
-      if (session.meta) {
-        delete session.meta.birthDataHash;
-        delete session.meta.birthDataSavedAt;
-      }
-      delete session.birthData;
-      return session;
-    });
-    writeLocalKey(`${STORAGE_PREFIX}_birthData`, null);
   },
 
   saveSession(payload = {}) {
@@ -364,7 +583,7 @@ const UIDataSaver = {
       }
 
       if (payload.preferences) {
-        writeLocalKey(`${STORAGE_PREFIX}_preferences`, payload.preferences);
+        writeLocalKey(`${STORAGE_PREFIX}:preferences`, payload.preferences);
       }
 
       updateSession((session) => ({
@@ -395,7 +614,7 @@ const UIDataSaver = {
         apiResponse: {
           ...(session.apiResponse || {}),
           ...apiResponse,
-          timestamp: new Date().toISOString()
+          timestamp: nowISO()
         }
       }));
 
@@ -416,7 +635,7 @@ const UIDataSaver = {
         throw new Error('Comprehensive analysis payload required');
       }
 
-      const timestamp = new Date().toISOString();
+      const timestamp = nowISO();
 
       updateSession((session) => ({
         ...session,
@@ -473,7 +692,7 @@ const UIDataSaver = {
         const analysis = { ...(session.analysis || {}) };
         analysis[analysisType] = {
           ...apiResponse,
-          timestamp: new Date().toISOString()
+          timestamp: nowISO()
         };
         session.analysis = analysis;
         return session;
@@ -484,6 +703,10 @@ const UIDataSaver = {
       errorLog(`Error saving ${analysisType} analysis`, error);
       return { success: false, error: error?.message || 'Unknown error' };
     }
+  },
+
+  saveIndividualAnalysis(analysisType, analysisData) {
+    return this.saveApiAnalysisResponse(analysisType, analysisData);
   },
 
   getHousesAnalysis() {
@@ -514,14 +737,10 @@ const UIDataSaver = {
     return this.getIndividualAnalysis('preliminary');
   },
 
-  saveIndividualAnalysis(analysisType, analysisData) {
-    return this.saveApiAnalysisResponse(analysisType, analysisData);
-  },
-
   loadSession() {
     try {
       const currentSession = ensureSession();
-      const preferences = readLocalKey(`${STORAGE_PREFIX}_preferences`);
+      const preferences = readLocalKey(`${STORAGE_PREFIX}:preferences`);
       const birthStamped = this.getBirthData();
       const birthData = birthStamped ? birthStamped.data : null;
 
@@ -532,7 +751,7 @@ const UIDataSaver = {
         meta: {
           birthDataMeta: birthStamped ? birthStamped.meta : null
         },
-        loadedAt: new Date().toISOString()
+        loadedAt: nowISO()
       };
     } catch (error) {
       errorLog('Error loading session data', error);
@@ -559,7 +778,7 @@ const UIDataSaver = {
       .forEach((key) => {
         const value = readLocalKey(key);
         const timestamp = value?.timestamp;
-        if (!value || (timestamp && now - new Date(timestamp).getTime() > expiryMs)) {
+        if (!value || (timestamp && now - Date.parse(timestamp) > expiryMs)) {
           storage.removeItem(key);
         }
       });
@@ -570,48 +789,38 @@ const UIDataSaver = {
   },
 
   clearAll() {
-    const sessionStorage = getSessionStorage();
+    this.clear();
+    removeSessionKey(CACHE_KEYS.SESSION);
+    removeSessionKey('comprehensive_analysis_data');
+
     const localStorage = getLocalStorage();
-
-    if (sessionStorage) {
-      sessionStorage.removeItem(CACHE_KEYS.SESSION);
-      sessionStorage.removeItem(CACHE_KEYS.BIRTH_DATA);
-      sessionStorage.removeItem(CACHE_KEYS.BIRTH_DATA_SESSION);
-      sessionStorage.removeItem(CACHE_KEYS.LAST_CHART);
-    }
-
     if (localStorage) {
       Object.keys(localStorage)
         .filter((key) => key.startsWith(STORAGE_PREFIX))
         .forEach((key) => localStorage.removeItem(key));
     }
-
-    MEM.birth = null;
   },
 
   initializeBrowserEvents() {
-    if (!isBrowser) {
+    if (!isBrowser || typeof window === 'undefined' || typeof document === 'undefined') {
       return;
     }
 
     window.addEventListener('beforeunload', () => {
-      const storage = getSessionStorage();
-      if (!storage) {
-        return;
-      }
-
-      if (!storage.getItem(CACHE_KEYS.BIRTH_DATA) && MEM.birth) {
-        const serialized = jsonSafe.stringify(MEM.birth);
-        if (serialized) {
-          storage.setItem(CACHE_KEYS.BIRTH_DATA, serialized);
-        }
+      try {
+        safeSet(CANONICAL_KEYS.updatedAt, nowISO());
+      } catch (error) {
+        errorLog('Failed to refresh timestamp on unload', error);
       }
     });
 
     document.addEventListener('formDataChanged', (event) => {
       const detail = event?.detail;
       if (detail?.birthData) {
-        this.setBirthData(detail.birthData);
+        UIDataSaver.setBirthData(detail.birthData);
+      }
+      if (detail?.chartId) {
+        UIDataSaver.setChartId(detail.chartId);
       }
     });
   },

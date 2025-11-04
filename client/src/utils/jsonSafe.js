@@ -6,23 +6,19 @@
  * @module jsonSafe
  */
 
-<<<<<<< Current (Your changes)
 /**
  * Safely parse JSON string
  * @param {string} str - JSON string to parse
  * @returns {*|null} Parsed object or null if parse fails
  */
 export function parse(str) {
-  if (!str || typeof str !== 'string') {
+  if (typeof str !== 'string' || str.length === 0) {
     return null;
   }
-  
+
   try {
     return JSON.parse(str);
-  } catch (error) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.debug('[jsonSafe] Parse error:', error.message);
-    }
+  } catch (_error) {
     return null;
   }
 }
@@ -33,59 +29,20 @@ export function parse(str) {
  * @returns {string|null} JSON string or null if stringify fails
  */
 export function stringify(obj) {
-  if (obj === undefined) {
+  if (typeof obj === 'undefined') {
     return null;
   }
-  
+
   try {
     return JSON.stringify(obj);
-  } catch (error) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.debug('[jsonSafe] Stringify error:', error.message);
-    }
+  } catch (_error) {
     return null;
   }
 }
 
-/**
- * Default export as object with methods
- */
-export default {
+export const jsonSafe = {
   parse,
   stringify,
 };
-=======
-export const jsonSafe = {
-  /**
-   * Parse JSON without throwing. Returns null on failure or when input is not a string.
-   * @param {string | null | undefined} str
-   * @returns {unknown}
-   */
-  parse(str) {
-    if (typeof str !== 'string') {
-      return null;
-    }
-
-    try {
-      return JSON.parse(str);
-    } catch (error) {
-      return null;
-    }
-  },
-
-  /**
-   * Stringify JSON without throwing. Returns null on failure.
-   * @param {unknown} obj
-   * @returns {string | null}
-   */
-  stringify(obj) {
-    try {
-      return JSON.stringify(obj);
-    } catch (error) {
-      return null;
-    }
-  }
-};
 
 export default jsonSafe;
->>>>>>> Incoming (Background Agent changes)

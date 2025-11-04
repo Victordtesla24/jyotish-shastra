@@ -1,8 +1,18 @@
 import UIDataSaver from '../UIDataSaver.js';
 import { CACHE_KEYS } from '../../../utils/cacheKeys.js';
-import { CACHE_TTL_MS, canonical, hash } from '../../../utils/cachePolicy.js';
+import { canonical, hash } from '../../../utils/cachePolicy.js';
 
-const sampleBirthData = {
+const CANONICAL_PREFIX = 'btr:v2';
+const CANONICAL_KEYS = {
+  birthData: `${CANONICAL_PREFIX}:birthData`,
+  updatedAt: `${CANONICAL_PREFIX}:updatedAt`,
+  fingerprint: `${CANONICAL_PREFIX}:fingerprint`,
+  chartId: `${CANONICAL_PREFIX}:chartId`
+};
+
+const TTL_MS = 15 * 60 * 1000;
+
+const baseBirthData = {
   name: 'Test User',
   dateOfBirth: '1990-01-01',
   timeOfBirth: '12:00',
@@ -12,12 +22,19 @@ const sampleBirthData = {
   timezone: 'Asia/Kolkata'
 };
 
-const readCanonicalBirthData = () => {
-  const raw = sessionStorage.getItem(CACHE_KEYS.BIRTH_DATA);
-  return raw ? JSON.parse(raw) : null;
+const computeFingerprint = (data) => {
+  const payload = {
+    name: (data.name || '').trim(),
+    dateOfBirth: data.dateOfBirth,
+    timeOfBirth: data.timeOfBirth,
+    latitude: Number(data.latitude).toFixed(6),
+    longitude: Number(data.longitude).toFixed(6),
+    timezone: data.timezone
+  };
+  return hash(canonical(payload));
 };
 
-describe('UIDataSaver birth data persistence', () => {
+describe('UIDataSaver v2 canonical storage', () => {
   beforeEach(() => {
     jest.useFakeTimers().setSystemTime(new Date('2024-01-01T00:00:00.000Z'));
     sessionStorage.clear();
@@ -30,64 +47,77 @@ describe('UIDataSaver birth data persistence', () => {
     jest.useRealTimers();
   });
 
-  it('persists birth data using canonical stamped structure', () => {
-    const result = UIDataSaver.setBirthData(sampleBirthData);
-    expect(result).toBe(true);
-
-    const stored = readCanonicalBirthData();
-    expect(stored).not.toBeNull();
-    expect(stored.data).toEqual(sampleBirthData);
-    expect(stored.meta).toMatchObject({ dataHash: expect.any(String), savedAt: Date.now(), version: 1 });
+  it('returns null when no birth data is stored', () => {
+    expect(UIDataSaver.getBirthData()).toBeNull();
   });
 
-  it('rejects and clears expired canonical birth data', () => {
-    const staleSavedAt = Date.now() - CACHE_TTL_MS - 1000;
+  it('persists and retrieves fresh birth data with meta info', () => {
+    expect(UIDataSaver.setBirthData(baseBirthData)).toBe(true);
+
+    const storedJson = sessionStorage.getItem(CANONICAL_KEYS.birthData);
+    expect(storedJson).not.toBeNull();
+
+    const stored = JSON.parse(storedJson);
+    expect(stored).toMatchObject({ ...baseBirthData, latitude: 19.076, longitude: 72.8777 });
+
+    const result = UIDataSaver.getBirthData();
+    expect(result?.data).toEqual(stored);
+    expect(result?.meta).toMatchObject({ schema: '2', savedAtISO: '2024-01-01T00:00:00.000Z' });
+    expect(typeof result?.meta?.fingerprint).toBe('string');
+  });
+
+  it('expires stale birth data after TTL window', () => {
+    sessionStorage.setItem(CANONICAL_KEYS.birthData, JSON.stringify(baseBirthData));
+    sessionStorage.setItem(CANONICAL_KEYS.fingerprint, computeFingerprint(baseBirthData));
     sessionStorage.setItem(
-      CACHE_KEYS.BIRTH_DATA,
-      JSON.stringify({
-        data: sampleBirthData,
-        meta: { savedAt: staleSavedAt, dataHash: 'hstale', version: 1 }
-      })
+      CANONICAL_KEYS.updatedAt,
+      new Date(Date.now() - TTL_MS - 1000).toISOString()
     );
+    sessionStorage.setItem(`${CANONICAL_PREFIX}:schema`, '2');
 
-    const retrieved = UIDataSaver.getBirthData();
-
-    expect(retrieved).toBeNull();
-    expect(sessionStorage.getItem(CACHE_KEYS.BIRTH_DATA)).toBeNull();
+    expect(UIDataSaver.getBirthData()).toBeNull();
+    expect(sessionStorage.getItem(CANONICAL_KEYS.birthData)).toBeNull();
   });
 
-  it('handles corrupt canonical payloads gracefully', () => {
-    sessionStorage.setItem(CACHE_KEYS.BIRTH_DATA, '{invalid json');
+  it('produces distinct fingerprints for differing birth data', () => {
+    UIDataSaver.setBirthData(baseBirthData);
+    const firstMeta = UIDataSaver.getMeta();
 
-    const retrieved = UIDataSaver.getBirthData();
+    UIDataSaver.setBirthData({ ...baseBirthData, timeOfBirth: '18:45' });
+    const secondMeta = UIDataSaver.getMeta();
 
-    expect(retrieved).toBeNull();
-    expect(sessionStorage.getItem(CACHE_KEYS.BIRTH_DATA)).toBeNull();
+    expect(firstMeta?.fingerprint).not.toEqual(secondMeta?.fingerprint);
   });
 
-  it('upgrades legacy birth_data_session payload to canonical form', () => {
-    sessionStorage.setItem(CACHE_KEYS.BIRTH_DATA_SESSION, JSON.stringify(sampleBirthData));
+  it('stores and retrieves chart id while refreshing timestamp', () => {
+    UIDataSaver.setBirthData(baseBirthData);
+    UIDataSaver.setChartId('chart-001');
 
-    const retrieved = UIDataSaver.getBirthData();
-
-    expect(retrieved).not.toBeNull();
-    expect(retrieved?.data).toEqual(sampleBirthData);
-
-    const canonicalEntry = readCanonicalBirthData();
-    expect(canonicalEntry).not.toBeNull();
-    expect(canonicalEntry?.data).toEqual(sampleBirthData);
-    expect(canonicalEntry?.meta?.dataHash).toEqual(hash(canonical(sampleBirthData)));
+    expect(UIDataSaver.getChartId()).toBe('chart-001');
+    const updatedAt = sessionStorage.getItem(CANONICAL_KEYS.updatedAt);
+    expect(updatedAt).toBe('2024-01-01T00:00:00.000Z');
   });
 
-  it('records last chart metadata with deterministic hash', () => {
-    UIDataSaver.setLastChart('chart-123', sampleBirthData);
+  it('migrates legacy birth_data_session payload on first access', () => {
+    sessionStorage.setItem(CACHE_KEYS.BIRTH_DATA_SESSION, JSON.stringify(baseBirthData));
+
+    const retrieved = UIDataSaver.getBirthData();
+    expect(retrieved?.data).toEqual(expect.objectContaining(baseBirthData));
+
+    expect(sessionStorage.getItem(CACHE_KEYS.BIRTH_DATA_SESSION)).toBeNull();
+    expect(sessionStorage.getItem(CANONICAL_KEYS.birthData)).not.toBeNull();
+  });
+
+  it('records last chart metadata with derived fingerprint hash', () => {
+    UIDataSaver.setBirthData(baseBirthData);
+    UIDataSaver.setLastChart('chart-777', baseBirthData);
 
     const raw = sessionStorage.getItem(CACHE_KEYS.LAST_CHART);
     expect(raw).not.toBeNull();
 
     const stored = JSON.parse(raw);
-    expect(stored.chartId).toBe('chart-123');
-    expect(stored.birthDataHash).toBe(hash(canonical(sampleBirthData)));
+    expect(stored.chartId).toBe('chart-777');
+    expect(stored.birthDataHash).toBe(computeFingerprint(baseBirthData));
     expect(typeof stored.savedAt).toBe('number');
   });
 });

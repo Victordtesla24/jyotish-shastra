@@ -147,9 +147,6 @@ const HomePage = () => {
 
       // Create chart object with metadata and store in context
       // Include both raw and transformed data for maximum compatibility
-      const chartId = chartData.data?.chartId || chartData.chartId || `chart_${Date.now()}`;
-      UIDataSaver.setLastChart(chartId, formData);
-
       const chart = {
         id: chartId,
         birthData: formData,
