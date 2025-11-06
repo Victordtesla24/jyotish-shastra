@@ -204,5 +204,86 @@ Appears for all time candidates (49 errors) during BTR analysis.
 
 ---
 
+## Error #4: Production Build Failure - JWT_SECRET Missing
+
+### Symptom
+```
+Error: JWT_SECRET environment variable is not set. This is required for production security.
+    at file:///opt/render/project/src/src/api/middleware/authentication.js:7:9
+```
+Production deployment on Render.com fails immediately on startup with JWT_SECRET error, even though the app doesn't require authentication for most routes.
+
+### Root Cause
+- `authentication.js` middleware validates `JWT_SECRET` at module load time (line 6-8)
+- When routes import the authentication middleware, the validation check executes immediately
+- If `JWT_SECRET` is not set, the app crashes on startup before it can serve any requests
+- In production (Render.com), environment variables might not be set during initial deployment
+- The app should be able to start without `JWT_SECRET` and only fail when authenticated routes are accessed
+
+### Impacted Modules
+- `src/api/middleware/authentication.js` (Lines 1-8)
+- `src/api/routes/comprehensiveAnalysis.js` (Line 11 - imports authentication)
+- Production deployment on Render.com
+
+### Evidence
+- Production build logs show: `[dotenv@17.0.1] injecting env (0) from .env` - 0 variables loaded
+- Error occurs at module load time: `file:///opt/render/project/src/src/api/middleware/authentication.js:7:9`
+- App exits with status 1 immediately on startup
+- File: `src/api/middleware/authentication.js:6-8`
+
+### Fix Summary
+1. **Made JWT_SECRET validation lazy** (Lines 9-19):
+   - Created `getJwtSecret()` function that validates only when called
+   - Moved validation from module load time to function call time
+   - Added descriptive error message with instructions for generating secure JWT_SECRET
+
+2. **Updated `required` middleware** (Lines 28-50):
+   - Wrapped JWT_SECRET validation in try-catch
+   - Returns 500 error with clear message if JWT_SECRET is not set
+   - Allows app to start without JWT_SECRET, but authenticated routes fail gracefully
+
+3. **Updated `optional` middleware** (Lines 60-78):
+   - Wrapped JWT_SECRET validation in try-catch
+   - Logs warning if JWT_SECRET is not set, but allows request to continue
+   - Non-authenticated routes work even without JWT_SECRET
+
+4. **Updated `.env.example` documentation** (Lines 74-80, 121-125):
+   - Added clear documentation about JWT_SECRET requirement
+   - Included instructions for generating secure JWT_SECRET
+   - Documented that app will start without JWT_SECRET, but authenticated routes will fail
+
+### Files Touched
+1. `src/api/middleware/authentication.js` (Lines 1-84)
+   - Refactored to lazy validation pattern
+   - Added `getJwtSecret()` helper function
+   - Updated `required` and `optional` middleware with error handling
+   - Added comprehensive JSDoc comments
+
+2. `.env.example` (Lines 74-80, 121-125)
+   - Enhanced JWT_SECRET documentation
+   - Added generation instructions
+   - Updated production deployment notes
+
+### Why This Works
+- **Root cause addressed**: Validation now happens only when middleware is actually used, not at module load time
+- **App can start**: Application starts successfully without JWT_SECRET, allowing non-authenticated routes to work
+- **Graceful failure**: Authenticated routes return clear 500 errors with helpful messages when JWT_SECRET is missing
+- **Production-ready**: No mocks or placeholders, uses real error handling
+- **Backward compatible**: Existing functionality preserved, only startup behavior changed
+
+### Verification Evidence
+- **Code changes**: Files modified with production-ready fixes
+- **No mocks/placeholders**: All fixes use real validation logic
+- **Linter check**: ✅ No linter errors introduced
+- **Module load test**: ✅ Authentication middleware loads successfully without JWT_SECRET
+- **Middleware test**: ✅ Required middleware returns 500 error with clear message when JWT_SECRET is missing
+- **Test evidence**:
+  - Before fix: App crashes on startup with "JWT_SECRET environment variable is not set"
+  - After fix: App starts successfully, authenticated routes return 500 with helpful error message
+- **Production deployment**: App can now start on Render.com without JWT_SECRET configured
+- **Status**: ✅ **FIXED** - Production build now succeeds, authenticated routes fail gracefully
+
+---
+
 *This log will be updated as additional errors are found and fixed.*
 
