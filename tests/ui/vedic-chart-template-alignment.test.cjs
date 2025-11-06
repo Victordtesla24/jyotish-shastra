@@ -77,8 +77,9 @@ describe('Vedic Chart Template Alignment Tests', () => {
     test('House coordinates follow North Indian pattern', () => {
       const componentContent = fs.readFileSync(VedicChartDisplayPath, 'utf8');
       
-      // Extract HOUSE_POSITIONS section
-      const housePositionsMatch = componentContent.match(/const HOUSE_POSITIONS = \{([^}]+)\}/s);
+      // Extract HOUSE_POSITIONS section - use balanced brace matching
+      // Match from "const HOUSE_POSITIONS = {" to the closing "};"
+      const housePositionsMatch = componentContent.match(/const HOUSE_POSITIONS = \{([\s\S]*?)\};/);
       expect(housePositionsMatch).toBeTruthy();
       
       const housePositionsText = housePositionsMatch[1];

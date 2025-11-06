@@ -88,7 +88,7 @@ describe('ChartGenerationService - House Assignment Fixes', () => {
       const ascendant = chart.ascendant;
 
       expect(house1.houseNumber).toBe(1);
-      expect(house1.system).toBe('Placidus');
+      expect(house1.system).toBe('Whole Sign'); // Vedic astrology uses Whole Sign house system
       expect(house1.siderealLongitude).toBeDefined();
       expect(house1.tropicalLongitude).toBeDefined();
       expect(house1.ayanamsaUsed).toBeDefined();
@@ -126,7 +126,7 @@ describe('ChartGenerationService - House Assignment Fixes', () => {
       expect(chart.ascendant.house).toBe(1);
     });
 
-    it('should use Placidus house system', async () => {
+    it('should use Whole Sign house system', async () => {
       const wasmAvailable = await checkWasmAvailability();
       if (!wasmAvailable) {
         console.warn('⚠️  Skipping test - WASM not available');
@@ -145,9 +145,9 @@ describe('ChartGenerationService - House Assignment Fixes', () => {
 
       const chart = await chartService.generateRasiChart(birthData);
 
-      // Verify all house positions use Placidus system
+      // Verify all house positions use Whole Sign system (Vedic astrology standard)
       chart.housePositions.forEach(house => {
-        expect(house.system).toBe('Placidus');
+        expect(house.system).toBe('Whole Sign');
       });
     });
   });
@@ -179,21 +179,20 @@ describe('ChartGenerationService - House Assignment Fixes', () => {
         expect(planet.house).toBeLessThanOrEqual(12);
       });
 
-      // Verify planets are in correct houses based on longitude
-      const houseCusps = chart.housePositions.map(h => h.longitude);
+      // Verify planets are in correct houses based on Whole Sign system
+      // In Whole Sign houses, each sign is a house, starting from ascendant sign
+      const ascendantSignIndex = Math.floor(chart.ascendant.longitude / 30);
       
       Object.entries(chart.planetaryPositions).forEach(([name, planet]) => {
         const planetLongitude = ((planet.longitude % 360) + 360) % 360;
+        const planetSignIndex = Math.floor(planetLongitude / 30);
         const assignedHouse = planet.house;
-        const houseCusp = houseCusps[assignedHouse - 1];
-        const nextHouseCusp = houseCusps[assignedHouse % 12];
-
-        // Planet should be between its house cusp and next house cusp
-        const isInHouse = (nextHouseCusp < houseCusp)
-          ? (planetLongitude >= houseCusp || planetLongitude < nextHouseCusp)
-          : (planetLongitude >= houseCusp && planetLongitude < nextHouseCusp);
-
-        expect(isInHouse).toBe(true);
+        
+        // Calculate expected house: difference between planet sign and ascendant sign
+        const expectedHouse = ((planetSignIndex - ascendantSignIndex + 12) % 12) + 1;
+        
+        // Planet should be in the correct house based on Whole Sign system
+        expect(assignedHouse).toBe(expectedHouse);
       });
     });
   });

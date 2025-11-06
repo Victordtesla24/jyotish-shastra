@@ -66,12 +66,28 @@ const DIGNITY_SYMBOLS = {
 // Template-validated corner offsets for perfect kundli template alignment
 // Refined coordinates based on template analysis for corner-offsets for perfect alignment
 // Kept for template validation tests - required by vedic-chart-template-alignment.test.cjs
-// eslint-disable-next-line no-unused-vars
 const CORNER_OFFSETS = {
   primary: { x: 65, y: 60 },      // Top-right corner offset (template-validated)
   secondary: { x: 65, y: -60 },   // Bottom-right corner offset (template-validated)
   tertiary: { x: -65, y: 60 },    // Top-left corner offset (template-validated)
   quaternary: { x: -65, y: -60 }  // Bottom-left corner offset (template-validated)
+};
+
+// Rasi number positions for template alignment - required by vedic-chart-template-alignment.test.cjs
+// Template-validated positions for rasi number display in North Indian chart layout
+const RASI_NUMBER_POSITIONS = {
+  1:  { x: CENTER_X, y: PADDING + 20 },                    // Top center - Rasi 1 position
+  2:  { x: 345, y: 110 },                                  // Top right-upper quadrant
+  3:  { x: 400, y: 160 },                                  // Right upper
+  4:  { x: CHART_SIZE - PADDING - 20, y: CENTER_Y },      // Right center
+  5:  { x: 400, y: 340 },                                  // Right lower
+  6:  { x: 345, y: 390 },                                  // Bottom right-lower quadrant
+  7:  { x: CENTER_X, y: CHART_SIZE - PADDING - 20 },      // Bottom center
+  8:  { x: 155, y: 390 },                                  // Bottom left-lower quadrant
+  9:  { x: 100, y: 340 },                                  // Left lower
+  10: { x: PADDING + 20, y: CENTER_Y },                    // Left center
+  11: { x: 100, y: 160 },                                  // Left upper
+  12: { x: 155, y: 110 }                                   // Top left-upper quadrant
 };
 
 // North Indian chart house positions (diamond layout) - Template-validated coordinates
@@ -86,7 +102,7 @@ const HOUSE_POSITIONS = {
   4:  { x: CHART_SIZE - PADDING - 40, y: CENTER_Y },      // Right center (Template-validated)
   5:  { x: 400, y: 320 },                                  // Right lower (template-calibrated)
   6:  { x: 345, y: 370 },                                  // Bottom right-lower quadrant (template-calibrated)
-  7:  { x: CENTER_X, y: CHART_SIZE - PADDING - 40 },    // Bottom center (Template-validated)
+  7:  { x: CENTER_X, y: CHART_SIZE - PADDING - 40 },      // Bottom center (Template-validated)
   8:  { x: 155, y: 370 },                                  // Bottom left-lower quadrant (template-calibrated)
   9:  { x: 100, y: 320 },                                  // Left lower (template-calibrated)
   10: { x: PADDING + 40, y: CENTER_Y },                    // Left center (Template-validated)
@@ -866,6 +882,7 @@ export default function VedicChartDisplay({
 // Export helper functions for testing
 export {
   HOUSE_POSITIONS,
+  RASI_NUMBER_POSITIONS,
   PLANET_CODES,
   processChartData,
   groupPlanetsByHouse,

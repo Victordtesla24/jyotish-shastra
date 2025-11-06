@@ -40,6 +40,29 @@ async function toJulianDayUT(dateUtc) {
   return typeof result === 'object' && result.julianDay ? result.julianDay : result;
 }
 
+/**
+ * Calculate Gulika (Mandi) longitude per BPHS
+ * 
+ * @see BPHS Chapter 3, Śloka 70 (PDF page 45)
+ * @quote "The degree ascending at the time of start of Gulika's portion will be the longitude of Gulika at a given place."
+ * 
+ * @note Editor's Note (PDF page 45, Note 2): "Gulika's position should be found out for the beginning of Saturn's Muhurta only."
+ * @note Editor's Note (PDF page 45): "Mandi and Gulika are one and the same."
+ * 
+ * @algorithm
+ * 1. Divide day/night duration into 8 equal segments (Kālāvelās)
+ * 2. Find Saturn's Muhurta segment (8th for day, 7th for night, based on weekday)
+ * 3. Calculate START of Saturn's Muhurta (not end) - this is Gulika time
+ * 4. Calculate ascending degree at Gulika time - this is Gulika longitude
+ * 
+ * @param {Date} birthDateLocal - Local birth date/time
+ * @param {number} latitude - Birth latitude in degrees
+ * @param {number} longitude - Birth longitude in degrees
+ * @param {string} timezone - IANA timezone identifier (e.g., 'Asia/Kolkata')
+ * @param {Object} sunriseOptions - Optional sunrise calculation options
+ * @returns {Promise<Object>} Gulika longitude, sign, degree, and local time
+ * @throws {Error} If coordinates or timezone are invalid
+ */
 export async function computeGulikaLongitude({
   birthDateLocal,
   latitude,
@@ -59,40 +82,45 @@ export async function computeGulikaLongitude({
     throw new Error('Timezone is required for Gulika calculation');
   }
 
-  const sunriseSunsetResult = await computeSunriseSunset(
-    birthDateLocal.getFullYear(),
-    birthDateLocal.getMonth() + 1, // JavaScript months are 0-based, need 1-based
-    birthDateLocal.getDate(),
-    latitude,
-    longitude,
-    timezone
-  );
-  
-  // Extract sunrise and sunset times from result object
-  const sunriseLocal = sunriseSunsetResult?.sunrise?.time;
-  const sunsetLocal = sunriseSunsetResult?.sunset?.time;
-  
-  // Parse timezone offset from timezone string (e.g., '+05:30' -> 5.5)
+  // Parse timezone offset from timezone string BEFORE calling computeSunriseSunset
   let tzOffsetHours = 0;
   if (timezone && typeof timezone === 'string') {
-    // Parse timezone string format: '+05:30' or '-05:00' or 'Asia/Kolkata'
+    // Parse timezone string format: '+05:30' or '-05:00'
     const tzMatch = timezone.match(/^([+-])(\d{2}):(\d{2})$/);
     if (tzMatch) {
       const sign = tzMatch[1] === '+' ? 1 : -1;
       const hours = parseInt(tzMatch[2], 10);
       const minutes = parseInt(tzMatch[3], 10);
       tzOffsetHours = sign * (hours + minutes / 60);
-    } else {
-      // Try to get offset from sunriseSunsetResult if available
-      tzOffsetHours = sunriseSunsetResult?.timezoneOffset || sunriseSunsetResult?.timezone || 0;
-      
-      // If still not available, default to 0 and log warning
-      if (!Number.isFinite(tzOffsetHours)) {
-        console.warn(`Could not parse timezone offset from: ${timezone}, defaulting to 0`);
+    } else if (timezone.includes('/')) {
+      // Handle IANA timezone format (e.g., 'Asia/Kolkata')
+      try {
+        const moment = (await import('moment-timezone')).default;
+        const timezoneMoment = moment.tz(birthDateLocal, timezone);
+        tzOffsetHours = timezoneMoment.utcOffset() / 60; // Convert minutes to hours
+      } catch (tzError) {
+        console.warn(`Could not parse timezone offset from: ${timezone}, defaulting to 0. Error: ${tzError.message}`);
         tzOffsetHours = 0;
       }
+    } else {
+      console.warn(`Could not parse timezone offset from: ${timezone}, defaulting to 0`);
+      tzOffsetHours = 0;
     }
   }
+
+  // Now call computeSunriseSunset with the numeric timezone offset
+  const sunriseSunsetResult = await computeSunriseSunset(
+    birthDateLocal.getFullYear(),
+    birthDateLocal.getMonth() + 1, // JavaScript months are 0-based, need 1-based
+    birthDateLocal.getDate(),
+    latitude,
+    longitude,
+    tzOffsetHours  // Pass numeric offset, not string
+  );
+  
+  // Extract sunrise and sunset times from result object
+  const sunriseLocal = sunriseSunsetResult?.sunrise?.time;
+  const sunsetLocal = sunriseSunsetResult?.sunset?.time;
 
   const isDay = birthDateLocal >= sunriseLocal && birthDateLocal <= sunsetLocal;
   const weekday = birthDateLocal.getDay(); // 0 Sunday
@@ -122,7 +150,7 @@ export async function computeGulikaLongitude({
         nextDay.getDate(),
         latitude,
         longitude,
-        timezone
+        tzOffsetHours  // Pass numeric offset, not string
       );
       const nextSunriseLocal = nextSunriseSunsetResult?.sunrise?.time;
     durationMs = nextSunriseLocal.getTime() - sunsetLocal.getTime();
@@ -131,6 +159,8 @@ export async function computeGulikaLongitude({
   }
 
   const kalaMs = durationMs / 8;
+  // BPHS Ch.3 Śloka 70, p.45: Calculate START of Saturn's Muhurta (not end)
+  // Editor's Note p.45: "Gulika's position should be found out for the beginning of Saturn's Muhurta only."
   const gulikaLocal = new Date(startLocal.getTime() + segmentIndex * kalaMs);
   
   // Validate gulikaLocal is a valid date

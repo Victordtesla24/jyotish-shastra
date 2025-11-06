@@ -103,9 +103,17 @@ class ChartService {
       prepared.latitude = birthData.latitude;
       prepared.longitude = birthData.longitude;
       
-      // Timezone is required with coordinates
-      if (birthData.timezone || birthData.geocodingInfo?.timezone) {
-        prepared.timezone = birthData.timezone || birthData.geocodingInfo.timezone;
+      // CRITICAL FIX: Timezone is required with coordinates for backend validation
+      // Backend validator requires timezone when coordinates are provided
+      // Try multiple sources: direct timezone, geocodingInfo.timezone, or throw error
+      if (birthData.timezone) {
+        prepared.timezone = birthData.timezone;
+      } else if (birthData.geocodingInfo?.timezone) {
+        prepared.timezone = birthData.geocodingInfo.timezone;
+      } else {
+        // If coordinates are provided but timezone is missing, throw error
+        // This prevents 400 errors from backend validation
+        throw new Error('Timezone is required when coordinates are provided. Please provide timezone or use place of birth instead.');
       }
     }
 

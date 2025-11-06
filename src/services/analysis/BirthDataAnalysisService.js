@@ -9,7 +9,6 @@
 // Removed direct sweph-wasm import to avoid initialization issues in test environments
 
 import moment from 'moment';
-import { getSign, getSignName } from '../../utils/helpers/astrologyHelpers.js';
 
 class BirthDataAnalysisService {
   constructor() {
@@ -226,7 +225,6 @@ class BirthDataAnalysisService {
 
     if (rasiChart && rasiChart.planetaryPositions) {
       const positions = rasiChart.planetaryPositions;
-      const housePositions = rasiChart.housePositions || {};
 
       for (const [planet, position] of Object.entries(positions)) {
         const houseNumber = this.calculateHouseNumber(position.longitude, rasiChart.ascendant.longitude);
@@ -350,7 +348,13 @@ class BirthDataAnalysisService {
     const planetaryPositions = this.analyzePlanetaryPositions(rasiChart);
     const mahadasha = this.analyzeMahadasha(rasiChart, birthData);
 
-    const allComplete = birthDetails.completeness === 100 &&
+    // CRITICAL FIX: readyForAnalysis should only check birth data completeness
+    // Charts are generated later in performComprehensiveAnalysis, so we shouldn't
+    // require them to be present here. Birth data completeness is the key requirement.
+    const birthDataComplete = birthDetails.completeness === 100;
+    
+    // All components complete (for status tracking)
+    const allComplete = birthDataComplete &&
                        chartGeneration.status === 'complete' &&
                        ascendant.lagnaSign &&
                        Object.keys(planetaryPositions.planetaryPositions).length === 9 &&
@@ -363,7 +367,9 @@ class BirthDataAnalysisService {
       ascendantCalculated: !!ascendant.lagnaSign,
       planetsCalculated: Object.keys(planetaryPositions.planetaryPositions).length,
       dashaCalculated: !!mahadasha.currentDasha,
-      readyForAnalysis: allComplete
+      // CRITICAL FIX: readyForAnalysis only requires birth data completeness
+      // Charts will be generated in performComprehensiveAnalysis after this check
+      readyForAnalysis: birthDataComplete
     };
   }
 

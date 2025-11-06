@@ -39,7 +39,7 @@
     "test:btr:bphs": "jest tests/integration/btr/bphs-methods.test.js --verbose",
     "test:btr:golden": "jest tests/integration/btr/golden-case.test.js --verbose",
     "test:btr:all": "jest tests/unit/metrics tests/unit/adapters tests/integration/btr --verbose",
-    "evidence:generate": "node scripts/generate-evidence.js",
+    "evidence:generate": "node scripts/generate-evidence.cjs",
     "evidence:validate": "node scripts/generate-evidence.js && cat EVIDENCE.md | grep 'PASS ✓'",
     "deploy:validate": "npm run test:btr:all && npm run evidence:generate"
   },
@@ -83,6 +83,7 @@
     "jest-environment-jsdom": "^29.7.0",
     "jest-transform-css": "^6.0.3",
     "lint-staged": "^15.2.0",
+    "pdf-parse": "^2.4.5",
     "prettier": "^3.1.0",
     "supertest": "^7.1.4",
     "ts-node": "^10.9.2",

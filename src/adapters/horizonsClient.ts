@@ -61,12 +61,16 @@ export class HorizonsClient {
     // Map body name to NAIF ID
     const targetId = HORIZONS_BODY_MAP[body] || body;
 
+    // CRITICAL FIX: Preserve decimal precision in Julian Day string conversion
+    // Use toFixed(1) to ensure .0 is preserved, or use String() to preserve full precision
+    const jdString = julianDay % 1 === 0 ? `${julianDay}.0` : String(julianDay);
+
     // Construct query
     const query: HorizonsQuery = {
       target: targetId,
       observer,
-      startTime: `JD${julianDay}`,
-      stopTime: `JD${julianDay}`,
+      startTime: `JD${jdString}`,
+      stopTime: `JD${jdString}`,
       step: '1d',
       quantities: '1',
       coordType: 'ECLIPTIC',

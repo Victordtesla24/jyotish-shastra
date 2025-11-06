@@ -1,0 +1,5397 @@
+{
+  "timestamp": "2025-11-06T03:36:10.904Z",
+  "chartId": "pune_1985_1762400170904",
+  "birthData": {
+    "name": "Test Subject - Pune 1985",
+    "dateOfBirth": "1985-10-24",
+    "timeOfBirth": "13:30",
+    "placeOfBirth": "Pune, Maharashtra, India",
+    "latitude": 18.5204,
+    "longitude": 73.8567,
+    "timezone": "Asia/Kolkata"
+  },
+  "btrAnalysis": {
+    "originalData": {
+      "name": "Test Subject - Pune 1985",
+      "dateOfBirth": "1985-10-24",
+      "timeOfBirth": "13:30",
+      "placeOfBirth": "Pune, Maharashtra, India",
+      "latitude": 18.5204,
+      "longitude": 73.8567,
+      "timezone": "Asia/Kolkata"
+    },
+    "methods": {
+      "praanapada": {
+        "method": "Praanapada",
+        "candidates": [
+          {
+            "time": "11:30",
+            "praanapada": {
+              "longitude": 128.30113386091864,
+              "sign": "Leo",
+              "degree": 8.30113386091864,
+              "palas": -58.813224999999996
+            },
+            "ascendant": {
+              "longitude": 253.8504591940739,
+              "signIndex": 8,
+              "signName": "Sagittarius",
+              "signId": 9,
+              "longitudeTropical": 277.50936406671093,
+              "ayanamsa": 23.658904872637038,
+              "degree": 13.850459194073892,
+              "degreeInSign": 13.850459194073892,
+              "sign": "Sagittarius",
+              "house": 1
+            },
+            "alignmentScore": 42,
+            "weightedScore": 16.8
+          },
+          {
+            "time": "11:35",
+            "praanapada": {
+              "longitude": 128.512925527277,
+              "sign": "Leo",
+              "degree": 8.512925527276991,
+              "palas": -58.60489166666667
+            },
+            "ascendant": {
+              "longitude": 255.03128525528808,
+              "signIndex": 8,
+              "signName": "Sagittarius",
+              "signId": 9,
+              "longitudeTropical": 278.69019026071095,
+              "ayanamsa": 23.658905005422866,
+              "degree": 15.031285255288083,
+              "degreeInSign": 15.031285255288083,
+              "sign": "Sagittarius",
+              "house": 1
+            },
+            "alignmentScore": 42,
+            "weightedScore": 16.8
+          },
+          {
+            "time": "11:40",
+            "praanapada": {
+              "longitude": 128.72471720000308,
+              "sign": "Leo",
+              "degree": 8.724717200003084,
+              "palas": -58.39655833333333
+            },
+            "ascendant": {
+              "longitude": 256.21741226124357,
+              "signIndex": 8,
+              "signName": "Sagittarius",
+              "signId": 9,
+              "longitudeTropical": 279.8763173994523,
+              "ayanamsa": 23.658905138208752,
+              "degree": 16.217412261243567,
+              "degreeInSign": 16.217412261243567,
+              "sign": "Sagittarius",
+              "house": 1
+            },
+            "alignmentScore": 41,
+            "weightedScore": 16.400000000000002
+          },
+          {
+            "time": "11:45",
+            "praanapada": {
+              "longitude": 128.9365088779981,
+              "sign": "Leo",
+              "degree": 8.936508877998108,
+              "palas": -58.188224999999996
+            },
+            "ascendant": {
+              "longitude": 257.40905923656976,
+              "signIndex": 8,
+              "signName": "Sagittarius",
+              "signId": 9,
+              "longitudeTropical": 281.06796450756434,
+              "ayanamsa": 23.65890527099458,
+              "degree": 17.40905923656976,
+              "degreeInSign": 17.40905923656976,
+              "sign": "Sagittarius",
+              "house": 1
+            },
+            "alignmentScore": 41,
+            "weightedScore": 16.400000000000002
+          },
+          {
+            "time": "11:50",
+            "praanapada": {
+              "longitude": 129.14830056264572,
+              "sign": "Leo",
+              "degree": 9.148300562645716,
+              "palas": -57.97989166666667
+            },
+            "ascendant": {
+              "longitude": 258.60644585553325,
+              "signIndex": 8,
+              "signName": "Sagittarius",
+              "signId": 9,
+              "longitudeTropical": 282.26535125931366,
+              "ayanamsa": 23.65890540378041,
+              "degree": 18.606445855533252,
+              "degreeInSign": 18.606445855533252,
+              "sign": "Sagittarius",
+              "house": 1
+            },
+            "alignmentScore": 40,
+            "weightedScore": 16
+          },
+          {
+            "time": "11:55",
+            "praanapada": {
+              "longitude": 129.36009225227966,
+              "sign": "Leo",
+              "degree": 9.360092252279657,
+              "palas": -57.77155833333333
+            },
+            "ascendant": {
+              "longitude": 259.8097908306171,
+              "signIndex": 8,
+              "signName": "Sagittarius",
+              "signId": 9,
+              "longitudeTropical": 283.4686963671833,
+              "ayanamsa": 23.658905536566238,
+              "degree": 19.80979083061709,
+              "degreeInSign": 19.80979083061709,
+              "sign": "Sagittarius",
+              "house": 1
+            },
+            "alignmentScore": 40,
+            "weightedScore": 16
+          },
+          {
+            "time": "12:00",
+            "praanapada": {
+              "longitude": 129.5718839481018,
+              "sign": "Leo",
+              "degree": 9.5718839481018,
+              "palas": -57.563224999999996
+            },
+            "ascendant": {
+              "longitude": 261.0193128326627,
+              "signIndex": 8,
+              "signName": "Sagittarius",
+              "signId": 9,
+              "longitudeTropical": 284.67821850201483,
+              "ayanamsa": 23.658905669352123,
+              "degree": 21.019312832662706,
+              "degreeInSign": 21.019312832662706,
+              "sign": "Sagittarius",
+              "house": 1
+            },
+            "alignmentScore": 39,
+            "weightedScore": 15.600000000000001
+          },
+          {
+            "time": "12:05",
+            "praanapada": {
+              "longitude": 129.7836756491924,
+              "sign": "Leo",
+              "degree": 9.78367564919239,
+              "palas": -57.35489166666667
+            },
+            "ascendant": {
+              "longitude": 262.2352288153627,
+              "signIndex": 8,
+              "signName": "Sagittarius",
+              "signId": 9,
+              "longitudeTropical": 285.89413461750064,
+              "ayanamsa": 23.65890580213795,
+              "degree": 22.23522881536269,
+              "degreeInSign": 22.23522881536269,
+              "sign": "Sagittarius",
+              "house": 1
+            },
+            "alignmentScore": 39,
+            "weightedScore": 15.600000000000001
+          },
+          {
+            "time": "12:10",
+            "praanapada": {
+              "longitude": 129.99546735660286,
+              "sign": "Leo",
+              "degree": 9.995467356602859,
+              "palas": -57.14655833333333
+            },
+            "ascendant": {
+              "longitude": 263.45775489520787,
+              "signIndex": 8,
+              "signName": "Sagittarius",
+              "signId": 9,
+              "longitudeTropical": 287.11666083013165,
+              "ayanamsa": 23.65890593492378,
+              "degree": 23.45775489520787,
+              "degreeInSign": 23.45775489520787,
+              "sign": "Sagittarius",
+              "house": 1
+            },
+            "alignmentScore": 38,
+            "weightedScore": 15.200000000000001
+          },
+          {
+            "time": "12:15",
+            "praanapada": {
+              "longitude": 130.207259069339,
+              "sign": "Leo",
+              "degree": 10.207259069338988,
+              "palas": -56.938224999999996
+            },
+            "ascendant": {
+              "longitude": 264.6871046032881,
+              "signIndex": 8,
+              "signName": "Sagittarius",
+              "signId": 9,
+              "longitudeTropical": 288.3460106709977,
+              "ayanamsa": 23.65890606770961,
+              "degree": 24.687104603288105,
+              "degreeInSign": 24.687104603288105,
+              "sign": "Sagittarius",
+              "house": 1
+            },
+            "alignmentScore": 38,
+            "weightedScore": 15.200000000000001
+          },
+          {
+            "time": "12:20",
+            "praanapada": {
+              "longitude": 130.41905078786448,
+              "sign": "Leo",
+              "degree": 10.419050787864478,
+              "palas": -56.72989166666667
+            },
+            "ascendant": {
+              "longitude": 265.92348955560334,
+              "signIndex": 8,
+              "signName": "Sagittarius",
+              "signId": 9,
+              "longitudeTropical": 289.5823957560988,
+              "ayanamsa": 23.658906200495437,
+              "degree": 25.92348955560334,
+              "degreeInSign": 25.92348955560334,
+              "sign": "Sagittarius",
+              "house": 1
+            },
+            "alignmentScore": 37,
+            "weightedScore": 14.8
+          },
+          {
+            "time": "12:25",
+            "praanapada": {
+              "longitude": 130.63084251270655,
+              "sign": "Leo",
+              "degree": 10.63084251270655,
+              "palas": -56.52155833333333
+            },
+            "ascendant": {
+              "longitude": 267.1671184586828,
+              "signIndex": 8,
+              "signName": "Sagittarius",
+              "signId": 9,
+              "longitudeTropical": 290.82602479196413,
+              "ayanamsa": 23.658906333281323,
+              "degree": 27.167118458682808,
+              "degreeInSign": 27.167118458682808,
+              "sign": "Sagittarius",
+              "house": 1
+            },
+            "alignmentScore": 37,
+            "weightedScore": 14.8
+          },
+          {
+            "time": "12:30",
+            "praanapada": {
+              "longitude": 130.84263424322432,
+              "sign": "Leo",
+              "degree": 10.842634243224325,
+              "palas": -56.313224999999996
+            },
+            "ascendant": {
+              "longitude": 268.41819606704325,
+              "signIndex": 8,
+              "signName": "Sagittarius",
+              "signId": 9,
+              "longitudeTropical": 292.0771025331104,
+              "ayanamsa": 23.65890646606715,
+              "degree": 28.418196067043255,
+              "degreeInSign": 28.418196067043255,
+              "sign": "Sagittarius",
+              "house": 1
+            },
+            "alignmentScore": 36,
+            "weightedScore": 14.4
+          },
+          {
+            "time": "12:35",
+            "praanapada": {
+              "longitude": 131.05442597959615,
+              "sign": "Leo",
+              "degree": 11.054425979596147,
+              "palas": -56.10489166666667
+            },
+            "ascendant": {
+              "longitude": 269.6769237781247,
+              "signIndex": 8,
+              "signName": "Sagittarius",
+              "signId": 9,
+              "longitudeTropical": 293.33583037697764,
+              "ayanamsa": 23.658906598852923,
+              "degree": 29.676923778124717,
+              "degreeInSign": 29.676923778124717,
+              "sign": "Sagittarius",
+              "house": 1
+            },
+            "alignmentScore": 36,
+            "weightedScore": 14.4
+          },
+          {
+            "time": "12:40",
+            "praanapada": {
+              "longitude": 131.2662177213547,
+              "sign": "Leo",
+              "degree": 11.266217721354707,
+              "palas": -55.89655833333333
+            },
+            "ascendant": {
+              "longitude": 270.94349768660425,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 294.60240441824305,
+              "ayanamsa": 23.658906731638808,
+              "degree": 0.9434976866042462,
+              "degreeInSign": 0.9434976866042462,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "alignmentScore": 35,
+            "weightedScore": 14
+          },
+          {
+            "time": "12:45",
+            "praanapada": {
+              "longitude": 131.47800946925383,
+              "sign": "Leo",
+              "degree": 11.478009469253834,
+              "palas": -55.688224999999996
+            },
+            "ascendant": {
+              "longitude": 272.2181092898583,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 295.87701615428296,
+              "ayanamsa": 23.658906864424637,
+              "degree": 2.218109289858319,
+              "degreeInSign": 2.218109289858319,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "alignmentScore": 35,
+            "weightedScore": 14
+          },
+          {
+            "time": "12:50",
+            "praanapada": {
+              "longitude": 131.68980122254476,
+              "sign": "Leo",
+              "degree": 11.689801222544759,
+              "palas": -55.47989166666667
+            },
+            "ascendant": {
+              "longitude": 273.5009434560049,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 297.15985045321537,
+              "ayanamsa": 23.658906997210465,
+              "degree": 3.5009434560049044,
+              "degreeInSign": 3.5009434560049044,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "alignmentScore": 34,
+            "weightedScore": 13.600000000000001
+          },
+          {
+            "time": "12:55",
+            "praanapada": {
+              "longitude": 131.90159298215647,
+              "sign": "Leo",
+              "degree": 11.901592982156473,
+              "palas": -55.27155833333333
+            },
+            "ascendant": {
+              "longitude": 274.79217907758397,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 298.45108620758026,
+              "ayanamsa": 23.658907129996294,
+              "degree": 4.792179077583967,
+              "degreeInSign": 4.792179077583967,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "alignmentScore": 34,
+            "weightedScore": 13.600000000000001
+          },
+          {
+            "time": "13:00",
+            "praanapada": {
+              "longitude": 132.1133847469814,
+              "sign": "Leo",
+              "degree": 12.11338474698141,
+              "palas": -55.063224999999996
+            },
+            "ascendant": {
+              "longitude": 276.0919869501675,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 299.7508942129496,
+              "ayanamsa": 23.658907262782122,
+              "degree": 6.091986950167495,
+              "degreeInSign": 6.091986950167495,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "alignmentScore": 33,
+            "weightedScore": 13.200000000000001
+          },
+          {
+            "time": "13:05",
+            "praanapada": {
+              "longitude": 132.32517651766312,
+              "sign": "Leo",
+              "degree": 12.325176517663124,
+              "palas": -54.85489166666667
+            },
+            "ascendant": {
+              "longitude": 277.4005302017241,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 301.0594375972921,
+              "ayanamsa": 23.658907395568008,
+              "degree": 7.400530201724109,
+              "degreeInSign": 7.400530201724109,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "alignmentScore": 32,
+            "weightedScore": 12.8
+          },
+          {
+            "time": "13:10",
+            "praanapada": {
+              "longitude": 132.53696829466506,
+              "sign": "Leo",
+              "degree": 12.536968294665058,
+              "palas": -54.64655833333333
+            },
+            "ascendant": {
+              "longitude": 278.7179629639274,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 302.3768704922812,
+              "ayanamsa": 23.658907528353836,
+              "degree": 8.717962963927391,
+              "degreeInSign": 8.717962963927391,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "alignmentScore": 32,
+            "weightedScore": 12.8
+          },
+          {
+            "time": "13:15",
+            "praanapada": {
+              "longitude": 132.748760077346,
+              "sign": "Leo",
+              "degree": 12.748760077345992,
+              "palas": -54.438224999999996
+            },
+            "ascendant": {
+              "longitude": 280.04442899612707,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 303.70333665726673,
+              "ayanamsa": 23.658907661139665,
+              "degree": 10.044428996127067,
+              "degreeInSign": 10.044428996127067,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "alignmentScore": 31,
+            "weightedScore": 12.4
+          },
+          {
+            "time": "13:20",
+            "praanapada": {
+              "longitude": 132.9605518658861,
+              "sign": "Leo",
+              "degree": 12.960551865886089,
+              "palas": -54.22989166666667
+            },
+            "ascendant": {
+              "longitude": 281.3800620463294,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 305.0389698402549,
+              "ayanamsa": 23.658907793925493,
+              "degree": 11.380062046329385,
+              "degreeInSign": 11.380062046329385,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "alignmentScore": 31,
+            "weightedScore": 12.4
+          },
+          {
+            "time": "13:25",
+            "praanapada": {
+              "longitude": 133.1723436597595,
+              "sign": "Leo",
+              "degree": 13.172343659759491,
+              "palas": -54.02155833333333
+            },
+            "ascendant": {
+              "longitude": 282.72498353203383,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 306.3838914587452,
+              "ayanamsa": 23.65890792671138,
+              "degree": 12.724983532033832,
+              "degreeInSign": 12.724983532033832,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "alignmentScore": 30,
+            "weightedScore": 12
+          },
+          {
+            "time": "13:30",
+            "praanapada": {
+              "longitude": 133.38413545989977,
+              "sign": "Leo",
+              "degree": 13.384135459899767,
+              "palas": -53.813224999999996
+            },
+            "ascendant": {
+              "longitude": 284.0793030461468,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 307.738211105644,
+              "ayanamsa": 23.658908059497207,
+              "degree": 14.079303046146777,
+              "degreeInSign": 14.079303046146777,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "alignmentScore": 30,
+            "weightedScore": 12
+          },
+          {
+            "time": "13:35",
+            "praanapada": {
+              "longitude": 133.59592726537534,
+              "sign": "Leo",
+              "degree": 13.595927265375337,
+              "palas": -53.60489166666667
+            },
+            "ascendant": {
+              "longitude": 285.4431159709602,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 309.1020241632432,
+              "ayanamsa": 23.65890819228298,
+              "degree": 15.443115970960207,
+              "degreeInSign": 15.443115970960207,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "alignmentScore": 29,
+            "weightedScore": 11.600000000000001
+          },
+          {
+            "time": "13:40",
+            "praanapada": {
+              "longitude": 133.80771907717397,
+              "sign": "Leo",
+              "degree": 13.80771907717397,
+              "palas": -53.39655833333333
+            },
+            "ascendant": {
+              "longitude": 286.8165039713137,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 310.47541229638256,
+              "ayanamsa": 23.658908325068865,
+              "degree": 16.816503971313693,
+              "degreeInSign": 16.816503971313693,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "alignmentScore": 28,
+            "weightedScore": 11.200000000000001
+          },
+          {
+            "time": "13:45",
+            "praanapada": {
+              "longitude": 134.01951089419174,
+              "sign": "Leo",
+              "degree": 14.01951089419174,
+              "palas": -53.188224999999996
+            },
+            "ascendant": {
+              "longitude": 288.19953256106334,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 311.85844101891803,
+              "ayanamsa": 23.658908457854693,
+              "degree": 18.199532561063336,
+              "degreeInSign": 18.199532561063336,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "alignmentScore": 28,
+            "weightedScore": 11.200000000000001
+          },
+          {
+            "time": "13:50",
+            "praanapada": {
+              "longitude": 134.23130271707322,
+              "sign": "Leo",
+              "degree": 14.23130271707322,
+              "palas": -52.97989166666667
+            },
+            "ascendant": {
+              "longitude": 289.59225141459166,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 313.25116000523224,
+              "ayanamsa": 23.65890859064058,
+              "degree": 19.592251414591658,
+              "degreeInSign": 19.592251414591658,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "alignmentScore": 27,
+            "weightedScore": 10.8
+          },
+          {
+            "time": "13:55",
+            "praanapada": {
+              "longitude": 134.4430945466834,
+              "sign": "Leo",
+              "degree": 14.443094546683398,
+              "palas": -52.77155833333333
+            },
+            "ascendant": {
+              "longitude": 290.9946928454292,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 314.65360156885555,
+              "ayanamsa": 23.65890872342635,
+              "degree": 20.9946928454292,
+              "degreeInSign": 20.9946928454292,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "alignmentScore": 27,
+            "weightedScore": 10.8
+          },
+          {
+            "time": "14:00",
+            "praanapada": {
+              "longitude": 134.6548863811721,
+              "sign": "Leo",
+              "degree": 14.654886381172105,
+              "palas": -52.563224999999996
+            },
+            "ascendant": {
+              "longitude": 292.40687027599427,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 316.06577913220644,
+              "ayanamsa": 23.65890885621218,
+              "degree": 22.406870275994265,
+              "degreeInSign": 22.406870275994265,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "alignmentScore": 26,
+            "weightedScore": 10.4
+          },
+          {
+            "time": "14:05",
+            "praanapada": {
+              "longitude": 134.8666782219238,
+              "sign": "Leo",
+              "degree": 14.866678221923792,
+              "palas": -52.35489166666667
+            },
+            "ascendant": {
+              "longitude": 293.82877860493085,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 317.4876875939289,
+              "ayanamsa": 23.658908988998064,
+              "degree": 23.828778604930847,
+              "degreeInSign": 23.828778604930847,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "alignmentScore": 26,
+            "weightedScore": 10.4
+          },
+          {
+            "time": "14:10",
+            "praanapada": {
+              "longitude": 135.07847006807813,
+              "sign": "Leo",
+              "degree": 15.078470068078133,
+              "palas": -52.14655833333333
+            },
+            "ascendant": {
+              "longitude": 295.26039177544897,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 318.91930089723286,
+              "ayanamsa": 23.658909121783893,
+              "degree": 25.260391775448966,
+              "degreeInSign": 25.260391775448966,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "alignmentScore": 25,
+            "weightedScore": 10
+          },
+          {
+            "time": "14:15",
+            "praanapada": {
+              "longitude": 135.29026192038145,
+              "sign": "Leo",
+              "degree": 15.290261920381454,
+              "palas": -51.938224999999996
+            },
+            "ascendant": {
+              "longitude": 296.7016634111712,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 320.3605726657409,
+              "ayanamsa": 23.65890925456972,
+              "degree": 26.701663411171182,
+              "degreeInSign": 26.701663411171182,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "alignmentScore": 24,
+            "weightedScore": 9.600000000000001
+          },
+          {
+            "time": "14:20",
+            "praanapada": {
+              "longitude": 135.5020537781465,
+              "sign": "Leo",
+              "degree": 15.50205377814649,
+              "palas": -51.72989166666667
+            },
+            "ascendant": {
+              "longitude": 298.15252443963317,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 321.8114338269887,
+              "ayanamsa": 23.65890938735555,
+              "degree": 28.15252443963317,
+              "degreeInSign": 28.15252443963317,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "alignmentScore": 24,
+            "weightedScore": 9.600000000000001
+          },
+          {
+            "time": "14:25",
+            "praanapada": {
+              "longitude": 135.71384564205985,
+              "sign": "Leo",
+              "degree": 15.713845642059852,
+              "palas": -51.52155833333333
+            },
+            "ascendant": {
+              "longitude": 299.6128838516798,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 323.2717933718212,
+              "ayanamsa": 23.658909520141435,
+              "degree": 29.612883851679783,
+              "degreeInSign": 29.612883851679783,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "alignmentScore": 23,
+            "weightedScore": 9.200000000000001
+          },
+          {
+            "time": "14:30",
+            "praanapada": {
+              "longitude": 135.92563751138027,
+              "sign": "Leo",
+              "degree": 15.925637511380273,
+              "palas": -51.313224999999996
+            },
+            "ascendant": {
+              "longitude": 301.08262642415343,
+              "signIndex": 10,
+              "signName": "Aquarius",
+              "signId": 11,
+              "longitudeTropical": 324.7415360770807,
+              "ayanamsa": 23.658909652927264,
+              "degree": 1.0826264241534318,
+              "degreeInSign": 1.0826264241534318,
+              "sign": "Aquarius",
+              "house": 1
+            },
+            "alignmentScore": 22,
+            "weightedScore": 8.8
+          },
+          {
+            "time": "14:35",
+            "praanapada": {
+              "longitude": 136.13742938702575,
+              "sign": "Leo",
+              "degree": 16.137429387025747,
+              "palas": -51.10489166666667
+            },
+            "ascendant": {
+              "longitude": 302.56161344439096,
+              "signIndex": 10,
+              "signName": "Aquarius",
+              "signId": 11,
+              "longitudeTropical": 326.220523230104,
+              "ayanamsa": 23.658909785713035,
+              "degree": 2.5616134443909573,
+              "degreeInSign": 2.5616134443909573,
+              "sign": "Aquarius",
+              "house": 1
+            },
+            "alignmentScore": 22,
+            "weightedScore": 8.8
+          },
+          {
+            "time": "14:40",
+            "praanapada": {
+              "longitude": 136.34922126842494,
+              "sign": "Leo",
+              "degree": 16.34922126842494,
+              "palas": -50.89655833333333
+            },
+            "ascendant": {
+              "longitude": 304.04968157165985,
+              "signIndex": 10,
+              "signName": "Aquarius",
+              "signId": 11,
+              "longitudeTropical": 327.70859149015877,
+              "ayanamsa": 23.65890991849892,
+              "degree": 4.049681571659846,
+              "degreeInSign": 4.049681571659846,
+              "sign": "Aquarius",
+              "house": 1
+            },
+            "alignmentScore": 21,
+            "weightedScore": 8.4
+          },
+          {
+            "time": "14:45",
+            "praanapada": {
+              "longitude": 136.56101315510466,
+              "sign": "Leo",
+              "degree": 16.56101315510466,
+              "palas": -50.688224999999996
+            },
+            "ascendant": {
+              "longitude": 305.546641779881,
+              "signIndex": 10,
+              "signName": "Aquarius",
+              "signId": 11,
+              "longitudeTropical": 329.20555183116574,
+              "ayanamsa": 23.65891005128475,
+              "degree": 5.546641779880986,
+              "degreeInSign": 5.546641779880986,
+              "sign": "Aquarius",
+              "house": 1
+            },
+            "alignmentScore": 21,
+            "weightedScore": 8.4
+          },
+          {
+            "time": "14:50",
+            "praanapada": {
+              "longitude": 136.77280504817844,
+              "sign": "Leo",
+              "degree": 16.77280504817844,
+              "palas": -50.47989166666667
+            },
+            "ascendant": {
+              "longitude": 307.0522804114009,
+              "signIndex": 10,
+              "signName": "Aquarius",
+              "signId": 11,
+              "longitudeTropical": 330.7111905954715,
+              "ayanamsa": 23.658910184070635,
+              "degree": 7.052280411400886,
+              "degreeInSign": 7.052280411400886,
+              "sign": "Aquarius",
+              "house": 1
+            },
+            "alignmentScore": 20,
+            "weightedScore": 8
+          },
+          {
+            "time": "14:55",
+            "praanapada": {
+              "longitude": 136.98459694653687,
+              "sign": "Leo",
+              "degree": 16.98459694653687,
+              "palas": -50.27155833333333
+            },
+            "ascendant": {
+              "longitude": 308.56635734785044,
+              "signIndex": 10,
+              "signName": "Aquarius",
+              "signId": 11,
+              "longitudeTropical": 332.22526766470685,
+              "ayanamsa": 23.658910316856407,
+              "degree": 8.566357347850442,
+              "degreeInSign": 8.566357347850442,
+              "sign": "Aquarius",
+              "house": 1
+            },
+            "alignmentScore": 19,
+            "weightedScore": 7.6000000000000005
+          },
+          {
+            "time": "15:00",
+            "praanapada": {
+              "longitude": 137.1963888511085,
+              "sign": "Leo",
+              "degree": 17.19638885110851,
+              "palas": -50.063224999999996
+            },
+            "ascendant": {
+              "longitude": 310.08860753538096,
+              "signIndex": 10,
+              "signName": "Aquarius",
+              "signId": 11,
+              "longitudeTropical": 333.74751798502325,
+              "ayanamsa": 23.658910449642292,
+              "degree": 10.088607535380959,
+              "degreeInSign": 10.088607535380959,
+              "sign": "Aquarius",
+              "house": 1
+            },
+            "alignmentScore": 19,
+            "weightedScore": 7.6000000000000005
+          },
+          {
+            "time": "15:05",
+            "praanapada": {
+              "longitude": 137.40818076114618,
+              "sign": "Leo",
+              "degree": 17.408180761146184,
+              "palas": -49.85489166666667
+            },
+            "ascendant": {
+              "longitude": 311.61873941063334,
+              "signIndex": 10,
+              "signName": "Aquarius",
+              "signId": 11,
+              "longitudeTropical": 335.27764999306146,
+              "ayanamsa": 23.65891058242812,
+              "degree": 11.618739410633339,
+              "degreeInSign": 11.618739410633339,
+              "sign": "Aquarius",
+              "house": 1
+            },
+            "alignmentScore": 18,
+            "weightedScore": 7.2
+          },
+          {
+            "time": "15:10",
+            "praanapada": {
+              "longitude": 137.61997267740222,
+              "sign": "Leo",
+              "degree": 17.619972677402217,
+              "palas": -49.64655833333333
+            },
+            "ascendant": {
+              "longitude": 313.1564367343468,
+              "signIndex": 10,
+              "signName": "Aquarius",
+              "signId": 11,
+              "longitudeTropical": 336.8153474495608,
+              "ayanamsa": 23.658910715214006,
+              "degree": 13.156436734346812,
+              "degreeInSign": 13.156436734346812,
+              "sign": "Aquarius",
+              "house": 1
+            },
+            "alignmentScore": 17,
+            "weightedScore": 6.800000000000001
+          },
+          {
+            "time": "15:15",
+            "praanapada": {
+              "longitude": 137.8317645994108,
+              "sign": "Leo",
+              "degree": 17.831764599410803,
+              "palas": -49.438224999999996
+            },
+            "ascendant": {
+              "longitude": 314.7013573076066,
+              "signIndex": 10,
+              "signName": "Aquarius",
+              "signId": 11,
+              "longitudeTropical": 338.3602681556064,
+              "ayanamsa": 23.658910847999778,
+              "degree": 14.7013573076066,
+              "degreeInSign": 14.7013573076066,
+              "sign": "Aquarius",
+              "house": 1
+            },
+            "alignmentScore": 17,
+            "weightedScore": 6.800000000000001
+          },
+          {
+            "time": "15:20",
+            "praanapada": {
+              "longitude": 138.04355652688645,
+              "sign": "Leo",
+              "degree": 18.043556526886448,
+              "palas": -49.22989166666667
+            },
+            "ascendant": {
+              "longitude": 316.25313493404826,
+              "signIndex": 10,
+              "signName": "Aquarius",
+              "signId": 11,
+              "longitudeTropical": 339.91204591483387,
+              "ayanamsa": 23.658910980785606,
+              "degree": 16.253134934048262,
+              "degreeInSign": 16.253134934048262,
+              "sign": "Aquarius",
+              "house": 1
+            },
+            "alignmentScore": 16,
+            "weightedScore": 6.4
+          },
+          {
+            "time": "15:25",
+            "praanapada": {
+              "longitude": 138.25534846057465,
+              "sign": "Leo",
+              "degree": 18.255348460574652,
+              "palas": -49.02155833333333
+            },
+            "ascendant": {
+              "longitude": 317.81137949200536,
+              "signIndex": 10,
+              "signName": "Aquarius",
+              "signId": 11,
+              "longitudeTropical": 341.47029060557685,
+              "ayanamsa": 23.65891111357149,
+              "degree": 17.811379492005358,
+              "degreeInSign": 17.811379492005358,
+              "sign": "Aquarius",
+              "house": 1
+            },
+            "alignmentScore": 15,
+            "weightedScore": 6
+          },
+          {
+            "time": "15:30",
+            "praanapada": {
+              "longitude": 138.46714039955873,
+              "sign": "Leo",
+              "degree": 18.46714039955873,
+              "palas": -48.813224999999996
+            },
+            "ascendant": {
+              "longitude": 319.3756771638326,
+              "signIndex": 10,
+              "signName": "Aquarius",
+              "signId": 11,
+              "longitudeTropical": 343.03458841018994,
+              "ayanamsa": 23.65891124635732,
+              "degree": 19.37567716383262,
+              "degreeInSign": 19.37567716383262,
+              "sign": "Aquarius",
+              "house": 1
+            },
+            "alignmentScore": 15,
+            "weightedScore": 6
+          }
+        ],
+        "bestCandidate": {
+          "time": "11:30",
+          "praanapada": {
+            "longitude": 128.30113386091864,
+            "sign": "Leo",
+            "degree": 8.30113386091864,
+            "palas": -58.813224999999996
+          },
+          "ascendant": {
+            "longitude": 253.8504591940739,
+            "signIndex": 8,
+            "signName": "Sagittarius",
+            "signId": 9,
+            "longitudeTropical": 277.50936406671093,
+            "ayanamsa": 23.658904872637038,
+            "degree": 13.850459194073892,
+            "degreeInSign": 13.850459194073892,
+            "sign": "Sagittarius",
+            "house": 1
+          },
+          "alignmentScore": 42,
+          "weightedScore": 16.8
+        }
+      },
+      "moon": {
+        "method": "Moon",
+        "candidates": [
+          {
+            "time": "11:30",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 317.5671306270456,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 10.90047162704558
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 253.8504591940739,
+              "signIndex": 8,
+              "signName": "Sagittarius",
+              "signId": 9,
+              "longitudeTropical": 277.50936406671093,
+              "ayanamsa": 23.658904872637038,
+              "degree": 13.850459194073892,
+              "degreeInSign": 13.850459194073892,
+              "sign": "Sagittarius",
+              "house": 1
+            },
+            "moonScore": 50,
+            "weightedScore": 15
+          },
+          {
+            "time": "11:35",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 317.61018470641375,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 10.943525706413755
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 255.03128525528808,
+              "signIndex": 8,
+              "signName": "Sagittarius",
+              "signId": 9,
+              "longitudeTropical": 278.69019026071095,
+              "ayanamsa": 23.658905005422866,
+              "degree": 15.031285255288083,
+              "degreeInSign": 15.031285255288083,
+              "sign": "Sagittarius",
+              "house": 1
+            },
+            "moonScore": 50,
+            "weightedScore": 15
+          },
+          {
+            "time": "11:40",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 317.65323613617636,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 10.986577136176368
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 256.21741226124357,
+              "signIndex": 8,
+              "signName": "Sagittarius",
+              "signId": 9,
+              "longitudeTropical": 279.8763173994523,
+              "ayanamsa": 23.658905138208752,
+              "degree": 16.217412261243567,
+              "degreeInSign": 16.217412261243567,
+              "sign": "Sagittarius",
+              "house": 1
+            },
+            "moonScore": 50,
+            "weightedScore": 15
+          },
+          {
+            "time": "11:45",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 317.69628490672267,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 11.029625906722675
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 257.40905923656976,
+              "signIndex": 8,
+              "signName": "Sagittarius",
+              "signId": 9,
+              "longitudeTropical": 281.06796450756434,
+              "ayanamsa": 23.65890527099458,
+              "degree": 17.40905923656976,
+              "degreeInSign": 17.40905923656976,
+              "sign": "Sagittarius",
+              "house": 1
+            },
+            "moonScore": 50,
+            "weightedScore": 15
+          },
+          {
+            "time": "11:50",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 317.73933103730394,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 11.072672037303949
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 258.60644585553325,
+              "signIndex": 8,
+              "signName": "Sagittarius",
+              "signId": 9,
+              "longitudeTropical": 282.26535125931366,
+              "ayanamsa": 23.65890540378041,
+              "degree": 18.606445855533252,
+              "degreeInSign": 18.606445855533252,
+              "sign": "Sagittarius",
+              "house": 1
+            },
+            "moonScore": 50,
+            "weightedScore": 15
+          },
+          {
+            "time": "11:55",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 317.7823745067235,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 11.115715506723507
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 259.8097908306171,
+              "signIndex": 8,
+              "signName": "Sagittarius",
+              "signId": 9,
+              "longitudeTropical": 283.4686963671833,
+              "ayanamsa": 23.658905536566238,
+              "degree": 19.80979083061709,
+              "degreeInSign": 19.80979083061709,
+              "sign": "Sagittarius",
+              "house": 1
+            },
+            "moonScore": 50,
+            "weightedScore": 15
+          },
+          {
+            "time": "12:00",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 317.8254153342307,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 11.158756334230691
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 261.0193128326627,
+              "signIndex": 8,
+              "signName": "Sagittarius",
+              "signId": 9,
+              "longitudeTropical": 284.67821850201483,
+              "ayanamsa": 23.658905669352123,
+              "degree": 21.019312832662706,
+              "degreeInSign": 21.019312832662706,
+              "sign": "Sagittarius",
+              "house": 1
+            },
+            "moonScore": 50,
+            "weightedScore": 15
+          },
+          {
+            "time": "12:05",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 317.8684535101635,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 11.201794510163484
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 262.2352288153627,
+              "signIndex": 8,
+              "signName": "Sagittarius",
+              "signId": 9,
+              "longitudeTropical": 285.89413461750064,
+              "ayanamsa": 23.65890580213795,
+              "degree": 22.23522881536269,
+              "degreeInSign": 22.23522881536269,
+              "sign": "Sagittarius",
+              "house": 1
+            },
+            "moonScore": 50,
+            "weightedScore": 15
+          },
+          {
+            "time": "12:10",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 317.9114890479916,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 11.244830047991616
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 263.45775489520787,
+              "signIndex": 8,
+              "signName": "Sagittarius",
+              "signId": 9,
+              "longitudeTropical": 287.11666083013165,
+              "ayanamsa": 23.65890593492378,
+              "degree": 23.45775489520787,
+              "degreeInSign": 23.45775489520787,
+              "sign": "Sagittarius",
+              "house": 1
+            },
+            "moonScore": 50,
+            "weightedScore": 15
+          },
+          {
+            "time": "12:15",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 317.954521938124,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 11.287862938124011
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 264.6871046032881,
+              "signIndex": 8,
+              "signName": "Sagittarius",
+              "signId": 9,
+              "longitudeTropical": 288.3460106709977,
+              "ayanamsa": 23.65890606770961,
+              "degree": 24.687104603288105,
+              "degreeInSign": 24.687104603288105,
+              "sign": "Sagittarius",
+              "house": 1
+            },
+            "moonScore": 50,
+            "weightedScore": 15
+          },
+          {
+            "time": "12:20",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 317.9975521881977,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 11.330893188197695
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 265.92348955560334,
+              "signIndex": 8,
+              "signName": "Sagittarius",
+              "signId": 9,
+              "longitudeTropical": 289.5823957560988,
+              "ayanamsa": 23.658906200495437,
+              "degree": 25.92348955560334,
+              "degreeInSign": 25.92348955560334,
+              "sign": "Sagittarius",
+              "house": 1
+            },
+            "moonScore": 50,
+            "weightedScore": 15
+          },
+          {
+            "time": "12:25",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 318.0405798058878,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 11.373920805887781
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 267.1671184586828,
+              "signIndex": 8,
+              "signName": "Sagittarius",
+              "signId": 9,
+              "longitudeTropical": 290.82602479196413,
+              "ayanamsa": 23.658906333281323,
+              "degree": 27.167118458682808,
+              "degreeInSign": 27.167118458682808,
+              "sign": "Sagittarius",
+              "house": 1
+            },
+            "moonScore": 50,
+            "weightedScore": 15
+          },
+          {
+            "time": "12:30",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 318.08360478738325,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 11.41694578738326
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 268.41819606704325,
+              "signIndex": 8,
+              "signName": "Sagittarius",
+              "signId": 9,
+              "longitudeTropical": 292.0771025331104,
+              "ayanamsa": 23.65890646606715,
+              "degree": 28.418196067043255,
+              "degreeInSign": 28.418196067043255,
+              "sign": "Sagittarius",
+              "house": 1
+            },
+            "moonScore": 50,
+            "weightedScore": 15
+          },
+          {
+            "time": "12:35",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 318.1266271345438,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 11.459968134543818
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 269.6769237781247,
+              "signIndex": 8,
+              "signName": "Sagittarius",
+              "signId": 9,
+              "longitudeTropical": 293.33583037697764,
+              "ayanamsa": 23.658906598852923,
+              "degree": 29.676923778124717,
+              "degreeInSign": 29.676923778124717,
+              "sign": "Sagittarius",
+              "house": 1
+            },
+            "moonScore": 50,
+            "weightedScore": 15
+          },
+          {
+            "time": "12:40",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 318.16964684353843,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 11.502987843538438
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 270.94349768660425,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 294.60240441824305,
+              "ayanamsa": 23.658906731638808,
+              "degree": 0.9434976866042462,
+              "degreeInSign": 0.9434976866042462,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "moonScore": 50,
+            "weightedScore": 15
+          },
+          {
+            "time": "12:45",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 318.2126639278372,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 11.546004927837192
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 272.2181092898583,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 295.87701615428296,
+              "ayanamsa": 23.658906864424637,
+              "degree": 2.218109289858319,
+              "degreeInSign": 2.218109289858319,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "moonScore": 50,
+            "weightedScore": 15
+          },
+          {
+            "time": "12:50",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 318.255678377765,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 11.589019377764988
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 273.5009434560049,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 297.15985045321537,
+              "ayanamsa": 23.658906997210465,
+              "degree": 3.5009434560049044,
+              "degreeInSign": 3.5009434560049044,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "moonScore": 50,
+            "weightedScore": 15
+          },
+          {
+            "time": "12:55",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 318.2986902068094,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 11.632031206809405
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 274.79217907758397,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 298.45108620758026,
+              "ayanamsa": 23.658907129996294,
+              "degree": 4.792179077583967,
+              "degreeInSign": 4.792179077583967,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "moonScore": 50,
+            "weightedScore": 15
+          },
+          {
+            "time": "13:00",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 318.34169940529137,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 11.675040405291373
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 276.0919869501675,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 299.7508942129496,
+              "ayanamsa": 23.658907262782122,
+              "degree": 6.091986950167495,
+              "degreeInSign": 6.091986950167495,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "moonScore": 50,
+            "weightedScore": 15
+          },
+          {
+            "time": "13:05",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 318.384705980944,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 11.718046980943985
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 277.4005302017241,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 301.0594375972921,
+              "ayanamsa": 23.658907395568008,
+              "degree": 7.400530201724109,
+              "degreeInSign": 7.400530201724109,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "moonScore": 50,
+            "weightedScore": 15
+          },
+          {
+            "time": "13:10",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 318.4277099413989,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 11.761050941398924
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 278.7179629639274,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 302.3768704922812,
+              "ayanamsa": 23.658907528353836,
+              "degree": 8.717962963927391,
+              "degreeInSign": 8.717962963927391,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "moonScore": 50,
+            "weightedScore": 15
+          },
+          {
+            "time": "13:15",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 318.47071128284426,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 11.804052282844271
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 280.04442899612707,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 303.70333665726673,
+              "ayanamsa": 23.658907661139665,
+              "degree": 10.044428996127067,
+              "degreeInSign": 10.044428996127067,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "moonScore": 50,
+            "weightedScore": 15
+          },
+          {
+            "time": "13:20",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 318.51371000712925,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 11.847051007129256
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 281.3800620463294,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 305.0389698402549,
+              "ayanamsa": 23.658907793925493,
+              "degree": 11.380062046329385,
+              "degreeInSign": 11.380062046329385,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "moonScore": 50,
+            "weightedScore": 15
+          },
+          {
+            "time": "13:25",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 318.5567061104548,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 11.890047110454805
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 282.72498353203383,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 306.3838914587452,
+              "ayanamsa": 23.65890792671138,
+              "degree": 12.724983532033832,
+              "degreeInSign": 12.724983532033832,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "moonScore": 50,
+            "weightedScore": 15
+          },
+          {
+            "time": "13:30",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 318.5996996061906,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 11.933040606190605
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 284.0793030461468,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 307.738211105644,
+              "ayanamsa": 23.658908059497207,
+              "degree": 14.079303046146777,
+              "degreeInSign": 14.079303046146777,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "moonScore": 50,
+            "weightedScore": 15
+          },
+          {
+            "time": "13:35",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 318.64269048475217,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 11.976031484752173
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 285.4431159709602,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 309.1020241632432,
+              "ayanamsa": 23.65890819228298,
+              "degree": 15.443115970960207,
+              "degreeInSign": 15.443115970960207,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "moonScore": 50,
+            "weightedScore": 15
+          },
+          {
+            "time": "13:40",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 318.6856787596013,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 12.019019759601282
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 286.8165039713137,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 310.47541229638256,
+              "ayanamsa": 23.658908325068865,
+              "degree": 16.816503971313693,
+              "degreeInSign": 16.816503971313693,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "moonScore": 50,
+            "weightedScore": 15
+          },
+          {
+            "time": "13:45",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 318.7286644210649,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 12.062005421064885
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 288.19953256106334,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 311.85844101891803,
+              "ayanamsa": 23.658908457854693,
+              "degree": 18.199532561063336,
+              "degreeInSign": 18.199532561063336,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "moonScore": 50,
+            "weightedScore": 15
+          },
+          {
+            "time": "13:50",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 318.77164747682036,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 12.10498847682037
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 289.59225141459166,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 313.25116000523224,
+              "ayanamsa": 23.65890859064058,
+              "degree": 19.592251414591658,
+              "degreeInSign": 19.592251414591658,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "moonScore": 50,
+            "weightedScore": 15
+          },
+          {
+            "time": "13:55",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 318.81462794031154,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 12.147968940311547
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 290.9946928454292,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 314.65360156885555,
+              "ayanamsa": 23.65890872342635,
+              "degree": 20.9946928454292,
+              "degreeInSign": 20.9946928454292,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "moonScore": 50,
+            "weightedScore": 15
+          },
+          {
+            "time": "14:00",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 318.8576057903837,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 12.19094679038368
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 292.40687027599427,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 316.06577913220644,
+              "ayanamsa": 23.65890885621218,
+              "degree": 22.406870275994265,
+              "degreeInSign": 22.406870275994265,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "moonScore": 50,
+            "weightedScore": 15
+          },
+          {
+            "time": "14:05",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 318.90058104624336,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 12.233922046243368
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 293.82877860493085,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 317.4876875939289,
+              "ayanamsa": 23.658908988998064,
+              "degree": 23.828778604930847,
+              "degreeInSign": 23.828778604930847,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "moonScore": 50,
+            "weightedScore": 15
+          },
+          {
+            "time": "14:10",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 318.94355369823575,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 12.276894698235754
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 295.26039177544897,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 318.91930089723286,
+              "ayanamsa": 23.658909121783893,
+              "degree": 25.260391775448966,
+              "degreeInSign": 25.260391775448966,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "moonScore": 50,
+            "weightedScore": 15
+          },
+          {
+            "time": "14:15",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 318.9865237597945,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 12.31986475979453
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 296.7016634111712,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 320.3605726657409,
+              "ayanamsa": 23.65890925456972,
+              "degree": 26.701663411171182,
+              "degreeInSign": 26.701663411171182,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "moonScore": 50,
+            "weightedScore": 15
+          },
+          {
+            "time": "14:20",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 319.0294912213308,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 12.36283222133078
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 298.15252443963317,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 321.8114338269887,
+              "ayanamsa": 23.65890938735555,
+              "degree": 28.15252443963317,
+              "degreeInSign": 28.15252443963317,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "moonScore": 50,
+            "weightedScore": 15
+          },
+          {
+            "time": "14:25",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 319.0724560962408,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 12.405797096240793
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 299.6128838516798,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 323.2717933718212,
+              "ayanamsa": 23.658909520141435,
+              "degree": 29.612883851679783,
+              "degreeInSign": 29.612883851679783,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "moonScore": 50,
+            "weightedScore": 15
+          },
+          {
+            "time": "14:30",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 319.1154183748994,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 12.448759374899385
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 301.08262642415343,
+              "signIndex": 10,
+              "signName": "Aquarius",
+              "signId": 11,
+              "longitudeTropical": 324.7415360770807,
+              "ayanamsa": 23.658909652927264,
+              "degree": 1.0826264241534318,
+              "degreeInSign": 1.0826264241534318,
+              "sign": "Aquarius",
+              "house": 1
+            },
+            "moonScore": 75,
+            "weightedScore": 22.5
+          },
+          {
+            "time": "14:35",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 319.15837807073956,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 12.491719070739567
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 302.56161344439096,
+              "signIndex": 10,
+              "signName": "Aquarius",
+              "signId": 11,
+              "longitudeTropical": 326.220523230104,
+              "ayanamsa": 23.658909785713035,
+              "degree": 2.5616134443909573,
+              "degreeInSign": 2.5616134443909573,
+              "sign": "Aquarius",
+              "house": 1
+            },
+            "moonScore": 75,
+            "weightedScore": 22.5
+          },
+          {
+            "time": "14:40",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 319.2013351799037,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 12.534676179903716
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 304.04968157165985,
+              "signIndex": 10,
+              "signName": "Aquarius",
+              "signId": 11,
+              "longitudeTropical": 327.70859149015877,
+              "ayanamsa": 23.65890991849892,
+              "degree": 4.049681571659846,
+              "degreeInSign": 4.049681571659846,
+              "sign": "Aquarius",
+              "house": 1
+            },
+            "moonScore": 75,
+            "weightedScore": 22.5
+          },
+          {
+            "time": "14:45",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 319.2442896985051,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 12.577630698505107
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 305.546641779881,
+              "signIndex": 10,
+              "signName": "Aquarius",
+              "signId": 11,
+              "longitudeTropical": 329.20555183116574,
+              "ayanamsa": 23.65891005128475,
+              "degree": 5.546641779880986,
+              "degreeInSign": 5.546641779880986,
+              "sign": "Aquarius",
+              "house": 1
+            },
+            "moonScore": 75,
+            "weightedScore": 22.5
+          },
+          {
+            "time": "14:50",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 319.287241640013,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 12.620582640013016
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 307.0522804114009,
+              "signIndex": 10,
+              "signName": "Aquarius",
+              "signId": 11,
+              "longitudeTropical": 330.7111905954715,
+              "ayanamsa": 23.658910184070635,
+              "degree": 7.052280411400886,
+              "degreeInSign": 7.052280411400886,
+              "sign": "Aquarius",
+              "house": 1
+            },
+            "moonScore": 75,
+            "weightedScore": 22.5
+          },
+          {
+            "time": "14:55",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 319.3301909947502,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 12.66353199475019
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 308.56635734785044,
+              "signIndex": 10,
+              "signName": "Aquarius",
+              "signId": 11,
+              "longitudeTropical": 332.22526766470685,
+              "ayanamsa": 23.658910316856407,
+              "degree": 8.566357347850442,
+              "degreeInSign": 8.566357347850442,
+              "sign": "Aquarius",
+              "house": 1
+            },
+            "moonScore": 75,
+            "weightedScore": 22.5
+          },
+          {
+            "time": "15:00",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 319.37313777614077,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 12.706478776140774
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 310.08860753538096,
+              "signIndex": 10,
+              "signName": "Aquarius",
+              "signId": 11,
+              "longitudeTropical": 333.74751798502325,
+              "ayanamsa": 23.658910449642292,
+              "degree": 10.088607535380959,
+              "degreeInSign": 10.088607535380959,
+              "sign": "Aquarius",
+              "house": 1
+            },
+            "moonScore": 75,
+            "weightedScore": 22.5
+          },
+          {
+            "time": "15:05",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 319.4160819746186,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 12.749422974618586
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 311.61873941063334,
+              "signIndex": 10,
+              "signName": "Aquarius",
+              "signId": 11,
+              "longitudeTropical": 335.27764999306146,
+              "ayanamsa": 23.65891058242812,
+              "degree": 11.618739410633339,
+              "degreeInSign": 11.618739410633339,
+              "sign": "Aquarius",
+              "house": 1
+            },
+            "moonScore": 75,
+            "weightedScore": 22.5
+          },
+          {
+            "time": "15:10",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 319.45902360353557,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 12.792364603535578
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 313.1564367343468,
+              "signIndex": 10,
+              "signName": "Aquarius",
+              "signId": 11,
+              "longitudeTropical": 336.8153474495608,
+              "ayanamsa": 23.658910715214006,
+              "degree": 13.156436734346812,
+              "degreeInSign": 13.156436734346812,
+              "sign": "Aquarius",
+              "house": 1
+            },
+            "moonScore": 75,
+            "weightedScore": 22.5
+          },
+          {
+            "time": "15:15",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 319.5019626590772,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 12.835303659077216
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 314.7013573076066,
+              "signIndex": 10,
+              "signName": "Aquarius",
+              "signId": 11,
+              "longitudeTropical": 338.3602681556064,
+              "ayanamsa": 23.658910847999778,
+              "degree": 14.7013573076066,
+              "degreeInSign": 14.7013573076066,
+              "sign": "Aquarius",
+              "house": 1
+            },
+            "moonScore": 75,
+            "weightedScore": 22.5
+          },
+          {
+            "time": "15:20",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 319.5448991373469,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 12.878240137346882
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 316.25313493404826,
+              "signIndex": 10,
+              "signName": "Aquarius",
+              "signId": 11,
+              "longitudeTropical": 339.91204591483387,
+              "ayanamsa": 23.658910980785606,
+              "degree": 16.253134934048262,
+              "degreeInSign": 16.253134934048262,
+              "sign": "Aquarius",
+              "house": 1
+            },
+            "moonScore": 75,
+            "weightedScore": 22.5
+          },
+          {
+            "time": "15:25",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 319.58783305174643,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 12.921174051746437
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 317.81137949200536,
+              "signIndex": 10,
+              "signName": "Aquarius",
+              "signId": 11,
+              "longitudeTropical": 341.47029060557685,
+              "ayanamsa": 23.65891111357149,
+              "degree": 17.811379492005358,
+              "degreeInSign": 17.811379492005358,
+              "sign": "Aquarius",
+              "house": 1
+            },
+            "moonScore": 75,
+            "weightedScore": 22.5
+          },
+          {
+            "time": "15:30",
+            "moon": {
+              "sign": "Aquarius",
+              "degree": 319.6307643926755,
+              "nakshatra": {
+                "name": "Shatabhisha",
+                "number": 24,
+                "pada": 4,
+                "degree": 12.964105392675481
+              },
+              "pada": 1
+            },
+            "ascendant": {
+              "longitude": 319.3756771638326,
+              "signIndex": 10,
+              "signName": "Aquarius",
+              "signId": 11,
+              "longitudeTropical": 343.03458841018994,
+              "ayanamsa": 23.65891124635732,
+              "degree": 19.37567716383262,
+              "degreeInSign": 19.37567716383262,
+              "sign": "Aquarius",
+              "house": 1
+            },
+            "moonScore": 75,
+            "weightedScore": 22.5
+          }
+        ],
+        "bestCandidate": {
+          "time": "14:30",
+          "moon": {
+            "sign": "Aquarius",
+            "degree": 319.1154183748994,
+            "nakshatra": {
+              "name": "Shatabhisha",
+              "number": 24,
+              "pada": 4,
+              "degree": 12.448759374899385
+            },
+            "pada": 1
+          },
+          "ascendant": {
+            "longitude": 301.08262642415343,
+            "signIndex": 10,
+            "signName": "Aquarius",
+            "signId": 11,
+            "longitudeTropical": 324.7415360770807,
+            "ayanamsa": 23.658909652927264,
+            "degree": 1.0826264241534318,
+            "degreeInSign": 1.0826264241534318,
+            "sign": "Aquarius",
+            "house": 1
+          },
+          "moonScore": 75,
+          "weightedScore": 22.5
+        }
+      },
+      "gulika": {
+        "method": "Gulika",
+        "candidates": [
+          {
+            "time": "11:30",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 253.8504591940739,
+              "signIndex": 8,
+              "signName": "Sagittarius",
+              "signId": 9,
+              "longitudeTropical": 277.50936406671093,
+              "ayanamsa": 23.658904872637038,
+              "degree": 13.850459194073892,
+              "degreeInSign": 13.850459194073892,
+              "sign": "Sagittarius",
+              "house": 1
+            },
+            "gulikaScore": 50,
+            "weightedScore": 10
+          },
+          {
+            "time": "11:35",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 255.03128525528808,
+              "signIndex": 8,
+              "signName": "Sagittarius",
+              "signId": 9,
+              "longitudeTropical": 278.69019026071095,
+              "ayanamsa": 23.658905005422866,
+              "degree": 15.031285255288083,
+              "degreeInSign": 15.031285255288083,
+              "sign": "Sagittarius",
+              "house": 1
+            },
+            "gulikaScore": 50,
+            "weightedScore": 10
+          },
+          {
+            "time": "11:40",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 256.21741226124357,
+              "signIndex": 8,
+              "signName": "Sagittarius",
+              "signId": 9,
+              "longitudeTropical": 279.8763173994523,
+              "ayanamsa": 23.658905138208752,
+              "degree": 16.217412261243567,
+              "degreeInSign": 16.217412261243567,
+              "sign": "Sagittarius",
+              "house": 1
+            },
+            "gulikaScore": 50,
+            "weightedScore": 10
+          },
+          {
+            "time": "11:45",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 257.40905923656976,
+              "signIndex": 8,
+              "signName": "Sagittarius",
+              "signId": 9,
+              "longitudeTropical": 281.06796450756434,
+              "ayanamsa": 23.65890527099458,
+              "degree": 17.40905923656976,
+              "degreeInSign": 17.40905923656976,
+              "sign": "Sagittarius",
+              "house": 1
+            },
+            "gulikaScore": 50,
+            "weightedScore": 10
+          },
+          {
+            "time": "11:50",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 258.60644585553325,
+              "signIndex": 8,
+              "signName": "Sagittarius",
+              "signId": 9,
+              "longitudeTropical": 282.26535125931366,
+              "ayanamsa": 23.65890540378041,
+              "degree": 18.606445855533252,
+              "degreeInSign": 18.606445855533252,
+              "sign": "Sagittarius",
+              "house": 1
+            },
+            "gulikaScore": 50,
+            "weightedScore": 10
+          },
+          {
+            "time": "11:55",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 259.8097908306171,
+              "signIndex": 8,
+              "signName": "Sagittarius",
+              "signId": 9,
+              "longitudeTropical": 283.4686963671833,
+              "ayanamsa": 23.658905536566238,
+              "degree": 19.80979083061709,
+              "degreeInSign": 19.80979083061709,
+              "sign": "Sagittarius",
+              "house": 1
+            },
+            "gulikaScore": 50,
+            "weightedScore": 10
+          },
+          {
+            "time": "12:00",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 261.0193128326627,
+              "signIndex": 8,
+              "signName": "Sagittarius",
+              "signId": 9,
+              "longitudeTropical": 284.67821850201483,
+              "ayanamsa": 23.658905669352123,
+              "degree": 21.019312832662706,
+              "degreeInSign": 21.019312832662706,
+              "sign": "Sagittarius",
+              "house": 1
+            },
+            "gulikaScore": 50,
+            "weightedScore": 10
+          },
+          {
+            "time": "12:05",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 262.2352288153627,
+              "signIndex": 8,
+              "signName": "Sagittarius",
+              "signId": 9,
+              "longitudeTropical": 285.89413461750064,
+              "ayanamsa": 23.65890580213795,
+              "degree": 22.23522881536269,
+              "degreeInSign": 22.23522881536269,
+              "sign": "Sagittarius",
+              "house": 1
+            },
+            "gulikaScore": 50,
+            "weightedScore": 10
+          },
+          {
+            "time": "12:10",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 263.45775489520787,
+              "signIndex": 8,
+              "signName": "Sagittarius",
+              "signId": 9,
+              "longitudeTropical": 287.11666083013165,
+              "ayanamsa": 23.65890593492378,
+              "degree": 23.45775489520787,
+              "degreeInSign": 23.45775489520787,
+              "sign": "Sagittarius",
+              "house": 1
+            },
+            "gulikaScore": 50,
+            "weightedScore": 10
+          },
+          {
+            "time": "12:15",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 264.6871046032881,
+              "signIndex": 8,
+              "signName": "Sagittarius",
+              "signId": 9,
+              "longitudeTropical": 288.3460106709977,
+              "ayanamsa": 23.65890606770961,
+              "degree": 24.687104603288105,
+              "degreeInSign": 24.687104603288105,
+              "sign": "Sagittarius",
+              "house": 1
+            },
+            "gulikaScore": 50,
+            "weightedScore": 10
+          },
+          {
+            "time": "12:20",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 265.92348955560334,
+              "signIndex": 8,
+              "signName": "Sagittarius",
+              "signId": 9,
+              "longitudeTropical": 289.5823957560988,
+              "ayanamsa": 23.658906200495437,
+              "degree": 25.92348955560334,
+              "degreeInSign": 25.92348955560334,
+              "sign": "Sagittarius",
+              "house": 1
+            },
+            "gulikaScore": 50,
+            "weightedScore": 10
+          },
+          {
+            "time": "12:25",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 267.1671184586828,
+              "signIndex": 8,
+              "signName": "Sagittarius",
+              "signId": 9,
+              "longitudeTropical": 290.82602479196413,
+              "ayanamsa": 23.658906333281323,
+              "degree": 27.167118458682808,
+              "degreeInSign": 27.167118458682808,
+              "sign": "Sagittarius",
+              "house": 1
+            },
+            "gulikaScore": 50,
+            "weightedScore": 10
+          },
+          {
+            "time": "12:30",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 268.41819606704325,
+              "signIndex": 8,
+              "signName": "Sagittarius",
+              "signId": 9,
+              "longitudeTropical": 292.0771025331104,
+              "ayanamsa": 23.65890646606715,
+              "degree": 28.418196067043255,
+              "degreeInSign": 28.418196067043255,
+              "sign": "Sagittarius",
+              "house": 1
+            },
+            "gulikaScore": 50,
+            "weightedScore": 10
+          },
+          {
+            "time": "12:35",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 269.6769237781247,
+              "signIndex": 8,
+              "signName": "Sagittarius",
+              "signId": 9,
+              "longitudeTropical": 293.33583037697764,
+              "ayanamsa": 23.658906598852923,
+              "degree": 29.676923778124717,
+              "degreeInSign": 29.676923778124717,
+              "sign": "Sagittarius",
+              "house": 1
+            },
+            "gulikaScore": 50,
+            "weightedScore": 10
+          },
+          {
+            "time": "12:40",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 270.94349768660425,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 294.60240441824305,
+              "ayanamsa": 23.658906731638808,
+              "degree": 0.9434976866042462,
+              "degreeInSign": 0.9434976866042462,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "gulikaScore": 30,
+            "weightedScore": 6
+          },
+          {
+            "time": "12:45",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 272.2181092898583,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 295.87701615428296,
+              "ayanamsa": 23.658906864424637,
+              "degree": 2.218109289858319,
+              "degreeInSign": 2.218109289858319,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "gulikaScore": 30,
+            "weightedScore": 6
+          },
+          {
+            "time": "12:50",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 273.5009434560049,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 297.15985045321537,
+              "ayanamsa": 23.658906997210465,
+              "degree": 3.5009434560049044,
+              "degreeInSign": 3.5009434560049044,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "gulikaScore": 30,
+            "weightedScore": 6
+          },
+          {
+            "time": "12:55",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 274.79217907758397,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 298.45108620758026,
+              "ayanamsa": 23.658907129996294,
+              "degree": 4.792179077583967,
+              "degreeInSign": 4.792179077583967,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "gulikaScore": 30,
+            "weightedScore": 6
+          },
+          {
+            "time": "13:00",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 276.0919869501675,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 299.7508942129496,
+              "ayanamsa": 23.658907262782122,
+              "degree": 6.091986950167495,
+              "degreeInSign": 6.091986950167495,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "gulikaScore": 30,
+            "weightedScore": 6
+          },
+          {
+            "time": "13:05",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 277.4005302017241,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 301.0594375972921,
+              "ayanamsa": 23.658907395568008,
+              "degree": 7.400530201724109,
+              "degreeInSign": 7.400530201724109,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "gulikaScore": 30,
+            "weightedScore": 6
+          },
+          {
+            "time": "13:10",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 278.7179629639274,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 302.3768704922812,
+              "ayanamsa": 23.658907528353836,
+              "degree": 8.717962963927391,
+              "degreeInSign": 8.717962963927391,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "gulikaScore": 30,
+            "weightedScore": 6
+          },
+          {
+            "time": "13:15",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 280.04442899612707,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 303.70333665726673,
+              "ayanamsa": 23.658907661139665,
+              "degree": 10.044428996127067,
+              "degreeInSign": 10.044428996127067,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "gulikaScore": 30,
+            "weightedScore": 6
+          },
+          {
+            "time": "13:20",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 281.3800620463294,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 305.0389698402549,
+              "ayanamsa": 23.658907793925493,
+              "degree": 11.380062046329385,
+              "degreeInSign": 11.380062046329385,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "gulikaScore": 30,
+            "weightedScore": 6
+          },
+          {
+            "time": "13:25",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 282.72498353203383,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 306.3838914587452,
+              "ayanamsa": 23.65890792671138,
+              "degree": 12.724983532033832,
+              "degreeInSign": 12.724983532033832,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "gulikaScore": 30,
+            "weightedScore": 6
+          },
+          {
+            "time": "13:30",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 284.0793030461468,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 307.738211105644,
+              "ayanamsa": 23.658908059497207,
+              "degree": 14.079303046146777,
+              "degreeInSign": 14.079303046146777,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "gulikaScore": 30,
+            "weightedScore": 6
+          },
+          {
+            "time": "13:35",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 285.4431159709602,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 309.1020241632432,
+              "ayanamsa": 23.65890819228298,
+              "degree": 15.443115970960207,
+              "degreeInSign": 15.443115970960207,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "gulikaScore": 30,
+            "weightedScore": 6
+          },
+          {
+            "time": "13:40",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 286.8165039713137,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 310.47541229638256,
+              "ayanamsa": 23.658908325068865,
+              "degree": 16.816503971313693,
+              "degreeInSign": 16.816503971313693,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "gulikaScore": 30,
+            "weightedScore": 6
+          },
+          {
+            "time": "13:45",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 288.19953256106334,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 311.85844101891803,
+              "ayanamsa": 23.658908457854693,
+              "degree": 18.199532561063336,
+              "degreeInSign": 18.199532561063336,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "gulikaScore": 30,
+            "weightedScore": 6
+          },
+          {
+            "time": "13:50",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 289.59225141459166,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 313.25116000523224,
+              "ayanamsa": 23.65890859064058,
+              "degree": 19.592251414591658,
+              "degreeInSign": 19.592251414591658,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "gulikaScore": 30,
+            "weightedScore": 6
+          },
+          {
+            "time": "13:55",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 290.9946928454292,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 314.65360156885555,
+              "ayanamsa": 23.65890872342635,
+              "degree": 20.9946928454292,
+              "degreeInSign": 20.9946928454292,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "gulikaScore": 30,
+            "weightedScore": 6
+          },
+          {
+            "time": "14:00",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 292.40687027599427,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 316.06577913220644,
+              "ayanamsa": 23.65890885621218,
+              "degree": 22.406870275994265,
+              "degreeInSign": 22.406870275994265,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "gulikaScore": 30,
+            "weightedScore": 6
+          },
+          {
+            "time": "14:05",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 293.82877860493085,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 317.4876875939289,
+              "ayanamsa": 23.658908988998064,
+              "degree": 23.828778604930847,
+              "degreeInSign": 23.828778604930847,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "gulikaScore": 30,
+            "weightedScore": 6
+          },
+          {
+            "time": "14:10",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 295.26039177544897,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 318.91930089723286,
+              "ayanamsa": 23.658909121783893,
+              "degree": 25.260391775448966,
+              "degreeInSign": 25.260391775448966,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "gulikaScore": 30,
+            "weightedScore": 6
+          },
+          {
+            "time": "14:15",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 296.7016634111712,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 320.3605726657409,
+              "ayanamsa": 23.65890925456972,
+              "degree": 26.701663411171182,
+              "degreeInSign": 26.701663411171182,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "gulikaScore": 30,
+            "weightedScore": 6
+          },
+          {
+            "time": "14:20",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 298.15252443963317,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 321.8114338269887,
+              "ayanamsa": 23.65890938735555,
+              "degree": 28.15252443963317,
+              "degreeInSign": 28.15252443963317,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "gulikaScore": 30,
+            "weightedScore": 6
+          },
+          {
+            "time": "14:25",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 299.6128838516798,
+              "signIndex": 9,
+              "signName": "Capricorn",
+              "signId": 10,
+              "longitudeTropical": 323.2717933718212,
+              "ayanamsa": 23.658909520141435,
+              "degree": 29.612883851679783,
+              "degreeInSign": 29.612883851679783,
+              "sign": "Capricorn",
+              "house": 1
+            },
+            "gulikaScore": 30,
+            "weightedScore": 6
+          },
+          {
+            "time": "14:30",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 301.08262642415343,
+              "signIndex": 10,
+              "signName": "Aquarius",
+              "signId": 11,
+              "longitudeTropical": 324.7415360770807,
+              "ayanamsa": 23.658909652927264,
+              "degree": 1.0826264241534318,
+              "degreeInSign": 1.0826264241534318,
+              "sign": "Aquarius",
+              "house": 1
+            },
+            "gulikaScore": 40,
+            "weightedScore": 8
+          },
+          {
+            "time": "14:35",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 302.56161344439096,
+              "signIndex": 10,
+              "signName": "Aquarius",
+              "signId": 11,
+              "longitudeTropical": 326.220523230104,
+              "ayanamsa": 23.658909785713035,
+              "degree": 2.5616134443909573,
+              "degreeInSign": 2.5616134443909573,
+              "sign": "Aquarius",
+              "house": 1
+            },
+            "gulikaScore": 40,
+            "weightedScore": 8
+          },
+          {
+            "time": "14:40",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 304.04968157165985,
+              "signIndex": 10,
+              "signName": "Aquarius",
+              "signId": 11,
+              "longitudeTropical": 327.70859149015877,
+              "ayanamsa": 23.65890991849892,
+              "degree": 4.049681571659846,
+              "degreeInSign": 4.049681571659846,
+              "sign": "Aquarius",
+              "house": 1
+            },
+            "gulikaScore": 40,
+            "weightedScore": 8
+          },
+          {
+            "time": "14:45",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 305.546641779881,
+              "signIndex": 10,
+              "signName": "Aquarius",
+              "signId": 11,
+              "longitudeTropical": 329.20555183116574,
+              "ayanamsa": 23.65891005128475,
+              "degree": 5.546641779880986,
+              "degreeInSign": 5.546641779880986,
+              "sign": "Aquarius",
+              "house": 1
+            },
+            "gulikaScore": 40,
+            "weightedScore": 8
+          },
+          {
+            "time": "14:50",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 307.0522804114009,
+              "signIndex": 10,
+              "signName": "Aquarius",
+              "signId": 11,
+              "longitudeTropical": 330.7111905954715,
+              "ayanamsa": 23.658910184070635,
+              "degree": 7.052280411400886,
+              "degreeInSign": 7.052280411400886,
+              "sign": "Aquarius",
+              "house": 1
+            },
+            "gulikaScore": 40,
+            "weightedScore": 8
+          },
+          {
+            "time": "14:55",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 308.56635734785044,
+              "signIndex": 10,
+              "signName": "Aquarius",
+              "signId": 11,
+              "longitudeTropical": 332.22526766470685,
+              "ayanamsa": 23.658910316856407,
+              "degree": 8.566357347850442,
+              "degreeInSign": 8.566357347850442,
+              "sign": "Aquarius",
+              "house": 1
+            },
+            "gulikaScore": 40,
+            "weightedScore": 8
+          },
+          {
+            "time": "15:00",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 310.08860753538096,
+              "signIndex": 10,
+              "signName": "Aquarius",
+              "signId": 11,
+              "longitudeTropical": 333.74751798502325,
+              "ayanamsa": 23.658910449642292,
+              "degree": 10.088607535380959,
+              "degreeInSign": 10.088607535380959,
+              "sign": "Aquarius",
+              "house": 1
+            },
+            "gulikaScore": 40,
+            "weightedScore": 8
+          },
+          {
+            "time": "15:05",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 311.61873941063334,
+              "signIndex": 10,
+              "signName": "Aquarius",
+              "signId": 11,
+              "longitudeTropical": 335.27764999306146,
+              "ayanamsa": 23.65891058242812,
+              "degree": 11.618739410633339,
+              "degreeInSign": 11.618739410633339,
+              "sign": "Aquarius",
+              "house": 1
+            },
+            "gulikaScore": 40,
+            "weightedScore": 8
+          },
+          {
+            "time": "15:10",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 313.1564367343468,
+              "signIndex": 10,
+              "signName": "Aquarius",
+              "signId": 11,
+              "longitudeTropical": 336.8153474495608,
+              "ayanamsa": 23.658910715214006,
+              "degree": 13.156436734346812,
+              "degreeInSign": 13.156436734346812,
+              "sign": "Aquarius",
+              "house": 1
+            },
+            "gulikaScore": 40,
+            "weightedScore": 8
+          },
+          {
+            "time": "15:15",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 314.7013573076066,
+              "signIndex": 10,
+              "signName": "Aquarius",
+              "signId": 11,
+              "longitudeTropical": 338.3602681556064,
+              "ayanamsa": 23.658910847999778,
+              "degree": 14.7013573076066,
+              "degreeInSign": 14.7013573076066,
+              "sign": "Aquarius",
+              "house": 1
+            },
+            "gulikaScore": 40,
+            "weightedScore": 8
+          },
+          {
+            "time": "15:20",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 316.25313493404826,
+              "signIndex": 10,
+              "signName": "Aquarius",
+              "signId": 11,
+              "longitudeTropical": 339.91204591483387,
+              "ayanamsa": 23.658910980785606,
+              "degree": 16.253134934048262,
+              "degreeInSign": 16.253134934048262,
+              "sign": "Aquarius",
+              "house": 1
+            },
+            "gulikaScore": 40,
+            "weightedScore": 8
+          },
+          {
+            "time": "15:25",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 317.81137949200536,
+              "signIndex": 10,
+              "signName": "Aquarius",
+              "signId": 11,
+              "longitudeTropical": 341.47029060557685,
+              "ayanamsa": 23.65891111357149,
+              "degree": 17.811379492005358,
+              "degreeInSign": 17.811379492005358,
+              "sign": "Aquarius",
+              "house": 1
+            },
+            "gulikaScore": 40,
+            "weightedScore": 8
+          },
+          {
+            "time": "15:30",
+            "gulika": {
+              "longitude": 42.28500891952642,
+              "sign": "Taurus",
+              "degree": 12.285008919526419,
+              "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+            },
+            "ascendant": {
+              "longitude": 319.3756771638326,
+              "signIndex": 10,
+              "signName": "Aquarius",
+              "signId": 11,
+              "longitudeTropical": 343.03458841018994,
+              "ayanamsa": 23.65891124635732,
+              "degree": 19.37567716383262,
+              "degreeInSign": 19.37567716383262,
+              "sign": "Aquarius",
+              "house": 1
+            },
+            "gulikaScore": 40,
+            "weightedScore": 8
+          }
+        ],
+        "bestCandidate": {
+          "time": "11:30",
+          "gulika": {
+            "longitude": 42.28500891952642,
+            "sign": "Taurus",
+            "degree": 12.285008919526419,
+            "gulikaTimeLocal": "1985-10-24T20:09:29.746Z"
+          },
+          "ascendant": {
+            "longitude": 253.8504591940739,
+            "signIndex": 8,
+            "signName": "Sagittarius",
+            "signId": 9,
+            "longitudeTropical": 277.50936406671093,
+            "ayanamsa": 23.658904872637038,
+            "degree": 13.850459194073892,
+            "degreeInSign": 13.850459194073892,
+            "sign": "Sagittarius",
+            "house": 1
+          },
+          "gulikaScore": 50,
+          "weightedScore": 10
+        }
+      },
+      "events": {
+        "method": "Event Correlation",
+        "candidates": [
+          {
+            "time": "11:30",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "11:35",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "11:40",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "11:45",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "11:50",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "11:55",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "12:00",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "12:05",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "12:10",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "12:15",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "12:20",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "12:25",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "12:30",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "12:35",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "12:40",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "12:45",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "12:50",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "12:55",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "13:00",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "13:05",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "13:10",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "13:15",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "13:20",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "13:25",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "13:30",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "13:35",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "13:40",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "13:45",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "13:50",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "13:55",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "14:00",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "14:05",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "14:10",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "14:15",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "14:20",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "14:25",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "14:30",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "14:35",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "14:40",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "14:45",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "14:50",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "14:55",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "15:00",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "15:05",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "15:10",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "15:15",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "15:20",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "15:25",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          },
+          {
+            "time": "15:30",
+            "eventScore": 48.333333333333336,
+            "weightedScore": 4.833333333333334,
+            "correlatedEvents": [
+              {
+                "date": "1995-06-15",
+                "type": "education",
+                "description": "Completed engineering degree",
+                "significance": "major",
+                "correlation": 25
+              },
+              {
+                "date": "2008-11-20",
+                "type": "marriage",
+                "description": "Marriage ceremony",
+                "significance": "major",
+                "correlation": 60
+              },
+              {
+                "date": "2012-03-10",
+                "type": "career",
+                "description": "Major job promotion",
+                "significance": "major",
+                "correlation": 60
+              }
+            ]
+          }
+        ],
+        "bestCandidate": {
+          "time": "11:30",
+          "eventScore": 48.333333333333336,
+          "weightedScore": 4.833333333333334,
+          "correlatedEvents": [
+            {
+              "date": "1995-06-15",
+              "type": "education",
+              "description": "Completed engineering degree",
+              "significance": "major",
+              "correlation": 25
+            },
+            {
+              "date": "2008-11-20",
+              "type": "marriage",
+              "description": "Marriage ceremony",
+              "significance": "major",
+              "correlation": 60
+            },
+            {
+              "date": "2012-03-10",
+              "type": "career",
+              "description": "Major job promotion",
+              "significance": "major",
+              "correlation": 60
+            }
+          ]
+        }
+      }
+    },
+    "recommendations": [
+      "Moderate confidence (73.31666666666666%) in rectified birth time: 11:30",
+      "Consider providing additional life events for improved accuracy",
+      "Praanapada method strongly supports this birth time"
+    ],
+    "confidence": 73.31666666666666,
+    "rectifiedTime": "11:30",
+    "analysisLog": [
+      "Starting BPHS Birth Time Rectification analysis",
+      "Birth data validation passed: date=1985-10-24, place=Pune, Maharashtra, India, coords=(18.5204, 73.8567), tz=Asia/Kolkata",
+      "Generated 49 time candidates for analysis (range: ±2 hours, 5-min intervals)",
+      "Starting Praanapada method analysis",
+      "Praanapada analysis: best candidate 11:30 with score 42",
+      "Starting Moon position method analysis",
+      "Moon analysis: best candidate 14:30 with score 75",
+      "Starting Gulika position method analysis",
+      "Gulika analysis: best candidate 11:30 with score 50",
+      "Starting event correlation analysis",
+      "Event correlation: best candidate 11:30 with score 48.333333333333336",
+      "BTR analysis completed successfully"
+    ],
+    "analysis": {
+      "bestCandidate": {
+        "time": "11:30",
+        "praanapada": {
+          "longitude": 128.30113386091864,
+          "sign": "Leo",
+          "degree": 8.30113386091864,
+          "palas": -58.813224999999996
+        },
+        "ascendant": {
+          "longitude": 253.8504591940739,
+          "signIndex": 8,
+          "signName": "Sagittarius",
+          "signId": 9,
+          "longitudeTropical": 277.50936406671093,
+          "ayanamsa": 23.658904872637038,
+          "degree": 13.850459194073892,
+          "degreeInSign": 13.850459194073892,
+          "sign": "Sagittarius",
+          "house": 1
+        },
+        "alignmentScore": 42,
+        "weightedScore": 16.8,
+        "totalScore": 46.63333333333333,
+        "methods": [
+          "Praanapada",
+          "Moon",
+          "Gulika",
+          "Event Correlation"
+        ]
+      },
+      "allCandidates": [
+        {
+          "time": "11:30",
+          "praanapada": {
+            "longitude": 128.30113386091864,
+            "sign": "Leo",
+            "degree": 8.30113386091864,
+            "palas": -58.813224999999996
+          },
+          "ascendant": {
+            "longitude": 253.8504591940739,
+            "signIndex": 8,
+            "signName": "Sagittarius",
+            "signId": 9,
+            "longitudeTropical": 277.50936406671093,
+            "ayanamsa": 23.658904872637038,
+            "degree": 13.850459194073892,
+            "degreeInSign": 13.850459194073892,
+            "sign": "Sagittarius",
+            "house": 1
+          },
+          "alignmentScore": 42,
+          "weightedScore": 16.8,
+          "totalScore": 46.63333333333333,
+          "methods": [
+            "Praanapada",
+            "Moon",
+            "Gulika",
+            "Event Correlation"
+          ]
+        },
+        {
+          "time": "11:35",
+          "praanapada": {
+            "longitude": 128.512925527277,
+            "sign": "Leo",
+            "degree": 8.512925527276991,
+            "palas": -58.60489166666667
+          },
+          "ascendant": {
+            "longitude": 255.03128525528808,
+            "signIndex": 8,
+            "signName": "Sagittarius",
+            "signId": 9,
+            "longitudeTropical": 278.69019026071095,
+            "ayanamsa": 23.658905005422866,
+            "degree": 15.031285255288083,
+            "degreeInSign": 15.031285255288083,
+            "sign": "Sagittarius",
+            "house": 1
+          },
+          "alignmentScore": 42,
+          "weightedScore": 16.8,
+          "totalScore": 46.63333333333333,
+          "methods": [
+            "Praanapada",
+            "Moon",
+            "Gulika",
+            "Event Correlation"
+          ]
+        },
+        {
+          "time": "11:40",
+          "praanapada": {
+            "longitude": 128.72471720000308,
+            "sign": "Leo",
+            "degree": 8.724717200003084,
+            "palas": -58.39655833333333
+          },
+          "ascendant": {
+            "longitude": 256.21741226124357,
+            "signIndex": 8,
+            "signName": "Sagittarius",
+            "signId": 9,
+            "longitudeTropical": 279.8763173994523,
+            "ayanamsa": 23.658905138208752,
+            "degree": 16.217412261243567,
+            "degreeInSign": 16.217412261243567,
+            "sign": "Sagittarius",
+            "house": 1
+          },
+          "alignmentScore": 41,
+          "weightedScore": 16.400000000000002,
+          "totalScore": 46.23333333333334,
+          "methods": [
+            "Praanapada",
+            "Moon",
+            "Gulika",
+            "Event Correlation"
+          ]
+        },
+        {
+          "time": "11:45",
+          "praanapada": {
+            "longitude": 128.9365088779981,
+            "sign": "Leo",
+            "degree": 8.936508877998108,
+            "palas": -58.188224999999996
+          },
+          "ascendant": {
+            "longitude": 257.40905923656976,
+            "signIndex": 8,
+            "signName": "Sagittarius",
+            "signId": 9,
+            "longitudeTropical": 281.06796450756434,
+            "ayanamsa": 23.65890527099458,
+            "degree": 17.40905923656976,
+            "degreeInSign": 17.40905923656976,
+            "sign": "Sagittarius",
+            "house": 1
+          },
+          "alignmentScore": 41,
+          "weightedScore": 16.400000000000002,
+          "totalScore": 46.23333333333334,
+          "methods": [
+            "Praanapada",
+            "Moon",
+            "Gulika",
+            "Event Correlation"
+          ]
+        },
+        {
+          "time": "11:50",
+          "praanapada": {
+            "longitude": 129.14830056264572,
+            "sign": "Leo",
+            "degree": 9.148300562645716,
+            "palas": -57.97989166666667
+          },
+          "ascendant": {
+            "longitude": 258.60644585553325,
+            "signIndex": 8,
+            "signName": "Sagittarius",
+            "signId": 9,
+            "longitudeTropical": 282.26535125931366,
+            "ayanamsa": 23.65890540378041,
+            "degree": 18.606445855533252,
+            "degreeInSign": 18.606445855533252,
+            "sign": "Sagittarius",
+            "house": 1
+          },
+          "alignmentScore": 40,
+          "weightedScore": 16,
+          "totalScore": 45.833333333333336,
+          "methods": [
+            "Praanapada",
+            "Moon",
+            "Gulika",
+            "Event Correlation"
+          ]
+        }
+      ],
+      "methodBreakdown": {
+        "praanapada": "Completed",
+        "moon": "Completed",
+        "gulika": "Completed",
+        "events": "Completed"
+      }
+    }
+  },
+  "m1_ephemerisAccuracy": {
+    "Sun": {
+      "expectedDelta": 0.005,
+      "threshold": 0.01,
+      "shouldPass": true
+    },
+    "Moon": {
+      "expectedDelta": 0.03,
+      "threshold": 0.05,
+      "shouldPass": true
+    },
+    "Mars": {
+      "expectedDelta": 0.07,
+      "threshold": 0.1,
+      "shouldPass": true
+    }
+  },
+  "m2_crossMethodConvergence": {
+    "threshold": 3,
+    "expectedSpread": 4,
+    "shouldPass": false,
+    "note": "4 minutes spread (14:28 to 14:32) slightly exceeds ≤3min threshold"
+  },
+  "m3_ensembleConfidence": {
+    "threshold": 0.7,
+    "expectedConfidence": 0.85,
+    "shouldPass": true
+  },
+  "m4_eventFitAgreement": {
+    "threshold": 75,
+    "expectedPercentage": 100,
+    "shouldPass": true,
+    "note": "All 3 major life events align with dasha/varga predictions"
+  },
+  "m5_geocodingPrecision": {
+    "threshold": 1000,
+    "expectedDiagonal": 35418.5,
+    "shouldPass": false,
+    "note": "City-level precision: expect warning but not critical failure"
+  }
+}

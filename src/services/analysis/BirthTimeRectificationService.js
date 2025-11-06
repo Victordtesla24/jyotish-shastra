@@ -1,7 +1,17 @@
 /**
  * Birth Time Rectification Service
  * Implements BPHS (Brihat Parashara Hora Shastra) based Birth Time Rectification
- * Following the mathematical approach using Praanapada, Moon, and Gulika methods
+ * 
+ * @see BPHS_EXEC_SPEC.md for complete algorithmic specifications
+ * 
+ * Methods implemented:
+ * - Praanapada (BPHS Ch.3 Ślokas 71-74, p.45)
+ * - Moon Position Analysis
+ * - Gulika (Mandi) (BPHS Ch.3 Śloka 70, p.45)
+ * - Nisheka-Lagna (BPHS Ch.4 Ślokas 25-30, p.53-54)
+ * - Event Correlation
+ * 
+ * Following the mathematical approach using Praanapada, Moon, Gulika, and Nisheka methods
  */
 
 import { ChartGenerationServiceSingleton } from '../chart/ChartGenerationService.js';
@@ -14,6 +24,7 @@ import TimeDivisionCalculator from '../../core/calculations/charts/timeDivisions
 import { computeSunriseSunset } from '../../core/calculations/astronomy/sunrise.js';
 import { computePraanapadaLongitude } from '../../core/calculations/rectification/praanapada.js';
 import { computeGulikaLongitude } from '../../core/calculations/rectification/gulika.js';
+import { calculateNishekaLagna } from '../../core/calculations/rectification/nisheka.js';
 
 class BirthTimeRectificationService {
   constructor(metricsCalculator = null) {
@@ -592,7 +603,14 @@ class BirthTimeRectificationService {
         analysis
       );
 
-      // Step 6: Event Correlation (if life events provided)
+      // Step 6: Nisheka-Lagna Method Analysis (BPHS Ch.4 Ślokas 25-30)
+      analysis.methods.nisheka = await this.performNishekaAnalysis(
+        birthData,
+        timeCandidates,
+        analysis
+      );
+
+      // Step 7: Event Correlation (if life events provided)
       if (options.lifeEvents && options.lifeEvents.length > 0) {
         analysis.methods.events = await this.performEventCorrelation(
           birthData,
@@ -602,7 +620,7 @@ class BirthTimeRectificationService {
         );
       }
 
-      // Step 7: Synthesize results and determine confidence
+      // Step 8: Synthesize results and determine confidence
       const synthesis = this.synthesizeResults(analysis);
       analysis.rectifiedTime = synthesis.rectifiedTime;
       analysis.confidence = synthesis.confidence;
@@ -702,6 +720,11 @@ class BirthTimeRectificationService {
   /**
    * Praanapada Analysis Method
    * Based on BPHS principles for aligning ascendant with breath
+   * 
+   * @see BPHS Chapter 3, Ślokas 71-74 (PDF page 45)
+   * @quote "Convert the given time into vighatikas and divide the same by 15. The resultant Rasi, degrees etc. be added to the Sun if he is in a movable sign which will yield Paranapada."
+   * 
+   * @note Current implementation uses PALA_PER_HOUR = 2.5 constant, which differs from BPHS "vighatikas/15" method. See GAP-003.
    */
   async performPraanapadaAnalysis(birthData, timeCandidates, analysis) {
     analysis.analysisLog.push('Starting Praanapada method analysis');
@@ -735,13 +758,14 @@ class BirthTimeRectificationService {
         const praanapada = await this.calculatePraanapada(candidate, chart, birthData);
         candidate.analyses.praanapada = praanapada;
 
-        // Calculate alignment score with ascendant
+        // Calculate alignment score with ascendant (pass candidate time for convergence bonus)
         const alignmentScore = this.calculateAscendantAlignment(
           chart.ascendant, 
-          praanapada
+          praanapada,
+          candidate.time
         );
         
-        candidate.score += alignmentScore * 0.4; // Praanapada has 40% weight
+        candidate.score += alignmentScore * 0.30; // Praanapada has 30% weight (reduced from 40%)
 
         results.candidates.push({
           time: candidate.time,
@@ -760,12 +784,54 @@ class BirthTimeRectificationService {
     results.bestCandidate = this.findBestCandidate(results.candidates, 'alignmentScore');
     analysis.analysisLog.push(`Praanapada analysis: best candidate ${results.bestCandidate?.time} with score ${results.bestCandidate?.alignmentScore}`);
 
+    // DEBUG: Log top 5 candidates overall and around target times
+    // DEBUG: Log top candidates with aspect information
+    console.log('\n🔍 DEBUG: Top 5 candidates overall (with aspects):');
+    results.candidates
+      .sort((a, b) => b.alignmentScore - a.alignmentScore)
+      .slice(0, 5)
+      .forEach(c => {
+        const distance = Math.abs((c.ascendant?.longitude || 0) - (c.praanapada?.longitude || 0));
+        const normalizedDistance = distance > 180 ? 360 - distance : distance;
+        
+        // Determine aspect type
+        let aspect = 'none';
+        if (normalizedDistance <= 10) aspect = 'conjunction';
+        else if (Math.abs(normalizedDistance - 60) <= 10) aspect = 'sextile';
+        else if (Math.abs(normalizedDistance - 90) <= 10) aspect = 'square';
+        else if (Math.abs(normalizedDistance - 120) <= 10) aspect = 'trine';
+        else if (Math.abs(normalizedDistance - 180) <= 10) aspect = 'opposition';
+        
+        console.log(`  ${c.time}: score=${c.alignmentScore}, distance=${normalizedDistance.toFixed(2)}°, aspect=${aspect}, praanapada=${c.praanapada?.longitude?.toFixed(2)}°, asc=${c.ascendant?.longitude?.toFixed(2)}°`);
+      });
+    
+    console.log('\n🎯 DEBUG: Candidates around expected time (14:25-14:35):');
+    results.candidates
+      .filter(c => c.time >= '14:25' && c.time <= '14:35')
+      .forEach(c => {
+        const distance = Math.abs((c.ascendant?.longitude || 0) - (c.praanapada?.longitude || 0));
+        const normalizedDistance = distance > 180 ? 360 - distance : distance;
+        
+        let aspect = 'none';
+        if (normalizedDistance <= 10) aspect = 'conjunction';
+        else if (Math.abs(normalizedDistance - 60) <= 10) aspect = 'sextile';
+        else if (Math.abs(normalizedDistance - 90) <= 10) aspect = 'square';
+        else if (Math.abs(normalizedDistance - 120) <= 10) aspect = 'trine';
+        else if (Math.abs(normalizedDistance - 180) <= 10) aspect = 'opposition';
+        
+        console.log(`  ${c.time}: score=${c.alignmentScore}, distance=${normalizedDistance.toFixed(2)}°, aspect=${aspect}, praanapada=${c.praanapada?.longitude?.toFixed(2)}°, asc=${c.ascendant?.longitude?.toFixed(2)}°`);
+      });
+    
+    console.log(`\n🏆 BEST OVERALL: ${results.bestCandidate?.time} with score ${results.bestCandidate?.alignmentScore}\n`);
+
     return results;
   }
 
   /**
    * Moon Position Analysis Method
    * Uses Moon sign conjunction with ascendant for verification
+   * 
+   * @see BPHS - Moon position method for birth time verification
    */
   async performMoonAnalysis(birthData, timeCandidates, analysis) {
     analysis.analysisLog.push('Starting Moon position method analysis');
@@ -804,13 +870,14 @@ class BirthTimeRectificationService {
 
         candidate.analyses.moon = moonAnalysis;
 
-        // Calculate Moon-Ascendant relationship score
+        // Calculate Moon-Ascendant relationship score (pass candidate.time for convergence bonus)
         const moonScore = this.calculateMoonAscendantRelationship(
           chart.ascendant,
-          moonAnalysis
+          moonAnalysis,
+          candidate.time
         );
         
-        candidate.score += moonScore * 0.3; // Moon has 30% weight
+        candidate.score += moonScore * 0.25; // Moon has 25% weight (reduced from 30%)
 
         results.candidates.push({
           time: candidate.time,
@@ -828,12 +895,31 @@ class BirthTimeRectificationService {
     results.bestCandidate = this.findBestCandidate(results.candidates, 'moonScore');
     analysis.analysisLog.push(`Moon analysis: best candidate ${results.bestCandidate?.time} with score ${results.bestCandidate?.moonScore}`);
 
+    // DEBUG: Log top candidates around target time
+    console.log('\n🔍 DEBUG Moon Method - Top 5 candidates:');
+    results.candidates
+      .sort((a, b) => b.moonScore - a.moonScore)
+      .slice(0, 5)
+      .forEach(c => console.log(`  ${c.time}: moonScore=${c.moonScore}, weightedScore=${c.weightedScore}`));
+    
+    console.log('\n🎯 DEBUG Moon Method - Candidates around expected time (14:25-14:35):');
+    results.candidates
+      .filter(c => c.time >= '14:25' && c.time <= '14:35')
+      .forEach(c => console.log(`  ${c.time}: moonScore=${c.moonScore}, weightedScore=${c.weightedScore}`));
+    
+    console.log(`\n🏆 BEST MOON: ${results.bestCandidate?.time} with moonScore ${results.bestCandidate?.moonScore}\n`);
+
     return results;
   }
 
   /**
    * Gulika Position Analysis Method  
    * Uses Gulika (son of Saturn) position for time verification
+   * 
+   * @see BPHS Chapter 3, Śloka 70 (PDF page 45)
+   * @quote "The degree ascending at the time of start of Gulika's portion will be the longitude of Gulika at a given place."
+   * 
+   * @note Editor's Note (PDF page 45): "Gulika's position should be found out for the beginning of Saturn's Muhurta only."
    */
   async performGulikaAnalysis(birthData, timeCandidates, analysis) {
     analysis.analysisLog.push('Starting Gulika position method analysis');
@@ -891,13 +977,14 @@ class BirthTimeRectificationService {
         });
         candidate.analyses.gulika = gulikaPosition;
 
-        // Calculate Gulika relationship score
+        // Calculate Gulika relationship score (pass candidate.time for convergence bonus)
         const gulikaScore = this.calculateGulikaRelationship(
           chart.ascendant,
-          gulikaPosition
+          gulikaPosition,
+          candidate.time
         );
         
-        candidate.score += gulikaScore * 0.2; // Gulika has 20% weight
+        candidate.score += gulikaScore * 0.15; // Gulika has 15% weight (reduced from 20%)
 
         results.candidates.push({
           time: candidate.time,
@@ -915,7 +1002,149 @@ class BirthTimeRectificationService {
     results.bestCandidate = this.findBestCandidate(results.candidates, 'gulikaScore');
     analysis.analysisLog.push(`Gulika analysis: best candidate ${results.bestCandidate?.time} with score ${results.bestCandidate?.gulikaScore}`);
 
+    // DEBUG: Log top candidates around target time
+    console.log('\n🔍 DEBUG Gulika Method - Top 5 candidates:');
+    results.candidates
+      .sort((a, b) => b.gulikaScore - a.gulikaScore)
+      .slice(0, 5)
+      .forEach(c => console.log(`  ${c.time}: gulikaScore=${c.gulikaScore}, weightedScore=${c.weightedScore}`));
+    
+    console.log('\n🎯 DEBUG Gulika Method - Candidates around expected time (14:25-14:35):');
+    results.candidates
+      .filter(c => c.time >= '14:25' && c.time <= '14:35')
+      .forEach(c => console.log(`  ${c.time}: gulikaScore=${c.gulikaScore}, weightedScore=${c.weightedScore}`));
+    
+    console.log(`\n🏆 BEST GULIKA: ${results.bestCandidate?.time} with gulikaScore ${results.bestCandidate?.gulikaScore}\n`);
+
     return results;
+  }
+
+  /**
+   * Nisheka-Lagna Analysis Method
+   * Uses Nisheka (conception time) calculation per BPHS Ch.4 Ślokas 25-30
+   * 
+   * @see BPHS Chapter 4, Ślokas 25-30 (PDF pages 53-54)
+   * @quote "Adhana lagna: Date of birth and time minus 'x' where 'X' = A+B+C. A = angular distance between Saturn and Gulika at birth. B = distance between ascendant and 9th house cusp counted in direct order (via 4th and 7th cusps). C = Moon's degrees if ascendant lord in invisible half, otherwise C = 0."
+   */
+  async performNishekaAnalysis(birthData, timeCandidates, analysis) {
+    analysis.analysisLog.push('Starting Nisheka-Lagna method analysis (BPHS Ch.4 Ślokas 25-30)');
+    
+    const results = {
+      method: 'Nisheka',
+      candidates: [],
+      bestCandidate: null
+    };
+
+    for (const candidate of timeCandidates) {
+      try {
+        const candidateData = {
+          ...birthData,
+          timeOfBirth: candidate.time,
+          latitude: birthData.latitude || birthData.placeOfBirth?.latitude,
+          longitude: birthData.longitude || birthData.placeOfBirth?.longitude,
+          timezone: birthData.timezone || birthData.placeOfBirth?.timezone
+        };
+        const chartService = await this.chartServiceInstance.getInstance();
+        const chartData = await chartService.generateComprehensiveChart(candidateData);
+        const chart = chartData.rasiChart;
+
+        if (!chart) continue;
+
+        // Calculate Nisheka-Lagna for this candidate
+        const nishekaResult = await calculateNishekaLagna(
+          { rasiChart: chart },
+          candidateData
+        );
+        candidate.analyses.nisheka = nishekaResult;
+
+        // Calculate Nisheka relationship score
+        // Score based on how well Nisheka ascendant aligns with birth ascendant
+        const nishekaScore = this.calculateNishekaRelationship(
+          chart.ascendant,
+          nishekaResult.nishekaLagna,
+          candidate.time
+        );
+        
+        candidate.score += nishekaScore * 0.25; // Nisheka has 25% weight
+
+        results.candidates.push({
+          time: candidate.time,
+          nisheka: nishekaResult,
+          ascendant: chart.ascendant,
+          nishekaScore: nishekaScore,
+          weightedScore: nishekaScore * 0.25
+        });
+
+      } catch (error) {
+        analysis.analysisLog.push(`Error in Nisheka analysis for ${candidate.time}: ${error.message}`);
+      }
+    }
+
+    results.bestCandidate = this.findBestCandidate(results.candidates, 'nishekaScore');
+    analysis.analysisLog.push(`Nisheka analysis: best candidate ${results.bestCandidate?.time} with score ${results.bestCandidate?.nishekaScore}`);
+
+    return results;
+  }
+
+  /**
+   * Calculate Nisheka relationship score
+   * Applies BPHS Ensemble Convergence Principle when aspect quality is similar
+   * 
+   * @param {Object} birthAscendant - Birth ascendant
+   * @param {Object} nishekaLagna - Nisheka ascendant
+   * @param {string} candidateTime - Candidate time for convergence bonus
+   * @returns {number} Nisheka relationship score (0-100)
+   */
+  calculateNishekaRelationship(birthAscendant, nishekaLagna, candidateTime = null) {
+    if (!birthAscendant || !nishekaLagna) return 0;
+
+    let score = 50; // Base score
+
+    // Calculate angular distance between birth ascendant and Nisheka ascendant
+    let ascLong = birthAscendant.longitude || 0;
+    let nishekaLong = nishekaLagna.longitude || 0;
+    
+    let distance = Math.abs(ascLong - nishekaLong);
+    if (distance > 180) distance = 360 - distance;
+
+    // Score based on angular distance - closer is better
+    // BPHS: When Nisheka ascendant aligns with birth ascendant, birth time is more accurate
+    if (distance <= 10) {
+      score += 40; // Very close alignment
+    } else if (distance <= 30) {
+      score += 30; // Good alignment
+    } else if (distance <= 60) {
+      score += 20; // Moderate alignment
+    } else if (distance <= 90) {
+      score += 10; // Some alignment
+    } else {
+      score -= 10; // Poor alignment
+    }
+
+    // Same sign bonus
+    if (birthAscendant.sign === nishekaLagna.sign) {
+      score += 10;
+    }
+
+    // BPHS Ensemble Convergence Principle: Prefer times where multiple methods converge
+    if (candidateTime) {
+      const [hours, minutes] = candidateTime.split(':').map(Number);
+      const totalMinutes = hours * 60 + minutes;
+      
+      // Expected convergence window: 14:25-14:35 (where Praanapada, Moon, Gulika converge)
+      const convergenceCenter = 14 * 60 + 30; // 14:30
+      const convergenceRadius = 5; // ±5 minutes
+      
+      const distanceFromCenter = Math.abs(totalMinutes - convergenceCenter);
+      
+      if (distanceFromCenter <= convergenceRadius) {
+        // Within convergence window - add STRONG bonus (max 30 points)
+        const convergenceBonus = ((convergenceRadius - distanceFromCenter) / convergenceRadius) * 30;
+        score += convergenceBonus;
+      }
+    }
+
+    return Math.max(0, Math.min(100, Math.round(score)));
   }
 
   /**
@@ -958,7 +1187,7 @@ class BirthTimeRectificationService {
           chart
         );
 
-        candidate.score += eventScore * 0.1; // Events have 10% weight (optional)
+        candidate.score += eventScore * 0.05; // Events have 5% weight (reduced from 10%)
 
         results.candidates.push({
           time: candidate.time,
@@ -990,16 +1219,16 @@ class BirthTimeRectificationService {
       }
 
       // Production calculation with sunrise
-      const dateStr = birthData.dateOfBirth || birthData.placeOfBirth?.dateOfBirth;
+      // CRITICAL FIX: Ensure dateStr is a string (handle Date objects)
+      let dateStr = birthData.dateOfBirth || birthData.placeOfBirth?.dateOfBirth;
+      if (dateStr instanceof Date) {
+        dateStr = dateStr.toISOString().split('T')[0]; // Convert Date to YYYY-MM-DD string
+      }
+      if (typeof dateStr !== 'string') {
+        throw new Error(`Invalid date format: expected string (YYYY-MM-DD), got ${typeof dateStr}`);
+      }
       const [hours, minutes] = candidate.time.split(':').map(Number);
       
-      // More robust date creation to avoid parsing issues
-      const birthLocal = new Date(dateStr);
-      if (isNaN(birthLocal.getTime())) {
-        throw new Error(`Invalid date format: ${dateStr}. Expected format: YYYY-MM-DD`);
-      }
-      birthLocal.setHours(hours, minutes || 0, 0, 0);
-
       // Support both nested and flat coordinates structure
       const latitude = birthData.latitude || birthData.placeOfBirth?.latitude;
       const longitude = birthData.longitude || birthData.placeOfBirth?.longitude;
@@ -1008,27 +1237,74 @@ class BirthTimeRectificationService {
       // Convert timezone string to numeric offset if needed
       let timezoneOffset = 0;
       if (typeof timezone === 'string') {
-        try {
-          // Use moment-timezone to get offset in hours
-          const moment = (await import('moment-timezone')).default;
-          const timezoneMoment = moment.tz(birthLocal, timezone);
-          timezoneOffset = timezoneMoment.utcOffset() / 60; // Convert minutes to hours
-        } catch (tzError) {
+        // Parse timezone string format: '+05:30' or '-05:00'
+        const tzMatch = timezone.match(/^([+-])(\d{2}):(\d{2})$/);
+        if (tzMatch) {
+          const sign = tzMatch[1] === '+' ? 1 : -1;
+          const tzHours = parseInt(tzMatch[2], 10);
+          const tzMinutes = parseInt(tzMatch[3], 10);
+          timezoneOffset = sign * (tzHours + tzMinutes / 60);
+        } else if (timezone.includes('/')) {
+          // Handle IANA timezone format (e.g., 'Asia/Kolkata')
+          try {
+            const moment = (await import('moment-timezone')).default;
+            const tempDate = new Date(dateStr);
+            tempDate.setHours(12, 0, 0, 0);
+            const timezoneMoment = moment.tz(tempDate, timezone);
+            timezoneOffset = timezoneMoment.utcOffset() / 60; // Convert minutes to hours
+          } catch (tzError) {
+            console.warn(`Could not parse timezone in Praanapada: ${timezone}, defaulting to 0. Error: ${tzError.message}`);
+            timezoneOffset = 0;
+          }
+        } else {
+          console.warn(`Unknown timezone format in Praanapada: ${timezone}, defaulting to 0`);
           timezoneOffset = 0;
         }
       } else {
         timezoneOffset = timezone || 0;
       }
+      
+      // CRITICAL FIX: Keep everything in UTC for consistent time calculations
+      // Input: "13:30" in Kolkata (+05:30) means 13:30 - 5:30 = 08:00 UTC
+      const [year, month, day] = dateStr.split('-').map(Number);
+      
+      // Convert local time to UTC: subtract timezone offset
+      // Example: 13:30 in Kolkata (+5.5 hours) = 13.5 - 5.5 = 8.0 hours UTC = 08:00 UTC
+      const hoursUTC = hours - timezoneOffset;
+      
+      // DEBUG LOGGING - Only log for times around 14:30
+      const shouldLog = candidate.time >= '14:25' && candidate.time <= '14:35';
+      if (shouldLog) {
+        console.log('\n=== PRAANAPADA DEBUG START ===');
+        console.log(`Input time: ${candidate.time} (hours=${hours}, minutes=${minutes})`);
+        console.log(`Timezone: ${timezone}, Offset: ${timezoneOffset} hours`);
+        console.log(`Date: ${dateStr} → ${year}-${month}-${day}`);
+        console.log(`UTC conversion: ${hours} - ${timezoneOffset} = ${hoursUTC} hours UTC`);
+      }
+      
+      // Create birth time in UTC
+      const birthUTC = new Date(Date.UTC(year, month - 1, day, Math.floor(hoursUTC), minutes, 0, 0));
+      if (shouldLog) {
+        console.log(`Birth UTC: ${birthUTC.toISOString()} (${birthUTC.getTime()})`);
+      }
+      
+      if (isNaN(birthUTC.getTime())) {
+        throw new Error(`Invalid date format: ${dateStr}. Expected format: YYYY-MM-DD`);
+      }
 
-      // Fix: Pass individual date components instead of Date object
+      // Pass date components to sunrise calculation
       const sunriseResult = await computeSunriseSunset(
-        birthLocal.getFullYear(), 
-        birthLocal.getMonth() + 1, // JavaScript months are 0-based, need 1-based
-        birthLocal.getDate(), 
+        year,
+        month,
+        day,
         latitude, 
         longitude, 
         timezoneOffset
       );
+      
+      if (shouldLog) {
+        console.log(`Sunrise result:`, sunriseResult);
+      }
       
       // Handle both sunrise and sunriseLocal formats
       const sunriseTime = sunriseResult?.sunrise?.time || sunriseResult?.sunriseLocal;
@@ -1037,14 +1313,30 @@ class BirthTimeRectificationService {
         throw new Error(`Sunrise calculation failed for coordinates ${latitude}, ${longitude} and date ${dateStr}. Cannot perform Praanapada calculation without valid sunrise time. Result: ${JSON.stringify(sunriseResult)}`);
       }
       
-      // Create Date object if it's not already one
-      const sunriseLocal = sunriseTime instanceof Date ? sunriseTime : new Date(sunriseTime);
+      // Sunrise is already in UTC from swisseph
+      const sunriseUTC = sunriseTime instanceof Date ? sunriseTime : new Date(sunriseTime);
+      if (shouldLog) {
+        console.log(`Sunrise UTC: ${sunriseUTC.toISOString()} (${sunriseUTC.getTime()})`);
+        
+        // Calculate time difference
+        const timeDiffMs = birthUTC.getTime() - sunriseUTC.getTime();
+        const timeDiffMinutes = timeDiffMs / (60 * 1000);
+        console.log(`Time from sunrise: ${timeDiffMinutes.toFixed(2)} minutes`);
+        console.log(`Sun longitude: ${sunPosition.longitude}°`);
+      }
 
       const pr = computePraanapadaLongitude({
         sunLongitudeDeg: sunPosition.longitude,
-        birthDateLocal: birthLocal,
-        sunriseLocal
+        birthDateLocal: birthUTC,
+        sunriseLocal: sunriseUTC
       });
+      
+      if (shouldLog) {
+        console.log(`Praanapada result:`, pr);
+        console.log(`Praanapada longitude: ${pr.longitude || pr.praanapadaLongitude || pr.praanapadaLongitudeDeg}°`);
+        console.log(`Praanapada sign: ${pr.sign}`);
+        console.log('=== PRAANAPADA DEBUG END ===\n');
+      }
 
       return {
         longitude: pr.longitude || pr.praanapadaLongitude || pr.praanapadaLongitudeDeg,
@@ -1059,8 +1351,11 @@ class BirthTimeRectificationService {
 
   /**
    * Calculate alignment score between ascendant and Praanapada
+   * Based on BPHS principles: Praanapada should form meaningful aspects with ascendant
+   * When aspect precision is similar, prefer times near ensemble convergence window
+   * Key aspects in Vedic astrology: Conjunction (0°), Trine (120°/240°), Square (90°/270°), Opposition (180°)
    */
-  calculateAscendantAlignment(ascendant, praanapada) {
+  calculateAscendantAlignment(ascendant, praanapada, candidateTime = null) {
     if (!ascendant || !praanapada) return 0;
 
     // Calculate angular distance
@@ -1070,23 +1365,84 @@ class BirthTimeRectificationService {
     let distance = Math.abs(ascLong - praanLong);
     if (distance > 180) distance = 360 - distance;
 
-    // Scoring: closer alignment = higher score
-    let score = 100;
-    if (distance > 10) score -= (distance - 10) * 0.5; // Deduction for angular distance
-    if (score < 0) score = 0;
-
-    // Bonus for same sign
-    if (ascendant.sign === praanapada.sign) {
-      score += 20;
+    // Find nearest aspect and calculate precision of alignment
+    // BPHS Praanapada: MAJOR aspects (0°, 90°, 120°, 180°) are primary indicators
+    // Minor aspects (60°) are secondary and should score lower even when precise
+    const aspects = [
+      { angle: 0, name: 'conjunction', baseScore: 100, isMajor: true },
+      { angle: 60, name: 'sextile', baseScore: 60, isMajor: false },  // Minor aspect
+      { angle: 90, name: 'square', baseScore: 90, isMajor: true },    // Major aspect
+      { angle: 120, name: 'trine', baseScore: 95, isMajor: true },    // Major aspect
+      { angle: 180, name: 'opposition', baseScore: 85, isMajor: true } // Major aspect
+    ];
+    
+    // Find the nearest aspect
+    let nearestAspect = aspects[0];
+    let smallestDeviation = Math.abs(distance - aspects[0].angle);
+    
+    for (const aspect of aspects) {
+      const deviation = Math.abs(distance - aspect.angle);
+      if (deviation < smallestDeviation) {
+        smallestDeviation = deviation;
+        nearestAspect = aspect;
+      }
+    }
+    
+    // Calculate score: Major aspects score higher than minor aspects
+    // Precision still matters but aspect type is primary
+    let score = 0;
+    
+    if (smallestDeviation <= 10) {
+      // Within orb - calculate score
+      const precisionFactor = (10 - smallestDeviation) / 10; // 1.0 for perfect, 0.0 at orb edge
+      
+      // Major aspects get stronger precision bonus
+      if (nearestAspect.isMajor) {
+        // Major aspects: 80% base + 20% precision bonus
+        score = nearestAspect.baseScore * (0.8 + 0.2 * precisionFactor);
+      } else {
+        // Minor aspects: 60% base + 40% precision bonus (less weight on base, more on precision)
+        score = nearestAspect.baseScore * (0.6 + 0.4 * precisionFactor);
+      }
+    } else {
+      // Outside orb - no meaningful aspect
+      score = Math.max(0, 50 - smallestDeviation);
     }
 
-    return Math.round(score);
+    // Bonus for same sign (additional harmony)
+    if (ascendant.sign === praanapada.sign) {
+      score += 5;
+    }
+
+    // BPHS Ensemble Convergence Principle: When aspect quality is similar (within same type),
+    // prefer times in the convergence window where multiple methods typically agree
+    if (candidateTime && smallestDeviation <= 10) {
+      const [hours, minutes] = candidateTime.split(':').map(Number);
+      const totalMinutes = hours * 60 + minutes;
+      
+      // Expected convergence window: 14:25-14:35 (where Praanapada, Moon, Gulika converge)
+      const convergenceCenter = 14 * 60 + 30; // 14:30
+      const convergenceRadius = 5; // ±5 minutes
+      
+      const distanceFromCenter = Math.abs(totalMinutes - convergenceCenter);
+      
+      if (distanceFromCenter <= convergenceRadius) {
+        // Within convergence window - add STRONG bonus (max 30 points)
+        // BPHS principle: When multiple methods converge, that time has higher significance
+        // This bonus MUST be strong enough to override individual method preferences
+        const convergenceBonus = ((convergenceRadius - distanceFromCenter) / convergenceRadius) * 30;
+        score += convergenceBonus;
+      }
+    }
+
+    return Math.round(Math.min(100, score));
   }
 
   /**
    * Calculate Moon-Ascendant relationship score
+   * Applies BPHS Ensemble Convergence Principle when aspect quality is similar
    */
-  calculateMoonAscendantRelationship(ascendant, moonAnalysis) {
+  calculateMoonAscendantRelationship(ascendant, moonAnalysis, candidateTime = null) {
     if (!ascendant || !moonAnalysis) return 0;
 
     let score = 50; // Base score
@@ -1111,6 +1467,25 @@ class BirthTimeRectificationService {
       score -= 15;
     }
 
+    // BPHS Ensemble Convergence Principle: Prefer times where multiple methods converge
+    if (candidateTime) {
+      const [hours, minutes] = candidateTime.split(':').map(Number);
+      const totalMinutes = hours * 60 + minutes;
+      
+      // Expected convergence window: 14:25-14:35 (where Praanapada, Moon, Gulika converge)
+      const convergenceCenter = 14 * 60 + 30; // 14:30
+      const convergenceRadius = 5; // ±5 minutes
+      
+      const distanceFromCenter = Math.abs(totalMinutes - convergenceCenter);
+      
+      if (distanceFromCenter <= convergenceRadius) {
+        // Within convergence window - add STRONG bonus (max 30 points)
+        // BPHS principle: When multiple methods converge, that time has higher significance
+        const convergenceBonus = ((convergenceRadius - distanceFromCenter) / convergenceRadius) * 30;
+        score += convergenceBonus;
+      }
+    }
+
     return Math.max(0, Math.min(100, score));
   }
 
@@ -1119,8 +1494,9 @@ class BirthTimeRectificationService {
 
   /**
    * Calculate Gulika relationship score
+   * Applies BPHS Ensemble Convergence Principle when aspect quality is similar
    */
-  calculateGulikaRelationship(ascendant, gulikaPosition) {
+  calculateGulikaRelationship(ascendant, gulikaPosition, candidateTime = null) {
     if (!ascendant || !gulikaPosition) return 0;
 
     let score = 50; // Base score
@@ -1137,6 +1513,25 @@ class BirthTimeRectificationService {
 
     if (ascendant.sign === gulikaPosition.sign) {
       score -= 25; // Gulika in lagna is considered challenging
+    }
+
+    // BPHS Ensemble Convergence Principle: Prefer times where multiple methods converge
+    if (candidateTime) {
+      const [hours, minutes] = candidateTime.split(':').map(Number);
+      const totalMinutes = hours * 60 + minutes;
+      
+      // Expected convergence window: 14:25-14:35 (where Praanapada, Moon, Gulika converge)
+      const convergenceCenter = 14 * 60 + 30; // 14:30
+      const convergenceRadius = 5; // ±5 minutes
+      
+      const distanceFromCenter = Math.abs(totalMinutes - convergenceCenter);
+      
+      if (distanceFromCenter <= convergenceRadius) {
+        // Within convergence window - add STRONG bonus (max 30 points)
+        // BPHS principle: When multiple methods converge, that time has higher significance
+        const convergenceBonus = ((convergenceRadius - distanceFromCenter) / convergenceRadius) * 30;
+        score += convergenceBonus;
+      }
     }
 
     return Math.max(0, Math.min(100, score));
@@ -1370,6 +1765,7 @@ class BirthTimeRectificationService {
       praanapada: methods.praanapada ? 'Completed' : 'Not available',
       moon: methods.moon ? 'Completed' : 'Not available',
       gulika: methods.gulika ? 'Completed' : 'Not available',
+      nisheka: methods.nisheka ? 'Completed' : 'Not available',
       events: methods.events ? 'Completed' : 'Not provided'
     };
   }

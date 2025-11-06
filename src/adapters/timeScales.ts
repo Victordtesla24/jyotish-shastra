@@ -138,6 +138,27 @@ export class TimeScaleConverter {
       return null;
     }
 
+    // CRITICAL FIX: Check if year is within IERS table range (1973-2023)
+    // IERS table only covers 1973-01-01 to 2023-12-31
+    // For dates outside this range, return null to use polynomial estimation
+    const firstRecord = this.deltaTTable[0];
+    const lastRecord = this.deltaTTable[this.deltaTTable.length - 1];
+    const minYear = firstRecord.year;
+    const maxYear = lastRecord.year;
+    
+    // Check if year is outside IERS table range
+    if (year < minYear || year > maxYear) {
+      return null; // Use polynomial estimation for dates outside IERS range
+    }
+    
+    // For years at the boundaries, check month
+    if (year === minYear && month < firstRecord.month) {
+      return null;
+    }
+    if (year === maxYear && month > lastRecord.month) {
+      return null;
+    }
+
     // Find surrounding data points
     const decimalYear = year + (month - 0.5) / 12;
     
@@ -166,7 +187,7 @@ export class TimeScaleConverter {
       return before.deltaT;
     }
 
-    // If only one side available, use that value
+    // If only one side available within range, use that value
     if (before && !after) {
       return before.deltaT;
     }

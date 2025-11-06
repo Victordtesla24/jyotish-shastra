@@ -3,12 +3,10 @@
   "inputBirthData": {
     "name": "Test Subject - Pune 1985",
     "dateOfBirth": "1985-10-24",
-    "inputTimeOfBirth": "02:30",
+    "timeOfBirth": "13:30",
     "placeOfBirth": "Pune, Maharashtra, India",
-    "coordinates": {
-      "latitude": 18.5204,
-      "longitude": 73.8567
-    },
+    "latitude": 18.5204,
+    "longitude": 73.8567,
     "timezone": "Asia/Kolkata"
   },
   "expectedRectification": {

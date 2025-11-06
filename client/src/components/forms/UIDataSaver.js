@@ -77,13 +77,12 @@ const logSessionState = (method, data) => {
 
 const safeGet = (key) => {
   // CRITICAL FIX: Use global sessionStorage first (matches test environment)
+  // Check for sessionStorage availability directly (works in both browser and test environments)
   let storage = null;
-  if (isBrowser) {
-    if (typeof sessionStorage !== 'undefined') {
-      storage = sessionStorage;
-    } else {
-      storage = getSessionStorage();
-    }
+  if (typeof sessionStorage !== 'undefined') {
+    storage = sessionStorage;
+  } else if (isBrowser) {
+    storage = getSessionStorage();
   }
   if (!storage) {
     return null;
@@ -97,15 +96,13 @@ const safeGet = (key) => {
 };
 
 const safeSet = (key, value) => {
-  // CRITICAL FIX: Use the same storage access pattern as safeGet() for consistency
-  // This ensures we use the exact same storage object in all environments
+  // CRITICAL FIX: Use the exact same storage access pattern as safeGet() for consistency
+  // This ensures we write to the exact same storage object that safeGet() reads from
   let storage = null;
-  if (isBrowser) {
-    if (typeof sessionStorage !== 'undefined') {
-      storage = sessionStorage;
-    } else {
-      storage = getSessionStorage();
-    }
+  if (typeof sessionStorage !== 'undefined') {
+    storage = sessionStorage;
+  } else if (isBrowser) {
+    storage = getSessionStorage();
   }
   if (!storage) {
     return;
@@ -115,9 +112,11 @@ const safeSet = (key, value) => {
       storage.removeItem(key);
     } else {
       storage.setItem(key, value);
+      logStorageOperation('write', key, 'success', { valueLength: value.length });
     }
   } catch (error) {
     errorLog('Failed to write key', key, error);
+    logStorageOperation('write', key, 'error', { error: error.message });
     throw error;
   }
 };
@@ -254,16 +253,13 @@ const clearAllV2Keys = () => {
   // This ensures we're operating on the same storage object in all environments
   
   // CRITICAL: Use the exact same logic as safeGet() to get the storage reference
-  // Check global sessionStorage first (matches test environment usage)
+  // This ensures we're operating on the exact same storage object that safeGet() uses
+  // Check for sessionStorage availability directly (works in both browser and test environments)
   let storage = null;
-  
-  // Always check global sessionStorage first (matches test environment)
   if (typeof sessionStorage !== 'undefined') {
     storage = sessionStorage;
-  } else if (isBrowser && typeof window !== 'undefined' && window.sessionStorage) {
-    storage = window.sessionStorage;
-  } else if (typeof global !== 'undefined' && global.sessionStorage) {
-    storage = global.sessionStorage;
+  } else if (isBrowser) {
+    storage = getSessionStorage();
   }
   
   if (storage) {
@@ -591,7 +587,9 @@ const UIDataSaver = {
   },
 
   getBirthData() {
-    if (!isBrowser) {
+    // CRITICAL FIX: Check for sessionStorage availability directly (works in both browser and test environments)
+    // In test environments, sessionStorage might be available even if isBrowser is false
+    if (!isBrowser && typeof sessionStorage === 'undefined') {
       return null;
     }
 

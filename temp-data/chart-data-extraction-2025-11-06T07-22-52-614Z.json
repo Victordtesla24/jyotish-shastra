@@ -1,0 +1,1441 @@
+{
+  "extracted": {
+    "timestamp": "2025-11-06T07:22:52.614Z",
+    "extractionVersion": "1.0.0",
+    "datasets": {
+      "rootLevelData": {
+        "success": true,
+        "generatedAt": "2025-11-06T07:22:12.202Z",
+        "chartId": null
+      },
+      "birthData": {
+        "name": "Vikram Test",
+        "dateOfBirth": "1990-01-01",
+        "timeOfBirth": "10:30",
+        "latitude": 19.054999,
+        "longitude": 72.869204,
+        "timezone": "Asia/Kolkata",
+        "gender": null,
+        "geocodingInfo": {
+          "service": "user_provided",
+          "accuracy": "high",
+          "formattedAddress": "Mumbai, Maharashtra, India"
+        }
+      },
+      "rasiChartData": {
+        "id": "2fba7084-808b-4319-a516-2e73ff8e61d3",
+        "jd": 2447892.7083333335,
+        "hasAscendant": true,
+        "hasPlanets": true,
+        "hasHousePositions": true,
+        "hasNakshatra": true,
+        "hasAspects": true,
+        "planetCount": 12,
+        "housePositionsCount": 12
+      },
+      "ascendantData": {
+        "longitude": 309.13542773695633,
+        "signIndex": 10,
+        "signName": "Aquarius",
+        "signId": 11,
+        "longitudeTropical": 332.8528423069314,
+        "ayanamsa": 23.717414569975062,
+        "degree": 9.13542773695633,
+        "degreeInSign": 9.13542773695633,
+        "sign": "Aquarius"
+      },
+      "planetsArrayData": [
+        {
+          "name": "Sun",
+          "longitude": 256.7994964999673,
+          "degree": 16.79949649996729,
+          "sign": "Sagittarius",
+          "signId": 9,
+          "latitude": 0.0000015307492750917431,
+          "distance": 0.9833325696369803,
+          "speed": null,
+          "isRetrograde": false,
+          "isCombust": false,
+          "dignity": "neutral",
+          "house": 11
+        },
+        {
+          "name": "Moon",
+          "longitude": 305.6298918220623,
+          "degree": 5.629891822062291,
+          "sign": "Aquarius",
+          "signId": 11,
+          "latitude": 1.125715728629354,
+          "distance": 0.0025409401873441005,
+          "speed": null,
+          "isRetrograde": false,
+          "isCombust": false,
+          "dignity": "neutral",
+          "house": 1
+        },
+        {
+          "name": "Mars",
+          "longitude": 226.07743121693466,
+          "degree": 16.077431216934656,
+          "sign": "Scorpio",
+          "signId": 8,
+          "latitude": -0.02973578953778596,
+          "distance": 2.3092610964142075,
+          "speed": null,
+          "isRetrograde": false,
+          "isCombust": false,
+          "dignity": "own",
+          "house": 10
+        },
+        {
+          "name": "Mercury",
+          "longitude": 272.0329244510773,
+          "degree": 2.0329244510772924,
+          "sign": "Capricorn",
+          "signId": 10,
+          "latitude": 0.5393340613143155,
+          "distance": 0.7775526522534734,
+          "speed": null,
+          "isRetrograde": false,
+          "isCombust": false,
+          "dignity": "neutral",
+          "house": 12
+        },
+        {
+          "name": "Jupiter",
+          "longitude": 71.47062573880856,
+          "degree": 11.470625738808565,
+          "sign": "Gemini",
+          "signId": 3,
+          "latitude": -0.11769941703192326,
+          "distance": 4.170961860274037,
+          "speed": null,
+          "isRetrograde": false,
+          "isCombust": false,
+          "dignity": "neutral",
+          "house": 5
+        },
+        {
+          "name": "Venus",
+          "longitude": 282.5407567727325,
+          "degree": 12.540756772732493,
+          "sign": "Capricorn",
+          "signId": 10,
+          "latitude": 1.8296034634272789,
+          "distance": 0.30674559863738193,
+          "speed": null,
+          "isRetrograde": false,
+          "isCombust": false,
+          "dignity": "neutral",
+          "house": 12
+        },
+        {
+          "name": "Saturn",
+          "longitude": 261.9055917880303,
+          "degree": 21.90559178803028,
+          "sign": "Sagittarius",
+          "signId": 9,
+          "latitude": 0.29366468902890375,
+          "distance": 11.006170966793205,
+          "speed": null,
+          "isRetrograde": false,
+          "isCombust": true,
+          "dignity": "neutral",
+          "house": 11
+        },
+        {
+          "name": "Uranus",
+          "longitude": 252.0505208885902,
+          "degree": 12.0505208885902,
+          "sign": "Sagittarius",
+          "signId": 9,
+          "latitude": -0.27005589917401907,
+          "distance": 20.359832699615062,
+          "speed": null,
+          "isRetrograde": false,
+          "isCombust": true,
+          "dignity": "neutral",
+          "house": 11
+        },
+        {
+          "name": "Neptune",
+          "longitude": 258.3096339774788,
+          "degree": 18.309633977478825,
+          "sign": "Sagittarius",
+          "signId": 9,
+          "latitude": 0.8473766331745292,
+          "distance": 31.193321572963786,
+          "speed": null,
+          "isRetrograde": false,
+          "isCombust": true,
+          "dignity": "neutral",
+          "house": 11
+        },
+        {
+          "name": "Pluto",
+          "longitude": 203.36771062589764,
+          "degree": 23.367710625897644,
+          "sign": "Libra",
+          "signId": 7,
+          "latitude": 15.282637951366306,
+          "distance": 30.21037135351791,
+          "speed": null,
+          "isRetrograde": false,
+          "isCombust": false,
+          "dignity": "neutral",
+          "house": 9
+        },
+        {
+          "name": "Rahu",
+          "longitude": 294.7330150978073,
+          "degree": 24.73301509780731,
+          "sign": "Capricorn",
+          "signId": 10,
+          "latitude": null,
+          "distance": 0.0025695552897999903,
+          "speed": null,
+          "isRetrograde": false,
+          "isCombust": false,
+          "dignity": "neutral",
+          "house": 12
+        },
+        {
+          "name": "Ketu",
+          "longitude": 114.73301509780731,
+          "degree": 24.73301509780731,
+          "sign": "Cancer",
+          "signId": 4,
+          "latitude": null,
+          "distance": 0.0025695552897999903,
+          "speed": null,
+          "isRetrograde": true,
+          "isCombust": false,
+          "dignity": "neutral",
+          "house": 6
+        }
+      ],
+      "planetaryPositionsObjectData": {
+        "sun": {
+          "longitude": 256.7994964999673,
+          "degree": 16.79949649996729,
+          "sign": "Sagittarius",
+          "signId": 9,
+          "latitude": 0.0000015307492750917431,
+          "distance": 0.9833325696369803,
+          "speed": null,
+          "isRetrograde": false,
+          "isCombust": false,
+          "dignity": "neutral",
+          "house": 11
+        },
+        "moon": {
+          "longitude": 305.6298918220623,
+          "degree": 5.629891822062291,
+          "sign": "Aquarius",
+          "signId": 11,
+          "latitude": 1.125715728629354,
+          "distance": 0.0025409401873441005,
+          "speed": null,
+          "isRetrograde": false,
+          "isCombust": false,
+          "dignity": "neutral",
+          "house": 1
+        },
+        "mars": {
+          "longitude": 226.07743121693466,
+          "degree": 16.077431216934656,
+          "sign": "Scorpio",
+          "signId": 8,
+          "latitude": -0.02973578953778596,
+          "distance": 2.3092610964142075,
+          "speed": null,
+          "isRetrograde": false,
+          "isCombust": false,
+          "dignity": "own",
+          "house": 10
+        },
+        "mercury": {
+          "longitude": 272.0329244510773,
+          "degree": 2.0329244510772924,
+          "sign": "Capricorn",
+          "signId": 10,
+          "latitude": 0.5393340613143155,
+          "distance": 0.7775526522534734,
+          "speed": null,
+          "isRetrograde": false,
+          "isCombust": false,
+          "dignity": "neutral",
+          "house": 12
+        },
+        "jupiter": {
+          "longitude": 71.47062573880856,
+          "degree": 11.470625738808565,
+          "sign": "Gemini",
+          "signId": 3,
+          "latitude": -0.11769941703192326,
+          "distance": 4.170961860274037,
+          "speed": null,
+          "isRetrograde": false,
+          "isCombust": false,
+          "dignity": "neutral",
+          "house": 5
+        },
+        "venus": {
+          "longitude": 282.5407567727325,
+          "degree": 12.540756772732493,
+          "sign": "Capricorn",
+          "signId": 10,
+          "latitude": 1.8296034634272789,
+          "distance": 0.30674559863738193,
+          "speed": null,
+          "isRetrograde": false,
+          "isCombust": false,
+          "dignity": "neutral",
+          "house": 12
+        },
+        "saturn": {
+          "longitude": 261.9055917880303,
+          "degree": 21.90559178803028,
+          "sign": "Sagittarius",
+          "signId": 9,
+          "latitude": 0.29366468902890375,
+          "distance": 11.006170966793205,
+          "speed": null,
+          "isRetrograde": false,
+          "isCombust": true,
+          "dignity": "neutral",
+          "house": 11
+        },
+        "uranus": {
+          "longitude": 252.0505208885902,
+          "degree": 12.0505208885902,
+          "sign": "Sagittarius",
+          "signId": 9,
+          "latitude": -0.27005589917401907,
+          "distance": 20.359832699615062,
+          "speed": null,
+          "isRetrograde": false,
+          "isCombust": true,
+          "dignity": "neutral",
+          "house": 11
+        },
+        "neptune": {
+          "longitude": 258.3096339774788,
+          "degree": 18.309633977478825,
+          "sign": "Sagittarius",
+          "signId": 9,
+          "latitude": 0.8473766331745292,
+          "distance": 31.193321572963786,
+          "speed": null,
+          "isRetrograde": false,
+          "isCombust": true,
+          "dignity": "neutral",
+          "house": 11
+        },
+        "pluto": {
+          "longitude": 203.36771062589764,
+          "degree": 23.367710625897644,
+          "sign": "Libra",
+          "signId": 7,
+          "latitude": 15.282637951366306,
+          "distance": 30.21037135351791,
+          "speed": null,
+          "isRetrograde": false,
+          "isCombust": false,
+          "dignity": "neutral",
+          "house": 9
+        },
+        "rahu": {
+          "longitude": 294.7330150978073,
+          "degree": 24.73301509780731,
+          "sign": "Capricorn",
+          "signId": 10,
+          "latitude": null,
+          "distance": 0.0025695552897999903,
+          "speed": null,
+          "isRetrograde": false,
+          "isCombust": false,
+          "dignity": "neutral",
+          "house": 12
+        },
+        "ketu": {
+          "longitude": 114.73301509780731,
+          "degree": 24.73301509780731,
+          "sign": "Cancer",
+          "signId": 4,
+          "latitude": null,
+          "distance": 0.0025695552897999903,
+          "speed": null,
+          "isRetrograde": true,
+          "isCombust": false,
+          "dignity": "neutral",
+          "house": 6
+        }
+      },
+      "housePositionsArrayData": [
+        {
+          "houseNumber": 1,
+          "degree": 309.13542773695633,
+          "sign": "Aquarius",
+          "signId": 11,
+          "longitude": 309.13542773695633
+        },
+        {
+          "houseNumber": 2,
+          "degree": 336.28258543002494,
+          "sign": "Pisces",
+          "signId": 12,
+          "longitude": 336.28258543002494
+        },
+        {
+          "houseNumber": 3,
+          "degree": 6.2825854300249375,
+          "sign": "Aries",
+          "signId": 1,
+          "longitude": 6.2825854300249375
+        },
+        {
+          "houseNumber": 4,
+          "degree": 36.28258543002494,
+          "sign": "Taurus",
+          "signId": 2,
+          "longitude": 36.28258543002494
+        },
+        {
+          "houseNumber": 5,
+          "degree": 66.28258543002494,
+          "sign": "Gemini",
+          "signId": 3,
+          "longitude": 66.28258543002494
+        },
+        {
+          "houseNumber": 6,
+          "degree": 96.28258543002494,
+          "sign": "Cancer",
+          "signId": 4,
+          "longitude": 96.28258543002494
+        },
+        {
+          "houseNumber": 7,
+          "degree": 126.28258543002494,
+          "sign": "Leo",
+          "signId": 5,
+          "longitude": 126.28258543002494
+        },
+        {
+          "houseNumber": 8,
+          "degree": 156.28258543002494,
+          "sign": "Virgo",
+          "signId": 6,
+          "longitude": 156.28258543002494
+        },
+        {
+          "houseNumber": 9,
+          "degree": 186.28258543002494,
+          "sign": "Libra",
+          "signId": 7,
+          "longitude": 186.28258543002494
+        },
+        {
+          "houseNumber": 10,
+          "degree": 216.28258543002494,
+          "sign": "Scorpio",
+          "signId": 8,
+          "longitude": 216.28258543002494
+        },
+        {
+          "houseNumber": 11,
+          "degree": 246.28258543002494,
+          "sign": "Sagittarius",
+          "signId": 9,
+          "longitude": 246.28258543002494
+        },
+        {
+          "houseNumber": 12,
+          "degree": 276.28258543002494,
+          "sign": "Capricorn",
+          "signId": 10,
+          "longitude": 276.28258543002494
+        }
+      ],
+      "nakshatraData": {
+        "name": "Dhanishta",
+        "number": 23,
+        "pada": 4,
+        "degree": 12.296565822062298
+      },
+      "aspectsData": {
+        "conjunctions": [
+          {
+            "planet1": "sun",
+            "planet2": "saturn",
+            "distance": 5.106095288062988,
+            "orb": 5.106095288062988
+          },
+          {
+            "planet1": "sun",
+            "planet2": "uranus",
+            "distance": 4.748975611377091,
+            "orb": 4.748975611377091
+          },
+          {
+            "planet1": "sun",
+            "planet2": "neptune",
+            "distance": 1.5101374775115346,
+            "orb": 1.5101374775115346
+          },
+          {
+            "planet1": "saturn",
+            "planet2": "uranus",
+            "distance": 9.85507089944008,
+            "orb": 9.85507089944008
+          },
+          {
+            "planet1": "saturn",
+            "planet2": "neptune",
+            "distance": 3.595957810551454,
+            "orb": 3.595957810551454
+          },
+          {
+            "planet1": "uranus",
+            "planet2": "neptune",
+            "distance": 6.2591130888886255,
+            "orb": 6.2591130888886255
+          }
+        ],
+        "oppositions": [
+          {
+            "planet1": "sun",
+            "planet2": "jupiter",
+            "distance": 185.32887076115873,
+            "orb": 5.328870761158726
+          },
+          {
+            "planet1": "jupiter",
+            "planet2": "uranus",
+            "distance": 180.57989514978163,
+            "orb": 0.5798951497816347
+          },
+          {
+            "planet1": "jupiter",
+            "planet2": "neptune",
+            "distance": 186.83900823867026,
+            "orb": 6.83900823867026
+          },
+          {
+            "planet1": "rahu",
+            "planet2": "ketu",
+            "distance": 180,
+            "orb": 0
+          }
+        ],
+        "trines": [],
+        "squares": [
+          {
+            "planet1": "pluto",
+            "planet2": "rahu",
+            "distance": 91.36530447190967,
+            "orb": 1.365304471909667
+          },
+          {
+            "planet1": "pluto",
+            "planet2": "ketu",
+            "distance": 88.63469552809033,
+            "orb": 1.365304471909667
+          }
+        ],
+        "specialAspects": []
+      },
+      "navamsaChartData": {
+        "hasAscendant": true,
+        "hasPlanetaryPositions": true,
+        "hasPlanets": true,
+        "hasHousePositions": true,
+        "planetCount": 12,
+        "planets": [
+          {
+            "name": "sun",
+            "planet": "sun",
+            "longitude": 166.66666666666666,
+            "degree": 16.666666666666668,
+            "sign": "Virgo",
+            "signId": 6,
+            "house": 10,
+            "dignity": "neutral"
+          },
+          {
+            "name": "moon",
+            "planet": "moon",
+            "longitude": 213.33333333333334,
+            "degree": 3.3333333333333335,
+            "sign": "Scorpio",
+            "signId": 8,
+            "house": 11,
+            "dignity": "neutral"
+          },
+          {
+            "name": "mars",
+            "planet": "mars",
+            "longitude": 223.33333333333334,
+            "degree": 13.333333333333334,
+            "sign": "Scorpio",
+            "signId": 8,
+            "house": 12,
+            "dignity": "own"
+          },
+          {
+            "name": "mercury",
+            "planet": "mercury",
+            "longitude": 270,
+            "degree": 0,
+            "sign": "Capricorn",
+            "signId": 10,
+            "house": 1,
+            "dignity": "neutral"
+          },
+          {
+            "name": "jupiter",
+            "planet": "jupiter",
+            "longitude": 280,
+            "degree": 10,
+            "sign": "Capricorn",
+            "signId": 10,
+            "house": 2,
+            "dignity": "neutral"
+          },
+          {
+            "name": "venus",
+            "planet": "venus",
+            "longitude": 10,
+            "degree": 10,
+            "sign": "Aries",
+            "signId": 1,
+            "house": 5,
+            "dignity": "neutral"
+          },
+          {
+            "name": "saturn",
+            "planet": "saturn",
+            "longitude": 200,
+            "degree": 20,
+            "sign": "Libra",
+            "signId": 7,
+            "house": 11,
+            "dignity": "neutral"
+          },
+          {
+            "name": "uranus",
+            "planet": "uranus",
+            "longitude": 100,
+            "degree": 10,
+            "sign": "Cancer",
+            "signId": 4,
+            "house": 8,
+            "dignity": "neutral"
+          },
+          {
+            "name": "neptune",
+            "planet": "neptune",
+            "longitude": 166.66666666666666,
+            "degree": 16.666666666666668,
+            "sign": "Virgo",
+            "signId": 6,
+            "house": 10,
+            "dignity": "neutral"
+          },
+          {
+            "name": "pluto",
+            "planet": "pluto",
+            "longitude": 53.333333333333336,
+            "degree": 23.333333333333336,
+            "sign": "Taurus",
+            "signId": 2,
+            "house": 6,
+            "dignity": "neutral"
+          },
+          {
+            "name": "rahu",
+            "planet": "rahu",
+            "longitude": 143.33333333333334,
+            "degree": 23.333333333333336,
+            "sign": "Leo",
+            "signId": 5,
+            "house": 9,
+            "dignity": "neutral"
+          },
+          {
+            "name": "ketu",
+            "planet": "ketu",
+            "longitude": 323.3333333333333,
+            "degree": 23.333333333333336,
+            "sign": "Aquarius",
+            "signId": 11,
+            "house": 3,
+            "dignity": "neutral"
+          }
+        ]
+      },
+      "navamsaPlanetsArrayData": [
+        {
+          "name": "sun",
+          "planet": "sun",
+          "longitude": 166.66666666666666,
+          "degree": 16.666666666666668,
+          "sign": "Virgo",
+          "signId": 6,
+          "house": 10,
+          "dignity": "neutral"
+        },
+        {
+          "name": "moon",
+          "planet": "moon",
+          "longitude": 213.33333333333334,
+          "degree": 3.3333333333333335,
+          "sign": "Scorpio",
+          "signId": 8,
+          "house": 11,
+          "dignity": "neutral"
+        },
+        {
+          "name": "mars",
+          "planet": "mars",
+          "longitude": 223.33333333333334,
+          "degree": 13.333333333333334,
+          "sign": "Scorpio",
+          "signId": 8,
+          "house": 12,
+          "dignity": "own"
+        },
+        {
+          "name": "mercury",
+          "planet": "mercury",
+          "longitude": 270,
+          "degree": null,
+          "sign": "Capricorn",
+          "signId": 10,
+          "house": 1,
+          "dignity": "neutral"
+        },
+        {
+          "name": "jupiter",
+          "planet": "jupiter",
+          "longitude": 280,
+          "degree": 10,
+          "sign": "Capricorn",
+          "signId": 10,
+          "house": 2,
+          "dignity": "neutral"
+        },
+        {
+          "name": "venus",
+          "planet": "venus",
+          "longitude": 10,
+          "degree": 10,
+          "sign": "Aries",
+          "signId": 1,
+          "house": 5,
+          "dignity": "neutral"
+        },
+        {
+          "name": "saturn",
+          "planet": "saturn",
+          "longitude": 200,
+          "degree": 20,
+          "sign": "Libra",
+          "signId": 7,
+          "house": 11,
+          "dignity": "neutral"
+        },
+        {
+          "name": "uranus",
+          "planet": "uranus",
+          "longitude": 100,
+          "degree": 10,
+          "sign": "Cancer",
+          "signId": 4,
+          "house": 8,
+          "dignity": "neutral"
+        },
+        {
+          "name": "neptune",
+          "planet": "neptune",
+          "longitude": 166.66666666666666,
+          "degree": 16.666666666666668,
+          "sign": "Virgo",
+          "signId": 6,
+          "house": 10,
+          "dignity": "neutral"
+        },
+        {
+          "name": "pluto",
+          "planet": "pluto",
+          "longitude": 53.333333333333336,
+          "degree": 23.333333333333336,
+          "sign": "Taurus",
+          "signId": 2,
+          "house": 6,
+          "dignity": "neutral"
+        },
+        {
+          "name": "rahu",
+          "planet": "rahu",
+          "longitude": 143.33333333333334,
+          "degree": 23.333333333333336,
+          "sign": "Leo",
+          "signId": 5,
+          "house": 9,
+          "dignity": "neutral"
+        },
+        {
+          "name": "ketu",
+          "planet": "ketu",
+          "longitude": 323.3333333333333,
+          "degree": 23.333333333333336,
+          "sign": "Aquarius",
+          "signId": 11,
+          "house": 3,
+          "dignity": "neutral"
+        }
+      ],
+      "analysisData": {
+        "hasPersonality": true,
+        "hasHealth": true,
+        "hasCareer": true,
+        "hasRelationships": true,
+        "hasFinances": true,
+        "hasSpirituality": true,
+        "hasTiming": true
+      },
+      "dashaInfoData": {
+        "birthDasha": "Mars",
+        "currentDasha": {
+          "planet": "Jupiter",
+          "startAge": 25,
+          "endAge": 41,
+          "period": 16,
+          "remainingYears": 5.152478889332521
+        },
+        "dashaPeriods": {
+          "sun": 6,
+          "moon": 10,
+          "mars": 7,
+          "mercury": 17,
+          "jupiter": 16,
+          "venus": 20,
+          "saturn": 19,
+          "rahu": 18,
+          "ketu": 7
+        },
+        "nakshatraLord": "mars",
+        "dashaSequence": [
+          {
+            "planet": "Mars",
+            "startAge": 0,
+            "endAge": 7,
+            "period": 7,
+            "isCurrent": false,
+            "remainingYears": null
+          },
+          {
+            "planet": "Rahu",
+            "startAge": 7,
+            "endAge": 25,
+            "period": 18,
+            "isCurrent": false,
+            "remainingYears": null
+          },
+          {
+            "planet": "Jupiter",
+            "startAge": 25,
+            "endAge": 41,
+            "period": 16,
+            "isCurrent": true,
+            "remainingYears": 5.152478889332521
+          },
+          {
+            "planet": "Saturn",
+            "startAge": 41,
+            "endAge": 60,
+            "period": 19,
+            "isCurrent": false,
+            "remainingYears": null
+          },
+          {
+            "planet": "Mercury",
+            "startAge": 60,
+            "endAge": 77,
+            "period": 17,
+            "isCurrent": false,
+            "remainingYears": null
+          },
+          {
+            "planet": "Ketu",
+            "startAge": 77,
+            "endAge": 84,
+            "period": 7,
+            "isCurrent": false,
+            "remainingYears": null
+          },
+          {
+            "planet": "Venus",
+            "startAge": 84,
+            "endAge": 104,
+            "period": 20,
+            "isCurrent": false,
+            "remainingYears": null
+          },
+          {
+            "planet": "Sun",
+            "startAge": 104,
+            "endAge": 110,
+            "period": 6,
+            "isCurrent": false,
+            "remainingYears": null
+          },
+          {
+            "planet": "Moon",
+            "startAge": 110,
+            "endAge": 120,
+            "period": 10,
+            "isCurrent": false,
+            "remainingYears": null
+          }
+        ],
+        "summary": {
+          "currentPeriod": "Jupiter Mahadasha",
+          "nextAntardasha": {
+            "mahadasha": "Jupiter",
+            "antardasha": "Moon",
+            "startAge": 36.33333333333332,
+            "endAge": 37.66666666666666,
+            "period": 1.3333333333333333,
+            "effects": {
+              "activatedHouses": [],
+              "houseEffects": [],
+              "relationship": {
+                "type": "friendly",
+                "strength": "Excellent",
+                "strengthScore": 95,
+                "effects": [
+                  "Jupiter and Moon have supportive interaction",
+                  "Strong planetary combination with significant life impact"
+                ],
+                "compatibility": {
+                  "natural": "friendly",
+                  "sign": 10,
+                  "aspectual": 12,
+                  "house": 8
+                },
+                "recommendations": [
+                  "Regular spiritual practices to harmonize planetary energies"
+                ]
+              },
+              "periodNature": "Highly Benefic",
+              "keyThemes": [],
+              "predictions": {
+                "general": "Period of Jupiter and Moon influence",
+                "specific": [],
+                "timing": "Throughout the period"
+              }
+            },
+            "events": [],
+            "strength": {
+              "strength": 4,
+              "factors": [
+                "Dusthana placement"
+              ],
+              "dignity": "Neutral",
+              "house": 12,
+              "functionalNature": "Neutral"
+            },
+            "description": "Jupiter MD - Moon AD (1.3 years)"
+          },
+          "upcomingPeriods": [
+            {
+              "dasha": "Saturn",
+              "startAge": 41,
+              "endAge": 60,
+              "period": 19,
+              "generalTenor": "Saturn period brings discipline, service, delays, old age",
+              "keyThemes": [
+                "discipline",
+                "service",
+                "delays",
+                "old age"
+              ],
+              "lifeFocus": "gains, income, friends, fulfillment; enemies, health, service, debts",
+              "challenges": [
+                "Delays",
+                "Obstacles",
+                "Health issues"
+              ],
+              "opportunities": [
+                "Learning opportunities",
+                "Character building"
+              ]
+            },
+            {
+              "dasha": "Mercury",
+              "startAge": 60,
+              "endAge": 77,
+              "period": 17,
+              "generalTenor": "Mercury period brings communication, business, education",
+              "keyThemes": [
+                "communication",
+                "business",
+                "education"
+              ],
+              "lifeFocus": "expenses, losses, spirituality, foreign; children, education, intelligence, romance",
+              "challenges": [
+                "Minimal challenges"
+              ],
+              "opportunities": [
+                "Learning opportunities",
+                "Character building"
+              ]
+            }
+          ],
+          "overallAssessment": "Period analysis complete"
+        }
+      },
+      "birthDataAnalysisData": {
+        "section": "1. Birth Data Collection and Chart Casting",
+        "timestamp": "2025-11-06T07:22:52.614Z",
+        "hasAnalyses": true,
+        "hasSummary": true
+      },
+      "chartGenerationData": {
+        "question": "Can you cast the Vedic birth chart (Kundli) with Rasi (D1) and Navamsa (D9) charts?",
+        "answer": "Yes, both essential charts have been successfully generated: Rasi (D1) and Navamsa (D9). The Rasi chart shows planetary positions in the 12 signs/houses at birth, while the Navamsa chart provides finer detail for marriage and destiny analysis.",
+        "hasDetails": true,
+        "hasRasiChart": true,
+        "hasNavamsaChart": true
+      },
+      "planetaryPositionsWithHouseNumbers": {
+        "sun": {
+          "sign": "Sagittarius",
+          "degree": 16.79949649996729,
+          "longitude": 256.7994964999673,
+          "house": 11,
+          "dignity": "neutral",
+          "isRetrograde": false,
+          "isCombust": false
+        },
+        "moon": {
+          "sign": "Aquarius",
+          "degree": 5.629891822062291,
+          "longitude": 305.6298918220623,
+          "house": 12,
+          "dignity": "neutral",
+          "isRetrograde": false,
+          "isCombust": false
+        },
+        "mars": {
+          "sign": "Scorpio",
+          "degree": 16.077431216934656,
+          "longitude": 226.07743121693466,
+          "house": 10,
+          "dignity": "own",
+          "isRetrograde": false,
+          "isCombust": false
+        },
+        "mercury": {
+          "sign": "Capricorn",
+          "degree": 2.0329244510772924,
+          "longitude": 272.0329244510773,
+          "house": 11,
+          "dignity": "neutral",
+          "isRetrograde": false,
+          "isCombust": false
+        },
+        "jupiter": {
+          "sign": "Gemini",
+          "degree": 11.470625738808565,
+          "longitude": 71.47062573880856,
+          "house": 5,
+          "dignity": "neutral",
+          "isRetrograde": false,
+          "isCombust": false
+        },
+        "venus": {
+          "sign": "Capricorn",
+          "degree": 12.540756772732493,
+          "longitude": 282.5407567727325,
+          "house": 12,
+          "dignity": "neutral",
+          "isRetrograde": false,
+          "isCombust": false
+        },
+        "saturn": {
+          "sign": "Sagittarius",
+          "degree": 21.90559178803028,
+          "longitude": 261.9055917880303,
+          "house": 11,
+          "dignity": "neutral",
+          "isRetrograde": false,
+          "isCombust": true
+        },
+        "uranus": {
+          "sign": "Sagittarius",
+          "degree": 12.0505208885902,
+          "longitude": 252.0505208885902,
+          "house": 11,
+          "dignity": "neutral",
+          "isRetrograde": false,
+          "isCombust": true
+        },
+        "neptune": {
+          "sign": "Sagittarius",
+          "degree": 18.309633977478825,
+          "longitude": 258.3096339774788,
+          "house": 11,
+          "dignity": "neutral",
+          "isRetrograde": false,
+          "isCombust": true
+        },
+        "pluto": {
+          "sign": "Libra",
+          "degree": 23.367710625897644,
+          "longitude": 203.36771062589764,
+          "house": 9,
+          "dignity": "neutral",
+          "isRetrograde": false,
+          "isCombust": false
+        },
+        "rahu": {
+          "sign": "Capricorn",
+          "degree": 24.73301509780731,
+          "longitude": 294.7330150978073,
+          "house": 12,
+          "dignity": "neutral",
+          "isRetrograde": false,
+          "isCombust": false
+        },
+        "ketu": {
+          "sign": "Cancer",
+          "degree": 24.73301509780731,
+          "longitude": 114.73301509780731,
+          "house": 6,
+          "dignity": "neutral",
+          "isRetrograde": true,
+          "isCombust": false
+        }
+      },
+      "mahadashaData": {
+        "question": "Which Mahadasha is the person running from birth and what is the sequence of planetary periods?",
+        "answer": "Based on Moon's nakshatra (Dhanishta), the person started with Mars Mahadasha. Currently running Jupiter Mahadasha (5.2 years remaining). Next: Saturn Mahadasha starting at age 41.0. The complete 120-year Vimshottari cycle includes all 9 planets.",
+        "hasDetails": true,
+        "nakshatra": "Dhanishta",
+        "nakshatraLord": "Mars",
+        "startingDasha": "Mars",
+        "currentDasha": {
+          "planet": "Jupiter",
+          "startAge": 25,
+          "endAge": 41,
+          "remainingYears": 5.151166971139482
+        },
+        "dashaSequence": [
+          {
+            "planet": "Mars",
+            "startAge": 0,
+            "endAge": 7,
+            "period": 7,
+            "isCurrent": false,
+            "remainingYears": null
+          },
+          {
+            "planet": "Rahu",
+            "startAge": 7,
+            "endAge": 25,
+            "period": 18,
+            "isCurrent": false,
+            "remainingYears": null
+          },
+          {
+            "planet": "Jupiter",
+            "startAge": 25,
+            "endAge": 41,
+            "period": 16,
+            "isCurrent": true,
+            "remainingYears": 5.151166971139482
+          },
+          {
+            "planet": "Saturn",
+            "startAge": 41,
+            "endAge": 60,
+            "period": 19,
+            "isCurrent": false,
+            "remainingYears": null
+          },
+          {
+            "planet": "Mercury",
+            "startAge": 60,
+            "endAge": 77,
+            "period": 17,
+            "isCurrent": false,
+            "remainingYears": null
+          },
+          {
+            "planet": "Ketu",
+            "startAge": 77,
+            "endAge": 84,
+            "period": 7,
+            "isCurrent": false,
+            "remainingYears": null
+          },
+          {
+            "planet": "Venus",
+            "startAge": 84,
+            "endAge": 104,
+            "period": 20,
+            "isCurrent": false,
+            "remainingYears": null
+          }
+        ]
+      },
+      "summaryData": {
+        "status": "incomplete",
+        "completeness": 100,
+        "chartsGenerated": 2,
+        "ascendantCalculated": true,
+        "planetsCalculated": 12,
+        "dashaCalculated": true,
+        "readyForAnalysis": true
+      }
+    }
+  },
+  "joined": {
+    "timestamp": "2025-11-06T07:22:52.614Z",
+    "joiningVersion": "1.0.0",
+    "joins": {
+      "rasiByHouse": {
+        "1": "11",
+        "2": "12",
+        "3": "1",
+        "4": "2",
+        "5": "3",
+        "6": "4",
+        "7": "5",
+        "8": "6",
+        "9": "7",
+        "10": "8",
+        "11": "9",
+        "12": "10"
+      },
+      "enhancedPlanetaryPositions": {
+        "sun": {
+          "longitude": 256.7994964999673,
+          "degree": 16.79949649996729,
+          "sign": "Sagittarius",
+          "signId": 9,
+          "latitude": 0.0000015307492750917431,
+          "distance": 0.9833325696369803,
+          "speed": null,
+          "isRetrograde": false,
+          "isCombust": false,
+          "dignity": "neutral",
+          "house": 11
+        },
+        "moon": {
+          "longitude": 305.6298918220623,
+          "degree": 5.629891822062291,
+          "sign": "Aquarius",
+          "signId": 11,
+          "latitude": 1.125715728629354,
+          "distance": 0.0025409401873441005,
+          "speed": null,
+          "isRetrograde": false,
+          "isCombust": false,
+          "dignity": "neutral",
+          "house": 12
+        },
+        "mars": {
+          "longitude": 226.07743121693466,
+          "degree": 16.077431216934656,
+          "sign": "Scorpio",
+          "signId": 8,
+          "latitude": -0.02973578953778596,
+          "distance": 2.3092610964142075,
+          "speed": null,
+          "isRetrograde": false,
+          "isCombust": false,
+          "dignity": "own",
+          "house": 10
+        },
+        "mercury": {
+          "longitude": 272.0329244510773,
+          "degree": 2.0329244510772924,
+          "sign": "Capricorn",
+          "signId": 10,
+          "latitude": 0.5393340613143155,
+          "distance": 0.7775526522534734,
+          "speed": null,
+          "isRetrograde": false,
+          "isCombust": false,
+          "dignity": "neutral",
+          "house": 11
+        },
+        "jupiter": {
+          "longitude": 71.47062573880856,
+          "degree": 11.470625738808565,
+          "sign": "Gemini",
+          "signId": 3,
+          "latitude": -0.11769941703192326,
+          "distance": 4.170961860274037,
+          "speed": null,
+          "isRetrograde": false,
+          "isCombust": false,
+          "dignity": "neutral",
+          "house": 5
+        },
+        "venus": {
+          "longitude": 282.5407567727325,
+          "degree": 12.540756772732493,
+          "sign": "Capricorn",
+          "signId": 10,
+          "latitude": 1.8296034634272789,
+          "distance": 0.30674559863738193,
+          "speed": null,
+          "isRetrograde": false,
+          "isCombust": false,
+          "dignity": "neutral",
+          "house": 12
+        },
+        "saturn": {
+          "longitude": 261.9055917880303,
+          "degree": 21.90559178803028,
+          "sign": "Sagittarius",
+          "signId": 9,
+          "latitude": 0.29366468902890375,
+          "distance": 11.006170966793205,
+          "speed": null,
+          "isRetrograde": false,
+          "isCombust": true,
+          "dignity": "neutral",
+          "house": 11
+        },
+        "uranus": {
+          "longitude": 252.0505208885902,
+          "degree": 12.0505208885902,
+          "sign": "Sagittarius",
+          "signId": 9,
+          "latitude": -0.27005589917401907,
+          "distance": 20.359832699615062,
+          "speed": null,
+          "isRetrograde": false,
+          "isCombust": true,
+          "dignity": "neutral",
+          "house": 11
+        },
+        "neptune": {
+          "longitude": 258.3096339774788,
+          "degree": 18.309633977478825,
+          "sign": "Sagittarius",
+          "signId": 9,
+          "latitude": 0.8473766331745292,
+          "distance": 31.193321572963786,
+          "speed": null,
+          "isRetrograde": false,
+          "isCombust": true,
+          "dignity": "neutral",
+          "house": 11
+        },
+        "pluto": {
+          "longitude": 203.36771062589764,
+          "degree": 23.367710625897644,
+          "sign": "Libra",
+          "signId": 7,
+          "latitude": 15.282637951366306,
+          "distance": 30.21037135351791,
+          "speed": null,
+          "isRetrograde": false,
+          "isCombust": false,
+          "dignity": "neutral",
+          "house": 9
+        },
+        "rahu": {
+          "longitude": 294.7330150978073,
+          "degree": 24.73301509780731,
+          "sign": "Capricorn",
+          "signId": 10,
+          "latitude": null,
+          "distance": 0.0025695552897999903,
+          "speed": null,
+          "isRetrograde": false,
+          "isCombust": false,
+          "dignity": "neutral",
+          "house": 12
+        },
+        "ketu": {
+          "longitude": 114.73301509780731,
+          "degree": 24.73301509780731,
+          "sign": "Cancer",
+          "signId": 4,
+          "latitude": null,
+          "distance": 0.0025695552897999903,
+          "speed": null,
+          "isRetrograde": true,
+          "isCombust": false,
+          "dignity": "neutral",
+          "house": 6
+        }
+      },
+      "planetsByHouse": {
+        "1": [],
+        "2": [],
+        "3": [],
+        "4": [],
+        "5": [
+          "Ju 11"
+        ],
+        "6": [
+          "Ke 24"
+        ],
+        "7": [],
+        "8": [],
+        "9": [
+          "Pl 23"
+        ],
+        "10": [
+          "Ma 16"
+        ],
+        "11": [
+          "Su 16",
+          "Me 2",
+          "Sa 21",
+          "Ur 12",
+          "Ne 18"
+        ],
+        "12": [
+          "Mo 5",
+          "Ve 12",
+          "Ra 24"
+        ]
+      }
+    }
+  },
+  "metadata": {
+    "savedAt": "2025-11-06T07:22:52.614Z",
+    "totalDatasets": 18,
+    "datasetsExtracted": [
+      "rootLevelData",
+      "birthData",
+      "rasiChartData",
+      "ascendantData",
+      "planetsArrayData",
+      "planetaryPositionsObjectData",
+      "housePositionsArrayData",
+      "nakshatraData",
+      "aspectsData",
+      "navamsaChartData",
+      "navamsaPlanetsArrayData",
+      "analysisData",
+      "dashaInfoData",
+      "birthDataAnalysisData",
+      "chartGenerationData",
+      "planetaryPositionsWithHouseNumbers",
+      "mahadashaData",
+      "summaryData"
+    ]
+  }
+}

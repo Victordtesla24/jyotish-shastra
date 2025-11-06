@@ -1330,9 +1330,28 @@ class ChartController {
       }
 
       // Handle placeOfBirth format - multiple format support
+      // CRITICAL FIX: Preserve coordinates from nested placeOfBirth object
       if (processed.placeOfBirth) {
-        if (typeof processed.placeOfBirth === 'object' && processed.placeOfBirth.name) {
-          processed.placeOfBirth = processed.placeOfBirth.name;
+        if (typeof processed.placeOfBirth === 'object') {
+          // If placeOfBirth is an object with coordinates, extract them to top-level
+          // This ensures validation passes (checks top-level coordinates first)
+          if (processed.placeOfBirth.latitude && processed.placeOfBirth.longitude) {
+            // Extract coordinates to top-level for validation compatibility
+            if (!processed.latitude) {
+              processed.latitude = parseFloat(processed.placeOfBirth.latitude);
+            }
+            if (!processed.longitude) {
+              processed.longitude = parseFloat(processed.placeOfBirth.longitude);
+            }
+            if (!processed.timezone && processed.placeOfBirth.timezone) {
+              processed.timezone = processed.placeOfBirth.timezone;
+            }
+            // Keep placeOfBirth as object to preserve nested structure for backward compatibility
+          } else if (processed.placeOfBirth.name && !processed.placeOfBirth.latitude && !processed.placeOfBirth.longitude) {
+            // Object with only name, no coordinates - convert to string for geocoding
+            processed.placeOfBirth = processed.placeOfBirth.name;
+          }
+          // If object has no name and no coordinates, keep as-is (validation will handle)
         } else if (typeof processed.placeOfBirth === 'string') {
           // Keep string as-is (backend geocoder will handle)
         }

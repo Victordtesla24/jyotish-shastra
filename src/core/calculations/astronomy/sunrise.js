@@ -58,8 +58,10 @@ export async function computeSunriseSunset(
       return computeSunriseSunsetFallback(year, month, day, latitude, longitude, timezone);
     }
 
-    // Calculate Julian Day for the date at noon UT
-    const jd = await swisseph.swe_julday(year, month, day, 12.0, 1); // SE_GREG_CAL = 1
+    // Calculate Julian Day for the date at midnight UT (0.0)
+    // This ensures sunrise/sunset are calculated for the CURRENT day, not the next day
+    // If we use noon (12.0) and birth time is after noon, swisseph returns next day's sunrise
+    const jd = await swisseph.swe_julday(year, month, day, 0.0, 1); // SE_GREG_CAL = 1
     
     // Set geographic location
     const geopos = [longitude, latitude, 0]; // [longitude, latitude, altitude]

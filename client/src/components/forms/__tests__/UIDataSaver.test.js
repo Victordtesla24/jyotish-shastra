@@ -7,7 +7,8 @@ const CANONICAL_KEYS = {
   birthData: `${CANONICAL_PREFIX}:birthData`,
   updatedAt: `${CANONICAL_PREFIX}:updatedAt`,
   fingerprint: `${CANONICAL_PREFIX}:fingerprint`,
-  chartId: `${CANONICAL_PREFIX}:chartId`
+  chartId: `${CANONICAL_PREFIX}:chartId`,
+  schema: `${CANONICAL_PREFIX}:schema`
 };
 
 // TTL constant for reference (15 minutes) - matches UIDataSaver.js TTL_MS

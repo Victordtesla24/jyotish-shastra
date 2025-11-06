@@ -12,6 +12,8 @@ This document lists all authoritative sources and standards used in BTR (Birth T
 - **URL**: https://ssd.jpl.nasa.gov/horizons/
 - **Purpose**: Planetary position validation for M1 ephemeris accuracy metric
 - **API Version**: Horizons Web-Service API (REST)
+- **API Documentation**: https://ssd.jpl.nasa.gov/api/horizons.api.html
+- **Manual Query Form**: https://ssd.jpl.nasa.gov/horizons/app.html#/
 - **Data Provenance**: DE440/DE441 JPL Development Ephemeris
 - **Citation**: Giorgini, J.D., et al. (1996). "JPL's On-Line Solar System Data Service"
 - **Query Parameters**:
@@ -60,14 +62,17 @@ This document lists all authoritative sources and standards used in BTR (Birth T
   - R. Santhanam (1984) - English translation
   - Girish Chand Sharma (1996) - English commentary
 - **Relevant Chapters for BTR**:
-  - **Chapter 80**: Ayurdaya (Longevity) - Praanapada calculation
+  - **Chapter 3, Śloka 70** (PDF page 45): Gulika (Mandi) calculation
+  - **Chapter 3, Ślokas 71-74** (PDF page 45): Praanapada calculation
+  - **Chapter 4, Ślokas 25-30** (PDF pages 53-54): Nisheka-Lagna (conception time)
+  - **Chapter 80**: Ayurdaya (Longevity) - Praanapada effects
   - **Chapter 81**: Birth time rectification principles
-  - **Upagraha Section**: Gulika (Mandi) determination
 - **Core Formulas Implemented**:
-  - **Praanapada**: Ascendant + (Moon - Sun) for daytime births
-  - **Gulika**: Time-based calculation using weekday lords
-  - **Nisheka (Conception Time)**: 273 days + tithi correction
+  - **Gulika**: Ascendant at START of Saturn's Muhurta (BPHS Ch.3 Śloka 70, p.45)
+  - **Praanapada**: Convert time to vighatikas, divide by 15, add to Sun (BPHS Ch.3 Ślokas 71-74, p.45)
+  - **Nisheka-Lagna**: Adhana Lagna = Birth - (A+B+C) where A=Saturn-Gulika distance, B=Ascendant-9th distance, C=Moon degrees if ascendant lord in invisible half (BPHS Ch.4 Ślokas 25-30, p.53-54)
 - **Sidereal System**: Lahiri Ayanamsa (default in Swiss Ephemeris)
+- **PDF Source**: `docs/BPHS-BTR/Maharishi_Parashara_Brihat_Parasara_Hora_Sastra_(Vol_1).pdf`
 
 ### Ayanamsa Standards
 - **Primary**: Lahiri (Chitrapaksha) Ayanamsa
@@ -75,6 +80,13 @@ This document lists all authoritative sources and standards used in BTR (Birth T
   - Annual precession rate: ~50.27" per year
 - **Swiss Ephemeris Code**: `SE$SIDM_LAHIRI` (mode 1)
 - **Reference**: N.C. Lahiri (1955), "Report of the Calendar Reform Committee"
+- **Editor's Note (BPHS PDF page 11)**: "Lahiri's Ayanamsa is the first best."
+
+### Positional Astronomy Centre (Govt. of India)
+- **Official Site**: https://www.iiap.res.in/?q=node/327
+- **Purpose**: Indian Astronomical Ephemeris context for Vedic astrology calculations
+- **Relevance**: Official Indian government astronomical data for traditional Vedic astrology
+- **Note**: Used for context and validation of Indian astronomical standards
 
 ---
 
@@ -84,6 +96,8 @@ This document lists all authoritative sources and standards used in BTR (Birth T
 - **Package**: `swisseph` (npm) version ^2.10.3-b-1
 - **Official Site**: https://www.astro.com/swisseph/
 - **Purpose**: High-precision sidereal planetary position calculations
+- **Programmer Interface**: https://www.astro.com/swisseph/swephprg.htm
+- **JPL Alignment**: Swiss Ephemeris uses JPL DE440/DE441 ephemeris data (aligned with JPL Horizons)
 - **Ephemeris Files Used**:
   - `seas_18.se1` - Asteroid ephemeris
   - `semo_18.se1` - Moon ephemeris
@@ -92,12 +106,25 @@ This document lists all authoritative sources and standards used in BTR (Birth T
 - **Precision**: Sub-arcsecond accuracy for modern dates
 - **Coordinate System**: ICRS (International Celestial Reference System)
 - **License**: Swiss Ephemeris License (free for non-commercial use)
-- **Documentation**: https://www.astro.com/swisseph/swephprg.htm
+- **Documentation**: 
+  - Programmer Interface: https://www.astro.com/swisseph/swephprg.htm
+  - API Reference: https://www.astro.com/swisseph/swephinfo_e.htm
+
+### IANA Time Zone Database
+- **Official Site**: https://www.iana.org/time-zones
+- **Purpose**: Canonical, up-to-date timezone rules for accurate civil time handling
+- **Database**: Time Zone Database (tzdata) - maintained by IANA
+- **Usage**: All timezone conversions use IANA timezone identifiers (e.g., 'Asia/Kolkata')
+- **Implementation**: `moment-timezone` (^0.5.43) - IANA timezone database integration
+- **Documentation**: https://www.iana.org/time-zones/repository
+- **Update Frequency**: Regular updates for DST changes and timezone rule modifications
+- **Reference**: Olson, Arthur David. "Time zone database" (tz database/tzdata)
 
 ### Node.js Ecosystem
 - **moment-timezone** (^0.5.43)
-  - Purpose: Timezone conversions (civil time → UTC)
+  - Purpose: Timezone conversions (civil time → UTC) using IANA timezone database
   - IANA timezone database integration
+  - Documentation: https://momentjs.com/timezone/docs/
 - **axios** (devDependency)
   - Purpose: HTTP client for JPL Horizons API (record mode only)
 - **jest** (^29.7.0)
@@ -134,10 +161,11 @@ This document lists all authoritative sources and standards used in BTR (Birth T
 - **Threshold**: ≤3 minutes maximum spread between methods
 - **Statistical Measure**: Median Absolute Deviation (MAD)
 - **Methods Compared**:
-  - Praanapada rectification
-  - Gulika-based rectification
-  - Ascendant-based rectification
+  - Praanapada rectification (BPHS Ch.3 Ślokas 71-74, p.45)
+  - Gulika-based rectification (BPHS Ch.3 Śloka 70, p.45)
+  - Nisheka-Lagna rectification (BPHS Ch.4 Ślokas 25-30, p.53-54)
   - Moon phase rectification
+  - Ascendant-based rectification
 
 ### M3: Ensemble Confidence Score
 - **Method**: Weighted average of individual method scores

@@ -13,6 +13,7 @@ module.exports = {
     '<rootDir>/tests/**/*.test.js',
     '<rootDir>/tests/**/*.test.jsx',
     '<rootDir>/tests/**/*.test.cjs',
+    '<rootDir>/tests/**/*.test.ts',
     '<rootDir>/client/src/**/*.test.js',
     '<rootDir>/client/src/**/*.test.jsx'
   ],
@@ -25,7 +26,7 @@ module.exports = {
   ],
   moduleDirectories: ['node_modules', '<rootDir>/src', '<rootDir>/client/src'],
   transform: {
-    '^.+\\.(js|jsx)$': 'babel-jest'
+    '^.+\\.(js|jsx|ts|tsx)$': 'babel-jest'
   },
   transformIgnorePatterns: [
     'node_modules/(?!(swisseph|uuid|bson|mongodb)/)'
