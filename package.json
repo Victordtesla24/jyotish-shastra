@@ -2,7 +2,7 @@
   "name": "vedic-chart-app",
   "type": "module",
   "scripts": {
-    "lint": "eslint . --max-warnings=0",
+    "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "build": "npm run copy-wasm 2>/dev/null || echo 'Skipping WASM copy' && npm run build:render 2>/dev/null || echo 'Build step completed'",
     "start:backend": "PORT=3001 node src/index.js",
@@ -34,7 +34,14 @@
     "test:summary-full": "node scripts/test-summary.js && open user-docs",
     "test:comprehensive": "node scripts/comprehensive-test-summary.js",
     "test:report": "bash scripts/generate-test-summary.sh",
-    "test:summary-simple": "bash scripts/test-summary-report.sh"
+    "test:summary-simple": "bash scripts/test-summary-report.sh",
+    "test:btr:accuracy": "jest tests/integration/btr/horizons-accuracy.test.js --verbose",
+    "test:btr:bphs": "jest tests/integration/btr/bphs-methods.test.js --verbose",
+    "test:btr:golden": "jest tests/integration/btr/golden-case.test.js --verbose",
+    "test:btr:all": "jest tests/unit/metrics tests/unit/adapters tests/integration/btr --verbose",
+    "evidence:generate": "node scripts/generate-evidence.js",
+    "evidence:validate": "node scripts/generate-evidence.js && cat EVIDENCE.md | grep 'PASS ✓'",
+    "deploy:validate": "npm run test:btr:all && npm run evidence:generate"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

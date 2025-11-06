@@ -37,78 +37,114 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
   const lastGeocodedLocationRef = React.useRef(null);
   // Track geocoding in progress to prevent concurrent calls
   const isGeocodingRef = React.useRef(false);
+  const pendingGeocodePromiseRef = React.useRef(null);
+  const coordinatesRef = React.useRef(coordinates);
+
+  useEffect(() => {
+    coordinatesRef.current = coordinates;
+  }, [coordinates]);
+
+  const hasValidCoordinates = useCallback((coords) =>
+    coords &&
+    typeof coords.latitude === 'number' &&
+    !Number.isNaN(coords.latitude) &&
+    typeof coords.longitude === 'number' &&
+    !Number.isNaN(coords.longitude), []);
 
   // Geocode location function wrapped in useCallback
   // REMOVED formData from dependencies to prevent infinite loop
-  const geocodeLocation = useCallback(async (location) => {
-    // Normalize location string (trim whitespace)
-    const trimmedLocation = location?.trim() || '';
-    
-    // Prevent geocoding empty or too short locations
-    if (!trimmedLocation || trimmedLocation.length < 4) {
-      return;
-    }
+  const geocodeLocation = useCallback(
+    async (location, { force = false } = {}) => {
+      // Normalize location string (trim whitespace)
+      const trimmedLocation = location?.trim() || '';
 
-    // Prevent duplicate calls for same location (normalized comparison)
-    if (lastGeocodedLocationRef.current === trimmedLocation) {
-      return;
-    }
+      // Prevent geocoding empty or too short locations
+      if (!trimmedLocation || trimmedLocation.length < 4) {
+        return null;
+      }
 
-    // Prevent geocoding if already in progress
-    if (isGeocodingRef.current) {
-      return;
-    }
+      if (
+        !force &&
+        hasValidCoordinates(coordinatesRef.current) &&
+        lastGeocodedLocationRef.current === trimmedLocation
+      ) {
+        return {
+          success: true,
+          latitude: coordinatesRef.current.latitude,
+          longitude: coordinatesRef.current.longitude,
+          timezone: coordinatesRef.current.timezone || 'UTC'
+        };
+      }
 
-    // Set flags BEFORE async operation to prevent concurrent calls
-    isGeocodingRef.current = true;
-    lastGeocodedLocationRef.current = trimmedLocation;
-    setGeocoding(true);
-    setLocationSuggestions([]);
+      if (pendingGeocodePromiseRef.current) {
+        return pendingGeocodePromiseRef.current;
+      }
 
-    try {
-      const result = await geocodingService.geocodeLocation(trimmedLocation);
+      if (isGeocodingRef.current && pendingGeocodePromiseRef.current) {
+        return pendingGeocodePromiseRef.current;
+      }
 
-      if (result.success) {
-        setCoordinates({
-          latitude: result.latitude,
-          longitude: result.longitude,
-          timezone: result.timezone
-        });
-        setErrors(prev => ({ ...prev, placeOfBirth: null }));
+      // Set flags BEFORE async operation to prevent concurrent calls
+      isGeocodingRef.current = true;
+      lastGeocodedLocationRef.current = trimmedLocation;
+      setGeocoding(true);
+      setLocationSuggestions([]);
 
-        // Save to session - get current formData at save time, not from closure
-        setFormData(currentFormData => {
-          dataSaver.saveSession({
-            birthData: currentFormData,
-            coordinates: {
-              latitude: result.latitude,
-              longitude: result.longitude,
-              timezone: result.timezone
-            }
+      const geocodeTask = (async () => {
+        try {
+          const result = await geocodingService.geocodeLocation(trimmedLocation);
+
+          setCoordinates({
+            latitude: result.latitude,
+            longitude: result.longitude,
+            timezone: result.timezone
           });
+          coordinatesRef.current = {
+            latitude: result.latitude,
+            longitude: result.longitude,
+            timezone: result.timezone
+          };
+          setErrors(prev => ({ ...prev, placeOfBirth: null }));
+
+        // CRITICAL FIX: Use only setBirthData() - single storage method
+        setFormData(currentFormData => {
+          const completeData = {
+            ...currentFormData,
+            latitude: result.latitude,
+            longitude: result.longitude,
+            timezone: result.timezone
+          };
+          dataSaver.setBirthData(completeData);
           return currentFormData; // Return unchanged to avoid re-render
         });
-      } else {
-        setLocationSuggestions(result.suggestions || []);
-        setErrors(prev => ({
-          ...prev,
-          placeOfBirth: result.error || 'Location not found'
-        }));
-        lastGeocodedLocationRef.current = null; // Allow retry on error
+
+          return result;
+        } catch (error) {
+          console.error('Geocoding error:', error);
+          const errorMessage = error.message || error.toString() || 'Failed to geocode location';
+          setErrors(prev => ({
+            ...prev,
+            placeOfBirth: errorMessage
+          }));
+          lastGeocodedLocationRef.current = null; // Allow retry on error
+          throw error;
+        } finally {
+          isGeocodingRef.current = false;
+          setGeocoding(false);
+          pendingGeocodePromiseRef.current = null;
+        }
+      })();
+
+      pendingGeocodePromiseRef.current = geocodeTask;
+
+      try {
+        return await geocodeTask;
+      } catch (_error) {
+        return null;
       }
-    } catch (error) {
-      console.error('Geocoding error:', error);
-      const errorMessage = error.message || error.toString() || 'Failed to geocode location';
-      setErrors(prev => ({
-        ...prev,
-        placeOfBirth: errorMessage
-      }));
-      lastGeocodedLocationRef.current = null; // Allow retry on error
-    } finally {
-      isGeocodingRef.current = false;
-      setGeocoding(false);
-    }
-  }, [dataSaver]); // Removed formData dependency - causes infinite loop
+    },
+    [dataSaver, hasValidCoordinates]
+  ); // Removed formData dependency - causes infinite loop
 
   // Load saved session data on mount
   useEffect(() => {
@@ -245,10 +281,42 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
     console.log('🔄 BirthDataForm: handleSubmit called');
 
     try {
+      let submissionCoordinates = coordinatesRef.current;
+
+      if (!hasValidCoordinates(submissionCoordinates) && formData.placeOfBirth) {
+        await geocodeLocation(formData.placeOfBirth, { force: true });
+        submissionCoordinates = coordinatesRef.current;
+      }
+
+      if (!hasValidCoordinates(submissionCoordinates)) {
+        setErrors(prev => ({
+          ...prev,
+          placeOfBirth: 'Valid location coordinates are required. Please wait for geocoding to complete.'
+        }));
+        setLoading(false);
+        return;
+      }
+
+      const normalizedCoordinates = {
+        latitude: Number(submissionCoordinates.latitude),
+        longitude: Number(submissionCoordinates.longitude),
+        timezone: submissionCoordinates.timezone || 'UTC'
+      };
+
+      if (
+        !hasValidCoordinates(coordinatesRef.current) ||
+        coordinatesRef.current.latitude !== normalizedCoordinates.latitude ||
+        coordinatesRef.current.longitude !== normalizedCoordinates.longitude ||
+        coordinatesRef.current.timezone !== normalizedCoordinates.timezone
+      ) {
+        setCoordinates(normalizedCoordinates);
+        coordinatesRef.current = normalizedCoordinates;
+      }
+
       // Combine form data with coordinates
       const completeData = {
         ...formData,
-        ...coordinates
+        ...normalizedCoordinates
       };
 
       // Validate input
@@ -292,7 +360,7 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
       // Save to session
       dataSaver.saveSession({
         birthData: formData,
-        coordinates: coordinates,
+        coordinates: normalizedCoordinates,
         apiRequest: requestBody
       });
 
@@ -304,7 +372,7 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
         // Save session with multiple strategies for test compatibility
         const enhancedSessionData = {
           birthData: formData,
-          coordinates: coordinates,
+          coordinates: normalizedCoordinates,
           apiRequest: requestBody,
           formSubmitted: true,
           submissionTimestamp: new Date().toISOString()
@@ -314,7 +382,10 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
         console.log('💾 BirthDataForm: Session saved before onSubmit:', sessionSaveResult);
         
         // Add test-compatible keys immediately
-        dataSaver.setBirthData(formData);
+        dataSaver.setBirthData({
+          ...formData,
+          ...normalizedCoordinates
+        });
         sessionStorage.setItem('jyotish_form_submitted', 'true');
         sessionStorage.setItem('jyotish_submission_timestamp', new Date().toISOString());
         

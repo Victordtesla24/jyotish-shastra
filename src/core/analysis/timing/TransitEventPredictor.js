@@ -1404,9 +1404,10 @@ class TransitEventPredictor {
   /**
    * Check Rahu-Ketu transit influence
    * @param {number} julianDay - Julian Day
+   * @param {Object} birthChart - Natal chart data
    * @returns {Object} Rahu-Ketu influence data
    */
-  checkRahuKetuTransitInfluence(julianDay) {
+  checkRahuKetuTransitInfluence(julianDay, birthChart = {}) {
     // Production-grade Rahu-Ketu influence calculation with natal chart analysis
     const t = (julianDay - 2451545.0) / 36525.0;
 

@@ -13,7 +13,7 @@ import ArudhaAnalysisService from './ArudhaAnalysisService.js';
 import NavamsaAnalysisService from '../../core/analysis/divisional/NavamsaAnalysisService.js';
 import DetailedDashaAnalysisService from './DetailedDashaAnalysisService.js';
 import YogaDetectionService from './YogaDetectionService.js';
-import ChartGenerationServiceSingleton, { ChartGenerationService } from '../chart/ChartGenerationService.js';
+import ChartGenerationServiceSingleton from '../chart/ChartGenerationService.js';
 import GeocodingService from '../geocoding/GeocodingService.js';
 
 class MasterAnalysisOrchestrator {

@@ -93,13 +93,14 @@ class UserReportService {
    */
   async getUserReports(userId, options = {}) {
     try {
+      // Destructure for validation, values reconstructed below
       const {
-        page = 1,
-        limit = 10,
-        sortBy = 'createdAt',
-        sortOrder = 'desc',
-        type = 'all',
-        status = 'all'
+        page: _page = 1,
+        limit: _limit = 10,
+        sortBy: _sortBy = 'createdAt',
+        sortOrder: _sortOrder = 'desc',
+        type: _type = 'all',
+        status: _status = 'all'
       } = options;
 
       // Get user

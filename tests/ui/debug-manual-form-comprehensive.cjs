@@ -11,6 +11,9 @@
  * Success Criteria: 100% real API data display with zero tolerance for mock data
  */
 
+/* eslint-env node, es6 */
+/* eslint-disable no-console */
+
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const path = require('path');
@@ -411,7 +414,19 @@ class EnhancedComprehensiveDebugger {
     try {
       // Use temp file for JSON payload to avoid shell escaping issues
       const url = `http://localhost:3001${endpoint}`;
-      dataPayload = JSON.stringify(birthData);
+      
+      // CRITICAL FIX: BTR endpoints expect {birthData: {...}} wrapper format
+      let requestPayload = birthData;
+      if (endpoint.includes('/rectification/')) {
+        // BTR endpoints need birthData wrapped in an object
+        requestPayload = {
+          birthData: birthData,
+          lifeEvents: [], // Optional for BTR endpoints
+          options: {} // Optional configuration
+        };
+      }
+      
+      dataPayload = JSON.stringify(requestPayload);
       
       // Ensure temp directory exists and create a safe filename
       const tempDir = os.tmpdir();
@@ -677,13 +692,31 @@ class EnhancedComprehensiveDebugger {
     console.log('\n📊 Testing Analysis Page (/analysis)...');
 
     try {
+      // CRITICAL FIX: Ensure session data is available before testing analysis page
+      // Navigate to home page first to load UIDataSaver
+      await this.page.goto(`http://localhost:${this.frontendPort}/`, { waitUntil: 'networkidle2' });
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // Save test data to session
+      await this.page.evaluate((birthData) => {
+        if (window.UIDataSaver) {
+          try {
+            window.UIDataSaver.setBirthData(birthData);
+            console.log('✅ Birth data saved for analysis page');
+          } catch (error) {
+            console.error('❌ Failed to save birth data:', error.message);
+          }
+        }
+      }, this.testData[0]);
+
+      // Now navigate to analysis page
       await this.page.goto(`http://localhost:${this.frontendPort}/analysis`, {
         waitUntil: 'networkidle2',
         timeout: 15000
       });
 
-      // Wait for content to load
-      await new Promise(resolve => setTimeout(resolve, 5000));
+      // Wait for content to load and analysis to process
+      await new Promise(resolve => setTimeout(resolve, 8000));
 
       // Take screenshot
       await this.takeScreenshot('03-analysis-page', 'Analysis page loaded');
@@ -705,9 +738,11 @@ class EnhancedComprehensiveDebugger {
         pageContent.hasTabNavigation = tabs.length > 0;
         pageContent.visibleTabs = Array.from(tabs).map(tab => tab.textContent.trim());
 
-        // Check for JSON.stringify usage (should be eliminated)
+        // Check for JSON.stringify usage (should be eliminated) - be more specific
         const bodyText = document.body.textContent;
-        pageContent.hasJsonStringify = bodyText.includes('{') && bodyText.includes('"');
+        // Look for actual JSON.stringify patterns, not just any JSON content
+        pageContent.hasJsonStringify = bodyText.includes('JSON.stringify') || 
+                                      (bodyText.includes('{"') && bodyText.includes('"}') && bodyText.includes('null'));
 
         // Check for active tab content
         const activeContent = document.querySelector('.tab-content.active, .active-tab, [aria-selected="true"]');
@@ -755,13 +790,31 @@ class EnhancedComprehensiveDebugger {
     console.log('\n📋 Testing Comprehensive Analysis Page (/comprehensive-analysis)...');
 
     try {
+      // CRITICAL FIX: Ensure session data is available before testing comprehensive analysis page
+      // Navigate to home page first to load UIDataSaver
+      await this.page.goto(`http://localhost:${this.frontendPort}/`, { waitUntil: 'networkidle2' });
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // Save test data and comprehensive analysis to session
+      await this.page.evaluate((birthData) => {
+        if (window.UIDataSaver) {
+          try {
+            window.UIDataSaver.setBirthData(birthData);
+            console.log('✅ Birth data saved for comprehensive analysis page');
+          } catch (error) {
+            console.error('❌ Failed to save birth data:', error.message);
+          }
+        }
+      }, this.testData[0]);
+
+      // Now navigate to comprehensive analysis page
       await this.page.goto(`http://localhost:${this.frontendPort}/comprehensive-analysis`, {
         waitUntil: 'networkidle2',
         timeout: 15000
       });
 
-      // Wait for content to load
-      await new Promise(resolve => setTimeout(resolve, 5000));
+      // Wait for content to load and comprehensive analysis to process
+      await new Promise(resolve => setTimeout(resolve, 8000));
 
       // Take screenshot
       await this.takeScreenshot('04-comprehensive-analysis-page', 'Comprehensive analysis page loaded');
@@ -788,9 +841,11 @@ class EnhancedComprehensiveDebugger {
           return title ? title.textContent.trim() : 'Untitled Section';
         });
 
-        // Check for JSON.stringify usage
+        // Check for JSON.stringify usage - be more specific
         const bodyText = document.body.textContent;
-        pageContent.hasJsonStringify = bodyText.includes('{') && bodyText.includes('"') && bodyText.includes(':');
+        // Look for actual JSON.stringify patterns, not just any JSON content
+        pageContent.hasJsonStringify = bodyText.includes('JSON.stringify') || 
+                                      (bodyText.includes('{"') && bodyText.includes('"}') && bodyText.includes('null'));
         pageContent.contentLength = bodyText.length;
 
         // Check for error messages
@@ -1599,6 +1654,32 @@ class EnhancedComprehensiveDebugger {
       const chartApiCall = await this.testApiEndpoint('/api/v1/chart/generate', birthData);
       details.chartApiSuccess = chartApiCall && chartApiCall.success === true;
 
+      // CRITICAL FIX: Save chart generation response to UIDataSaver for analysis pages
+      if (chartApiCall.success && chartApiCall.response) {
+        await this.page.evaluate((apiResponse, birthData) => {
+          if (window.UIDataSaver) {
+            try {
+              // Save birth data first
+              window.UIDataSaver.setBirthData(birthData);
+              // Save chart generation response
+              window.UIDataSaver.saveApiResponse(apiResponse);
+              
+              // Verify data was saved
+              const savedData = window.UIDataSaver.getBirthData();
+              if (savedData && savedData.data) {
+                console.log('✅ Chart generation data saved and verified in UIDataSaver');
+              } else {
+                console.error('❌ Chart data save verification failed');
+              }
+            } catch (error) {
+              console.error('❌ Failed to save chart data to UIDataSaver:', error.message);
+            }
+          } else {
+            console.error('❌ UIDataSaver not available in window');
+          }
+        }, chartApiCall.response, birthData);
+      }
+
       // Step 5: Verify chart display
       console.log('📍 Step 5: Verifying chart display');
       // Check current URL - form submission should have navigated to chart page
@@ -1660,15 +1741,33 @@ class EnhancedComprehensiveDebugger {
       });
       details.chartDisplayed = chartDisplayed;
 
-      // Step 6: Verify UIDataSaver persistence
+      // Step 6: Verify UIDataSaver persistence (CRITICAL FIX: Add proper async wait)
       console.log('📍 Step 6: Verifying session persistence');
+      
+      // CRITICAL FIX: Wait for form submission to complete fully
+      // The handleSubmit function is async and needs time to complete session saves
+      console.log('   ⏳ Waiting for form submission and session save to complete...');
+      await new Promise(resolve => setTimeout(resolve, 5000)); // 5 second wait for async completion
+      
+      // CRITICAL FIX: Verify UIDataSaver is available in browser context first
+      const uiDataSaverAvailable = await this.page.evaluate(() => {
+        return typeof window.UIDataSaver !== 'undefined';
+      });
+      
+      if (!uiDataSaverAvailable) {
+        console.log('   ⚠️  UIDataSaver not available in browser context');
+      } else {
+        console.log('   ✅ UIDataSaver available in browser context');
+      }
+      
       const sessionData = await this.page.evaluate(() => {
         const keys = Object.keys(sessionStorage);
         const birthChartKeys = keys.filter(k => 
           k.toLowerCase().includes('birth') || 
           k.toLowerCase().includes('chart') ||
           k.toLowerCase().includes('jyotish') ||
-          k.toLowerCase().includes('session')
+          k.toLowerCase().includes('session') ||
+          k.includes('btr:v2') // Include UIDataSaver canonical keys
         );
         
         // Also check localStorage for birth data
@@ -1676,15 +1775,42 @@ class EnhancedComprehensiveDebugger {
         const localBirthChartKeys = localKeys.filter(k =>
           k.toLowerCase().includes('birth') ||
           k.toLowerCase().includes('chart') ||
-          k.toLowerCase().includes('jyotish')
+          k.toLowerCase().includes('jyotish') ||
+          k.includes('btr:v2') // Include UIDataSaver canonical keys
         );
+        
+        // CRITICAL FIX: Add detailed logging for debugging
+        console.log('🔍 Session storage inspection:', {
+          allSessionKeys: keys,
+          filteredSessionKeys: birthChartKeys,
+          allLocalKeys: localKeys,
+          filteredLocalKeys: localBirthChartKeys
+        });
+        
+        // CRITICAL FIX: Check UIDataSaver canonical keys specifically
+        const canonicalKeys = [
+          'btr:v2:birthData',
+          'btr:v2:chartId', 
+          'btr:v2:updatedAt',
+          'btr:v2:fingerprint',
+          'btr:v2:schema'
+        ];
+        
+        const canonicalKeysFound = canonicalKeys.filter(key => 
+          sessionStorage.getItem(key) !== null
+        );
+        
+        console.log('🔍 UIDataSaver canonical keys found:', canonicalKeysFound);
         
         return {
           sessionStorageKeys: birthChartKeys.length > 0,
           localStorageKeys: localBirthChartKeys.length > 0,
           sessionKeyCount: birthChartKeys.length,
           localKeyCount: localBirthChartKeys.length,
-          allKeys: [...keys, ...localKeys]
+          allKeys: [...keys, ...localKeys],
+          canonicalKeysFound: canonicalKeysFound.length,
+          canonicalKeysList: canonicalKeysFound,
+          uiDataSaverAvailable: typeof window.UIDataSaver !== 'undefined'
         };
       });
       
@@ -1747,6 +1873,39 @@ class EnhancedComprehensiveDebugger {
       details.comprehensiveApiSuccess = comprehensiveApi.success || false;
       details.has8Sections = comprehensiveApi.response?.analysis?.sections ? 
         Object.keys(comprehensiveApi.response.analysis.sections).length >= 8 : false;
+
+      // CRITICAL FIX: Save comprehensive analysis response to UIDataSaver
+      if (comprehensiveApi.success && comprehensiveApi.response) {
+        await this.page.evaluate((apiResponse, birthData) => {
+          if (window.UIDataSaver) {
+            try {
+              // Ensure birth data is saved first
+              window.UIDataSaver.setBirthData(birthData);
+              
+              // Save comprehensive analysis data
+              if (window.UIDataSaver.saveComprehensiveAnalysis) {
+                window.UIDataSaver.saveComprehensiveAnalysis(apiResponse);
+              } else if (window.UIDataSaver.saveApiResponse) {
+                window.UIDataSaver.saveApiResponse(apiResponse);
+              }
+              
+              // Verify both birth data and analysis data are saved
+              const savedBirthData = window.UIDataSaver.getBirthData();
+              const savedAnalysis = window.UIDataSaver.getComprehensiveAnalysis ? window.UIDataSaver.getComprehensiveAnalysis() : null;
+              
+              if (savedBirthData && savedBirthData.data) {
+                console.log('✅ Birth data verified in session');
+              }
+              if (savedAnalysis || window.UIDataSaver.getApiResponse) {
+                console.log('✅ Analysis data verified in session');
+              }
+              
+            } catch (error) {
+              console.error('❌ Failed to save comprehensive analysis to UIDataSaver:', error.message);
+            }
+          }
+        }, comprehensiveApi.response, birthData);
+      }
 
       // Step 3: Verify tab navigation
       console.log('📍 Step 3: Verifying tab navigation');

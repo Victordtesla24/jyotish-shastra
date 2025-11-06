@@ -10,4 +10,4 @@ const logRequest = (req, res, next) => {
   next();
 };
 
-export default router;
+export default logRequest;

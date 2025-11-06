@@ -13,6 +13,28 @@ services:
         sync: false  # Will prompt for value during deployment
       - key: FRONTEND_URL
         sync: false  # Set after frontend deployment
+      
+      # BTR Metrics Configuration
+      - key: BTR_METRICS_ENABLED
+        value: "true"
+      - key: BTR_METRICS_DIR
+        value: metrics/btr
+      - key: BTR_REPORTS_DIR
+        value: reports/btr
+      
+      # JPL Horizons Configuration
+      - key: HORIZONS_ENABLED
+        value: "true"
+      - key: HORIZONS_MODE
+        value: replay
+      - key: HORIZONS_FIXTURE_DIR
+        value: fixtures/horizons
+      
+      # Time Scale Configuration
+      - key: DELTAT_SOURCE
+        value: IERS
+      - key: DELTAT_DATA_PATH
+        value: src/adapters/data/deltaT_iers.json
 
   # Frontend Static Site
   - type: web

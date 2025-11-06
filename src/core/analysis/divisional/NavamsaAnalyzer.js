@@ -757,13 +757,50 @@ class NavamsaAnalyzer {
   }
 
   static get7thLordInRasi(chart) {
-    // Calculate 7th house lord in Rasi
-    return { planet: 'Venus', sign: 'Libra', house: 7 }; // Placeholder
-  }
+    // Calculate 7th house lord in Rasi chart
+    // The 7th house lord is the planet that rules the sign in the 7th house
+    
+    if (!chart || !chart.housePositions || !chart.planetaryPositions) {
+      console.warn('⚠️ Invalid chart data for 7th lord calculation');
+      return { planet: 'Unknown', sign: 'Unknown', house: 0 };
+    }
 
-  static get7thLordInNavamsa(chart) {
-    // Calculate 7th house lord in Navamsa
-    return { planet: 'Venus', sign: 'Libra', house: 7 }; // Placeholder
+    // Get the sign in the 7th house
+    const seventhHouseSign = chart.housePositions[6]?.sign; // housePositions is 0-indexed
+    
+    if (!seventhHouseSign) {
+      console.warn('⚠️ Cannot determine 7th house sign');
+      return { planet: 'Unknown', sign: 'Unknown', house: 0 };
+    }
+
+    // Sign lordship mapping (Vedic astrology)
+    const signLords = {
+      'Aries': 'Mars', 'Taurus': 'Venus', 'Gemini': 'Mercury', 'Cancer': 'Moon',
+      'Leo': 'Sun', 'Virgo': 'Mercury', 'Libra': 'Venus', 'Scorpio': 'Mars',
+      'Sagittarius': 'Jupiter', 'Capricorn': 'Saturn', 'Aquarius': 'Saturn', 'Pisces': 'Jupiter'
+    };
+
+    const lordPlanet = signLords[seventhHouseSign];
+    
+    if (!lordPlanet) {
+      console.warn(`⚠️ Unknown sign in 7th house: ${seventhHouseSign}`);
+      return { planet: 'Unknown', sign: seventhHouseSign, house: 7 };
+    }
+
+    // Find the planet's position in the chart
+    const planetKey = lordPlanet.toLowerCase();
+    const planetData = chart.planetaryPositions[planetKey];
+
+    if (!planetData) {
+      console.warn(`⚠️ Cannot find ${lordPlanet} in chart planetary positions`);
+      return { planet: lordPlanet, sign: 'Unknown', house: 0 };
+    }
+
+    return {
+      planet: lordPlanet,
+      sign: planetData.sign,
+      house: planetData.house || 0
+    };
   }
 
   static calculateVenusStrengthForMarriage(venus, chart) {
@@ -6155,7 +6192,7 @@ class NavamsaAnalyzer {
        timing.significantFactors.push(...spiritualYogas);
 
        // 7. Generate spiritual timing recommendations
-       timing.recommendations = this.generateSpiritualTimingRecommendations(timing);
+       timing.recommendations = this.generateSpiritualTimingFromAnalysis(timing);
 
        // 8. Determine overall spiritual timing assessment
        timing.overallTiming = this.assessOverallSpiritualTiming(timing);
@@ -6452,11 +6489,11 @@ class NavamsaAnalyzer {
    }
 
    /**
-    * Generate spiritual timing recommendations
+    * Generate spiritual timing recommendations from timing analysis
     * @param {Object} timing - Timing analysis
     * @returns {Array} Recommendations
     */
-   static generateSpiritualTimingRecommendations(timing) {
+   static generateSpiritualTimingFromAnalysis(timing) {
      const recommendations = [];
 
      // Add defensive null checking for timing structure
@@ -7422,27 +7459,11 @@ class NavamsaAnalyzer {
      return verification;
    }
 
-   /**
-    * Verify marriage timing consistency
-    * @param {Object} rasiChart - Rasi chart
-    * @param {Object} navamsaChart - Navamsa chart
-    * @returns {Object} Timing verification
-    */
-   static verifyMarriageTimingConsistency(rasiChart, navamsaChart) {
-     const verification = { alignments: [], contradictions: [] };
-
-     // This is a simplified timing verification
-     // In practice, this would involve complex dasha analysis
-     verification.alignments.push('Marriage timing analysis requires detailed dasha verification');
-
-     return verification;
-   }
-
-   /**
-    * Resolve marriage contradictions using traditional principles
-    * @param {Array} contradictions - List of contradictions
-    * @returns {Array} Resolved explanations
-    */
+  /**
+   * Resolve marriage contradictions using traditional principles
+   * @param {Array} contradictions - List of contradictions
+   * @returns {Array} Resolved explanations
+   */
    static resolveMarriageContradictions(contradictions) {
      const resolved = [];
 

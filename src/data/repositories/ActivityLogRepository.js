@@ -4,7 +4,6 @@
  * audit trails, performance monitoring, and analytics capabilities.
  */
 
-const mongoose = require('mongoose');
 const ActivityLog = require('../models/ActivityLog');
 
 class ActivityLogRepository {

@@ -3261,7 +3261,7 @@ const AnalysisPage = () => {
   const renderTabContent = () => {
     // Helper function to show no data message
     const NoDataMessage = ({ analysisType }) => (
-      <div className="no-data-message text-center py-8">
+      <div className="analysis-section no-data-message text-center py-8" data-section-id={`${activeSection}-no-data`}>
         <h3 className="text-lg font-semibold text-gray-600 mb-2">
           📊 {analysisType} Analysis
         </h3>
@@ -3276,13 +3276,17 @@ const AnalysisPage = () => {
 
     switch (activeSection) {
       case 'lagna':
-        return analysisData.lagna ?
-          <LagnaDisplay data={analysisData.lagna?.analysis || analysisData.lagna} /> :
-          <NoDataMessage analysisType="Lagna" />;
+        return analysisData.lagna ? (
+          <div className="analysis-section" data-section-id="lagna-analysis">
+            <LagnaDisplay data={analysisData.lagna?.analysis || analysisData.lagna} />
+          </div>
+        ) : (
+          <NoDataMessage analysisType="Lagna" />
+        );
 
       case 'houses':
         return (
-          <div className="space-y-4">
+          <div className="analysis-section space-y-4" data-section-id="houses-analysis">
             {/* House sub-tabs */}
             <div className="tabs-vedic">
               <div className="tab-list">
@@ -3302,53 +3306,82 @@ const AnalysisPage = () => {
             </div>
 
             {analysisData.houses ? (
-              <HouseDisplay
-                houseNumber={activeHouse}
-                data={analysisData.houses?.analysis?.[`house${activeHouse}`] ||
-                     analysisData.houses?.[`house${activeHouse}`] ||
-                     analysisData.houses?.data?.[`house${activeHouse}`]}
-              />
+              <div className="section" data-section-id={`house-${activeHouse}`}>
+                <HouseDisplay
+                  houseNumber={activeHouse}
+                  data={analysisData.houses?.analysis?.[`house${activeHouse}`] ||
+                       analysisData.houses?.[`house${activeHouse}`] ||
+                       analysisData.houses?.data?.[`house${activeHouse}`]}
+                />
+              </div>
             ) : (
               <NoDataMessage analysisType="Houses" />
             )}
           </div>
         );
 
-            case 'aspects':
-
-        return analysisData.aspects ?
-          <AspectsDisplay data={analysisData.aspects?.analysis || analysisData.aspects} /> :
-          <NoDataMessage analysisType="Planetary Aspects" />;
+      case 'aspects':
+        return analysisData.aspects ? (
+          <div className="analysis-section" data-section-id="aspects-analysis">
+            <AspectsDisplay data={analysisData.aspects?.analysis || analysisData.aspects} />
+          </div>
+        ) : (
+          <NoDataMessage analysisType="Planetary Aspects" />
+        );
 
       case 'arudha':
-        return analysisData.arudha ?
-          <ArudhaDisplay data={analysisData.arudha?.analysis || analysisData.arudha} /> :
-          <NoDataMessage analysisType="Arudha Padas" />;
+        return analysisData.arudha ? (
+          <div className="analysis-section" data-section-id="arudha-analysis">
+            <ArudhaDisplay data={analysisData.arudha?.analysis || analysisData.arudha} />
+          </div>
+        ) : (
+          <NoDataMessage analysisType="Arudha Padas" />
+        );
 
       case 'navamsa':
-        return analysisData.navamsa ?
-          <NavamsaDisplay data={analysisData.navamsa?.analysis || analysisData.navamsa} /> :
-          <NoDataMessage analysisType="Navamsa Chart" />;
+        return analysisData.navamsa ? (
+          <div className="analysis-section" data-section-id="navamsa-analysis">
+            <NavamsaDisplay data={analysisData.navamsa?.analysis || analysisData.navamsa} />
+          </div>
+        ) : (
+          <NoDataMessage analysisType="Navamsa Chart" />
+        );
 
       case 'dasha':
-        return analysisData.dasha ?
-          <DashaDisplay data={analysisData.dasha?.analysis || analysisData.dasha} /> :
-          <NoDataMessage analysisType="Dasha Periods" />;
+        return analysisData.dasha ? (
+          <div className="analysis-section" data-section-id="dasha-analysis">
+            <DashaDisplay data={analysisData.dasha?.analysis || analysisData.dasha} />
+          </div>
+        ) : (
+          <NoDataMessage analysisType="Dasha Periods" />
+        );
 
       case 'preliminary':
-        return analysisData.preliminary ?
-          <PreliminaryDisplay data={analysisData.preliminary?.analysis || analysisData.preliminary} /> :
-          <NoDataMessage analysisType="Preliminary" />;
+        return analysisData.preliminary ? (
+          <div className="analysis-section" data-section-id="preliminary-analysis">
+            <PreliminaryDisplay data={analysisData.preliminary?.analysis || analysisData.preliminary} />
+          </div>
+        ) : (
+          <NoDataMessage analysisType="Preliminary" />
+        );
 
       case 'comprehensive':
-        return analysisData.comprehensive ?
-          <ComprehensiveDisplay data={analysisData.comprehensive?.analysis || analysisData.comprehensive} /> :
-          <NoDataMessage analysisType="Comprehensive" />;
+        return analysisData.comprehensive ? (
+          <div className="analysis-section" data-section-id="comprehensive-analysis">
+            <ComprehensiveDisplay data={analysisData.comprehensive?.analysis || analysisData.comprehensive} />
+          </div>
+        ) : (
+          <NoDataMessage analysisType="Comprehensive" />
+        );
 
       default:
-        return analysisData.lagna ?
-          <LagnaDisplay data={analysisData.lagna?.analysis || analysisData.lagna} /> :
-          <NoDataMessage analysisType="Lagna (Default)" />;
+        return analysisData.lagna ? (
+          <div className="analysis-section" data-section-id="lagna-default">
+            <LagnaDisplay data={analysisData.lagna?.analysis || analysisData.lagna} />
+          </div>
+        ) : (
+          <NoDataMessage analysisType="Lagna (Default)" />
+        );
     }
   };
 

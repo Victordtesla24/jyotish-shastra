@@ -53,8 +53,9 @@ class AscendantCalculator {
       // Set sidereal mode to Lahiri by default (handled by wrapper during initialization)
       
       // Test Swiss Ephemeris functionality with a known date
+      // CRITICAL FIX: Use Whole Sign houses for Vedic astrology consistency
       const testDate = 2451545.0; // J2000.0
-      const testResult = await this.swisseph.swe_houses(testDate, 28.7041, 77.1025, 'P');
+      const testResult = await this.swisseph.swe_houses(testDate, 28.7041, 77.1025, 'W');
       
       // Swiss Ephemeris returns {cusps: array, ascmc: array} structure
       // ascmc[0] is the ascendant, ascmc[1] is the MC
@@ -121,7 +122,7 @@ class AscendantCalculator {
   /**
    * Calculate ascendant and house cusps
    */
-  async calculateAscendantAndHouses(year, month, day, hours, minutes, latitude, longitude, houseSystem = 'P') {
+  async calculateAscendantAndHouses(year, month, day, hours, minutes, latitude, longitude, houseSystem = 'W') {
     // Ensure calculator is initialized
     await this.initialize();
     
@@ -133,7 +134,9 @@ class AscendantCalculator {
     const julianDay = calculateJulianDay(year, month, day, hours + minutes / 60.0);
     
     // Calculate houses using Swiss Ephemeris
+    // CRITICAL FIX: Use Whole Sign ('W') houses for Vedic astrology accuracy
     const housesResult = await this.swisseph.swe_houses(julianDay, latitude, longitude, houseSystem);
+    console.log(`✅ AscendantCalculator: Using Whole Sign house system (${houseSystem}) for Vedic accuracy`);
     
     if (!housesResult || !housesResult.cusps || !housesResult.ascmc || 
         typeof housesResult.ascmc[0] !== 'number') {
@@ -242,8 +245,10 @@ export default AscendantCalculator;
 // Export utility functions
 // Export removed - use getSwisseph() from swisseph-wrapper.js instead
 export async function isSwissephAvailable() {
-  if (swisseph === null) {
-    await ensureSwissephLoaded();
+  try {
+    const swissephInstance = await getSwisseph();
+    return swissephInstance !== null;
+  } catch (_error) {
+    return false;
   }
-  return swissephAvailable;
 }

@@ -31,12 +31,6 @@ module.exports = {
       // Resolve deprecation warnings
       webpackConfig.ignoreWarnings = [/DEP0176/];
       
-      // Disable React Refresh in production builds
-      const isProduction = process.env.NODE_ENV === 'production' || 
-                          process.env.BABEL_ENV === 'production' ||
-                          !process.env.NODE_ENV || 
-                          webpackConfig.mode === 'production';
-      
       // React Scripts handles react-refresh automatically in development
       // No need to manually remove it in production
       

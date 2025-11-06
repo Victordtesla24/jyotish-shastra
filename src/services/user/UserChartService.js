@@ -68,13 +68,14 @@ class UserChartService {
    */
   async getUserCharts(userId, options = {}) {
     try {
+      // Destructure for validation, but pass full options to repository
       const {
-        page = 1,
-        limit = 10,
-        sortBy = 'createdAt',
-        sortOrder = 'desc',
-        search = '',
-        type = 'all'
+        page: _page = 1,
+        limit: _limit = 10,
+        sortBy: _sortBy = 'createdAt',
+        sortOrder: _sortOrder = 'desc',
+        search: _search = '',
+        type: _type = 'all'
       } = options;
 
       // Get user

@@ -6,7 +6,7 @@
  * Based on classical Vedic astrology texts including Brihat Parashara Hora Shastra
  */
 
-import { getSign, getSignIndex, getSignLord, getHouseFromLongitude } from '../../../utils/helpers/astrologyHelpers.js';
+import { getSignLord } from '../../../utils/helpers/astrologyHelpers.js';
 
 class NavamsaAnalysisService {
   constructor(d1Chart = null, d9Chart = null) {
@@ -390,9 +390,9 @@ class NavamsaAnalysisService {
       const planets = this.safeGetPlanets(navamsaChart);
 
       // Use iterative approach instead of recursive to prevent stack overflow
-      const jupiter = this.findPlanetByName(planets, 'Jupiter');
-      const ketu = this.findPlanetByName(planets, 'Ketu');
-      const moon = this.findPlanetByName(planets, 'Moon');
+      const _jupiter = this.findPlanetByName(planets, 'Jupiter');
+      const _ketu = this.findPlanetByName(planets, 'Ketu');
+      const _moon = this.findPlanetByName(planets, 'Moon');
 
       // PRODUCTION-GRADE: Build analysis using direct calculations instead of recursive calls
       const analysis = {};
@@ -495,35 +495,27 @@ class NavamsaAnalysisService {
   /**
    * PRODUCTION-GRADE: Iterative moksha planets analysis
    */
-  analyzeMokshaPlanetsIteratively(navamsaChart) {
-    try {
-      return {
-        liberationPotential: 7,
-        ketuSignificance: 'Strong potential for spiritual growth',
-        jupiterWisdom: 'Good spiritual guidance capacity',
-        twelfthHouseInfluence: 'Moderate liberation indicators'
-      };
-    } catch (error) {
-      return { liberationPotential: 5 };
-    }
+  analyzeMokshaPlanetsIteratively(_navamsaChart) { // eslint-disable-line no-unused-vars
+    return {
+      liberationPotential: 7,
+      ketuSignificance: 'Strong potential for spiritual growth',
+      jupiterWisdom: 'Good spiritual guidance capacity',
+      twelfthHouseInfluence: 'Moderate liberation indicators'
+    };
   }
 
   /**
    * PRODUCTION-GRADE: Iterative spiritual yogas identification
    */
-  identifySpiritualYogasIteratively(navamsaChart) {
-    try {
-      // Simple yoga detection without complex recursive analysis
-      return [
-        {
-          yoga: 'Dharma Yoga',
-          strength: 'Moderate',
-          description: 'Combination supporting spiritual growth'
-        }
-      ];
-    } catch (error) {
-      return [];
-    }
+  identifySpiritualYogasIteratively(_navamsaChart) { // eslint-disable-line no-unused-vars
+    // Simple yoga detection without complex recursive analysis
+    return [
+      {
+        yoga: 'Dharma Yoga',
+        strength: 'Moderate',
+        description: 'Combination supporting spiritual growth'
+      }
+    ];
   }
 
   /**
@@ -558,18 +550,14 @@ class NavamsaAnalysisService {
   /**
    * PRODUCTION-GRADE: Iterative spiritual evolution assessment
    */
-  assessSpiritualEvolutionIteratively(navamsaChart) {
-    try {
-      return {
-        currentLevel: 6,
-        growthPotential: 7,
-        evolutionPath: 'Steady spiritual development',
-        pastLifeSkills: 'Some spiritual background indicated',
-        currentLifeLessons: 'Focus on dharmic living'
-      };
-    } catch (error) {
-      return { currentLevel: 5, growthPotential: 5 };
-    }
+  assessSpiritualEvolutionIteratively(_navamsaChart) { // eslint-disable-line no-unused-vars
+    return {
+      currentLevel: 6,
+      growthPotential: 7,
+      evolutionPath: 'Steady spiritual development',
+      pastLifeSkills: 'Some spiritual background indicated',
+      currentLifeLessons: 'Focus on dharmic living'
+    };
   }
 
   /**
@@ -887,11 +875,7 @@ class NavamsaAnalysisService {
     return analysis;
   }
 
-    /**
-   * Analyzes Navamsa Lagna and its implications
-   * @returns {string} Navamsa Lagna analysis
-   */
-  analyzeNavamsaLagna() {
+    _analyzeNavamsaLagna() { // Renamed duplicate to avoid conflict
     if (!this.d9Chart || !this.d9Chart.ascendant_sign) {
       return 'Navamsa chart or ascendant sign not available';
     }
@@ -1110,17 +1094,20 @@ class NavamsaAnalysisService {
     return opposites[sign];
   }
 
+  /* eslint-disable no-unused-vars */
+
   /**
    * Gets friendship status between planet and sign lord
    * @param {string} planetName - Planet name
    * @param {string} sign - Sign name
    * @returns {string} Friendship status
    */
-  getFriendshipStatus(planetName, sign) {
+  getFriendshipStatus(_planetName, _sign) {
     // Simplified friendship calculation
     // In real implementation, this would be more complex
     return 'Neutral';
   }
+  /* eslint-enable no-unused-vars */
 
   /**
    * Gets strength grade
@@ -1343,7 +1330,6 @@ class NavamsaAnalysisService {
     }
 
     // Check if planet is in own sign or exaltation
-    const planetSign = this.getSignFromLongitude(planet.longitude);
     const dignity = this.calculateNavamsaDignity(planet);
 
     if (dignity === 'Exalted' || dignity === 'Own Sign') {
@@ -1359,7 +1345,7 @@ class NavamsaAnalysisService {
    * @param {Array} rasiHouses - Rasi chart houses
    * @returns {Array} Navamsa houses
    */
-  calculateNavamsaHousesSimple(navamsaAscendant, rasiHouses = []) {
+  calculateNavamsaHousesSimple(navamsaAscendant, _rasiHouses = []) { // eslint-disable-line no-unused-vars
     const houses = [];
     const ascendantLongitude = navamsaAscendant?.longitude || 0;
 
@@ -1455,7 +1441,7 @@ class NavamsaAnalysisService {
     return effects[lagnaSign] || `${lagnaSign} brings unique spiritual qualities`;
   }
 
-  calculateLagnaStrength(chart, sign) {
+  calculateLagnaStrength(_chart, _sign) {
     // Calculate based on lord position, aspects, etc.
     return 7; // Simplified for now
   }
@@ -1505,11 +1491,11 @@ class NavamsaAnalysisService {
     return `Marriage prospects are ${prospects} based on Navamsa planetary positions`;
   }
 
-  getSpouseIndications(chart) {
+  getSpouseIndications(_chart) {
     return 'Spouse will have qualities indicated by 7th house lord and Venus/Jupiter position in Navamsa';
   }
 
-  getMarriageTimingFactors(chart) {
+  getMarriageTimingFactors(_chart) {
     return 'Marriage timing depends on Venus, Jupiter, and 7th lord dasha periods';
   }
 
@@ -1622,7 +1608,7 @@ class NavamsaAnalysisService {
     return 'Dharmic path with potential for spiritual growth';
   }
 
-  generateRecommendations(analysis) {
+  generateRecommendations(_analysis) {
     const recommendations = [
       'Strengthen Venus through appropriate remedies for marriage happiness',
       'Practice dharmic principles for spiritual growth',
@@ -1631,7 +1617,7 @@ class NavamsaAnalysisService {
     return recommendations;
   }
 
-  identifyImportantPeriods(analysis) {
+  identifyImportantPeriods(_analysis) {
     return [
       { period: 'Venus Dasha', significance: 'Marriage and relationship focus' },
       { period: 'Jupiter Dasha', significance: 'Spiritual growth and wisdom' }
@@ -2175,7 +2161,7 @@ class NavamsaAnalysisService {
    * @param {Object} d9Chart - D9 chart
    * @returns {Object} Marriage analysis
    */
-  static analyzeMarriageIndications(d9Chart) {
+  static analyzeMarriageIndications(_d9Chart) {
     return {
       spouseNature: 'Harmonious and balanced spouse indicated',
       maritalHarmony: 'Good prospects for marital happiness',
@@ -2188,7 +2174,7 @@ class NavamsaAnalysisService {
    * @param {Object} birthData - Birth data
    * @returns {Object} D9 chart
    */
-  static generateNavamsaChart(birthData) {
+  static generateNavamsaChart(_birthData) {
     // Simplified implementation for testing
     return {
       ascendant: { sign: 'Leo', longitude: 150 },
@@ -2420,7 +2406,7 @@ class NavamsaAnalysisService {
   /**
    * Get Ketu moksha effects
    */
-  getKetuMokshaEffects(house, sign) {
+  getKetuMokshaEffects(house, _sign) { // eslint-disable-line no-unused-vars
     const houseEffects = {
       1: 'Self-detachment and ego dissolution',
       4: 'Detachment from material comforts',
@@ -2752,7 +2738,7 @@ class NavamsaAnalysisService {
     return detachmentAreas[house] || 'General detachment from material concerns';
   }
 
-  getRahuGrowthDirection(house, sign) {
+  getRahuGrowthDirection(house, _sign) { // eslint-disable-line no-unused-vars
     const growthAreas = {
       1: 'Develop strong personal identity and leadership qualities',
       2: 'Focus on building wealth and establishing value systems',
@@ -2790,7 +2776,7 @@ class NavamsaAnalysisService {
     return lessons[house] || 'General life lessons for spiritual evolution';
   }
 
-  assessMaterialVsSpiritualBalance(house, sign) {
+  assessMaterialVsSpiritualBalance(house, _sign) { // eslint-disable-line no-unused-vars
     const materialHouses = [2, 6, 10, 11];
     const spiritualHouses = [1, 5, 8, 9, 12];
 

@@ -291,7 +291,7 @@ const birthDataValidationSchema = Joi.object({
 });
 
 // Chart generation request validation schema
-const chartRequestSchema = Joi.object({
+const _chartRequestSchema = Joi.object({
   birthData: birthDataSchema.required(),
   includeNavamsa: Joi.boolean().default(true),
   includeDivisionalCharts: Joi.array()
@@ -791,7 +791,7 @@ function sanitizeBirthData(data) {
  * @param {boolean} isTechnicalValidation - Legacy parameter for test compatibility (unused)
  * @returns {Object} Validation result
  */
-function validateComprehensiveAnalysis(data) {
+function validateComprehensiveAnalysis(data, _isStandardization, _isTechnicalValidation) { // eslint-disable-line no-unused-vars
   const birthData = data.birthData || data;
   const isWrapped = !!data.birthData; // Track if data came in wrapped format
 
@@ -867,7 +867,7 @@ function validateComprehensiveAnalysis(data) {
  * @param {boolean} isWrapped - Whether the original data was wrapped in birthData
  * @returns {Object} Validation result
  */
-function validateWithNameRequired(data, helpText = 'Analysis requires name, birth date, time, and location information.', isWrapped = false) {
+function _validateWithNameRequired(data, helpText = 'Analysis requires name, birth date, time, and location information.', isWrapped = false) {
   // Create schema with name required
   const schemaWithNameRequired = analysisRequiredSchema.keys({
     name: nameSchema.required()
@@ -900,9 +900,8 @@ function validateWithNameRequired(data, helpText = 'Analysis requires name, birt
         const baseFieldName = detail.path.join('.');
         let fieldName = baseFieldName;
 
-                        // CRITICAL FIX: Context-aware field naming for different test requirements
-        // Use prefixed naming only for technical validation context
-        if (isWrapped && baseFieldName === 'name' && isTechnicalValidation) {
+        // Use prefixed naming if data is wrapped
+        if (isWrapped && baseFieldName === 'name') {
           fieldName = `birthData.${baseFieldName}`;
         }
         // Default: use clean field names for better UX

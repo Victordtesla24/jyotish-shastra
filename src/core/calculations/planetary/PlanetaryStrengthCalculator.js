@@ -1010,7 +1010,7 @@ class PlanetaryStrengthCalculator {
     const planetHouse = getHouseFromLongitude(planet.longitude, this.ascendant.longitude);
     
     // Maximum Dig Bala when in opposite house (7th from ideal)
-    const oppositeHouse = idealHouse + 6;
+    let oppositeHouse = idealHouse + 6;
     if (oppositeHouse > 12) oppositeHouse -= 12;
     
     if (planetHouse === oppositeHouse) {
@@ -1032,7 +1032,7 @@ class PlanetaryStrengthCalculator {
     }
     
     // Production code - no fallback values
-    throw new Error(`Invalid house calculation for directional strength: house ${houseNumber} is not valid for directional strength calculation`);
+    throw new Error(`Invalid house calculation for directional strength: house ${planetHouse} is not valid for directional strength calculation`);
   }
 
   // KALA BALA METHODS  

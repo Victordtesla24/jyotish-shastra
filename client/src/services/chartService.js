@@ -180,28 +180,18 @@ class ChartService {
     }
 
     // Calculate house for each planet based on longitude
+    // Validate housePositions exist (required for chart structure, but not used for recalculation)
     if (!chartData.housePositions || !Array.isArray(chartData.housePositions) || chartData.housePositions.length !== 12) {
       throw new Error('House positions are required for accurate planet processing. Expected array of 12 house cusps.');
     }
     
-    const housePositions = chartData.housePositions;
-    
     return planetsData.map(planet => {
-      // Determine house based on longitude and ascendant
-      let house = 1;
-      if (housePositions && Object.keys(housePositions).length > 0 && chartData.ascendant) {
-        const ascendantLongitude = chartData.ascendant.longitude;
-        const planetLongitude = planet.longitude;
-        
-        if (planetLongitude === undefined || planetLongitude === null) {
-          throw new Error(`Invalid planet data: missing longitude for ${planet.name}. Ensure complete planetary position data is provided.`);
-        }
-        
-        // Calculate house (simplified - each house spans 30 degrees)
-        let adjustedDiff = planetLongitude - ascendantLongitude;
-        if (adjustedDiff < 0) adjustedDiff += 360;
-        house = Math.floor(adjustedDiff / 30) + 1;
-        if (house > 12) house = 12;
+      // CRITICAL FIX: Use ONLY API-provided house assignments (no frontend recalculation)
+      // API-provided house numbers are calculated using Placidus cusps in backend
+      // Backend is the single source of truth for house assignments
+      if (planet.house === undefined || planet.house === null || 
+          !Number.isInteger(planet.house) || planet.house < 1 || planet.house > 12) {
+        throw new Error(`Missing or invalid house assignment for planet ${planet.name || 'unknown'}: house=${planet.house}. API must provide valid house assignments (1-12).`);
       }
 
       return {
@@ -209,7 +199,7 @@ class ChartService {
         signId: planet.signId,
         sign: planet.sign,
         degrees: planet.degrees || planet.degree,
-        house: house,
+        house: planet.house, // Use API-provided house assignment only
         dignity: planet.dignity,
         longitude: planet.longitude,
         retrograde: planet.isRetrograde || planet.retrograde,
@@ -359,10 +349,11 @@ class ChartService {
    * @param {Object} options - Rendering options
    * @param {number} options.width - Chart width in pixels (default: 800)
    * @param {boolean} options.includeData - Include chart data in response (default: false)
+   * @param {string} options.chartType - Type of chart: 'rasi' or 'navamsa' (default: 'rasi')
    * @returns {Promise<Object>} SVG content and metadata
    */
   async renderChartSVG(birthData, options = {}) {
-    const { width = 800, includeData = false } = options;
+    const { width = 800, includeData = false, chartType = 'rasi' } = options;
 
     // Validate birth data
     const validatedData = this.validateAndPrepareInput(birthData);
@@ -373,14 +364,17 @@ class ChartService {
         validatedDataKeys: Object.keys(validatedData),
         validatedData: JSON.stringify(validatedData, null, 2),
         width,
-        includeData
+        includeData,
+        chartType
       });
 
       // Call backend rendering endpoint
+      // CRITICAL FIX: Include chartType in request payload
       const requestPayload = {
         ...validatedData,
         width,
-        includeData
+        includeData,
+        chartType // Pass 'rasi' or 'navamsa' to backend
       };
       
       console.log('🔍 chartService.renderChartSVG: Request payload', JSON.stringify(requestPayload, null, 2));

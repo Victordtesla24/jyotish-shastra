@@ -4,10 +4,6 @@
  * Integrates with OpenCage geocoding API
  */
 import geocode from 'opencage-api-client';
-import axios from 'axios';
-import fs from 'fs';
-import path from 'path';
-import dotenv from 'dotenv';
 
 class GeocodingService {
   constructor() {
@@ -42,7 +38,7 @@ class GeocodingService {
       const response = await this.geocoder.geocode({ q: query, key: this.apiKey });
 
       if (response && Array.isArray(response.results) && response.results.length > 0) {
-        const { geometry, components, formatted, annotations } = response.results[0];
+        const { geometry, formatted, annotations } = response.results[0];
         const { lat, lng } = geometry;
         const timezone = annotations?.timezone?.name || '';
 

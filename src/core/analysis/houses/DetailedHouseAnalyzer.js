@@ -1322,4 +1322,4 @@ class DetailedHouseAnalyzer {
     }
 }
 
-export default router;
+export default DetailedHouseAnalyzer;

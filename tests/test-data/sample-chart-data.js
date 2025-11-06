@@ -3,7 +3,7 @@
  * Based on sample-birth-data.json
  */
 
-const sampleBirthData = {
+let sampleBirthData = {
   name: 'Farhan',
   dateOfBirth: '1997-12-18',
   timeOfBirth: '02:30',

@@ -108,7 +108,7 @@ describe('Vedic Chart Template Alignment Tests', () => {
         // Should not have eslint disables for unused vars (our fix)
         expect(eslintMatch).toBeNull();
       } catch (error) {
-        fail('Component should be parsable: ' + error.message);
+        throw new Error('Component should be parsable: ' + error.message);
       }
     });
 
@@ -251,7 +251,7 @@ describe('Vedic Chart Template Alignment Tests', () => {
         if (pattern.startsWith('console.log')) {
           const matches = componentContent.match(new RegExp(pattern, 'g'));
           if (matches && matches.length > 2) {
-            fail('Too many console.log statements for production code');
+            throw new Error('Too many console.log statements for production code');
           }
         }
       });

@@ -68,15 +68,6 @@ const SWISS_EPHEMERIS_CONSTANTS = {
   ERR: -1
 };
 
-// Helper to get swisseph constant values from documentation
-function getSwissephValue(prop, defaultValue) {
-  if (SWISS_EPHEMERIS_CONSTANTS[prop] !== undefined) {
-    return SWISS_EPHEMERIS_CONSTANTS[prop];
-  }
-  // If property doesn't exist in documented constants, use provided default
-  return defaultValue;
-}
-
 const SWISS_EPHEMERIS = {
   // Calendar types
   CALENDAR: {
@@ -416,21 +407,6 @@ const PLANETS = {
 };
 
 // Constants for zodiac signs
-const SIGNS = {
-  ARIES: 'Aries',
-  TAURUS: 'Taurus',
-  GEMINI: 'Gemini',
-  CANCER: 'Cancer',
-  LEO: 'Leo',
-  VIRGO: 'Virgo',
-  LIBRA: 'Libra',
-  SCORPIO: 'Scorpio',
-  SAGITTARIUS: 'Sagittarius',
-  CAPRICORN: 'Capricorn',
-  AQUARIUS: 'Aquarius',
-  PISCES: 'Pisces'
-};
-
 export {
   SWISS_EPHEMERIS,
   PLANETARY_DATA,

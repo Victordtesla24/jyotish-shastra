@@ -209,15 +209,17 @@ class EnemyHouseDetector {
     if (!chartData.planets) return analysis;
 
     chartData.planets.forEach(planet => {
-      const housePosition = this.calculateHouseFromLongitude(
-        planet.longitude,
-        chartData.ascendant.longitude
-      );
+      // CRITICAL FIX: Use ONLY API-provided house assignments (no recalculation)
+      // API-provided house numbers are calculated using Placidus cusps in backend
+      if (!planet.house || planet.house < 1 || planet.house > 12) {
+        console.warn(`⚠️ Missing house assignment for ${planet.name}. Using API-provided house or skipping.`);
+        return;
+      }
 
       analysis[planet.name] = this.isInEnemyHouse(
         planet.name,
         planet.sign,
-        housePosition,
+        planet.house,
         chartData
       );
     });
@@ -225,21 +227,7 @@ class EnemyHouseDetector {
     return analysis;
   }
 
-  /**
-   * Calculate house from longitude (helper method)
-   */
-  calculateHouseFromLongitude(planetLongitude, ascendantLongitude) {
-    const normalizedPlanet = ((planetLongitude % 360) + 360) % 360;
-    const normalizedAscendant = ((ascendantLongitude % 360) + 360) % 360;
-
-    let houseDifference = normalizedPlanet - normalizedAscendant;
-    if (houseDifference < 0) {
-      houseDifference += 360;
-    }
-
-    const house = Math.floor(houseDifference / 30) + 1;
-    return house > 12 ? house - 12 : house;
-  }
+ 
 
   /**
    * Get planetary strength in current position

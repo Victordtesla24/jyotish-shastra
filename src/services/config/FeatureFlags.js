@@ -183,7 +183,7 @@ class FeatureFlagsService {
       rationale: []
     };
 
-    const baseFeatures = ['praanapada', 'moon', 'gulika']; // Always enabled (existing functionality)
+    const _baseFeatures = ['praanapada', 'moon', 'gulika']; // Reserved: Always enabled (existing functionality)
     
     switch (context) {
       case 'production':
@@ -257,7 +257,7 @@ class FeatureFlagsService {
 
     // Check each requested feature
     for (const [feature, enabled] of Object.entries(requestedFeatures)) {
-      if (!this.featureFlags.hasOwnProperty(feature)) {
+      if (!Object.prototype.hasOwnProperty.call(this.featureFlags, feature)) {
         validation.errors.push(`Unknown feature: ${feature}`);
         validation.isValid = false;
         continue;

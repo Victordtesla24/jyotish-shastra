@@ -47,7 +47,7 @@ export function jsonSanitizerMiddleware(req, res, next) {
   }
 
   // Store original json parser
-  const originalJson = req.body;
+  const _originalJson = req.body;
 
   // Override the raw body if it exists
   if (req.rawBody) {

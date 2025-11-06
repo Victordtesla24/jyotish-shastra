@@ -28,6 +28,10 @@ const PLANET_CODES = {
   'Rahu': 'Ra',
   'Ketu': 'Ke',
   'Ascendant': 'As',
+  // Outer planets (modern addition to Vedic system)
+  'Uranus': 'Ur',
+  'Neptune': 'Ne',
+  'Pluto': 'Pl',
   // API returns lowercase names
   'sun': 'Su',
   'moon': 'Mo', 
@@ -38,7 +42,10 @@ const PLANET_CODES = {
   'saturn': 'Sa',
   'rahu': 'Ra',
   'ketu': 'Ke',
-  'ascendant': 'As'
+  'ascendant': 'As',
+  'uranus': 'Ur',
+  'neptune': 'Ne',
+  'pluto': 'Pl'
 };
 
 // Load vedic_chart_xy_spec.json for positioning reference
@@ -178,17 +185,18 @@ class ChartRenderingService {
       chartId: apiData.chartId || null
     };
 
-    // 2. Birth Data
-    if (apiData.birthData) {
+    // 2. Birth Data - check both direct location and metadata location
+    const birthData = apiData.birthData || apiData.metadata?.birthData;
+    if (birthData) {
       extractedDataSets.datasets.birthData = {
-        name: apiData.birthData.name || null,
-        dateOfBirth: apiData.birthData.dateOfBirth || null,
-        timeOfBirth: apiData.birthData.timeOfBirth || null,
-        latitude: apiData.birthData.latitude || null,
-        longitude: apiData.birthData.longitude || null,
-        timezone: apiData.birthData.timezone || null,
-        gender: apiData.birthData.gender || null,
-        geocodingInfo: apiData.birthData.geocodingInfo || null
+        name: birthData.name || null,
+        dateOfBirth: birthData.dateOfBirth || null,
+        timeOfBirth: birthData.timeOfBirth || null,
+        latitude: birthData.latitude || null,
+        longitude: birthData.longitude || null,
+        timezone: birthData.timezone || null,
+        gender: birthData.gender || null,
+        geocodingInfo: birthData.geocodingInfo || null
       };
     }
 
@@ -266,15 +274,34 @@ class ChartRenderingService {
       }
     }
 
-    // 7. House Positions Array Data
-    if (rasiChart?.housePositions && Array.isArray(rasiChart.housePositions)) {
-      extractedDataSets.datasets.housePositionsArrayData = rasiChart.housePositions.map(house => ({
-        houseNumber: house.houseNumber || null,
-        degree: house.degree || null,
-        sign: house.sign || null,
-        signId: house.signId || null,
-        longitude: house.longitude || null
-      }));
+    // 7. House Positions Array Data - handle both array and object formats
+    if (rasiChart?.housePositions) {
+      if (Array.isArray(rasiChart.housePositions)) {
+        // Array format
+        extractedDataSets.datasets.housePositionsArrayData = rasiChart.housePositions.map(house => ({
+          houseNumber: house.houseNumber || null,
+          degree: house.degree || null,
+          sign: house.sign || null,
+          signId: house.signId || null,
+          longitude: house.longitude || null
+        }));
+      } else if (typeof rasiChart.housePositions === 'object') {
+        // Object format - convert to array
+        extractedDataSets.datasets.housePositionsArrayData = [];
+        for (let i = 1; i <= 12; i++) {
+          const houseData = rasiChart.housePositions[i.toString()];
+          if (houseData) {
+            extractedDataSets.datasets.housePositionsArrayData.push({
+              houseNumber: houseData.house || i,
+              degree: houseData.degree || null,
+              sign: houseData.sign || null,
+              signId: houseData.signId || null,
+              signName: houseData.signName || null,
+              longitude: houseData.cuspLongitude || houseData.longitude || null
+            });
+          }
+        }
+      }
     }
 
     // 8. Nakshatra Data
@@ -379,11 +406,18 @@ class ChartRenderingService {
         };
       }
 
-      // 16. Planetary Positions WITH HOUSE NUMBERS (CRITICAL - nested in birthDataAnalysis)
+      // 16. Planetary Positions WITH HOUSE NUMBERS - check multiple locations
+      let planetaryPositionsWithHouses = null;
+      
+      // First check nested in birthDataAnalysis (comprehensive analysis response)
       if (birthDataAnalysis.analyses?.planetaryPositions?.planetaryPositions) {
+        planetaryPositionsWithHouses = birthDataAnalysis.analyses.planetaryPositions.planetaryPositions;
+      }
+      
+      if (planetaryPositionsWithHouses) {
         extractedDataSets.datasets.planetaryPositionsWithHouseNumbers = {};
         
-        for (const [planetName, planetData] of Object.entries(birthDataAnalysis.analyses.planetaryPositions.planetaryPositions)) {
+        for (const [planetName, planetData] of Object.entries(planetaryPositionsWithHouses)) {
           if (planetData) {
             extractedDataSets.datasets.planetaryPositionsWithHouseNumbers[planetName] = {
               sign: planetData.sign || null,
@@ -423,6 +457,25 @@ class ChartRenderingService {
           dashaCalculated: birthDataAnalysis.summary.dashaCalculated || null,
           readyForAnalysis: birthDataAnalysis.summary.readyForAnalysis || null
         };
+      }
+    }
+
+    // CRITICAL FIX: Create planetaryPositionsWithHouseNumbers from rasiChart if not already created
+    if (!extractedDataSets.datasets.planetaryPositionsWithHouseNumbers && rasiChart?.planetaryPositions) {
+      extractedDataSets.datasets.planetaryPositionsWithHouseNumbers = {};
+      
+      for (const [planetName, planetData] of Object.entries(rasiChart.planetaryPositions)) {
+        if (planetData) {
+          extractedDataSets.datasets.planetaryPositionsWithHouseNumbers[planetName] = {
+            sign: planetData.sign || null,
+            degree: planetData.degree || null,
+            longitude: planetData.longitude || null,
+            house: planetData.house || null,
+            dignity: planetData.dignity || null,
+            isRetrograde: planetData.isRetrograde || false,
+            isCombust: planetData.isCombust || false
+          };
+        }
       }
     }
 
@@ -531,9 +584,10 @@ class ChartRenderingService {
   /**
    * Transform ChartGenerationService data to renderChart.js format
    * @param {Object} chartData - Chart data from ChartGenerationService
+   * @param {string} chartType - Type of chart: 'rasi' or 'navamsa' (default: 'rasi')
    * @returns {Object} Data in renderChart.js expected format
    */
-  transformToRenderFormat(chartData) {
+  transformToRenderFormat(chartData, chartType = 'rasi') {
     if (!chartData) {
       throw new Error('Chart data is required for rendering');
     }
@@ -550,57 +604,107 @@ class ChartRenderingService {
       console.log(`✅ Chart data extraction saved to: ${savedPath}`);
     }
 
-    // Handle both direct chart data and nested response structure
-    // API response can be: { data: { rasiChart: {...} } } or { rasiChart: {...} } or rasiChart directly
-    let rasiChart = chartData.rasiChart || chartData.data?.rasiChart || chartData;
-
-    // If rasiChart is still the full response, try to extract from data property
-    if (!rasiChart.planetaryPositions && !rasiChart.housePositions) {
-      // Check if we need to navigate deeper into the structure
-      if (chartData.data?.rasiChart) {
-        rasiChart = chartData.data.rasiChart;
-      } else if (chartData.rasiChart) {
-        rasiChart = chartData.rasiChart;
-      } else {
-        rasiChart = chartData;
-      }
-    }
-
-    if (!rasiChart.planetaryPositions || !rasiChart.housePositions) {
-      throw new Error('Invalid chart data: missing planetaryPositions or housePositions');
-    }
-
-    // Extract house numbers from API response structure
-    // Primary: Use planetaryPositions if house is present
-    let planetaryPositions = rasiChart.planetaryPositions;
+    // CRITICAL FIX: Select correct chart based on chartType
+    let targetChart;
     
-    // Fallback 1: Extract from birthDataAnalysis if house numbers are missing
-    const birthDataAnalysis = chartData.birthDataAnalysis || chartData.data?.birthDataAnalysis;
-    if (birthDataAnalysis?.analyses?.planetaryPositions?.planetaryPositions) {
-      const planetaryPositionsWithHouses = birthDataAnalysis.analyses.planetaryPositions.planetaryPositions;
+    if (chartType === 'navamsa') {
+      // Extract Navamsa chart data
+      targetChart = chartData.navamsaChart || chartData.data?.navamsaChart;
       
-      // Check if any planet in planetaryPositions has house property
-      const hasHouseNumbers = Object.values(planetaryPositions).some(p => p && typeof p.house === 'number');
+      if (!targetChart) {
+        throw new Error('Navamsa chart data not found in response. Ensure navamsaChart is generated.');
+      }
       
-      // If house numbers are missing, merge from birthDataAnalysis
-      if (!hasHouseNumbers) {
-        for (const [planetName, planetDataWithHouse] of Object.entries(planetaryPositionsWithHouses)) {
-          if (planetaryPositions[planetName]) {
-            planetaryPositions[planetName] = {
-              ...planetaryPositions[planetName],
-              house: planetDataWithHouse.house
-            };
+      console.log(`✅ Using Navamsa chart for rendering`);
+    } else {
+      // Handle both direct chart data and nested response structure
+      // API response can be: { data: { rasiChart: {...} } } or { rasiChart: {...} } or rasiChart directly
+      targetChart = chartData.rasiChart || chartData.data?.rasiChart || chartData;
+
+      // If rasiChart is still the full response, try to extract from data property
+      if (!targetChart.planetaryPositions && !targetChart.housePositions) {
+        // Check if we need to navigate deeper into the structure
+        if (chartData.data?.rasiChart) {
+          targetChart = chartData.data.rasiChart;
+        } else if (chartData.rasiChart) {
+          targetChart = chartData.rasiChart;
+        } else {
+          targetChart = chartData;
+        }
+      }
+      
+      console.log(`✅ Using Rasi chart for rendering`);
+    }
+
+    // Validate target chart structure
+    if (!targetChart.planetaryPositions || !targetChart.housePositions) {
+      throw new Error(`Invalid ${chartType} chart data: missing planetaryPositions or housePositions`);
+    }
+
+    // CRITICAL FIX: Extract planetary positions differently for Rasi vs Navamsa
+    let planetaryPositions;
+    
+    if (chartType === 'navamsa') {
+      // For Navamsa: Use planets array which has correct house numbers calculated from Navamsa ascendant
+      // Convert planets array to planetaryPositions object format
+      planetaryPositions = {};
+      const navamsaPlanets = targetChart.planets || [];
+      
+      console.log(`🔍 NAVAMSA RENDER FIX: Using planets array with ${navamsaPlanets.length} planets`);
+      
+      for (const planet of navamsaPlanets) {
+        if (planet && planet.name) {
+          planetaryPositions[planet.name] = {
+            sign: planet.sign,
+            signId: planet.signId,
+            degree: planet.degree,
+            longitude: planet.longitude,
+            house: planet.house, // CORRECT Navamsa house number!
+            dignity: planet.dignity || 'neutral',
+            isRetrograde: planet.isRetrograde || false
+          };
+          console.log(`  ✅ Navamsa ${planet.name}: ${planet.sign} House ${planet.house}`);
+        }
+      }
+    } else {
+      // For Rasi: Use planetaryPositions object (original logic)
+      planetaryPositions = targetChart.planetaryPositions;
+      
+      // Fallback 1: Extract from birthDataAnalysis if house numbers are missing
+      const birthDataAnalysis = chartData.birthDataAnalysis || chartData.data?.birthDataAnalysis;
+      if (birthDataAnalysis?.analyses?.planetaryPositions?.planetaryPositions) {
+        const planetaryPositionsWithHouses = birthDataAnalysis.analyses.planetaryPositions.planetaryPositions;
+        
+        // Check if any planet in planetaryPositions has house property
+        const hasHouseNumbers = Object.values(planetaryPositions).some(p => p && typeof p.house === 'number');
+        
+        // If house numbers are missing, merge from birthDataAnalysis
+        if (!hasHouseNumbers) {
+          for (const [planetName, planetDataWithHouse] of Object.entries(planetaryPositionsWithHouses)) {
+            if (planetaryPositions[planetName]) {
+              planetaryPositions[planetName] = {
+                ...planetaryPositions[planetName],
+                house: planetDataWithHouse.house
+              };
+            }
           }
         }
       }
     }
 
     // Use joined data if available, otherwise fallback to original extraction
-    const rasiByHouse = joinedData.joins.rasiByHouse || this.getRasiByHouse(rasiChart.housePositions);
-    const planetsByHouse = joinedData.joins.planetsByHouse || this.groupPlanetsByHouse(planetaryPositions);
+    // CRITICAL FIX: For Navamsa, ALWAYS use fresh grouping since we extracted from planets array
+    const rasiByHouse = joinedData.joins.rasiByHouse || this.getRasiByHouse(targetChart.housePositions);
+    const planetsByHouse = (chartType === 'navamsa') 
+      ? this.groupPlanetsByHouse(planetaryPositions)  // ALWAYS fresh for Navamsa
+      : (joinedData.joins.planetsByHouse || this.groupPlanetsByHouse(planetaryPositions));
     
     // Calculate ascendant slot index (default to 0 for template standard)
-    const ascSlotIndex = this.calculateAscendantSlot(rasiChart.ascendant);
+    const ascSlotIndex = this.calculateAscendantSlot(targetChart.ascendant);
+
+    // DEBUG: Log transformed data to verify correct chart is being used
+    console.log(`🔍 RENDER DEBUG (${chartType}): Ascendant = ${targetChart.ascendant.sign}, planetsByHouse sample:`, 
+      Object.entries(planetsByHouse).filter(([_h, p]) => p.length > 0).slice(0, 3).map(([h, p]) => `H${h}:[${p.join(',')}]`));
 
     return {
       ascSlotIndex,
@@ -728,10 +832,10 @@ class ChartRenderingService {
 
   /**
    * Calculate ascendant slot index based on ascendant position
-   * @param {Object} ascendant - Ascendant data from API
+   * @param {Object} _ascendant - Ascendant data from API (reserved for future chart orientations)
    * @returns {number} Slot index (0-11) for ascendant position
    */
-  calculateAscendantSlot(ascendant) {
+  calculateAscendantSlot(_ascendant) {
     // For template standard, we place House 1 (Lagna) at the top (slot index 0)
     // This matches the vedic_chart_xy_spec.json standard positioning
     return 0;
@@ -744,13 +848,15 @@ class ChartRenderingService {
    * Render chart as SVG using renderChart.js logic
    * @param {Object} chartData - Chart data from ChartGenerationService
    * @param {Object} options - Rendering options
+   * @param {string} options.chartType - Type of chart: 'rasi' or 'navamsa' (default: 'rasi')
    * @returns {string} SVG string of the rendered chart
    */
   renderChartSVG(chartData, options = {}) {
-    const { width = 800 } = options;
+    const { width = 800, chartType = 'rasi' } = options;
     
     // Transform data to render format (includes data extraction and joining)
-    const placements = this.transformToRenderFormat(chartData);
+    // CRITICAL FIX: Pass chartType to ensure correct chart is rendered
+    const placements = this.transformToRenderFormat(chartData, chartType);
     
     // Scale factor
     const k = width / 1000;
@@ -834,7 +940,7 @@ class ChartRenderingService {
    * @returns {Object} Validation result with any errors
    */
   validateChartData(chartData) {
-    const errors = [];
+    const _errors = []; // Reserved: Currently throws instead of collecting errors
     const warnings = [];
 
     // PRODUCTION-GRADE: Require valid chart data
@@ -888,12 +994,38 @@ class ChartRenderingService {
       throw new Error('House positions are required for chart rendering');
     }
     
-    if (!Array.isArray(rasiChart.housePositions)) {
-      throw new Error(`Invalid housePositions: expected array, got ${typeof rasiChart.housePositions}`);
-    }
+    // PRODUCTION-GRADE: Handle both array and object formats for housePositions
+    let housePositions = rasiChart.housePositions;
     
-    if (rasiChart.housePositions.length !== 12) {
-      throw new Error(`Invalid housePositions length: expected 12, got ${rasiChart.housePositions.length}`);
+    if (Array.isArray(housePositions)) {
+      // Array format (as per API docs)
+      if (housePositions.length !== 12) {
+        throw new Error(`Invalid housePositions length: expected 12, got ${housePositions.length}`);
+      }
+    } else if (typeof housePositions === 'object' && housePositions !== null) {
+      // Object format (actual API response) - convert to array
+      const houseKeys = Object.keys(housePositions);
+      if (houseKeys.length !== 12) {
+        throw new Error(`Invalid housePositions object: expected 12 houses, got ${houseKeys.length}`);
+      }
+      
+      // Convert object to array format for consistency
+      housePositions = [];
+      for (let i = 1; i <= 12; i++) {
+        const houseData = rasiChart.housePositions[i.toString()];
+        if (!houseData) {
+          throw new Error(`Missing house ${i} in housePositions object`);
+        }
+        housePositions.push({
+          houseNumber: i,
+          ...houseData
+        });
+      }
+      
+      // Update the chart data to use array format
+      rasiChart.housePositions = housePositions;
+    } else {
+      throw new Error(`Invalid housePositions: expected array or object, got ${typeof rasiChart.housePositions}`);
     }
 
     // ENHANCED: Validate house positions structure more flexibly

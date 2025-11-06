@@ -89,10 +89,12 @@ export function isFresh(stamped) {
   return Date.now() - savedAt <= CACHE_TTL_MS;
 }
 
-export default {
+const cachePolicy = {
   CACHE_TTL_MS,
   canonical,
   hash,
   stamp,
   isFresh
 };
+
+export default cachePolicy;

@@ -3,8 +3,6 @@
  * Includes Julian Day calculations, time zone conversions, and date utilities
  */
 
-const { TIME_CONSTANTS } = require('../constants/astronomicalConstants');
-
 /**
  * Convert Gregorian date to Julian Day Number
  * @param {Date} date - JavaScript Date object

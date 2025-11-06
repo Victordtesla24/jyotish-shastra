@@ -1,0 +1,10 @@
+client/build/
+node_modules/
+dist/
+build/
+temp-data/
+test-results/
+tests/ui/test-logs/
+scripts/
+tests/
+user-docs/

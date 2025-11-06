@@ -1,4 +1,4 @@
-import Joi from 'joi';
+// import Joi from 'joi'; // Not currently used
 
 export default function validation(schema) {
   return (req, res, next) => {
@@ -90,4 +90,4 @@ export default function validation(schema) {
     req.validatedBody = value;
     next();
   };
-};
+}

@@ -1,0 +1,54 @@
+{
+  "filename": "mars_2451545.0.json",
+  "query": {
+    "target": "499",
+    "observer": "@399",
+    "startTime": "JD2451545.0",
+    "stopTime": "JD2451545.0",
+    "step": "1d",
+    "quantities": "1",
+    "coordType": "ECLIPTIC",
+    "refPlane": "FRAME",
+    "center": "@0"
+  },
+  "response": {
+    "query": {
+      "target": "499",
+      "observer": "@399",
+      "startTime": "JD2451545.0",
+      "stopTime": "JD2451545.0",
+      "step": "1d",
+      "quantities": "1",
+      "coordType": "ECLIPTIC"
+    },
+    "apiVersion": "4.0",
+    "provenance": {
+      "source": "JPL Horizons",
+      "url": "https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND='499'&OBJ_DATA='YES'&MAKE_EPHEM='YES'&EPHEM_TYPE='OBSERVER'&CENTER='@399'&START_TIME='JD2451545.0'&STOP_TIME='JD2451545.0'&STEP_SIZE='1d'&QUANTITIES='1'&CSV_FORMAT='YES'",
+      "timestamp": "2024-01-15T12:00:00Z",
+      "signature": "fixture_mars_j2000"
+    },
+    "results": [
+      {
+        "julianDay": 2451545.0,
+        "julianDayUTC": 2451544.5,
+        "calendar": "2000-Jan-01 12:00:00.0000 TT",
+        "longitude": 355.4288,
+        "latitude": -0.9563,
+        "distance": 2.43057,
+        "lightTime": 20.296,
+        "rangeRate": -7.234
+      }
+    ],
+    "metadata": {
+      "targetName": "Mars",
+      "observerLocation": "Geocentric [399]",
+      "timeSystem": "TT",
+      "coordinateSystem": "ECLIPTIC",
+      "referenceFrame": "ICRF/J2000.0"
+    }
+  },
+  "recordedAt": "2024-01-15T12:00:00Z",
+  "validUntil": "2030-12-31T23:59:59Z",
+  "notes": "J2000.0 epoch reference position for Mars. Ecliptic longitude: 355.4288° (tropical), near end of Pisces. Using Lahiri ayanamsa (~24.06° at J2000.0), sidereal longitude ≈ 331.37° (in Aquarius). Mars latitude -0.9563° shows slight orbital inclination. Threshold for Mars: ≤0.10° per M1 requirements."
+}

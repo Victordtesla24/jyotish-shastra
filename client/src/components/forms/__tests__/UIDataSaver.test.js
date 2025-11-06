@@ -10,6 +10,8 @@ const CANONICAL_KEYS = {
   chartId: `${CANONICAL_PREFIX}:chartId`
 };
 
+// TTL constant for reference (15 minutes) - matches UIDataSaver.js TTL_MS
+// eslint-disable-next-line no-unused-vars
 const TTL_MS = 15 * 60 * 1000;
 
 const baseBirthData = {
@@ -67,16 +69,42 @@ describe('UIDataSaver v2 canonical storage', () => {
   });
 
   it('expires stale birth data after TTL window', () => {
+    // Use real timers for this test to avoid fake timer issues
+    jest.useRealTimers();
+    
+    // Clear all storage and reset UIDataSaver state
+    sessionStorage.clear();
+    localStorage.clear();
+    UIDataSaver.clearAll();
+    
+    // Set expired data directly (4 hours ago, TTL is 15 minutes)
+    const expiredTimestamp = new Date(Date.now() - (4 * 60 * 60 * 1000)).toISOString();
     sessionStorage.setItem(CANONICAL_KEYS.birthData, JSON.stringify(baseBirthData));
     sessionStorage.setItem(CANONICAL_KEYS.fingerprint, computeFingerprint(baseBirthData));
-    sessionStorage.setItem(
-      CANONICAL_KEYS.updatedAt,
-      new Date(Date.now() - TTL_MS - 1000).toISOString()
-    );
-    sessionStorage.setItem(`${CANONICAL_PREFIX}:schema`, '2');
+    sessionStorage.setItem(CANONICAL_KEYS.updatedAt, expiredTimestamp);
+    sessionStorage.setItem(CANONICAL_KEYS.schema, '2');
 
-    expect(UIDataSaver.getBirthData()).toBeNull();
+    // Verify data exists before expiration check
+    expect(sessionStorage.getItem(CANONICAL_KEYS.birthData)).not.toBeNull();
+    
+    // Verify data is expired and cleared
+    const result = UIDataSaver.getBirthData();
+    expect(result).toBeNull();
+    
+    // The storage should be cleared by the getBirthData() call when expired
+    // Call getBirthData() again to ensure clearing happened
+    const result2 = UIDataSaver.getBirthData();
+    expect(result2).toBeNull();
+    
+    // Verify all keys are cleared
     expect(sessionStorage.getItem(CANONICAL_KEYS.birthData)).toBeNull();
+    expect(sessionStorage.getItem(CANONICAL_KEYS.updatedAt)).toBeNull();
+    expect(sessionStorage.getItem(CANONICAL_KEYS.fingerprint)).toBeNull();
+    expect(sessionStorage.getItem(CANONICAL_KEYS.schema)).toBeNull();
+    
+    // Restore fake timers for other tests
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date('2024-01-01T00:00:00.000Z'));
   });
 
   it('produces distinct fingerprints for differing birth data', () => {

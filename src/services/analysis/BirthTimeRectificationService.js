@@ -4,7 +4,7 @@
  * Following the mathematical approach using Praanapada, Moon, and Gulika methods
  */
 
-import { ChartGenerationServiceSingleton, ChartGenerationService } from '../chart/ChartGenerationService.js';
+import { ChartGenerationServiceSingleton } from '../chart/ChartGenerationService.js';
 import DetailedDashaAnalysisService from './DetailedDashaAnalysisService.js';
  import ConditionalDashaService from './dasha/ConditionalDashaService.js';
 import BPHSEventClassifier from './eventClassification/BPHSEventClassifier.js';
@@ -16,7 +16,7 @@ import { computePraanapadaLongitude } from '../../core/calculations/rectificatio
 import { computeGulikaLongitude } from '../../core/calculations/rectification/gulika.js';
 
 class BirthTimeRectificationService {
-  constructor() {
+  constructor(metricsCalculator = null) {
     // Initialize singleton and store reference
     this.chartServiceInstance = ChartGenerationServiceSingleton;
     this.dashaService = new DetailedDashaAnalysisService();
@@ -27,6 +27,10 @@ class BirthTimeRectificationService {
     this.configManager = new BTRConfigurationManager();
     this.horaChartCalculator = new HoraChartCalculator();
     this.timeDivisionCalculator = new TimeDivisionCalculator();
+    
+    // NEW: Optional metrics calculator for BTR accuracy validation (M1-M5 metrics)
+    // Set via dependency injection to maintain zero breaking changes
+    this.metricsCalculator = metricsCalculator;
     
     // BPHS constants for calculations
     this.BPHS_CONSTANTS = {
@@ -330,6 +334,108 @@ class BirthTimeRectificationService {
     return this.eventClassifier.classifyEvent(eventDescription, eventDate, options);
   }
 
+  /**
+   * Calculate BTR accuracy metrics (NEW METHOD - Phase 4 Integration)
+   * Calculates M1-M5 metrics for BTR analysis validation
+   * 
+   * @param {Object} btrAnalysis - Complete BTR analysis result from performBirthTimeRectification
+   * @param {Object} birthData - Original birth data with coordinates
+   * @param {Object} geocodingResult - Optional geocoding result for M5 precision
+   * @param {Array} lifeEvents - Optional life events for M4 event-fit validation
+   * @returns {Promise<Object>} BTR metrics result with M1-M5 validation
+   */
+  async calculateMetrics(btrAnalysis, birthData, geocodingResult = null, lifeEvents = []) {
+    if (!this.metricsCalculator) {
+      throw new Error(
+        'Metrics calculator not configured. ' +
+        'Initialize BirthTimeRectificationService with BTRMetrics instance to enable metrics calculation.'
+      );
+    }
+
+    if (!btrAnalysis || !btrAnalysis.rectifiedTime) {
+      throw new Error('Valid BTR analysis result is required for metrics calculation');
+    }
+
+    if (!birthData || !birthData.dateOfBirth || !birthData.placeOfBirth) {
+      throw new Error('Complete birth data is required for metrics calculation');
+    }
+
+    try {
+      // Prepare birth data for metrics calculation
+      const metricsInput = {
+        name: birthData.name || 'Unknown',
+        inputBirthTime: birthData.timeOfBirth,
+        rectifiedBirthTime: btrAnalysis.rectifiedTime,
+        placeOfBirth: typeof birthData.placeOfBirth === 'string' 
+          ? birthData.placeOfBirth 
+          : birthData.placeOfBirth.name,
+        coordinates: {
+          latitude: birthData.latitude || birthData.placeOfBirth?.latitude,
+          longitude: birthData.longitude || birthData.placeOfBirth?.longitude
+        },
+        timezone: birthData.timezone || birthData.placeOfBirth?.timezone || 'UTC'
+      };
+
+      // Prepare BTR analysis result for metrics
+      const btrResult = {
+        methods: {
+          praanapada: btrAnalysis.methods.praanapada ? {
+            rectifiedTime: btrAnalysis.methods.praanapada.bestCandidate?.time || btrAnalysis.rectifiedTime,
+            confidence: btrAnalysis.methods.praanapada.bestCandidate?.alignmentScore / 100 || 0
+          } : undefined,
+          gulika: btrAnalysis.methods.gulika ? {
+            rectifiedTime: btrAnalysis.methods.gulika.bestCandidate?.time || btrAnalysis.rectifiedTime,
+            confidence: btrAnalysis.methods.gulika.bestCandidate?.gulikaScore / 100 || 0
+          } : undefined,
+          moon: btrAnalysis.methods.moon ? {
+            rectifiedTime: btrAnalysis.methods.moon.bestCandidate?.time || btrAnalysis.rectifiedTime,
+            confidence: btrAnalysis.methods.moon.bestCandidate?.moonScore / 100 || 0
+          } : undefined,
+          events: btrAnalysis.methods.events ? {
+            rectifiedTime: btrAnalysis.methods.events.bestCandidate?.time || btrAnalysis.rectifiedTime,
+            confidence: btrAnalysis.methods.events.bestCandidate?.eventScore / 100 || 0
+          } : undefined
+        },
+        ensemble: {
+          recommendedTime: btrAnalysis.rectifiedTime,
+          confidence: btrAnalysis.confidence / 100
+        },
+        chart: btrAnalysis.chart || await this.generateChartForMetrics(metricsInput),
+        lifeEvents: lifeEvents
+      };
+
+      // Calculate metrics using BTRMetrics instance
+      const chartId = `btr_${Date.now()}_${metricsInput.name.replace(/\s+/g, '_')}`;
+      const metrics = await this.metricsCalculator.calculateMetrics(
+        btrResult,
+        metricsInput,
+        geocodingResult,
+        chartId
+      );
+
+      return metrics;
+
+    } catch (error) {
+      throw new Error(`BTR metrics calculation failed: ${error.message}`);
+    }
+  }
+
+  /**
+   * Generate chart for metrics calculation if not provided
+   * @private
+   */
+  async generateChartForMetrics(birthData) {
+    const chartService = await this.chartServiceInstance.getInstance();
+    const flatBirthData = {
+      ...birthData,
+      latitude: birthData.coordinates.latitude,
+      longitude: birthData.coordinates.longitude,
+      timeOfBirth: birthData.rectifiedBirthTime
+    };
+    const chartData = await chartService.generateComprehensiveChart(flatBirthData);
+    return chartData.rasiChart;
+  }
+
   /*****
    * HELPER METHODS FOR NEW FUNCTIONALITY
    *****/
@@ -374,7 +480,6 @@ class BirthTimeRectificationService {
       return recommendations;
     }
 
-    const score = horaChart.hora.analysis.rectificationScore;
     const confidence = this.calculateHoraConfidence(horaChart);
 
     if (confidence >= 80) {

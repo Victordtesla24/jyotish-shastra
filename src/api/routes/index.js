@@ -7,6 +7,7 @@ import express from 'express';
 import chartRoutes from './chart.js';
 import comprehensiveAnalysisRoutes from './comprehensiveAnalysis.js';
 import birthTimeRectificationRoutes from './birthTimeRectification.js';
+import metricsRoutes from './metrics.js';
 import geocodingRoutes from './geocoding.js';
 import clientErrorLogRoutes from './clientErrorLog.js';
 
@@ -23,6 +24,9 @@ router.use(`${API_VERSION}/analysis`, comprehensiveAnalysisRoutes);
 
 // Birth Time Rectification routes
 router.use(`${API_VERSION}/rectification`, birthTimeRectificationRoutes);
+
+// BTR Metrics routes (read-only endpoints for pre-calculated metrics)
+router.use(`${API_VERSION}/rectification/metrics`, metricsRoutes);
 
 // Geocoding routes
 router.use(`${API_VERSION}/geocoding`, geocodingRoutes);
@@ -135,7 +139,15 @@ router.get('/', (req, res) => {
         withEvents: 'POST /v1/rectification/with-events',
         quick: 'POST /v1/rectification/quick',
         methods: 'POST /v1/rectification/methods',
-        test: 'GET /v1/rectification/test'
+        test: 'GET /v1/rectification/test',
+        metrics: {
+          latest: 'GET /v1/rectification/metrics/latest',
+          byChartId: 'GET /v1/rectification/metrics/:chartId',
+          list: 'GET /v1/rectification/metrics',
+          reports: {
+            latest: 'GET /v1/rectification/reports/latest'
+          }
+        }
       },
       geocoding: {
         location: 'POST /geocoding/location',

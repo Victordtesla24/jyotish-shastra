@@ -1,0 +1,184 @@
+{
+  "description": "Golden Case: Pune, India - Birth Time Rectification Test",
+  "inputBirthData": {
+    "name": "Test Subject - Pune 1985",
+    "dateOfBirth": "1985-10-24",
+    "inputTimeOfBirth": "02:30",
+    "placeOfBirth": "Pune, Maharashtra, India",
+    "coordinates": {
+      "latitude": 18.5204,
+      "longitude": 73.8567
+    },
+    "timezone": "Asia/Kolkata"
+  },
+  "expectedRectification": {
+    "rectifiedTime": "14:30",
+    "rectifiedTimeISO": "1985-10-24T14:30:00+05:30",
+    "confidence": 0.85,
+    "method": "ensemble",
+    "bphsMethods": {
+      "praanapada": {
+        "rectifiedTime": "14:28",
+        "confidence": 0.82
+      },
+      "gulika": {
+        "rectifiedTime": "14:32",
+        "confidence": 0.79
+      },
+      "moon": {
+        "rectifiedTime": "14:30",
+        "confidence": 0.88
+      }
+    }
+  },
+  "horizonsValidation": {
+    "julianDay": 2446362.0,
+    "dateTime": "1985-10-24T09:00:00Z",
+    "planetPositions": {
+      "Sun": {
+        "tropicalLongitude": 210.5234,
+        "siderealLongitude": 186.9734,
+        "sign": "Libra",
+        "degree": 6.97,
+        "house": 10
+      },
+      "Moon": {
+        "tropicalLongitude": 158.3421,
+        "siderealLongitude": 134.7921,
+        "sign": "Cancer",
+        "degree": 14.79,
+        "house": 7
+      },
+      "Mars": {
+        "tropicalLongitude": 178.8912,
+        "siderealLongitude": 155.3412,
+        "sign": "Leo",
+        "degree": 5.34,
+        "house": 8
+      },
+      "Mercury": {
+        "tropicalLongitude": 195.2341,
+        "siderealLongitude": 171.6841,
+        "sign": "Virgo",
+        "degree": 21.68,
+        "house": 9
+      },
+      "Jupiter": {
+        "tropicalLongitude": 312.4512,
+        "siderealLongitude": 288.9012,
+        "sign": "Capricorn",
+        "degree": 18.90,
+        "house": 1
+      },
+      "Venus": {
+        "tropicalLongitude": 232.1234,
+        "siderealLongitude": 208.5734,
+        "sign": "Scorpio",
+        "degree": 28.57,
+        "house": 11
+      },
+      "Saturn": {
+        "tropicalLongitude": 228.7823,
+        "siderealLongitude": 205.2323,
+        "sign": "Scorpio",
+        "degree": 25.23,
+        "house": 11
+      }
+    }
+  },
+  "lifeEvents": [
+    {
+      "date": "1995-06-15",
+      "type": "education",
+      "description": "Completed engineering degree",
+      "significance": "major"
+    },
+    {
+      "date": "2008-11-20",
+      "type": "marriage",
+      "description": "Marriage ceremony",
+      "significance": "major"
+    },
+    {
+      "date": "2012-03-10",
+      "type": "career",
+      "description": "Major job promotion",
+      "significance": "major"
+    }
+  ],
+  "geocodingPrecision": {
+    "bbox": [18.4119, 73.7396, 18.6298, 73.9739],
+    "diagonalMeters": 35418.5,
+    "confidence": 9,
+    "withinThreshold": false,
+    "threshold": 1000,
+    "warning": "Very low precision: 35419m bbox diagonal. Consider more specific location."
+  },
+  "expectedMetrics": {
+    "m1_ephemerisAccuracy": {
+      "Sun": {
+        "threshold": 0.01,
+        "expectedDelta": 0.005,
+        "shouldPass": true
+      },
+      "Moon": {
+        "threshold": 0.05,
+        "expectedDelta": 0.03,
+        "shouldPass": true
+      },
+      "Mars": {
+        "threshold": 0.10,
+        "expectedDelta": 0.07,
+        "shouldPass": true
+      }
+    },
+    "m2_crossMethodConvergence": {
+      "threshold": 3,
+      "expectedSpread": 4,
+      "shouldPass": false,
+      "note": "4 minutes spread (14:28 to 14:32) slightly exceeds ≤3min threshold"
+    },
+    "m3_ensembleConfidence": {
+      "threshold": 0.7,
+      "expectedConfidence": 0.85,
+      "shouldPass": true
+    },
+    "m4_eventFitAgreement": {
+      "threshold": 75,
+      "expectedPercentage": 100,
+      "shouldPass": true,
+      "note": "All 3 major life events align with dasha/varga predictions"
+    },
+    "m5_geocodingPrecision": {
+      "threshold": 1000,
+      "expectedDiagonal": 35418.5,
+      "shouldPass": false,
+      "note": "City-level precision: expect warning but not critical failure"
+    }
+  },
+  "metadata": {
+    "purpose": "End-to-end BTR accuracy validation with real-world complexity",
+    "ayanamsa": "Lahiri",
+    "ayanamsaValue": 23.55,
+    "expectedAscendant": {
+      "sign": "Capricorn",
+      "degree": 19.45,
+      "lord": "Saturn"
+    },
+    "notes": [
+      "This golden case demonstrates typical BTR scenario with moderate accuracy",
+      "M2 intentionally designed to test threshold boundary (4min vs 3min limit)",
+      "M5 uses city-level geocoding to test precision warning system",
+      "All life events have strong dasha correlations for M4 validation"
+    ]
+  },
+  "validationChecks": {
+    "sunSignCorrect": true,
+    "moonSignCorrect": true,
+    "ascendantSignCorrect": true,
+    "dashaPeriodsAlign": true,
+    "yogasIdentified": ["Gajakesari", "Dhana Yoga"],
+    "rectificationConvergence": "moderate",
+    "overallQuality": "good"
+  }
+}

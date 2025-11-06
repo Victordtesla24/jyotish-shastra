@@ -214,7 +214,7 @@ const ResponseDataToUIDisplayAnalyser = {
           challengingAspects: [],
           yogas: []
         },
-        message: analysis.message || 'Aspects analysis available in comprehensive report',
+        message: analysis.message || '',
         isEmpty: true
       };
     }
@@ -253,10 +253,10 @@ const ResponseDataToUIDisplayAnalyser = {
           arudhaLagna: null,
           upapadalagna: null,
           housePadas: {},
-          analysis: 'Arudha analysis available in comprehensive report',
-          socialImage: []
+          analysis: null,
+          socialImage: null
         },
-        message: analysis.message || 'Arudha analysis available in comprehensive report',
+        message: analysis.message || '',
         isEmpty: true
       };
     }
@@ -288,7 +288,7 @@ const ResponseDataToUIDisplayAnalyser = {
     return {
       success: apiResponse.success,
       analysis: analysis,
-      message: analysis.message || 'Lagna analysis completed successfully'
+      message: analysis.message || ''
     };
   },
 
@@ -317,7 +317,7 @@ const ResponseDataToUIDisplayAnalyser = {
       strengths: analysis.strengths || analysis.preliminary?.strengths,
       challenges: analysis.challenges || analysis.preliminary?.challenges,
       recommendations: analysis.recommendations || analysis.preliminary?.recommendations,
-      message: analysis.message || 'Preliminary analysis completed successfully'
+      message: analysis.message || ''
     };
   },
 
@@ -349,7 +349,7 @@ const ResponseDataToUIDisplayAnalyser = {
     return {
       success: apiResponse.success || true,
       analysis: apiResponse.analysis || apiResponse,
-      message: apiResponse.message || `${analysisType} analysis completed successfully`
+      message: apiResponse.message || ''
     };
   },
 
@@ -613,10 +613,16 @@ const ResponseDataToUIDisplayAnalyser = {
           loadedData.lagna = formattedLagnaData;
         } else if (sections.section2) {
           // Extract lagna data from section2 structure
+          const section2Data = sections.section2;
           loadedData.lagna = {
             analysis: {
-              fullData: sections.section2,
-              sign: sections.section2.lagnaSign || sections.section2.sign || 'Data available in section2',
+              fullData: section2Data,
+              sign: section2Data.lagnaSign || section2Data.sign || section2Data.analyses?.lagna?.sign || section2Data.lagnaDetails?.sign,
+              signLord: section2Data.lagnaLord || section2Data.analyses?.lagna?.signLord,
+              element: section2Data.element || section2Data.analyses?.lagna?.element,
+              characteristics: section2Data.characteristics || section2Data.analyses?.lagna?.characteristics || [],
+              degree: section2Data.degree || section2Data.analyses?.lagna?.degree,
+              nakshatra: section2Data.nakshatra || section2Data.analyses?.lagna?.nakshatra,
               message: 'Lagna analysis data extracted from section2'
             },
             success: true
@@ -908,5 +914,10 @@ const ResponseDataToUIDisplayAnalyser = {
     section8: 'Comprehensive Report'
   })
 };
+
+// Expose to window for testing validation
+if (typeof window !== 'undefined') {
+  window.ResponseDataToUIDisplayAnalyser = ResponseDataToUIDisplayAnalyser;
+}
 
 export default ResponseDataToUIDisplayAnalyser;

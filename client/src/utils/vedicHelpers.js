@@ -167,7 +167,7 @@ export function formatNakshatra(nakshatra, pada) {
   return pada ? `${nakshatra}-${pada}` : nakshatra;
 }
 
-export default {
+const vedicHelpers = {
   getVedicSymbol,
   getPlanetAbbreviation,
   formatDegree,
@@ -179,3 +179,5 @@ export default {
   getPlanetNature,
   formatNakshatra
 };
+
+export default vedicHelpers;

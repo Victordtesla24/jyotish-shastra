@@ -54,7 +54,7 @@ class ChartRepository {
         sortBy = 'createdAt',
         sortOrder = 'desc',
         search = '',
-        type = 'all'
+        type: _type = 'all' // Reserved for future chart type filtering
       } = options;
 
       const skip = (page - 1) * limit;

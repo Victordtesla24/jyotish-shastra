@@ -6,7 +6,6 @@
 
 const UserRepository = require('../../data/repositories/UserRepository');
 const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
 const fetch = require('node-fetch');
 
 class UserAuthenticationService {

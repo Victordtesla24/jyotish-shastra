@@ -172,9 +172,10 @@ class LagnaStrengthCalculator {
    * Calculate Lagna lord strength
    * @param {Object} lordPosition - Lagna lord position
    * @param {string} lagnaSign - Lagna sign
+   * @param {Object} chart - Chart data for aspect calculations
    * @returns {Object} Lord strength analysis
    */
-  static calculateLordStrength(lordPosition, lagnaSign) {
+  static calculateLordStrength(lordPosition, lagnaSign, chart = {}) {
     if (!lordPosition) {
       return {
         total: 0,
@@ -1337,7 +1338,7 @@ class LagnaStrengthCalculator {
 
     const M = (0.9856 * N) - 3.289; // Mean anomaly of the Sun
     const L = M + (1.916 * Math.sin(M * rad)) + (0.020 * Math.sin(2 * M * rad)) + 282.634; // True longitude of the Sun
-    const RA = deg * Math.atan(0.91764 * Math.tan(L * rad)); // Right ascension of the Sun
+    let RA = deg * Math.atan(0.91764 * Math.tan(L * rad)); // Right ascension of the Sun
 
     const Lquadrant = (Math.floor(L / 90)) * 90;
     const RAquadrant = (Math.floor(RA / 90)) * 90;

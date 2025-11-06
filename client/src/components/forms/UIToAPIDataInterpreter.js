@@ -418,4 +418,9 @@ class UIToAPIDataInterpreter {
   }
 }
 
+// Expose to window for testing validation
+if (typeof window !== 'undefined') {
+  window.UIToAPIDataInterpreter = UIToAPIDataInterpreter;
+}
+
 export default UIToAPIDataInterpreter;

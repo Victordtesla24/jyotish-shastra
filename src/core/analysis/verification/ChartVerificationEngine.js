@@ -336,7 +336,7 @@ class ChartVerificationEngine {
     let score = 0.5; // Neutral baseline
 
     switch (system) {
-      case 'houseAnalysis':
+      case 'houseAnalysis': {
         const seventhHouse = systemAnalysis.results.houseAnalyses[7];
         if (seventhHouse && seventhHouse.overallStrength >= 6) {
           score = 0.8;
@@ -346,8 +346,9 @@ class ChartVerificationEngine {
           score = 0.3;
         }
         break;
+      }
 
-      case 'aspectAnalysis':
+      case 'aspectAnalysis': {
         const aspectsToSeventh = systemAnalysis.results.aspectsToHouses[7];
         if (aspectsToSeventh && aspectsToSeventh.beneficAspects.length > aspectsToSeventh.maleficAspects.length) {
           score = 0.8;
@@ -357,8 +358,9 @@ class ChartVerificationEngine {
           score = 0.4;
         }
         break;
+      }
 
-      case 'dashaAnalysis':
+      case 'dashaAnalysis': {
         const marriagePrediction = systemAnalysis.results.marriage;
         if (marriagePrediction && marriagePrediction.mostPromisingPeriod) {
           score = 0.8;
@@ -368,6 +370,7 @@ class ChartVerificationEngine {
           score = 0.3;
         }
         break;
+      }
     }
 
     return Math.max(0, Math.min(1, score));
@@ -377,7 +380,7 @@ class ChartVerificationEngine {
     let score = 0.5;
 
     switch (system) {
-      case 'houseAnalysis':
+      case 'houseAnalysis': {
         const tenthHouse = systemAnalysis.results.houseAnalyses[10];
         if (tenthHouse && tenthHouse.overallStrength >= 6) {
           score = 0.8;
@@ -387,8 +390,9 @@ class ChartVerificationEngine {
           score = 0.3;
         }
         break;
+      }
 
-      case 'dashaAnalysis':
+      case 'dashaAnalysis': {
         const careerPrediction = systemAnalysis.results.career;
         if (careerPrediction && careerPrediction.careerStart) {
           score = 0.7;
@@ -396,8 +400,9 @@ class ChartVerificationEngine {
           score = 0.4;
         }
         break;
+      }
 
-      case 'planetaryStrength':
+      case 'planetaryStrength': {
         // Check 10th lord strength, Sun strength
         if (systemAnalysis.results.averageStrength >= 6) {
           score = 0.8;
@@ -407,6 +412,7 @@ class ChartVerificationEngine {
           score = 0.3;
         }
         break;
+      }
     }
 
     return Math.max(0, Math.min(1, score));
@@ -416,7 +422,7 @@ class ChartVerificationEngine {
     let score = 0.5;
 
     switch (system) {
-      case 'houseAnalysis':
+      case 'houseAnalysis': {
         const firstHouse = systemAnalysis.results.houseAnalyses[1];
         const sixthHouse = systemAnalysis.results.houseAnalyses[6];
 
@@ -433,8 +439,9 @@ class ChartVerificationEngine {
           score = 0.3;
         }
         break;
+      }
 
-      case 'aspectAnalysis':
+      case 'aspectAnalysis': {
         const firstHouseAspects = systemAnalysis.results.aspectsToHouses[1];
         if (firstHouseAspects && firstHouseAspects.maleficAspects.length === 0) {
           score = 0.8;
@@ -444,8 +451,9 @@ class ChartVerificationEngine {
           score = 0.4;
         }
         break;
+      }
 
-      case 'transitAnalysis':
+      case 'transitAnalysis': {
         const currentTransits = systemAnalysis.results.currentTransits;
         if (currentTransits && currentTransits.transitStrength.level === 'Strong') {
           score = 0.7;
@@ -455,6 +463,7 @@ class ChartVerificationEngine {
           score = 0.4;
         }
         break;
+      }
     }
 
     return Math.max(0, Math.min(1, score));
@@ -464,7 +473,7 @@ class ChartVerificationEngine {
     let score = 0.5;
 
     switch (system) {
-      case 'houseAnalysis':
+      case 'houseAnalysis': {
         const secondHouse = systemAnalysis.results.houseAnalyses[2];
         const eleventhHouse = systemAnalysis.results.houseAnalyses[11];
 
@@ -481,8 +490,9 @@ class ChartVerificationEngine {
           score = 0.3;
         }
         break;
+      }
 
-      case 'aspectAnalysis':
+      case 'aspectAnalysis': {
         const secondHouseAspects = systemAnalysis.results.aspectsToHouses[2];
         const eleventhHouseAspects = systemAnalysis.results.aspectsToHouses[11];
 
@@ -497,11 +507,13 @@ class ChartVerificationEngine {
           score = 0.4;
         }
         break;
+      }
 
-      case 'dashaAnalysis':
+      case 'dashaAnalysis': {
         // Would check financial dasha periods if available
         score = 0.6; // Default moderate score
         break;
+      }
     }
 
     return Math.max(0, Math.min(1, score));
@@ -511,7 +523,7 @@ class ChartVerificationEngine {
     let score = 0.5;
 
     switch (system) {
-      case 'houseAnalysis':
+      case 'houseAnalysis': {
         const ninthHouse = systemAnalysis.results.houseAnalyses[9];
         const twelfthHouse = systemAnalysis.results.houseAnalyses[12];
 
@@ -528,8 +540,9 @@ class ChartVerificationEngine {
           score = 0.3;
         }
         break;
+      }
 
-      case 'aspectAnalysis':
+      case 'aspectAnalysis': {
         const ninthHouseAspects = systemAnalysis.results.aspectsToHouses[9];
         if (ninthHouseAspects && ninthHouseAspects.beneficAspects.includes('Jupiter')) {
           score = 0.8;
@@ -539,8 +552,9 @@ class ChartVerificationEngine {
           score = 0.4;
         }
         break;
+      }
 
-      case 'planetaryStrength':
+      case 'planetaryStrength': {
         // Check Jupiter and Ketu strength for spirituality
         if (systemAnalysis.results.averageStrength >= 6) {
           score = 0.7;
@@ -548,6 +562,7 @@ class ChartVerificationEngine {
           score = 0.5;
         }
         break;
+      }
     }
 
     return Math.max(0, Math.min(1, score));
@@ -575,7 +590,7 @@ class ChartVerificationEngine {
    * Validate specific pattern across systems
    */
   validateSpecificPattern(pattern, criteria, systemAnalyses, birthChart) {
-    const validation = {
+    let validation = {
       pattern: pattern,
       description: criteria.description,
       passed: false,

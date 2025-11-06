@@ -101,6 +101,21 @@ curl -X POST https://jjyotish-shastra-backend.onrender.com/api/v1/chart/generate
   }' | jq . > farhan-birth-chart.json
 ```
 
+
+```bash
+curl -X POST https://jjyotish-shastra-backend.onrender.com/api/v1/chart/generate \
+  -H "Content-Type: application/json" \
+  -d '{
+      "name": "Vikram",
+      "dateOfBirth": "1985-10-24",
+      "timeOfBirth": "02:30",
+      "latitude": 18.5204,
+      "longitude": 73.8567,
+      "timezone": "Asia/Kolkata",
+      "gender": "male"
+  }' | jq . > vikram-birth-chart.json
+```
+
 ### 7. Generate Comprehensive Chart
 ```bash
 curl -X POST http://localhost:3001/api/v1/chart/generate/comprehensive \
@@ -124,7 +139,7 @@ curl -X POST http://localhost:3001/api/v1/chart/analysis/birth-data \
   -d '{
       "name": "Farhan",
       "dateOfBirth": "1997-12-18",
-      "timeOfBirth": "02:30",
+      "timeOfBirth": "14:30",
       "latitude": 32.4935378,
       "longitude": 74.5411575,
       "timezone": "Asia/Karachi",

@@ -732,24 +732,6 @@ class HouseAnalysisService {
   }
 
   /**
-   * Analyze all 12 houses (required by tests)
-   * @returns {Array} Complete analysis of all houses
-   */
-  analyzeAllHouses() {
-    if (!this.chart) {
-      throw new Error('Chart data required for house analysis');
-    }
-
-    const allHousesAnalysis = [];
-
-    for (let house = 1; house <= 12; house++) {
-      allHousesAnalysis.push(this.analyzeHouse(house));
-    }
-
-    return allHousesAnalysis;
-  }
-
-  /**
    * Determine functional benefics and malefics for an ascendant (required by tests)
    * @param {string} ascendantSign - Ascendant sign
    * @returns {Object} Functional nature of planets

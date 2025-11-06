@@ -397,16 +397,7 @@ function applyBestSolution(solution) {
   // Implementation details would go here
 }
 
-// Online research function (step 7 requirement)
-async function researchOnlineSolutions(errorMessage) {
-  console.log('🔍 RESEARCH: Finding solutions for:', errorMessage);
-  // Implementation details would include web search and solution application
-  return [
-    'NASA validation: Ensure placeOfBirth field is included in BPHS requests',
-    'Schema validation: Fix life event schema to match API expectations',
-    'HTTP status checking: Check response.success flag before data access'
-  ];
-}
+
 
 // Root cause analysis function
 async function analyzeRootCause(error) {

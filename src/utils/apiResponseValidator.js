@@ -148,7 +148,7 @@ export function validateGeocodingResponse(response) {
  * @param {number} statusCode - HTTP status code
  * @returns {Object} Standardized error response
  */
-export function createErrorResponse(error, code = 'API_ERROR', statusCode = 500) {
+export function createErrorResponse(error, code = 'API_ERROR', _statusCode = 500) {
   const errorMessage = error instanceof Error ? error.message : String(error);
   const errorStack = error instanceof Error && process.env.NODE_ENV === 'development' 
     ? error.stack 

@@ -643,7 +643,7 @@ class HouseLordCalculator {
         dignityFactors.push('Strong own sign placement');
         break;
       case 'debilitated':
-      case 'debilitation':
+      case 'debilitation': {
         dignityStrength = 15;
         dignityFactors.push('Weak debilitation placement');
 
@@ -654,6 +654,7 @@ class HouseLordCalculator {
           dignityFactors.push(`Neecha Bhanga adds ${neechaBhangaStrength} points`);
         }
         break;
+      }
       case 'friend':
       case 'friendly':
         dignityStrength = 72;
@@ -667,11 +668,13 @@ class HouseLordCalculator {
         dignityStrength = 55;
         dignityFactors.push('Neutral sign placement');
         break;
-      default:
+      default: {
         // Detailed friendship/enmity analysis
         const relationshipData = this.calculateDetailedRelationship(planet, sign);
         dignityStrength = relationshipData.strength;
         dignityFactors.push(relationshipData.description);
+        break;
+      }
     }
 
     // Additional factors affecting dignity

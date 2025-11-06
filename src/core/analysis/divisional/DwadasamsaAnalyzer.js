@@ -6,4 +6,4 @@ function analyzeDwadasamsaParents(dwadasamsaChart) {
   return { motherHouse, fatherHouse };
 }
 
-export default DwadasamsaAnalyzer;
+export default analyzeDwadasamsaParents;

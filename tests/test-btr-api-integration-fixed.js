@@ -199,10 +199,6 @@ async function testDataConsistency() {
         logResult('Data Consistency Check', false, `Failed: ${error.message}`);
         return false;
     }
-  } catch (error) {
-    logResult('Data Consistency Check', false, `Failed: ${error.message}`);
-    return false;
-    }
 }
 
 async function testBTRMethodsInfo() {

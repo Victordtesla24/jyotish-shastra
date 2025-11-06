@@ -207,20 +207,12 @@ router.post('/with-events', normalizeCoordinates, validation(rectificationWithEv
             });
         }
 
-        // Validate life events if provided
-        if (lifeEvents && (!Array.isArray(lifeEvents) || lifeEvents.length === 0)) {
-            return res.status(400).json({
-                success: false,
-                error: 'Validation failed',
-                message: 'At least one life event is required for event correlation analysis',
-                details: [{ field: 'lifeEvents', message: 'Life events array is required and must not be empty' }],
-                timestamp: new Date().toISOString()
-            });
-        }
+        const normalizedLifeEvents = Array.isArray(lifeEvents) ? lifeEvents : [];
+        const lifeEventsProvided = normalizedLifeEvents.length > 0;
 
         // Set options with events
         const analysisOptions = {
-            lifeEvents: lifeEvents,
+            lifeEvents: lifeEventsProvided ? normalizedLifeEvents : [],
             timeRange: { hours: 2 },
             methods: ['praanapada', 'moon', 'gulika', 'events'],
             ...options
@@ -235,8 +227,10 @@ router.post('/with-events', normalizeCoordinates, validation(rectificationWithEv
         res.json({
             success: true,
             rectification: rectificationResult,
-            lifeEvents: lifeEvents,
-            correlationScore: rectificationResult.methods.events?.bestCandidate?.eventScore || 0,
+            lifeEvents: lifeEventsProvided ? normalizedLifeEvents : [],
+            correlationScore: lifeEventsProvided
+                ? rectificationResult.methods.events?.bestCandidate?.eventScore || 0
+                : 0,
             timestamp: new Date().toISOString()
         });
 

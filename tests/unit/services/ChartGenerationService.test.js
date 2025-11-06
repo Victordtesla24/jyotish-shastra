@@ -1,4 +1,4 @@
-import ChartGenerationService from '../../../src/services/chart/ChartGenerationService.js';
+import { ChartGenerationService } from '../../../src/services/chart/ChartGenerationService.js';
 import { sampleBirthData } from '../../test-data/sample-chart-data.js';
 
 // Explicitly mock wasm-loader - use manual mock implementation
@@ -89,12 +89,26 @@ describe('ChartGenerationService', () => {
 
       // Validate Planetary Positions
       expect(chart).toHaveProperty('planetaryPositions');
-      expect(Object.keys(chart.planetaryPositions).length).toBe(9);
+      // Should have at least 9 traditional planets (Sun, Moon, Mars, Mercury, Jupiter, Venus, Saturn, Rahu, Ketu)
+      const planetCount = Object.keys(chart.planetaryPositions).length;
+      expect(planetCount).toBeGreaterThanOrEqual(9);
+      // May have up to 12 planets if outer planets (Uranus, Neptune, Pluto) are supported
+      expect(planetCount).toBeLessThanOrEqual(12);
+
+      // Verify traditional planets are present
+      const expectedPlanets = ['sun', 'moon', 'mars', 'mercury', 'jupiter', 'venus', 'saturn', 'rahu', 'ketu'];
+      expectedPlanets.forEach(planetName => {
+        expect(chart.planetaryPositions).toHaveProperty(planetName);
+      });
 
       Object.values(chart.planetaryPositions).forEach(planet => {
         expect(planet).toHaveProperty('sign');
         expect(planet).toHaveProperty('degree');
         expect(planet).toHaveProperty('isRetrograde');
+        expect(planet).toHaveProperty('dignity');
+        expect(planet).toHaveProperty('house');
+        expect(planet.house).toBeGreaterThanOrEqual(1);
+        expect(planet.house).toBeLessThanOrEqual(12);
       });
 
       // Validate House Positions
@@ -121,7 +135,10 @@ describe('ChartGenerationService', () => {
 
       expect(navamsaChart).toHaveProperty('ascendant');
       expect(navamsaChart).toHaveProperty('planetaryPositions');
-      expect(Object.keys(navamsaChart.planetaryPositions).length).toBe(9);
+      // Should have at least 9 traditional planets
+      const planetCount = Object.keys(navamsaChart.planetaryPositions).length;
+      expect(planetCount).toBeGreaterThanOrEqual(9);
+      expect(planetCount).toBeLessThanOrEqual(12);
       expect(navamsaChart).toHaveProperty('housePositions');
       expect(navamsaChart.housePositions.length).toBe(12);
     });
@@ -161,8 +178,24 @@ describe('ChartGenerationService', () => {
       const jd = await chartGenerationService.calculateJulianDay(sampleBirthData.dateOfBirth, sampleBirthData.timeOfBirth, sampleBirthData.timezone);
       const planets = await chartGenerationService.getPlanetaryPositions(jd);
       expect(planets).toBeDefined();
-      // Check for planets object instead of length
-      expect(Object.keys(planets).length).toBe(9);
+      // Should have at least 9 traditional planets (may have up to 12 with outer planets)
+      const planetCount = Object.keys(planets).length;
+      expect(planetCount).toBeGreaterThanOrEqual(9);
+      expect(planetCount).toBeLessThanOrEqual(12);
+      
+      // Verify all planets have required properties
+      Object.entries(planets).forEach(([planetName, planetData]) => {
+        expect(planetData).toHaveProperty('longitude');
+        expect(planetData).toHaveProperty('sign');
+        expect(planetData).toHaveProperty('signId');
+        expect(planetData).toHaveProperty('degree');
+        expect(planetData).toHaveProperty('isRetrograde');
+        expect(planetData).toHaveProperty('dignity');
+        expect(typeof planetData.longitude).toBe('number');
+        expect(typeof planetData.signId).toBe('number');
+        expect(planetData.signId).toBeGreaterThanOrEqual(1);
+        expect(planetData.signId).toBeLessThanOrEqual(12);
+      });
     });
   });
 });

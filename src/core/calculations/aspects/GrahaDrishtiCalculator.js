@@ -128,7 +128,7 @@ class GrahaDrishtiCalculator {
 
         // Special aspects for specific planets
         switch (planet) {
-            case 'Mars':
+            case 'Mars': {
                 // Mars aspects 4th and 8th houses
                 const fourthFromMars = this.calculateHouseFromDistance(fromHouse, 4);
                 const eighthFromMars = this.calculateHouseFromDistance(fromHouse, 8);
@@ -137,8 +137,9 @@ class GrahaDrishtiCalculator {
                     { house: eighthFromMars, type: '8th Aspect', strength: 100 }
                 );
                 break;
+            }
 
-            case 'Jupiter':
+            case 'Jupiter': {
                 // Jupiter aspects 5th and 9th houses
                 const fifthFromJupiter = this.calculateHouseFromDistance(fromHouse, 5);
                 const ninthFromJupiter = this.calculateHouseFromDistance(fromHouse, 9);
@@ -147,8 +148,9 @@ class GrahaDrishtiCalculator {
                     { house: ninthFromJupiter, type: '9th Aspect', strength: 100 }
                 );
                 break;
+            }
 
-            case 'Saturn':
+            case 'Saturn': {
                 // Saturn aspects 3rd and 10th houses
                 const thirdFromSaturn = this.calculateHouseFromDistance(fromHouse, 3);
                 const tenthFromSaturn = this.calculateHouseFromDistance(fromHouse, 10);
@@ -157,9 +159,10 @@ class GrahaDrishtiCalculator {
                     { house: tenthFromSaturn, type: '10th Aspect', strength: 100 }
                 );
                 break;
+            }
 
             case 'Rahu':
-            case 'Ketu':
+            case 'Ketu': {
                 // Some traditions give Rahu/Ketu additional aspects
                 const fifthFromNode = this.calculateHouseFromDistance(fromHouse, 5);
                 const ninthFromNode = this.calculateHouseFromDistance(fromHouse, 9);
@@ -168,6 +171,7 @@ class GrahaDrishtiCalculator {
                     { house: ninthFromNode, type: '9th Aspect', strength: 75 }
                 );
                 break;
+            }
         }
 
         return aspectHouses;

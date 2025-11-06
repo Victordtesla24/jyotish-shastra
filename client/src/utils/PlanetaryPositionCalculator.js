@@ -34,7 +34,7 @@ class PlanetaryPositionCalculator {
    */
   calculateHousePosition(planetLongitude, ascendantLongitude, housePositions = null) {
     const normalizedPlanet = this.normalizeLongitude(planetLongitude);
-    const normalizedAscendant = this.normalizeLongitude(ascendantLongitude);
+    this.normalizeLongitude(ascendantLongitude);
 
     if (!housePositions || housePositions.length !== 12) {
       throw new Error('House positions are required for accurate calculation. Expected array of 12 house cusps from API.');
@@ -93,13 +93,16 @@ class PlanetaryPositionCalculator {
   }
 
   /**
-   * Calculate house position from longitude and ascendant (alias for compatibility)
+   * DEPRECATED: Calculate house position from longitude and ascendant
+   * This method is deprecated - use API-provided house assignments instead
+   * @deprecated Use API-provided house assignments from backend instead
    * @param {number} planetLongitude - Planet's longitude in degrees
    * @param {number} ascendantLongitude - Ascendant longitude in degrees
    * @returns {number} House number (1-12)
    */
   calculateHouseFromLongitude(planetLongitude, ascendantLongitude) {
-    return this.calculateHousePosition(planetLongitude, ascendantLongitude);
+    console.warn('⚠️ calculateHouseFromLongitude is deprecated. Use API-provided house assignments instead.');
+    return this.calculateHousePosition(planetLongitude, ascendantLongitude, null);
   }
 
   /**
@@ -276,7 +279,7 @@ class PlanetaryPositionCalculator {
 
     // Complete Shadbala calculation following traditional Vedic principles
     const rashi = this.calculateRashi(planet.longitude);
-    const nakshatra = this.calculateNakshatra(planet.longitude);
+    this.calculateNakshatra(planet.longitude);
     const housePosition = this.calculateHousePosition(
       planet.longitude,
       chartData.ascendant.longitude,
@@ -338,7 +341,7 @@ class PlanetaryPositionCalculator {
     }
 
     // Tribhaga Bala (Day/Night division strength)
-    const dayHour = this.calculateDayHour(chartData.birthTime);
+    this.calculateDayHour(chartData.birthTime);
     const tribhagaRulers = this.getTribhagaRulers(isDayBirth);
 
     if (tribhagaRulers.includes(planet.name)) {
@@ -578,20 +581,6 @@ class PlanetaryPositionCalculator {
   calculateDrekkanaBala(planet) {
     // Simplified - would need precise decanate calculation
     return 10;
-  }
-
-  /**
-   * Calculate positional strength
-   */
-  calculatePositionalStrength(planet, rashi) {
-    // Simplified calculation based on dignity
-    if (planet.dignity === 'exalted') return 100;
-    if (planet.dignity === 'own') return 75;
-    if (planet.dignity === 'friend') return 50;
-    if (planet.dignity === 'neutral') return 25;
-    if (planet.dignity === 'enemy') return 10;
-    if (planet.dignity === 'debilitated') return 0;
-    return 25; // Default
   }
 
   /**

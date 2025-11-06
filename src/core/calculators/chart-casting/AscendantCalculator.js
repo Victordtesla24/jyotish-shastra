@@ -160,7 +160,7 @@ class AscendantCalculator {
           siderealLongitude: normalizedAscendant,
           ayanamsa: ayanamsa,
           latitude: latitude,
-          longitude: longitude
+          geographicLongitude: longitude
         },
         midheaven: {
           longitude: normalizedMidheaven,
@@ -214,7 +214,7 @@ class AscendantCalculator {
    * @param {number} geocentricLatitude - Latitude in degrees (North positive)
    * @returns {number} Calculated cusp latitude
    */
-  calculateHouseCuspLatitude(houseDegree, geoceticLatitude) {
+  calculateHouseCuspLatitude(houseDegree, geocentricLatitude) {
     // Simplified house cusp latitude calculation
     // This is a basic approximation - more sophisticated calculations would use projection methods
     const latitudeRad = geocentricLatitude * Math.PI / 180;
@@ -249,11 +249,6 @@ class AscendantCalculator {
       return false;
     }
   }
-
-  /**
-   * Export the initialization function for external use
-   */
-  export { ensureSwissephLoaded };
 }
 
 // Export the class for direct instantiation

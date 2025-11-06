@@ -386,8 +386,11 @@ class BirthDataAnalysisService {
     const nakshatraIndex = this.nakshatras.indexOf(nakshatraName);
     if (nakshatraIndex === -1) return null;
 
+    // CRITICAL FIX: Vimshottari dasha cycle repeats every 9 nakshatras
+    // Each of 9 planetary lords rules 3 nakshatras in the 27-nakshatra cycle
+    // Formula: nakshatraIndex % 9 gives the position in the 9-lord cycle
     const lords = ['Ketu', 'Venus', 'Sun', 'Moon', 'Mars', 'Rahu', 'Jupiter', 'Saturn', 'Mercury'];
-    return lords[Math.floor(nakshatraIndex / 3)];
+    return lords[nakshatraIndex % 9];
   }
 
   calculateCurrentDasha(startingDasha, ageInYears) {

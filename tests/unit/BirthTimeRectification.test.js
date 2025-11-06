@@ -126,9 +126,14 @@ describe('BirthTimeRectificationService', () => {
 
     test('should perform Praanapada analysis', async () => {
       const mockChartService = {
-        generateRasiChart: jest.fn().mockResolvedValue(TEST_CHART)
+        generateComprehensiveChart: jest.fn().mockResolvedValue({ rasiChart: TEST_CHART })
       };
-      service.chartService = mockChartService;
+      
+      // Mock the singleton getInstance method
+      const mockChartServiceInstance = {
+        getInstance: jest.fn().mockResolvedValue(mockChartService)
+      };
+      service.chartServiceInstance = mockChartServiceInstance;
 
       const analysis = await service.performPraanapadaAnalysis(
         TEST_BIRTH_DATA,
@@ -138,7 +143,7 @@ describe('BirthTimeRectificationService', () => {
 
       expect(analysis.method).toBe('Praanapada');
       expect(analysis.candidates).toBeDefined();
-      expect(mockChartService.generateRasiChart).toHaveBeenCalledTimes(49); // One for each candidate
+      expect(mockChartService.generateComprehensiveChart).toHaveBeenCalledTimes(49); // One for each candidate
     });
   });
 
@@ -266,7 +271,10 @@ describe('BirthTimeRectificationService', () => {
 
     test('should handle missing place of birth', async () => {
       await expect(
-        service.performBirthTimeRectification({ dateOfBirth: '1997-12-18' })
+        service.performBirthTimeRectification({ 
+          dateOfBirth: '1997-12-18',
+          timeOfBirth: '12:00'
+        })
       ).rejects.toThrow('Place of birth is required');
     });
   });

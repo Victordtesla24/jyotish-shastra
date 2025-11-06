@@ -197,7 +197,7 @@ class HouseLayoutManager {
    */
   calculateGridPositions(layout, sizeConfig, containerWidth, containerHeight) {
     const positions = {};
-    const { houseSize, gap, padding } = sizeConfig;
+    const { gap, padding } = sizeConfig;
     const { gridSize } = layout;
 
     const cellWidth = (containerWidth - (gridSize.cols - 1) * gap - 2 * padding) / gridSize.cols;
@@ -282,7 +282,7 @@ class HouseLayoutManager {
    */
   calculateRectangularPositions(layout, sizeConfig, containerWidth, containerHeight) {
     const positions = {};
-    const { houseSize, gap, padding } = sizeConfig;
+    const { gap, padding } = sizeConfig;
 
     const cols = 4;
     const rows = 4;
@@ -412,7 +412,7 @@ class HouseLayoutManager {
   getResponsiveSize(containerWidth) {
     if (!this.responsive) return this.size;
 
-    for (const [breakpoint, config] of Object.entries(this.responsiveBreakpoints)) {
+    for (const [, config] of Object.entries(this.responsiveBreakpoints)) {
       if (containerWidth <= config.maxWidth) {
         return config.recommendedSize;
       }
@@ -445,7 +445,7 @@ class HouseLayoutManager {
    * Generate CSS styles for chart layout
    */
   generateLayoutStyles() {
-    const layout = this.getLayout();
+    this.getLayout();
     const sizeConfig = this.getSizeConfig();
 
     const styles = {

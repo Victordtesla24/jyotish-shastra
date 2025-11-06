@@ -42,8 +42,10 @@ const HomePage = () => {
 
       console.log('✅ HomePage: Chart API response received:', chartData);
 
-      // Persist birth data immediately in canonical cache
-      UIDataSaver.setBirthData(formData);
+      const canonicalBirthData = {
+        ...(chartData?.data?.birthData || chartData?.birthData || {}),
+        ...formData
+      };
 
       // CRITICAL FIX: Also fetch comprehensive analysis data
       console.log('🔄 HomePage: Fetching comprehensive analysis...');
@@ -71,63 +73,34 @@ const HomePage = () => {
 
       setProgress(90);
 
-      // Save API response to UIDataSaver for session persistence
+      // CRITICAL FIX: Use only setBirthData() - single storage method to eliminate conflicts
+      const birthDataSaved = UIDataSaver.setBirthData(canonicalBirthData);
+      if (!birthDataSaved) {
+        console.warn('⚠️ HomePage: Failed to save birth data to canonical key');
+        throw new Error('Failed to save birth data - storage may be full');
+      }
+
+      console.log('💾 HomePage: Birth data saved via single storage method');
+
+      // Save API response data using UIDataSaver methods
       const apiResponseSaveResult = UIDataSaver.saveApiResponse({
         chart: chartData.data?.rasiChart || chartData.rasiChart,
         navamsa: chartData.data?.navamsaChart || chartData.navamsaChart,
         analysis: chartData.data?.analysis || chartData.analysis,
         metadata: chartData.metadata,
         success: chartData.success,
-        originalResponse: chartData // Keep full response for reference
+        originalResponse: chartData
       });
 
-      console.log('💾 HomePage: Chart API response saved to UIDataSaver:', apiResponseSaveResult);
+      console.log('💾 HomePage: Chart API response saved:', apiResponseSaveResult);
 
-      // CRITICAL: Save birth data to canonical key with staleness guards
-      const birthDataSaved = UIDataSaver.setBirthData(formData);
-      if (!birthDataSaved) {
-        console.warn('⚠️ HomePage: Failed to save birth data to canonical key');
-      }
-
-      // Get chart ID for last chart tracking
+      // Get chart ID and save last chart reference
       const chartId = chartData.data?.chartId || chartData.chartId || `chart_${Date.now()}`;
-      
-      // CRITICAL: Save last chart metadata with birth data hash
-      const lastChartSaved = UIDataSaver.setLastChart(chartId, formData);
-      if (!lastChartSaved) {
-        console.warn('⚠️ HomePage: Failed to save last chart metadata');
-      }
+      UIDataSaver.setChartId(chartId);
 
-      // Production-grade: Save session data after successful API responses
-      // Save complete session with all data for persistence
-      const completeSessionData = {
-        birthData: formData,
-        coordinates: {
-          latitude: formData.latitude,
-          longitude: formData.longitude,
-          timezone: formData.timezone
-        },
-        apiRequest: formData,
-        apiResponse: {
-          chart: chartData.data?.rasiChart || chartData.rasiChart,
-          navamsa: chartData.data?.navamsaChart || chartData.navamsaChart,
-          analysis: chartData.data?.analysis || chartData.analysis,
-          metadata: chartData.metadata,
-          success: chartData.success,
-          originalResponse: chartData
-        },
-        chart: {
-          displayed: true,
-          chartId: chartId,
-          generatedAt: new Date().toISOString()
-        }
-      };
-      
-      // Save session using UIDataSaver (legacy support)
-      const sessionSaveResult = UIDataSaver.saveSession(completeSessionData);
-      console.log('💾 HomePage: Session saved after successful chart generation:', sessionSaveResult);
+      console.log('💾 HomePage: Chart ID saved:', chartId);
 
-      // Set minimal session flags for navigation state
+      // Set minimal compatibility flags for tests
       sessionStorage.setItem('jyotish_chart_generated', 'true');
       sessionStorage.setItem('jyotish_session_timestamp', new Date().toISOString());
       
@@ -159,7 +132,7 @@ const HomePage = () => {
       setCurrentChart(chart);
       setProgress(100);
 
-      console.log('📊 HomePage: Chart context updated, navigating to chart page');
+      console.log('� HomePage: Chart context updated, navigating to chart page');
 
       // Navigate to chart page
       navigate('/chart');

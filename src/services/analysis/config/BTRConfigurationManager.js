@@ -375,7 +375,7 @@ class BTRConfigurationManager {
 
     const validation = configuration.validation;
     const config = configuration.configuration;
-    const rules = config.validationRules || this.defaultConfiguration.validationRules;
+    const _rules = config.validationRules || this.defaultConfiguration.validationRules; // Reserved for future validation rule checks
     
     // Clear previous validation results
     validation.errors = [];
@@ -568,7 +568,7 @@ class BTRConfigurationManager {
       configuration.analysisLog.push('Applying custom method weights');
       
       for (const [method, weight] of Object.entries(userOptions.methodWeights)) {
-        if (config.methodWeights.hasOwnProperty(method)) {
+        if (Object.prototype.hasOwnProperty.call(config.methodWeights, method)) {
           if (typeof weight === 'number' && weight >= 0 && weight <= 1) {
             config.methodWeights[method] = weight;
             configuration.analysisLog.push(`Updated ${method} weight to ${weight}`);
@@ -612,7 +612,7 @@ class BTRConfigurationManager {
   validateMethodWeights(methodWeights, validation, config) {
     // Check minimum methods requirement
     const activeMethods = Object.entries(methodWeights)
-      .filter(([method, weight]) => weight > 0)
+      .filter(([_method, weight]) => weight > 0)
       .map(([method]) => method);
     
     if (activeMethods.length < config.validationRules.requireMinimumMethods) {
@@ -764,7 +764,7 @@ class BTRConfigurationManager {
    */
   validateFeatureFlagRequirements(config, validation) {
     if (config.validationRules.featureFlagValidation) {
-      const preset = this.bhpsPresets[configuration?.selectedPreset];
+      const preset = this.bhpsPresets[config?.selectedPreset];
       
       if (preset && preset.requiresFeatureFlags) {
         const requiredFlags = preset.requiresFeatureFlags;
@@ -796,7 +796,7 @@ class BTRConfigurationManager {
    * @param {Object} config - Full configuration
    * @returns {number} BPHS alignment bonus (0-1)
    */
-  calculateBPHSAlignmentBonus(scores, config) {
+  calculateBPHSAlignmentBonus(scores, _config) {
     let alignment = 0;
     
     // Praanapada method weight indicates BPHS alignment
@@ -806,8 +806,8 @@ class BTRConfigurationManager {
     
     // Method consistency indicates BPHS alignment
     const activeScores = Object.entries(scores)
-      .filter(([method, score]) => score !== null && score !== undefined && score > 0)
-      .map(([method, score]) => score);
+      .filter(([_method, score]) => score !== null && score !== undefined && score > 0)
+      .map(([_method, score]) => score);
     
     if (activeScores.length >= 3) {
       const average = activeScores.reduce((sum, score) => sum + score, 0) / activeScores.length;
@@ -826,10 +826,10 @@ class BTRConfigurationManager {
    * @param {Object} config - Full configuration
    * @returns {number} Consistency bonus (0-1)
    */
-  calculateMethodConsistencyBonus(scores, config) {
+  calculateMethodConsistencyBonus(scores, _config) {
     const activeScores = Object.entries(scores)
-      .filter(([method, score]) => score !== null && score !== undefined && score > 0)
-      .map(([method, score]) => score);
+      .filter(([_method, score]) => score !== null && score !== undefined && score > 0)
+      .map(([_method, score]) => score);
     
     if (activeScores.length < 2) return 0;
 
@@ -988,7 +988,7 @@ class BTRConfigurationManager {
     
     const cloned = {};
     for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
         cloned[key] = this.deepClone(obj[key]);
       }
     }
@@ -1002,7 +1002,7 @@ class BTRConfigurationManager {
    */
   deepMerge(destination, source) {
     for (const key in source) {
-      if (source.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(source, key)) {
         if (typeof source[key] === 'object' && source[key] !== null && !Array.isArray(source[key])) {
           if (!destination[key] || typeof destination[key] !== 'object') {
             destination[key] = {};

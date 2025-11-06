@@ -1,4 +1,4 @@
-import ChartGenerationService from '../../src/services/chart/ChartGenerationService.js';
+import { ChartGenerationService } from '../../src/services/chart/ChartGenerationService.js';
 import MasterAnalysisOrchestrator from '../../src/services/analysis/MasterAnalysisOrchestrator.js';
 import sampleBirthData from '../test-data/sample-birth-data.json';
 
@@ -31,16 +31,16 @@ describe('System Test: Chart and Analysis Pipeline', () => {
     // In a real test, we would not mock this, but for a pure system-level flow test,
     // we can use the actual service.
     const chartService = new ChartGenerationService();
+    await chartService.ensureSwissephInitialized();
     const transformedBirthData = transformBirthData(sampleBirthData);
-    const chart = await chartService.generateRasiChart(transformedBirthData);
-    const d9Chart = await chartService.generateNavamsaChart(transformedBirthData);
-    const fullChartData = { ...chart, d9: d9Chart, birthData: transformedBirthData };
+    const comprehensiveChart = await chartService.generateComprehensiveChart(transformedBirthData);
+    const fullChartData = { ...comprehensiveChart, birthData: transformedBirthData };
 
     // Basic validation of the generated chart
     expect(fullChartData).toBeDefined();
-    expect(fullChartData).toHaveProperty('ascendant');
-    expect(fullChartData.planets.length).toBeGreaterThan(0);
-    expect(fullChartData.d9).toBeDefined();
+    expect(fullChartData.rasiChart).toHaveProperty('ascendant');
+    expect(Object.keys(fullChartData.rasiChart.planetaryPositions).length).toBeGreaterThan(0);
+    expect(fullChartData.navamsaChart).toBeDefined();
 
     // Phase 2: Comprehensive Analysis
     // The orchestrator takes the generated chart and processes it.
@@ -71,7 +71,7 @@ describe('System Test: Chart and Analysis Pipeline', () => {
 
     // We expect the ChartGenerationService to throw an error, which prevents the pipeline from proceeding.
     await expect(async () => {
-      await chartService.generateRasiChart(invalidData);
+      await chartService.generateComprehensiveChart(invalidData);
     }).rejects.toThrow();
   });
 

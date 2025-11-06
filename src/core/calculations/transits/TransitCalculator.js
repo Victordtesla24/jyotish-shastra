@@ -418,13 +418,4 @@ class TransitCalculator {
   }
 }
 
-// Export utility functions
-export { ensureSwissephLoaded };
-export async function isSwissephAvailable() {
-  if (swisseph === null) {
-    await ensureSwissephLoaded();
-  }
-  return swissephAvailable;
-}
-
 export default TransitCalculator;

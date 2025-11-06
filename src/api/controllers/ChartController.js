@@ -4,12 +4,10 @@
  * Enhanced with geocoding integration and comprehensive analysis
  */
 
-import ChartGenerationService from '../../services/chart/ChartGenerationService.js';
 import GeocodingService from '../../services/geocoding/GeocodingService.js';
 import LagnaAnalysisService from '../../services/analysis/LagnaAnalysisService.js';
-import HouseAnalysisService from '../../core/analysis/houses/HouseAnalysisService.js';
+import HouseAnalysisService from '../../services/analysis/HouseAnalysisService.js';
 import BirthDataAnalysisService from '../../services/analysis/BirthDataAnalysisService.js';
-import { v4 as uuidv4 } from 'uuid';
 import { validateChartRequest } from '../validators/birthDataValidator.js';
 import crypto from 'crypto';
 import ChartGenerationServiceSingleton from '../../services/chart/ChartGenerationService.js';
@@ -169,10 +167,10 @@ class ChartController {
 
       // PHASE 2: Verify house numbers in chartData.rasiChart.planetaryPositions before analysis
       const planetsWithHouses = Object.entries(chartData.rasiChart?.planetaryPositions || {}).filter(
-        ([name, data]) => data.house && typeof data.house === 'number' && data.house >= 1 && data.house <= 12
+        ([_name, data]) => data.house && typeof data.house === 'number' && data.house >= 1 && data.house <= 12
       );
       const planetsWithoutHouses = Object.entries(chartData.rasiChart?.planetaryPositions || {}).filter(
-        ([name, data]) => !data.house || typeof data.house !== 'number' || data.house < 1 || data.house > 12
+        ([_name, data]) => !data.house || typeof data.house !== 'number' || data.house < 1 || data.house > 12
       );
       
       console.log(`📊 ChartController.generateChart: chartData.rasiChart.planetaryPositions - ${planetsWithHouses.length} with houses, ${planetsWithoutHouses.length} without houses`);
@@ -192,7 +190,7 @@ class ChartController {
 
       // PHASE 2: Verify house numbers in chartData.rasiChart.planetaryPositions before JSON serialization
       const planetsWithHousesAfterAnalysis = Object.entries(chartData.rasiChart?.planetaryPositions || {}).filter(
-        ([name, data]) => data.house && typeof data.house === 'number' && data.house >= 1 && data.house <= 12
+        ([_name, data]) => data.house && typeof data.house === 'number' && data.house >= 1 && data.house <= 12
       );
       console.log(`📊 ChartController.generateChart: After analysis - ${planetsWithHousesAfterAnalysis.length} planets with houses`);
 
@@ -212,7 +210,7 @@ class ChartController {
       };
       
       const finalPlanetsWithHouses = Object.entries(responseData.rasiChart?.planetaryPositions || {}).filter(
-        ([name, data]) => data.house && typeof data.house === 'number' && data.house >= 1 && data.house <= 12
+        ([_name, data]) => data.house && typeof data.house === 'number' && data.house >= 1 && data.house <= 12
       );
       console.log(`📊 ChartController.generateChart: Final response - ${finalPlanetsWithHouses.length} planets with houses`);
 
@@ -404,7 +402,7 @@ class ChartController {
    * @returns {string} Extracted timezone
    */
   extractTimezoneFromError(errorMessage) {
-    const match = errorMessage.match(/for ([+\-]\d{2}:\d{2})/);
+    const match = errorMessage.match(/for ([+-]\d{2}:\d{2})/);
     return match ? match[1] : 'unknown';
   }
 
@@ -704,7 +702,7 @@ class ChartController {
       // ChartGenerationService may return positions without house numbers
       if (planetaryPositions && chartData.ascendant && chartData.ascendant.longitude !== undefined) {
         const { calculateHouseNumber } = await import('../../utils/helpers/astrologyHelpers.js');
-        for (const [planetName, position] of Object.entries(planetaryPositions)) {
+        for (const [_planetName, position] of Object.entries(planetaryPositions)) {
           if (position && typeof position.longitude === 'number' && 
               (position.house === undefined || position.house === null)) {
             try {
@@ -857,7 +855,7 @@ class ChartController {
    * @param {Object} analysis - Analysis data
    * @returns {Object} Summary
    */
-  generateComprehensiveSummary(analysis) {
+  generateComprehensiveSummary(_analysis) {
     return {
       overallAssessment: 'This chart indicates a person with strong leadership qualities and creative potential.',
       keyHighlights: [
@@ -891,7 +889,7 @@ class ChartController {
    * @param {Object} analysis - Analysis data
    * @returns {Array} Strengths
    */
-  identifyOverallStrengths(analysis) {
+  identifyOverallStrengths(_analysis) {
     return [
       'Strong leadership potential',
       'Excellent communication skills',
@@ -906,7 +904,7 @@ class ChartController {
    * @param {Object} analysis - Analysis data
    * @returns {Array} Challenges
    */
-  identifyOverallChallenges(analysis) {
+  identifyOverallChallenges(_analysis) {
     return [
       'Tendency towards impatience',
       'Need to balance work and personal life',
@@ -920,7 +918,7 @@ class ChartController {
    * @param {Object} analysis - Analysis data
    * @returns {Array} Recommendations
    */
-  generateOverallRecommendations(analysis) {
+  generateOverallRecommendations(_analysis) {
     return [
       'Focus on developing patience and emotional balance',
       'Pursue leadership roles in career',
@@ -950,9 +948,10 @@ class ChartController {
       console.log('📦 Request headers:', JSON.stringify(req.headers, null, 2));
 
       // Extract rendering options from request body
-      const { width = 800, includeData = false, ...birthData } = req.body;
+      // CRITICAL FIX: Extract chartType to determine if rendering Rasi or Navamsa chart
+      const { width = 800, includeData = false, chartType = 'rasi', ...birthData } = req.body;
 
-      console.log('🔍 Extracted rendering options:', { width, includeData });
+      console.log('🔍 Extracted rendering options:', { width, includeData, chartType });
       console.log('🔍 Extracted birth data keys:', Object.keys(birthData));
       console.log('🔍 Extracted birth data:', JSON.stringify(birthData, null, 2));
 
@@ -1130,11 +1129,16 @@ class ChartController {
       }
 
       // Generate SVG
-      console.log('🔍 renderChartSVG: Rendering SVG...');
+      console.log('🔍 renderChartSVG: Rendering SVG...', { chartType });
       let svgContent;
       try {
-        svgContent = renderingService.renderChartSVG(enhancedChartData, { width: parseInt(width) });
+        // CRITICAL FIX: Pass chartType to rendering service
+        svgContent = renderingService.renderChartSVG(enhancedChartData, { 
+          width: parseInt(width),
+          chartType: chartType // Determines if rendering Rasi (D1) or Navamsa (D9)
+        });
         console.log('✅ renderChartSVG: SVG generated successfully', {
+          chartType: chartType,
           svgLength: svgContent?.length || 0,
           hasBackground: svgContent?.includes('#FFF8E1'),
           lineCount: (svgContent?.match(/<line/g) || []).length

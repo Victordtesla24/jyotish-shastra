@@ -11,7 +11,7 @@ class GeocodingController {
    * @param {object} res - Express response object.
    * @param {function} next - Express next middleware function.
    */
-  async geocode(req, res, next) {
+  async geocode(req, res, _next) {
     try {
       const { placeOfBirth } = req.body;
       if (!placeOfBirth) {
@@ -57,7 +57,7 @@ class GeocodingController {
    * @param {object} res - Express response object.
    * @param {function} next - Express next middleware function.
    */
-  async getCoordinates(req, res, next) {
+  async getCoordinates(req, res, _next) {
     try {
       const { location } = req.query;
       if (!location) {

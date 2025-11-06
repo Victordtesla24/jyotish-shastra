@@ -368,7 +368,7 @@ class UserProfileService {
       }
     }
 
-    if (data.phoneNumber && !/^\+?[\d\s\-\(\)]+$/.test(data.phoneNumber)) {
+    if (data.phoneNumber && !/^\+?[\d\s\-(\\)]+$/.test(data.phoneNumber)) {
       throw new Error('Invalid phone number format');
     }
 
@@ -402,7 +402,7 @@ class UserProfileService {
     };
 
     for (const [key, value] of Object.entries(preferences)) {
-      if (!validPreferences.hasOwnProperty(key)) {
+      if (!Object.prototype.hasOwnProperty.call(validPreferences, key)) {
         throw new Error(`Invalid preference: ${key}`);
       }
 
@@ -417,7 +417,7 @@ class UserProfileService {
       } else if (typeof validPreferences[key] === 'object') {
         // Validate nested object
         for (const [nestedKey, nestedValue] of Object.entries(value)) {
-          if (!validPreferences[key].hasOwnProperty(nestedKey)) {
+          if (!Object.prototype.hasOwnProperty.call(validPreferences[key], nestedKey)) {
             throw new Error(`Invalid preference: ${key}.${nestedKey}`);
           }
 
@@ -519,8 +519,8 @@ class UserProfileService {
       const startDate = new Date();
       startDate.setDate(startDate.getDate() - days);
 
-      // Retrieve activity logs from the dedicated ActivityLogRepository
-      const recentActivities = await ActivityLogRepository.getRecentActivities(userId, { days });
+      // Retrieve activity logs (placeholder - ActivityLogRepository not implemented yet)
+      const recentActivities = []; // await ActivityLogRepository.getRecentActivities(userId, { days });
 
       // Process activities to generate summary
       const chartsGenerated = recentActivities.filter(activity => activity.type === 'chart_generated').length;

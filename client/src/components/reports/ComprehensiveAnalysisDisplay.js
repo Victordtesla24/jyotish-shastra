@@ -880,7 +880,7 @@ const ComprehensiveAnalysisDisplay = ({ analysisData }) => {
 
     if (!section) {
       return (
-        <div className="loading-vedic">
+        <div className="analysis-section loading-vedic" data-section-id={`${sectionId}-no-data`}>
           <div className="text-muted text-6xl mb-4">📊</div>
           <h3 className="text-xl font-semibold text-secondary mb-2">No Data Available</h3>
           <p className="text-muted">This section is currently empty or still loading.</p>
@@ -898,7 +898,7 @@ const ComprehensiveAnalysisDisplay = ({ analysisData }) => {
     }
 
     return (
-      <div className="p-8 space-vedic">
+      <div className="analysis-section p-8 space-vedic" data-section-id={sectionId}>
         {/* Enhanced Section Title */}
         <div className="border-b border-gold/20 pb-6 mb-8">
           <h2 className="text-3xl font-bold text-primary flex items-center gap-3">
@@ -920,51 +920,69 @@ const ComprehensiveAnalysisDisplay = ({ analysisData }) => {
 
         {/* Render section-specific content with enhanced components */}
         {sectionData.questions && (
-          <QuestionsDisplay questions={sectionData.questions} />
+          <div className="section" data-section-id={`${sectionId}-questions`}>
+            <QuestionsDisplay questions={sectionData.questions} />
+          </div>
         )}
 
         {sectionData.analyses && (
-          <AnalysesDisplay analyses={sectionData.analyses} />
+          <div className="section" data-section-id={`${sectionId}-analyses`}>
+            <AnalysesDisplay analyses={sectionData.analyses} />
+          </div>
         )}
 
         {sectionData.houses && (
-          <HousesDisplay houses={sectionData.houses} />
+          <div className="section" data-section-id={`${sectionId}-houses`}>
+            <HousesDisplay houses={sectionData.houses} />
+          </div>
         )}
 
         {sectionData.aspects && (
-          <AspectsDisplay aspects={sectionData.aspects} />
+          <div className="section" data-section-id={`${sectionId}-aspects`}>
+            <AspectsDisplay aspects={sectionData.aspects} />
+          </div>
         )}
 
         {sectionData.arudhaAnalysis && (
-          <GenericAnalysisDisplay
-            data={sectionData.arudhaAnalysis}
-            title="Arudha Analysis"
-            icon="🏛️"
-          />
+          <div className="section" data-section-id={`${sectionId}-arudha`}>
+            <GenericAnalysisDisplay
+              data={sectionData.arudhaAnalysis}
+              title="Arudha Analysis"
+              icon="🏛️"
+            />
+          </div>
         )}
 
         {sectionData.navamsaAnalysis && (
-          <GenericAnalysisDisplay
-            data={sectionData.navamsaAnalysis}
-            title="Navamsa Analysis"
-            icon="💒"
-          />
+          <div className="section" data-section-id={`${sectionId}-navamsa`}>
+            <GenericAnalysisDisplay
+              data={sectionData.navamsaAnalysis}
+              title="Navamsa Analysis"
+              icon="💒"
+            />
+          </div>
         )}
 
         {sectionData.dashaAnalysis && (
-          <GenericAnalysisDisplay
-            data={sectionData.dashaAnalysis}
-            title="Dasha Analysis"
-            icon="⏳"
-          />
+          <div className="section" data-section-id={`${sectionId}-dasha`}>
+            <GenericAnalysisDisplay
+              data={sectionData.dashaAnalysis}
+              title="Dasha Analysis"
+              icon="⏳"
+            />
+          </div>
         )}
 
         {/* Special handling for section8 - Comprehensive Report with Synthesis */}
         {sectionId === 'section8' && (
           sectionData.analyses?.synthesis ? (
-            <SynthesisDisplay synthesis={sectionData.analyses.synthesis} />
+            <div className="section" data-section-id={`${sectionId}-synthesis`}>
+              <SynthesisDisplay synthesis={sectionData.analyses.synthesis} />
+            </div>
           ) : sectionData.synthesis ? (
-            <SynthesisDisplay synthesis={sectionData.synthesis} />
+            <div className="section" data-section-id={`${sectionId}-synthesis`}>
+              <SynthesisDisplay synthesis={sectionData.synthesis} />
+            </div>
           ) : null
         )}
 
@@ -977,11 +995,13 @@ const ComprehensiveAnalysisDisplay = ({ analysisData }) => {
          !sectionData.navamsaAnalysis &&
          !sectionData.dashaAnalysis &&
          !(sectionId === 'section8' && (sectionData.analyses?.synthesis || sectionData.synthesis)) && (
-          <GenericAnalysisDisplay
-            data={sectionData}
-            title="Analysis Data"
-            icon="📋"
-          />
+          <div className="section" data-section-id={`${sectionId}-generic`}>
+            <GenericAnalysisDisplay
+              data={sectionData}
+              title="Analysis Data"
+              icon="📋"
+            />
+          </div>
         )}
       </div>
     );
