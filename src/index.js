@@ -60,13 +60,28 @@ app.use(helmet({
 // Determine if we're in development environment (for local testing)
 const isLocalTesting = !process.env.RENDER && process.env.NODE_ENV === 'production';
 
+/**
+ * Normalize URL to ensure it has a protocol
+ * @param {string} url - URL string (may or may not have protocol)
+ * @returns {string} URL with protocol
+ */
+function normalizeUrl(url) {
+  if (!url) return null;
+  // If URL already has protocol, return as-is
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+  // Otherwise, prepend https://
+  return `https://${url}`;
+}
+
 // CORS configuration for Render deployment
 const corsOptions = {
   origin: isProduction && !isLocalTesting
     ? [
         process.env.FRONTEND_URL,
         'https://jjyotish-shastra-frontend.onrender.com',
-        process.env.RENDER_EXTERNAL_URL ? `https://${process.env.RENDER_EXTERNAL_URL}` : null,
+        process.env.RENDER_EXTERNAL_URL ? normalizeUrl(process.env.RENDER_EXTERNAL_URL) : null,
       ].filter(Boolean)
     : [
         'http://localhost:3002',
@@ -296,7 +311,8 @@ const server = app.listen(PORT, () => {
   console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`🌐 Platform: ${isRender ? 'Render' : 'Local'}`);
   if (isRender && process.env.RENDER_EXTERNAL_URL) {
-    console.log(`🔗 URL: https://${process.env.RENDER_EXTERNAL_URL}`);
+    const externalUrl = normalizeUrl(process.env.RENDER_EXTERNAL_URL);
+    console.log(`🔗 URL: ${externalUrl}`);
   } else {
     console.log(`🔗 Health check: http://localhost:${PORT}/health`);
     console.log(`🎯 API Base URL: http://localhost:${PORT}/api`);
