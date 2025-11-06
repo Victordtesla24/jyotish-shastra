@@ -22,6 +22,53 @@ import AscendantCalculator from '../chart-casting/AscendantCalculator.js';
 import { computeGulikaLongitude } from './gulika.js';
 
 /**
+ * Normalize dateOfBirth to YYYY-MM-DD string format
+ * Handles Date objects, ISO strings, and YYYY-MM-DD strings
+ * 
+ * @param {string|Date} dateOfBirth - Date in various formats
+ * @returns {string} Normalized date string in YYYY-MM-DD format
+ */
+function normalizeDateOfBirth(dateOfBirth) {
+  if (!dateOfBirth) {
+    throw new Error('dateOfBirth is required');
+  }
+
+  // If it's already a Date object, convert to YYYY-MM-DD
+  if (dateOfBirth instanceof Date) {
+    if (isNaN(dateOfBirth.getTime())) {
+      throw new Error('Invalid Date object provided');
+    }
+    const year = dateOfBirth.getFullYear();
+    const month = String(dateOfBirth.getMonth() + 1).padStart(2, '0');
+    const day = String(dateOfBirth.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  // If it's a string, extract YYYY-MM-DD part
+  if (typeof dateOfBirth === 'string') {
+    // Handle ISO format: "1985-10-24T00:00:00.000Z" -> "1985-10-24"
+    if (dateOfBirth.includes('T')) {
+      return dateOfBirth.split('T')[0];
+    }
+    // Handle YYYY-MM-DD format (already correct)
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateOfBirth)) {
+      return dateOfBirth;
+    }
+    // Try parsing as Date and converting
+    const parsed = new Date(dateOfBirth);
+    if (!isNaN(parsed.getTime())) {
+      const year = parsed.getFullYear();
+      const month = String(parsed.getMonth() + 1).padStart(2, '0');
+      const day = String(parsed.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+    throw new Error(`Invalid dateOfBirth format: ${dateOfBirth}`);
+  }
+
+  throw new Error(`Unsupported dateOfBirth type: ${typeof dateOfBirth}`);
+}
+
+/**
  * Calculate angular distance between two longitudes
  * 
  * @param {number} long1 - First longitude in degrees
@@ -235,7 +282,15 @@ export async function calculateNishekaLagna(birthChart, birthData) {
     gulikaLongitude = chart.gulika.longitude;
   } else {
     // Calculate Gulika using computeGulikaLongitude
-    const birthDateLocal = new Date(`${birthData.dateOfBirth}T${birthData.timeOfBirth}`);
+    // CRITICAL FIX: Normalize dateOfBirth to YYYY-MM-DD string format before creating Date
+    const normalizedDate = normalizeDateOfBirth(birthData.dateOfBirth);
+    const birthDateLocal = new Date(`${normalizedDate}T${birthData.timeOfBirth}`);
+    
+    // Validate the created Date object
+    if (isNaN(birthDateLocal.getTime())) {
+      throw new Error(`Invalid birth date/time: ${normalizedDate}T${birthData.timeOfBirth}`);
+    }
+    
     const latitude = birthData.latitude || birthData.placeOfBirth?.latitude;
     const longitude = birthData.longitude || birthData.placeOfBirth?.longitude;
     const timezone = birthData.timezone || birthData.placeOfBirth?.timezone;
@@ -274,9 +329,11 @@ export async function calculateNishekaLagna(birthChart, birthData) {
   const X_days_gregorian = convertSavanamanaToSauramana(X_days_savanamana);
 
   // Step 7: Subtract from birth time
-  const birthDateTime = new Date(`${birthData.dateOfBirth}T${birthData.timeOfBirth}`);
+  // CRITICAL FIX: Normalize dateOfBirth to YYYY-MM-DD string format before creating Date
+  const normalizedDate = normalizeDateOfBirth(birthData.dateOfBirth);
+  const birthDateTime = new Date(`${normalizedDate}T${birthData.timeOfBirth}`);
   if (isNaN(birthDateTime.getTime())) {
-    throw new Error(`Invalid birth date/time: ${birthData.dateOfBirth}T${birthData.timeOfBirth}`);
+    throw new Error(`Invalid birth date/time: ${normalizedDate}T${birthData.timeOfBirth}`);
   }
 
   const nishekaDateTime = new Date(birthDateTime.getTime() - X_days_gregorian * 86400000);

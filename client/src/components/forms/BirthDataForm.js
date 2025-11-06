@@ -107,14 +107,29 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
           setErrors(prev => ({ ...prev, placeOfBirth: null }));
 
         // CRITICAL FIX: Use only setBirthData() - single storage method
+        // CRITICAL FIX: Ensure all required fields are present before calling setBirthData
         setFormData(currentFormData => {
           const completeData = {
             ...currentFormData,
             latitude: result.latitude,
             longitude: result.longitude,
-            timezone: result.timezone
+            timezone: result.timezone || currentFormData.timezone || 'UTC'
           };
-          dataSaver.setBirthData(completeData);
+          
+          // Only call setBirthData if all required fields are present
+          if (completeData.dateOfBirth && completeData.timeOfBirth && 
+              completeData.latitude != null && completeData.longitude != null && 
+              completeData.timezone) {
+            dataSaver.setBirthData(completeData);
+          } else {
+            console.warn('⚠️ BirthDataForm (Geocoding): Skipping setBirthData - missing required fields:', {
+              hasDateOfBirth: !!completeData.dateOfBirth,
+              hasTimeOfBirth: !!completeData.timeOfBirth,
+              hasLatitude: completeData.latitude != null,
+              hasLongitude: completeData.longitude != null,
+              hasTimezone: !!completeData.timezone
+            });
+          }
           return currentFormData; // Return unchanged to avoid re-render
         });
 
@@ -382,10 +397,28 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
         console.log('💾 BirthDataForm: Session saved before onSubmit:', sessionSaveResult);
         
         // Add test-compatible keys immediately
-        dataSaver.setBirthData({
+        // CRITICAL FIX: Ensure all required fields are present before calling setBirthData
+        const completeBirthData = {
           ...formData,
-          ...normalizedCoordinates
-        });
+          ...normalizedCoordinates,
+          // Ensure timezone is always present (required by UIDataSaver validation)
+          timezone: normalizedCoordinates.timezone || formData.timezone || 'UTC'
+        };
+        
+        // Only call setBirthData if all required fields are present
+        if (completeBirthData.dateOfBirth && completeBirthData.timeOfBirth && 
+            completeBirthData.latitude != null && completeBirthData.longitude != null && 
+            completeBirthData.timezone) {
+          dataSaver.setBirthData(completeBirthData);
+        } else {
+          console.warn('⚠️ BirthDataForm: Skipping setBirthData - missing required fields:', {
+            hasDateOfBirth: !!completeBirthData.dateOfBirth,
+            hasTimeOfBirth: !!completeBirthData.timeOfBirth,
+            hasLatitude: completeBirthData.latitude != null,
+            hasLongitude: completeBirthData.longitude != null,
+            hasTimezone: !!completeBirthData.timezone
+          });
+        }
         sessionStorage.setItem('jyotish_form_submitted', 'true');
         sessionStorage.setItem('jyotish_submission_timestamp', new Date().toISOString());
         

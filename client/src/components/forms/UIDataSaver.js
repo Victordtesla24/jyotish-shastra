@@ -545,9 +545,18 @@ const UIDataSaver = {
 
     const prepared = prepareBirthDataForStorage(birthData);
     if (!prepared) {
-      warnLog('Attempted to set birth data with invalid payload.');
-      logStorageOperation('setBirthData', 'validation', 'failed', { reason: 'invalid_payload' });
-      this.clear();
+      const normalized = normalizeBirthData(birthData);
+      const validationErrors = normalized.errors || ['Unknown validation error'];
+      warnLog('Attempted to set birth data with invalid payload.', {
+        errors: validationErrors,
+        receivedData: birthData ? Object.keys(birthData) : 'null',
+        missingFields: normalized.errors || []
+      });
+      logStorageOperation('setBirthData', 'validation', 'failed', { 
+        reason: 'invalid_payload',
+        errors: validationErrors,
+        receivedKeys: birthData ? Object.keys(birthData) : []
+      });
       return false;
     }
 
