@@ -384,6 +384,51 @@ The Jyotish Shastra platform has achieved **99.96% accuracy** in Vedic chart gen
 - **Output:** Available BTR features and methods
 - **Status:** ✅ Mapped
 
+---
+
+## BTR Metrics & Validation Endpoints (Phase 6-7 Enhancement)
+
+### 38. GET /api/v1/rectification/metrics/latest
+- **Method:** GET
+- **UI Component:** None (API-only, evidence generation)
+- **Input:** None
+- **Output:** `{ success: true, data: { metrics: BTRMetricsResult, timestamp, chartId } }`
+- **Status:** ✅ Implemented (Phase 6)
+- **Description:** Retrieves the most recent BTR metrics calculation including M1-M5 validation
+- **Uses:** Evidence generation (`scripts/generate-evidence.js`)
+
+### 39. GET /api/v1/rectification/metrics/:chartId
+- **Method:** GET
+- **UI Component:** None (API-only, evidence generation)
+- **Input:** Chart ID in path parameter
+- **Output:** `{ success: true, data: { metrics: BTRMetricsResult, timestamp } }`
+- **Status:** ✅ Implemented (Phase 6)
+- **Description:** Retrieves BTR metrics for a specific chart ID
+- **Metrics Included:** 
+  - M1: Ephemeris Accuracy (JPL Horizons validation)
+  - M2: Cross-Method Convergence
+  - M3: Ensemble Confidence Score
+  - M4: Event-Fit Agreement
+  - M5: Geocoding Precision
+
+### 40. GET /api/v1/rectification/reports/latest
+- **Method:** GET
+- **UI Component:** None (API-only, deployment validation)
+- **Input:** None
+- **Output:** `{ success: true, data: { report: HTMLString, timestamp, chartId } }`
+- **Status:** ✅ Implemented (Phase 6)
+- **Description:** Retrieves the most recent HTML evidence report
+- **Uses:** Post-deployment verification, manual validation
+
+### 41. GET /api/v1/rectification/reports/:chartId
+- **Method:** GET
+- **UI Component:** None (API-only, deployment validation)
+- **Input:** Chart ID in path parameter
+- **Output:** `{ success: true, data: { report: HTMLString, timestamp } }`
+- **Status:** ✅ Implemented (Phase 6)
+- **Description:** Retrieves HTML evidence report for specific chart
+- **Format:** Pre-generated HTML with metrics visualization
+
 ### 38. POST /api/v1/geocoding/timezone
 - **Method:** POST
 - **UI Component:** `geocodingService.js`, `BirthDataForm.jsx` (implicit)

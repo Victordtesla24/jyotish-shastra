@@ -429,3 +429,201 @@ render help
 **Last Updated:** January 2025  
 **Render CLI Version:** 2.5.0
 
+---
+
+## BTR Accuracy & Metrics Configuration (Phase 7 - 2025)
+
+### Overview
+
+Phase 7 implements the BTR (Birth Time Rectification) Accuracy & Metrics Enhancement system with comprehensive validation, evidence generation, and CI/CD integration.
+
+### Additional Environment Variables for BTR
+
+Add these environment variables to your **Backend Web Service**:
+
+```bash
+# BTR Metrics Configuration
+BTR_METRICS_ENABLED=true
+BTR_METRICS_DIR=metrics/btr
+BTR_REPORTS_DIR=reports/btr
+
+# JPL Horizons Configuration (Astronomical Validation)
+HORIZONS_ENABLED=true
+HORIZONS_MODE=replay  # CRITICAL: Use 'replay' in production, not 'record'
+HORIZONS_FIXTURE_DIR=fixtures/horizons
+
+# Time Scale Configuration (ΔT/TT/UT1/UTC Conversions)
+DELTAT_SOURCE=IERS
+DELTAT_DATA_PATH=src/adapters/data/deltaT_iers.json
+```
+
+**Important Notes:**
+- **HORIZONS_MODE=replay**: Uses pre-recorded fixtures, doesn't call JPL API in production
+- **BTR_METRICS_ENABLED=true**: Enables M1-M5 metrics calculation system
+- **DELTAT_SOURCE=IERS**: Uses IERS Delta-T table for time scale conversions
+
+### BTR-Specific Build Validation
+
+The existing build command already validates ephemeris files. BTR adds additional validation:
+
+```bash
+# Current build command (includes BTR validation)
+npm install && node scripts/validate-ephemeris-files.js
+```
+
+This validates:
+- ✅ Swiss Ephemeris data files (seas_18.se1, semo_18.se1, sepl_18.se1)
+- ✅ JPL Horizons fixtures (fixtures/horizons/*.json)
+- ✅ IERS Delta-T data (src/adapters/data/deltaT_iers.json)
+
+### Post-Deployment BTR Validation
+
+After deploying with BTR configuration, run the smoke tests:
+
+```bash
+# Basic smoke tests (5 tests)
+node scripts/post-deploy-smoke.js --url=https://your-backend-service.onrender.com
+
+# With golden case validation (6 tests)
+node scripts/post-deploy-smoke.js \
+  --url=https://your-backend-service.onrender.com \
+  --golden-case
+```
+
+**Expected Output:**
+```
+🔬 BTR Post-Deployment Smoke Tests
+📡 Testing: https://your-backend-service.onrender.com
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✓ Health Check: Server is healthy
+✓ API Availability: API responding (HTTP 200)
+✓ Metrics Endpoint: Endpoint available (no metrics yet)
+✓ Chart Generation: Chart generated successfully
+✓ Golden Case Validation: Golden case validated successfully
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📊 Test Summary:
+  ✓ Passed:  5
+  ✗ Failed:  0
+  ⊘ Skipped: 0
+  Total:   5
+
+✅ All smoke tests PASSED
+```
+
+### BTR API Endpoints Verification
+
+Test the new BTR metrics endpoints:
+
+```bash
+# Test metrics endpoint (may return 404 if no metrics generated yet)
+curl https://your-backend-service.onrender.com/api/v1/rectification/metrics/latest
+
+# Expected: 200 with metrics data OR 404 (both are valid)
+```
+
+### BTR Evidence Generation
+
+The BTR system generates evidence artifacts documenting accuracy:
+
+1. **EVIDENCE.md**: Comprehensive validation results (SC-1 through SC-7)
+2. **SOURCES.md**: Authoritative references (JPL Horizons, IERS, BPHS)
+3. **Metrics JSON**: Stored in `metrics/btr/` directory
+4. **HTML Reports**: Available via `/api/v1/rectification/reports/*` endpoints
+
+Generate evidence locally before deployment:
+
+```bash
+# Generate evidence from test metrics
+npm run evidence:generate
+
+# Validate evidence contains PASS status
+npm run evidence:validate
+```
+
+### BTR Deployment Checklist
+
+Before deploying with BTR enabled:
+
+- [ ] All environment variables set (BTR_METRICS_ENABLED, HORIZONS_MODE, etc.)
+- [ ] HORIZONS_MODE set to 'replay' (not 'record')
+- [ ] BTR fixtures committed to repository (fixtures/horizons/*.json)
+- [ ] Delta-T data file exists (src/adapters/data/deltaT_iers.json)
+- [ ] Local tests passing (`npm run test:btr:all`)
+- [ ] Evidence generated (`npm run evidence:generate`)
+
+After deployment:
+
+- [ ] Post-deploy smoke tests pass
+- [ ] Health check returns 200 OK
+- [ ] Metrics endpoints accessible (200 or 404)
+- [ ] Chart generation works with new BTR configuration
+- [ ] No console errors in Render logs
+
+### Troubleshooting BTR Issues
+
+#### Issue: BTR metrics endpoint returns 404
+
+**This is expected behavior** if no metrics have been generated yet. The endpoint will return data once:
+- BTR rectification analysis is performed
+- Metrics are calculated and persisted
+
+#### Issue: HORIZONS_MODE environment variable ignored
+
+**Solution:**
+1. Verify environment variable is set in Render Dashboard
+2. Check it's set to lowercase 'replay' (not 'Replay' or 'REPLAY')
+3. Redeploy service after changing environment variables
+
+#### Issue: Evidence generation fails
+
+**Common causes:**
+1. No metrics files in `metrics/btr/` directory
+2. Invalid JSON in metrics files
+3. Missing test data fixtures
+
+**Solution:**
+```bash
+# Run BTR tests to generate metrics
+npm run test:btr:golden
+
+# Then generate evidence
+npm run evidence:generate
+```
+
+#### Issue: Missing Delta-T data file
+
+**Solution:**
+Verify the file exists and is committed:
+```bash
+ls -la src/adapters/data/deltaT_iers.json
+# Should show file with ~50KB size
+```
+
+### BTR Success Criteria Validation (SC-7)
+
+The deployment is verified successful when:
+
+- [x] CI test gates pass (`npm run test:btr:all`)
+- [x] Post-deployment smoke tests pass (5/5 tests)
+- [x] Health endpoint returns 200 OK
+- [x] Environment variables configured correctly
+- [x] BTR metrics endpoints accessible
+- [x] Chart generation works
+- [x] Evidence generation succeeds
+
+### Additional Resources
+
+For comprehensive BTR deployment information, see:
+- **DEPLOYMENT.md**: Complete deployment guide with troubleshooting
+- **EVIDENCE.md**: Generated validation results
+- **SOURCES.md**: Authoritative references
+
+**BTR Documentation:**
+- Implementation Plan: `docs/BPHS-BTR/BPHS-BTR-implementation-plan.md`
+- System Architecture: `docs/architecture/system-architecture.md` (Section 4.5)
+- API Endpoints: `docs/api/endpoint-ui-mapping-inventory.md` (Endpoints 38-41)
+
+---
+
+**Phase 7 Implementation Complete**: All BTR accuracy, metrics, and deployment infrastructure ready for production use.
