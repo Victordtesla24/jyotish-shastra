@@ -50,9 +50,9 @@
 
   body {
     @apply font-sans antialiased;
-    background-color: var(--sacred-white);
-    color: #1F2937;
-    transition: background-color var(--animation-normal) ease;
+    background-color: var(--bg-primary, rgb(0, 0, 0));
+    color: var(--text-primary, rgb(255, 255, 255));
+    transition: background-color var(--animation-normal) ease, color var(--animation-normal) ease;
   }
 
   /* Focus styles */

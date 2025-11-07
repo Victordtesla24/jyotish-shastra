@@ -6,7 +6,7 @@ const Header = () => {
   const navigate = useNavigate();
 
   return (
-    <header className="nav-vedic bg-primary shadow-lg sticky top-0 z-50">
+    <header className="nav-vedic bg-black shadow-lg sticky top-0 z-50 border-b border-white/10">
       <div className="container-vedic py-4">
         <div className="flex items-center justify-between">
           <div
@@ -14,7 +14,7 @@ const Header = () => {
             onClick={() => navigate('/')}
           >
             <span className="text-2xl">🕉️</span>
-            <h1 className="font-accent text-xl md:text-2xl text-earth-brown dark:text-dark-text-primary">
+            <h1 className="font-accent text-xl md:text-2xl text-white typography-roboto">
               Jyotish Shastra
             </h1>
           </div>

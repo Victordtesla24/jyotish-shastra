@@ -6,6 +6,7 @@ import { useChart } from '../contexts/ChartContext.js';
 import UIDataSaver from '../components/forms/UIDataSaver.js';
 import { getApiUrl } from '../utils/apiConfig.js';
 import chartService from '../services/chartService.js';
+import HeroSection from '../components/ui/HeroSection.jsx';
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -151,30 +152,35 @@ const HomePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-yellow-50 flex items-center justify-center p-4">
-      <Card className="max-w-2xl w-full p-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">
-            🕉️ Jyotish Shastra
-          </h1>
-          <p className="text-gray-600">
-            Discover your Vedic astrology chart and comprehensive analysis
-          </p>
-        </div>
+    <HeroSection
+      title="Jyotish Shastra"
+      subtitle="Ancient Wisdom, Modern Precision"
+    >
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <Card className="max-w-2xl w-full p-8 bg-card backdrop-blur-sm card-shadow-prominent shadow-prominent">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold text-white mb-2 typography-roboto typography-h2">
+              Begin Your Journey
+            </h2>
+            <p className="text-white/80 typography-roboto typography-body">
+              Discover your Vedic astrology chart and comprehensive analysis
+            </p>
+          </div>
 
-        <BirthDataForm
-          onSubmit={handleFormSubmit}
-          onError={(error) => {
-            console.error('❌ HomePage: Form error received:', error);
-            setError(error);
-          }}
-        />
-        
-        {/* CRITICAL FIX: Test compatibility - ensure session is always created */}
-        <div id="test-compatibility-data" style={{display: 'none'}}>
-        </div>
-      </Card>
-    </div>
+          <BirthDataForm
+            onSubmit={handleFormSubmit}
+            onError={(error) => {
+              console.error('❌ HomePage: Form error received:', error);
+              setError(error);
+            }}
+          />
+          
+          {/* CRITICAL FIX: Test compatibility - ensure session is always created */}
+          <div id="test-compatibility-data" style={{display: 'none'}}>
+          </div>
+        </Card>
+      </div>
+    </HeroSection>
   );
 };
 

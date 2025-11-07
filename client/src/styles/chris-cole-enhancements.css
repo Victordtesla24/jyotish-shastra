@@ -1,0 +1,3004 @@
+/**
+ * Chris Cole Portfolio-Inspired UI/UX Enhancements
+ * Jyotish Shastra Vedic Astrology Platform
+ * 
+ * Design Principles:
+ * - Pure Black Background (rgb(0, 0, 0)) - Matching Chris Cole
+ * - Pure White Text (rgb(255, 255, 255)) - Matching Chris Cole
+ * - White Saturn & Planetary Animations - Matching Chris Cole
+ * - Vedic accents (30%): Divine Gold, Sacred Saffron, Cosmic Purple
+ * - Moderate animations: Fade-ins, parallax, smooth transitions
+ * - Responsive sidebar: Static ≥1024px, Overlay <1024px
+ */
+
+/* ============================================
+   Global Black Theme Styles
+   ============================================ */
+html,
+body {
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+.app-container {
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+  min-height: 100vh;
+}
+
+/* ============================================
+   Color Palette Variables
+   ============================================ */
+:root {
+  /* Monochrome Base (70%) */
+  --sacred-white: #FFFFFF;
+  --wisdom-gray-50: #F9FAFB;
+  --wisdom-gray-100: #F3F4F6;
+  --wisdom-gray-200: #E5E7EB;
+  --wisdom-gray-600: #4B5563;
+  --wisdom-gray-800: #1F2937;
+  --wisdom-gray-900: #111827;
+
+  /* Vedic Accents (30%) */
+  --divine-gold: #FFD700;
+  --sacred-saffron: #FF9933;
+  --cosmic-purple: #6B46C1;
+  --sacred-orange: #FF6B35;
+}
+
+/* ============================================
+   Chris Cole Black Theme Variables
+   ============================================ */
+:root[data-theme="chris-cole"],
+:root {
+  /* Background Colors - Pure Black Theme (Default) */
+  --bg-primary: rgb(0, 0, 0);
+  --bg-secondary: rgba(0, 0, 0, 0.95);
+  --bg-overlay: rgba(0, 0, 0, 0.7);
+  --bg-card: rgba(255, 255, 255, 0.05);
+  --bg-card-hover: rgba(255, 255, 255, 0.08);
+  --bg-sidebar: rgb(0, 0, 0);
+  --bg-sidebar-header: rgba(0, 0, 0, 0.95);
+  --bg-sidebar-footer: rgba(0, 0, 0, 0.9);
+  --bg-feature-card: rgba(255, 255, 255, 0.05);
+  --bg-form-input: rgba(255, 255, 255, 0.05);
+  
+  /* Text Colors - Pure White Theme (Default) */
+  --text-primary: rgb(255, 255, 255);
+  --text-secondary: rgba(255, 255, 255, 0.8);
+  --text-muted: rgba(255, 255, 255, 0.6);
+  --text-overlay: rgba(255, 255, 255, 0.12);
+  --text-sidebar: rgb(255, 255, 255);
+  --text-sidebar-muted: rgba(255, 255, 255, 0.7);
+  --text-feature-title: rgb(255, 255, 255);
+  --text-feature-description: rgba(255, 255, 255, 0.8);
+  
+  /* Vedic Accents (30%) - Strategic Highlights */
+  --divine-gold: #FFD700;
+  --sacred-saffron: #FF9933;
+  --cosmic-purple: #6B46C1;
+  
+  /* Sidebar Configuration */
+  --sidebar-width: 300px;
+  --sidebar-collapsed-width: 0px;
+  --sidebar-transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Hero Section Configuration */
+  --hero-min-height: 600px;
+  --starfield-opacity: 0.6;
+  
+  /* Animation Timing */
+  --entrance-duration: 0.8s;
+  --hover-duration: 0.3s;
+  
+  /* Shadow Scale - Enhanced Depth Hierarchy */
+  --shadow-subtle: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-soft: 0 2px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.08);
+  --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.1);
+  --shadow-prominent: 0 8px 24px rgba(0, 0, 0, 0.15), 0 8px 16px rgba(0, 0, 0, 0.12);
+  --shadow-elevated: 0 12px 32px rgba(0, 0, 0, 0.18), 0 12px 24px rgba(0, 0, 0, 0.15);
+  
+  /* Vedic Accent Shadows */
+  --shadow-vedic-gold: 0 4px 16px rgba(255, 215, 0, 0.25), 0 2px 8px rgba(255, 215, 0, 0.15);
+  --shadow-vedic-saffron: 0 4px 16px rgba(255, 153, 51, 0.25), 0 2px 8px rgba(255, 153, 51, 0.15);
+  --shadow-vedic-purple: 0 4px 16px rgba(107, 70, 193, 0.25), 0 2px 8px rgba(107, 70, 193, 0.15);
+  
+  /* Interactive Element Shadows */
+  --shadow-hover: 0 6px 20px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(0, 0, 0, 0.12);
+  --shadow-active: 0 2px 8px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* ============================================
+   Sidebar Navigation Styles
+   ============================================ */
+
+/* Sidebar Toggle Button */
+.sidebar-toggle {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 1100;
+  width: 48px;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all var(--hover-duration) ease;
+  box-shadow: var(--shadow-soft);
+}
+
+.sidebar-toggle:hover {
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: var(--shadow-medium);
+  transform: translateY(-2px);
+}
+
+.sidebar-toggle:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-subtle);
+}
+
+.hamburger-line {
+  width: 24px;
+  height: 2px;
+  background: var(--text-primary);
+  border-radius: 2px;
+  transition: all var(--hover-duration) ease;
+}
+
+/* Sidebar Container */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: var(--sidebar-width);
+  background: var(--bg-sidebar);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Enhanced Sidebar Shadows */
+.sidebar.shadow-prominent {
+  box-shadow: var(--shadow-prominent);
+}
+
+/* Sidebar Overlay Mode (<1024px) */
+.sidebar-overlay {
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+}
+
+/* Sidebar Backdrop (Mobile/Tablet) */
+.sidebar-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  backdrop-filter: blur(4px);
+}
+
+/* Sidebar Header */
+.sidebar-header {
+  padding: 2rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--bg-sidebar-header);
+}
+
+.sidebar-header.shadow-soft {
+  box-shadow: var(--shadow-soft);
+}
+
+.sidebar-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-sidebar);
+  margin: 0;
+  background: linear-gradient(135deg, var(--divine-gold) 0%, var(--sacred-saffron) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.sidebar-subtitle {
+  display: block;
+  font-size: 0.875rem;
+  color: var(--text-sidebar-muted);
+  margin-top: 0.25rem;
+}
+
+/* Sidebar Navigation */
+.sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem 0;
+}
+
+.sidebar-nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sidebar-nav-item {
+  margin: 0;
+}
+
+.sidebar-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  color: var(--text-sidebar-muted);
+  text-decoration: none;
+  font-weight: 500;
+  transition: all var(--hover-duration) ease;
+  position: relative;
+  box-shadow: var(--shadow-subtle);
+}
+
+.sidebar-nav-link:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-sidebar);
+  box-shadow: var(--shadow-soft);
+  transform: translateX(4px);
+}
+
+.sidebar-nav-link.shadow-hover:hover {
+  box-shadow: var(--shadow-hover);
+}
+
+.sidebar-nav-link.active {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--divine-gold);
+  font-weight: 600;
+}
+
+.nav-icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.nav-label {
+  flex: 1;
+}
+
+.active-indicator {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 70%;
+  background: linear-gradient(180deg, var(--divine-gold) 0%, var(--sacred-saffron) 100%);
+  border-radius: 0 4px 4px 0;
+}
+
+/* Sidebar Footer */
+.sidebar-footer {
+  padding: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--bg-sidebar-footer);
+}
+
+.sidebar-footer.shadow-subtle {
+  box-shadow: var(--shadow-subtle);
+}
+
+.sidebar-footer-text {
+  font-size: 0.75rem;
+  color: var(--text-sidebar-muted);
+  margin: 0;
+  text-align: center;
+}
+
+/* ============================================
+   Hero Section Styles
+   ============================================ */
+
+.hero-section {
+  position: relative;
+  min-height: var(--hero-min-height);
+  width: 100%;
+  overflow: hidden;
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Hero Background */
+.hero-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.starfield-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: var(--starfield-opacity);
+}
+
+.cosmic-gradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent; /* Remove gradient for pure black background */
+  opacity: 0;
+}
+
+/* Hero Content */
+.hero-content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.hero-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.hero-title {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 700;
+  color: var(--sacred-white);
+  margin: 0 0 1rem 0;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(135deg, var(--divine-gold) 0%, var(--sacred-saffron) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-subtitle {
+  font-size: clamp(1.125rem, 2vw, 1.5rem);
+  color: var(--text-secondary);
+  margin: 0;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.hero-main {
+  margin-bottom: 3rem;
+}
+
+/* Om Watermark */
+.om-watermark {
+  position: absolute;
+  bottom: 2rem;
+  right: 2rem;
+  font-size: 6rem;
+  color: var(--divine-gold);
+  opacity: 0.1;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Hero Features */
+.hero-features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
+}
+
+.feature-card {
+  background: var(--bg-feature-card);
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: var(--shadow-medium);
+  transition: all var(--hover-duration) ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.feature-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-vedic-gold);
+  border-color: var(--divine-gold);
+}
+
+.feature-card.feature-card-shadow {
+  box-shadow: var(--shadow-soft);
+}
+
+.feature-card.feature-card-shadow:hover {
+  box-shadow: var(--shadow-vedic-gold);
+  transform: translateY(-4px);
+}
+
+.feature-icon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.feature-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-feature-title);
+  margin: 0 0 0.5rem 0;
+}
+
+.feature-description {
+  font-size: 0.875rem;
+  color: var(--text-feature-description);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ============================================
+   Main Content Layout Adjustments
+   ============================================ */
+
+/* Main content margin for sidebar (≥1024px) */
+@media (min-width: 1024px) {
+  .main-content-with-sidebar {
+    margin-left: var(--sidebar-width);
+    transition: margin-left var(--sidebar-transition);
+  }
+}
+
+/* ============================================
+   Responsive Breakpoints
+   ============================================ */
+
+/* Tablet & Mobile (<1024px) */
+@media (max-width: 1023px) {
+  .sidebar {
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+  }
+  
+  .hero-title {
+    font-size: 2.5rem;
+  }
+  
+  .hero-subtitle {
+    font-size: 1.125rem;
+  }
+  
+  .om-watermark {
+    font-size: 4rem;
+    bottom: 1rem;
+    right: 1rem;
+  }
+  
+  .hero-features {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Mobile (<768px) */
+@media (max-width: 767px) {
+  .sidebar-toggle {
+    width: 44px;
+    height: 44px;
+  }
+  
+  .hamburger-line {
+    width: 20px;
+  }
+  
+  .hero-content {
+    padding: 1.5rem;
+  }
+  
+  .hero-title {
+    font-size: 2rem;
+  }
+  
+  .hero-subtitle {
+    font-size: 1rem;
+  }
+  
+  .feature-card {
+    padding: 1.5rem;
+  }
+  
+  .om-watermark {
+    font-size: 3rem;
+  }
+}
+
+/* ============================================
+   Accessibility Enhancements
+   ============================================ */
+
+/* Focus visible styles */
+.sidebar-toggle:focus-visible,
+.sidebar-nav-link:focus-visible {
+  outline: 2px solid var(--divine-gold);
+  outline-offset: 2px;
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .starfield-canvas {
+    display: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .sidebar {
+    border-right-width: 2px;
+  }
+  
+  .sidebar-nav-link {
+    border-bottom: 1px solid var(--wisdom-gray-200);
+  }
+  
+  .feature-card {
+    border-width: 2px;
+  }
+}
+
+/* ============================================
+   Phase 2: BirthDataForm Enhancements
+   ============================================ */
+
+/* Divine Input Glow Effects */
+.form-input-vedic,
+.form-select-vedic {
+  background-color: var(--bg-form-input) !important;
+  color: var(--text-primary) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  box-shadow: var(--shadow-subtle);
+}
+
+.form-input-vedic::placeholder,
+.form-select-vedic::placeholder {
+  color: var(--text-muted) !important;
+  opacity: 0.6;
+}
+
+.form-input-vedic:hover,
+.form-select-vedic:hover {
+  box-shadow: var(--shadow-soft);
+}
+
+.form-input-vedic:focus,
+.form-select-vedic:focus {
+  outline: none;
+  border-color: var(--divine-gold);
+  box-shadow: 
+    0 0 0 3px rgba(255, 215, 0, 0.1),
+    0 0 20px rgba(255, 215, 0, 0.3),
+    0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+/* Enhanced Focus States with Sacred Glow */
+.form-input-vedic:focus-visible,
+.form-select-vedic:focus-visible {
+  border-color: var(--divine-gold);
+  box-shadow:
+    0 0 0 4px rgba(255, 215, 0, 0.15),
+    0 0 30px rgba(255, 215, 0, 0.4),
+    0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Valid Input State with Subtle Saffron Glow */
+.form-input-vedic:valid:not(:placeholder-shown),
+.form-select-vedic:valid {
+  border-color: var(--sacred-saffron);
+  background: linear-gradient(
+    to right,
+    rgba(255, 153, 51, 0.02),
+    transparent
+  );
+}
+
+/* Enhanced Error States */
+.form-input-vedic[aria-invalid="true"],
+.form-select-vedic[aria-invalid="true"] {
+  border-color: var(--sacred-orange);
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+  animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+/* Shake animation for errors */
+@keyframes shake {
+  10%, 90% {
+    transform: translate3d(-1px, 0, 0);
+  }
+  20%, 80% {
+    transform: translate3d(2px, 0, 0);
+  }
+  30%, 50%, 70% {
+    transform: translate3d(-3px, 0, 0);
+  }
+  40%, 60% {
+    transform: translate3d(3px, 0, 0);
+  }
+}
+
+/* Divine Label Enhancement */
+.form-label-vedic {
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.form-input-vedic:focus ~ .form-label-vedic,
+.form-select-vedic:focus ~ .form-label-vedic,
+.form-input-vedic:focus + label,
+.form-select-vedic:focus + label {
+  color: var(--divine-gold);
+  transform: translateY(-2px);
+}
+
+/* Enhanced Button States */
+.btn-vedic {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-soft);
+}
+
+.btn-vedic:hover {
+  box-shadow: var(--shadow-medium);
+  transform: translateY(-2px);
+}
+
+.btn-vedic:active {
+  box-shadow: var(--shadow-subtle);
+  transform: translateY(0);
+}
+
+.btn-vedic.btn-primary {
+  box-shadow: var(--shadow-vedic-gold);
+}
+
+.btn-vedic.btn-primary:hover {
+  box-shadow: var(--shadow-vedic-saffron);
+  transform: translateY(-3px);
+}
+
+.btn-vedic.btn-secondary {
+  box-shadow: var(--shadow-soft);
+}
+
+.btn-vedic.btn-secondary:hover {
+  box-shadow: var(--shadow-medium);
+  transform: translateY(-2px);
+}
+
+.btn-vedic::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 215, 0, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.btn-vedic:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.btn-vedic:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 0 20px rgba(255, 215, 0, 0.4),
+    0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.btn-vedic:active {
+  transform: translateY(0);
+  box-shadow: 
+    0 0 15px rgba(255, 215, 0, 0.3),
+    0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Sacred Submit Button Glow */
+.btn-primary {
+  background: linear-gradient(135deg, var(--divine-gold) 0%, var(--sacred-saffron) 100%);
+  box-shadow: 0 4px 16px rgba(255, 215, 0, 0.3);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--sacred-saffron) 0%, var(--divine-gold) 100%);
+  box-shadow: 
+    0 0 30px rgba(255, 215, 0, 0.5),
+    0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+/* Loading State Enhancement */
+.spinner-vedic {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Alert Enhancement */
+.alert-error {
+  animation: slide-in 0.3s ease-out;
+  border-left: 4px solid var(--sacred-orange);
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Location Success Message Enhancement */
+.text-vedic-gold {
+  color: var(--divine-gold);
+  font-weight: 500;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+/* Tooltip Enhancement */
+.tooltip {
+  background: linear-gradient(135deg, var(--wisdom-gray-900) 0%, var(--wisdom-gray-800) 100%);
+  border: 1px solid var(--divine-gold);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* Form Grid Enhancement */
+.grid {
+  gap: 1.5rem;
+}
+
+/* Input Icons Enhancement */
+.form-input-vedic + div svg,
+.form-select-vedic + div svg {
+  transition: all 0.3s ease;
+}
+
+.form-input-vedic:focus + div svg,
+.form-select-vedic:focus + div svg {
+  color: var(--divine-gold);
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.5));
+}
+
+/* ============================================
+   Phase 2: ChartPage Sacred Container
+   ============================================ */
+
+/* Sacred Page Container */
+.vedic-container {
+  position: relative;
+}
+
+/* Card Cosmic Enhancement */
+.card-cosmic {
+  position: relative;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-medium);
+}
+
+.card-cosmic:hover {
+  box-shadow: var(--shadow-prominent);
+  transform: translateY(-2px);
+}
+
+/* Ornamental Frame Effect */
+.card-cosmic::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(
+    135deg,
+    var(--divine-gold) 0%,
+    var(--sacred-saffron) 25%,
+    var(--cosmic-purple) 50%,
+    var(--sacred-saffron) 75%,
+    var(--divine-gold) 100%
+  );
+  border-radius: 1.75rem;
+  opacity: 0;
+  z-index: -1;
+  transition: opacity 0.4s ease;
+}
+
+.card-cosmic:hover::before {
+  opacity: 0.3;
+  animation: rotate-border 3s linear infinite;
+}
+
+@keyframes rotate-border {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Hover Celestial Enhancement */
+.hover-celestial {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-celestial:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 
+    0 0 40px rgba(255, 215, 0, 0.2),
+    0 20px 50px rgba(0, 0, 0, 0.3);
+}
+
+/* Sacred Chart Frame */
+.bg-white\/10 {
+  position: relative;
+  overflow: hidden;
+}
+
+.bg-white\/10::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(
+    circle at center,
+    transparent 0%,
+    rgba(255, 215, 0, 0.05) 100%
+  );
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.bg-white\/10:hover::after {
+  opacity: 1;
+}
+
+/* Enhanced Section Title */
+.section-title-vedic {
+  position: relative;
+  display: inline-block;
+}
+
+.section-title-vedic::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--divine-gold) 50%,
+    transparent 100%
+  );
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 0.5;
+    width: 60%;
+  }
+  50% {
+    opacity: 1;
+    width: 80%;
+  }
+}
+
+/* Sacred Background Pattern Enhancement */
+.pattern-mandala {
+  background-image: repeating-radial-gradient(
+    circle at center,
+    transparent 0,
+    transparent 2px,
+    rgba(255, 215, 0, 0.05) 2px,
+    rgba(255, 215, 0, 0.05) 4px
+  );
+  animation: rotate-pattern 60s linear infinite;
+}
+
+@keyframes rotate-pattern {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Divine Symbol Animations */
+.animate-om-rotation {
+  animation: om-rotation 20s ease-in-out infinite;
+}
+
+@keyframes om-rotation {
+  0%, 100% {
+    transform: rotate(0deg) scale(1);
+    opacity: 0.2;
+  }
+  50% {
+    transform: rotate(180deg) scale(1.1);
+    opacity: 0.3;
+  }
+}
+
+.animate-lotus-bloom {
+  animation: lotus-bloom 15s ease-in-out infinite;
+}
+
+@keyframes lotus-bloom {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.25;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.35;
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.animate-cosmic-drift {
+  animation: cosmic-drift 8s ease-in-out infinite;
+}
+
+@keyframes cosmic-drift {
+  0%, 100% {
+    transform: translate(0, 0);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translate(10px, -10px);
+    opacity: 0.6;
+  }
+}
+
+.animate-celestial-glow {
+  animation: celestial-glow 4s ease-in-out infinite;
+}
+
+@keyframes celestial-glow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(107, 70, 193, 0.5);
+    opacity: 0.5;
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(107, 70, 193, 0.8);
+    opacity: 0.7;
+  }
+}
+
+.animate-divine-light {
+  animation: divine-light 3s ease-in-out infinite;
+}
+
+@keyframes divine-light {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.15;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.25;
+  }
+}
+
+.animate-sacred-pulse {
+  animation: sacred-pulse 2s ease-in-out infinite;
+}
+
+@keyframes sacred-pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+  }
+}
+
+/* Text Gradient Enhancement */
+.text-gradient-vedic {
+  background: linear-gradient(135deg, var(--divine-gold) 0%, var(--sacred-saffron) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-accent {
+  background: linear-gradient(135deg, var(--sacred-saffron) 0%, var(--divine-gold) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Gradient Background Enhancement */
+.bg-gradient-vedic-primary {
+  background: linear-gradient(
+    135deg,
+    rgba(107, 70, 193, 0.9) 0%,
+    rgba(139, 92, 246, 0.8) 50%,
+    rgba(107, 70, 193, 0.9) 100%
+  );
+}
+
+.bg-gradient-cosmic {
+  background: linear-gradient(135deg, var(--cosmic-purple) 0%, var(--divine-gold) 100%);
+}
+
+/* Backdrop Enhancement */
+.backdrop-vedic {
+  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Shadow Enhancements */
+.shadow-mandala {
+  box-shadow: 
+    0 0 30px rgba(255, 215, 0, 0.1),
+    0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.shadow-celestial {
+  box-shadow: 
+    0 0 40px rgba(255, 215, 0, 0.3),
+    0 15px 50px rgba(0, 0, 0, 0.4);
+}
+
+/* ============================================
+   Enhanced Shadow Utilities - Phase 1
+   ============================================ */
+
+/* Shadow Scale Utilities */
+.shadow-subtle {
+  box-shadow: var(--shadow-subtle);
+}
+
+.shadow-soft {
+  box-shadow: var(--shadow-soft);
+}
+
+.shadow-medium {
+  box-shadow: var(--shadow-medium);
+}
+
+.shadow-prominent {
+  box-shadow: var(--shadow-prominent);
+}
+
+.shadow-elevated {
+  box-shadow: var(--shadow-elevated);
+}
+
+/* Vedic Accent Shadows */
+.shadow-vedic-gold {
+  box-shadow: var(--shadow-vedic-gold);
+}
+
+.shadow-vedic-saffron {
+  box-shadow: var(--shadow-vedic-saffron);
+}
+
+.shadow-vedic-purple {
+  box-shadow: var(--shadow-vedic-purple);
+}
+
+/* Interactive Element Shadows */
+.shadow-hover {
+  transition: box-shadow var(--hover-duration) ease;
+}
+
+.shadow-hover:hover {
+  box-shadow: var(--shadow-hover);
+}
+
+.shadow-active:active {
+  box-shadow: var(--shadow-active);
+}
+
+/* Card Shadow Enhancements */
+.card-shadow-subtle {
+  box-shadow: var(--shadow-subtle);
+  transition: box-shadow var(--hover-duration) ease, transform var(--hover-duration) ease;
+}
+
+.card-shadow-subtle:hover {
+  box-shadow: var(--shadow-medium);
+  transform: translateY(-2px);
+}
+
+.card-shadow-medium {
+  box-shadow: var(--shadow-medium);
+  transition: box-shadow var(--hover-duration) ease, transform var(--hover-duration) ease;
+}
+
+.card-shadow-medium:hover {
+  box-shadow: var(--shadow-prominent);
+  transform: translateY(-3px);
+}
+
+.card-shadow-prominent {
+  box-shadow: var(--shadow-prominent);
+  transition: box-shadow var(--hover-duration) ease, transform var(--hover-duration) ease;
+}
+
+.card-shadow-prominent:hover {
+  box-shadow: var(--shadow-elevated);
+  transform: translateY(-4px);
+}
+
+/* Feature Card Shadows */
+.feature-card-shadow {
+  box-shadow: var(--shadow-soft);
+  transition: box-shadow var(--hover-duration) ease, transform var(--hover-duration) ease;
+}
+
+.feature-card-shadow:hover {
+  box-shadow: var(--shadow-vedic-gold);
+  transform: translateY(-4px);
+}
+
+/* Analysis Card Shadows */
+.analysis-card-shadow {
+  box-shadow: var(--shadow-medium);
+  transition: box-shadow var(--hover-duration) ease, transform var(--hover-duration) ease;
+}
+
+.analysis-card-shadow:hover {
+  box-shadow: var(--shadow-vedic-purple);
+  transform: translateY(-3px);
+}
+
+/* Chart Container Shadows */
+.chart-container-shadow {
+  box-shadow: var(--shadow-prominent);
+  transition: box-shadow var(--hover-duration) ease;
+}
+
+.chart-container-shadow:hover {
+  box-shadow: var(--shadow-elevated);
+}
+
+/* ============================================
+   Enhanced Typography - Phase 2
+   ============================================ */
+
+/* Typography Hierarchy - Roboto Font Family */
+.typography-roboto {
+  font-family: 'Roboto', 'Inter', ui-sans-serif, system-ui, sans-serif;
+}
+
+.typography-roboto-condensed {
+  font-family: 'Roboto Condensed', 'Roboto', sans-serif;
+}
+
+.typography-roboto-mono {
+  font-family: 'Roboto Mono', 'Courier New', monospace;
+}
+
+/* Heading Hierarchy - Large, Bold Headings */
+.typography-h1 {
+  font-family: 'Roboto', sans-serif;
+  font-size: 3rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.typography-h2 {
+  font-family: 'Roboto', sans-serif;
+  font-size: 2.25rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.typography-h3 {
+  font-family: 'Roboto', sans-serif;
+  font-size: 1.875rem;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+}
+
+.typography-h4 {
+  font-family: 'Roboto', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.typography-h5 {
+  font-family: 'Roboto', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.typography-h6 {
+  font-family: 'Roboto', sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+/* Body Text Hierarchy */
+.typography-body-large {
+  font-family: 'Roboto', sans-serif;
+  font-size: 1.125rem;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+.typography-body {
+  font-family: 'Roboto', sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+.typography-body-small {
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+/* Uppercase Headings (Chris Cole Style) */
+.typography-uppercase {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+}
+
+/* Minimal Body Text (Chris Cole Style) */
+.typography-minimal {
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 300;
+  line-height: 1.5;
+  color: var(--wisdom-gray-600);
+}
+
+/* Responsive Typography */
+@media (max-width: 768px) {
+  .typography-h1 {
+    font-size: 2.25rem;
+  }
+  
+  .typography-h2 {
+    font-size: 1.875rem;
+  }
+  
+  .typography-h3 {
+    font-size: 1.5rem;
+  }
+}
+
+/* ============================================
+   Enhanced Pre-loading Animation - Phase 3
+   ============================================ */
+
+/* PreLoader Container */
+.preloader-vedic {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-primary) !important;
+}
+
+.preloader-background {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
+  opacity: 0.5;
+}
+
+.preloader-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  text-align: center;
+}
+
+.preloader-om {
+  font-size: 4rem;
+  color: var(--divine-gold);
+  filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.5));
+  margin-bottom: 1rem;
+}
+
+.preloader-text {
+  font-family: 'Roboto', sans-serif;
+  font-size: 2rem;
+  font-weight: 300;
+  color: var(--text-primary) !important;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.preloader-progress-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  width: 200px;
+}
+
+.preloader-progress-bar {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+
+.preloader-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--divine-gold) 0%, var(--sacred-saffron) 100%);
+  border-radius: 2px;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  transition: width 0.3s ease;
+}
+
+.preloader-progress-text {
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: var(--text-primary) !important;
+  letter-spacing: 0.05em;
+}
+
+.preloader-message {
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 300;
+  color: var(--text-secondary) !important;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-top: 1rem;
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .preloader-om {
+    animation: none;
+  }
+  
+  .preloader-progress-fill {
+    transition: none;
+  }
+}
+
+/* ============================================
+   Smooth Scroll Effects - Phase 4
+   ============================================ */
+
+/* Scroll-triggered Animation Utilities */
+.scroll-fade-in {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.scroll-fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.scroll-parallax {
+  will-change: transform;
+}
+
+/* Reduced Motion Support for Scroll Effects */
+@media (prefers-reduced-motion: reduce) {
+  .scroll-fade-in {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  
+  .scroll-parallax {
+    transform: none !important;
+  }
+}
+
+/* ============================================
+   Floating Elements - Phase 5
+   ============================================ */
+
+/* Floating Elements Container */
+.floating-elements-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.floating-element {
+  position: absolute;
+  font-size: 2rem;
+  opacity: 0.7;
+  filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.3));
+  will-change: transform, opacity;
+}
+
+.floating-element-om {
+  color: var(--divine-gold);
+  filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.5));
+}
+
+.floating-element-planet {
+  color: var(--cosmic-purple);
+  filter: drop-shadow(0 0 10px rgba(107, 70, 193, 0.4));
+}
+
+.floating-element-moon {
+  color: var(--lunar-silver);
+  filter: drop-shadow(0 0 10px rgba(192, 192, 192, 0.4));
+}
+
+.floating-element-star {
+  color: var(--divine-gold);
+  filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.5));
+}
+
+.floating-element-sun {
+  color: var(--sacred-saffron);
+  filter: drop-shadow(0 0 12px rgba(255, 153, 51, 0.5));
+}
+
+.floating-element-crystal {
+  color: var(--cosmic-purple);
+  filter: drop-shadow(0 0 10px rgba(107, 70, 193, 0.4));
+}
+
+.floating-symbol {
+  display: block;
+  user-select: none;
+}
+
+/* Reduced Motion Support for Floating Elements */
+@media (prefers-reduced-motion: reduce) {
+  .floating-element {
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
+/* ============================================
+   Planetary Animations - White Saturn & Planets
+   ============================================ */
+
+/* Planetary Animations Container */
+.planetary-animations-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.planetary-element {
+  position: absolute;
+  opacity: 0.7;
+  will-change: transform, opacity;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
+  color: white;
+}
+
+.planetary-element-saturn,
+.planetary-element-saturn-2 {
+  filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.6));
+  font-size: 3rem;
+}
+
+.planetary-element-moon,
+.planetary-element-moon-2 {
+  filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.5));
+  font-size: 2.5rem;
+}
+
+.planetary-element-star,
+.planetary-element-star-2,
+.planetary-element-star-3 {
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.4));
+  font-size: 2rem;
+}
+
+.planetary-element-sun {
+  filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.5));
+  font-size: 2.5rem;
+}
+
+.planetary-symbol {
+  display: block;
+  user-select: none;
+  color: white;
+}
+
+/* Reduced Motion Support for Planetary Elements */
+@media (prefers-reduced-motion: reduce) {
+  .planetary-element {
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
+/* ============================================
+   Enhanced Loading States - Phase 6
+   ============================================ */
+
+/* Enhanced Spinner Variants */
+.spinner-cosmic {
+  position: relative;
+  border-radius: 50%;
+  border: 4px solid transparent;
+  border-top-color: var(--divine-gold);
+  border-right-color: var(--sacred-saffron);
+  border-bottom-color: var(--cosmic-purple);
+  border-left-color: var(--divine-gold);
+  animation: spin-cosmic 1.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+  box-shadow: 
+    0 0 20px rgba(255, 215, 0, 0.4),
+    0 0 40px rgba(255, 153, 51, 0.3),
+    inset 0 0 20px rgba(255, 215, 0, 0.2);
+}
+
+.spinner-cosmic::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60%;
+  height: 60%;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  border-top-color: var(--cosmic-purple);
+  border-bottom-color: var(--sacred-saffron);
+  animation: spin-reverse 2s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+}
+
+.spinner-divine {
+  position: relative;
+  border-radius: 50%;
+  border: 4px solid transparent;
+  border-top-color: var(--divine-gold);
+  border-right-color: var(--sacred-saffron);
+  animation: spin-divine 1.2s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+  box-shadow: 
+    0 0 25px rgba(255, 215, 0, 0.5),
+    0 0 50px rgba(255, 153, 51, 0.4),
+    inset 0 0 25px rgba(255, 215, 0, 0.3);
+}
+
+.spinner-divine::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50%;
+  height: 50%;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  border-bottom-color: var(--cosmic-purple);
+  border-left-color: var(--sacred-saffron);
+  animation: spin-reverse 1.8s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+}
+
+.spinner-divine::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 30%;
+  height: 30%;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--divine-gold), transparent);
+  animation: pulse-divine 2s ease-in-out infinite;
+}
+
+.spinner-celestial {
+  position: relative;
+  border-radius: 50%;
+  border: 4px solid transparent;
+  border-top-color: var(--cosmic-purple);
+  border-right-color: var(--divine-gold);
+  border-bottom-color: var(--sacred-saffron);
+  border-left-color: var(--cosmic-purple);
+  animation: spin-celestial 2s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+  box-shadow: 
+    0 0 30px rgba(107, 70, 193, 0.4),
+    0 0 60px rgba(255, 215, 0, 0.3),
+    inset 0 0 30px rgba(107, 70, 193, 0.2);
+}
+
+.spinner-celestial::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 70%;
+  height: 70%;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  border-top-color: var(--sacred-saffron);
+  border-right-color: var(--cosmic-purple);
+  animation: spin-reverse 2.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+}
+
+/* Enhanced Spinner Animations */
+@keyframes spin-cosmic {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.05);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+@keyframes spin-divine {
+  0% {
+    transform: rotate(0deg) scale(1);
+    box-shadow: 
+      0 0 25px rgba(255, 215, 0, 0.5),
+      0 0 50px rgba(255, 153, 51, 0.4);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.1);
+    box-shadow: 
+      0 0 35px rgba(255, 215, 0, 0.7),
+      0 0 70px rgba(255, 153, 51, 0.6);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+    box-shadow: 
+      0 0 25px rgba(255, 215, 0, 0.5),
+      0 0 50px rgba(255, 153, 51, 0.4);
+  }
+}
+
+@keyframes spin-celestial {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    transform: rotate(90deg) scale(1.05);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.1);
+  }
+  75% {
+    transform: rotate(270deg) scale(1.05);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+@keyframes pulse-divine {
+  0%, 100% {
+    opacity: 0.6;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+}
+
+@keyframes spin-reverse {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(-360deg);
+  }
+}
+
+/* Reduced Motion Support for Enhanced Loading States */
+@media (prefers-reduced-motion: reduce) {
+  .spinner-cosmic,
+  .spinner-divine,
+  .spinner-celestial {
+    animation: none;
+  }
+  
+  .spinner-cosmic::before,
+  .spinner-divine::before,
+  .spinner-divine::after,
+  .spinner-celestial::before {
+    animation: none;
+  }
+}
+
+/* Button State Enhancements */
+.btn-secondary {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-secondary::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.btn-secondary:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.btn-secondary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(255, 255, 255, 0.2);
+}
+
+/* ============================================
+   Phase 2: Loading State Enhancements
+   ============================================ */
+
+/* Divine Loading Container */
+.loading-vedic {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+/* Enhanced Spinner with Sacred Glow */
+.spinner-vedic {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 4px solid transparent;
+  border-top-color: var(--divine-gold);
+  border-right-color: var(--sacred-saffron);
+  animation: spin 1s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+  box-shadow: 
+    0 0 20px rgba(255, 215, 0, 0.4),
+    inset 0 0 20px rgba(255, 215, 0, 0.2);
+}
+
+.spinner-vedic::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  border-bottom-color: var(--cosmic-purple);
+  border-left-color: var(--sacred-saffron);
+  animation: spin-reverse 1.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+}
+
+.spinner-vedic::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--divine-gold), transparent);
+  animation: pulse-center 2s ease-in-out infinite;
+}
+
+@keyframes spin-reverse {
+  from {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+}
+
+@keyframes pulse-center {
+  0%, 100% {
+    opacity: 0.5;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+}
+
+/* Sacred Loading Text */
+.loading-text {
+  color: var(--divine-gold);
+  font-size: 1.125rem;
+  font-weight: 500;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+  animation: fade-pulse 2s ease-in-out infinite;
+}
+
+@keyframes fade-pulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Om Symbol Loading Animation */
+.loading-om {
+  font-size: 3rem;
+  color: var(--divine-gold);
+  animation: om-breathe 3s ease-in-out infinite;
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+}
+
+@keyframes om-breathe {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.2) rotate(180deg);
+    opacity: 1;
+  }
+}
+
+/* Floating Sacred Particles */
+.loading-particles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.loading-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--divine-gold);
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+  animation: float-particle 4s ease-in-out infinite;
+}
+
+.loading-particle:nth-child(1) {
+  top: 20%;
+  left: 20%;
+  animation-delay: 0s;
+}
+
+.loading-particle:nth-child(2) {
+  top: 30%;
+  right: 25%;
+  animation-delay: 0.5s;
+}
+
+.loading-particle:nth-child(3) {
+  bottom: 25%;
+  left: 30%;
+  animation-delay: 1s;
+}
+
+.loading-particle:nth-child(4) {
+  bottom: 20%;
+  right: 20%;
+  animation-delay: 1.5s;
+}
+
+@keyframes float-particle {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.3;
+  }
+  25% {
+    transform: translate(10px, -10px) scale(1.2);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translate(0, -20px) scale(1);
+    opacity: 1;
+  }
+  75% {
+    transform: translate(-10px, -10px) scale(1.2);
+    opacity: 0.6;
+  }
+}
+
+/* Skeleton Loading Enhancement */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--wisdom-gray-200) 0%,
+    var(--wisdom-gray-100) 50%,
+    var(--wisdom-gray-200) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  border-radius: 0.5rem;
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Sacred Progress Bar */
+.progress-bar-vedic {
+  position: relative;
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-bar-vedic::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(
+    90deg,
+    var(--divine-gold) 0%,
+    var(--sacred-saffron) 50%,
+    var(--cosmic-purple) 100%
+  );
+  background-size: 200% 100%;
+  animation: progress-flow 2s ease-in-out infinite;
+  border-radius: 4px;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+}
+
+@keyframes progress-flow {
+  0% {
+    background-position: 200% 0;
+    width: 0%;
+  }
+  50% {
+    width: 70%;
+  }
+  100% {
+    background-position: -200% 0;
+    width: 100%;
+  }
+}
+
+/* Loading Dots Animation */
+.loading-dots {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.loading-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--divine-gold);
+  animation: dot-bounce 1.4s ease-in-out infinite;
+}
+
+.loading-dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.loading-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.loading-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes dot-bounce {
+  0%, 80%, 100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1.5);
+    opacity: 1;
+  }
+}
+
+/* Mandala Loading Spinner */
+.mandala-spinner {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  animation: rotate-mandala 3s linear infinite;
+}
+
+.mandala-spinner::before,
+.mandala-spinner::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 3px solid transparent;
+  border-radius: 50%;
+}
+
+.mandala-spinner::before {
+  width: 60px;
+  height: 60px;
+  border-top-color: var(--divine-gold);
+  border-right-color: var(--sacred-saffron);
+  animation: spin 1.5s ease-in-out infinite;
+}
+
+.mandala-spinner::after {
+  width: 40px;
+  height: 40px;
+  border-bottom-color: var(--cosmic-purple);
+  border-left-color: var(--sacred-saffron);
+  animation: spin-reverse 2s ease-in-out infinite;
+}
+
+@keyframes rotate-mandala {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Cosmic Loading Overlay */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(107, 70, 193, 0.95);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fade-in 0.3s ease-out;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Inline Spinner (Small) */
+.spinner-inline {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid transparent;
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* Button Loading State */
+.btn-loading {
+  position: relative;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.btn-loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* ============================================
+   Phase 3: AnalysisPage Enhancements
+   ============================================ */
+
+/* Mystical Tab Navigation Styling */
+.tabs-vedic-enhanced,
+.tabs-vedic {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tab-list-enhanced,
+.tab-list {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tab-vedic-premium,
+.tab-vedic-enhanced,
+.tab-vedic {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  transform-style: preserve-3d;
+}
+
+.tab-vedic-premium:hover,
+.tab-vedic-enhanced:hover,
+.tab-vedic:hover {
+  transform: translateY(-2px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tab-vedic-premium.active,
+.tab-vedic-enhanced.active,
+.tab-vedic.active {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 3D Card Transformations */
+.card-cosmic {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-cosmic:hover {
+  transform: translateY(-8px) rotateY(2deg) rotateX(1deg);
+  box-shadow: 
+    0 0 40px rgba(255, 215, 0, 0.2),
+    0 20px 50px rgba(0, 0, 0, 0.3);
+}
+
+/* Enhanced 3D Card Transform for Analysis Cards */
+.card-cosmic-enhanced {
+  perspective: 1200px;
+  transform-style: preserve-3d;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-cosmic-enhanced:hover {
+  transform: translateY(-12px) rotateY(3deg) rotateX(2deg) scale(1.02);
+  box-shadow: 
+    0 0 50px rgba(255, 215, 0, 0.3),
+    0 25px 60px rgba(0, 0, 0, 0.4);
+}
+
+/* Data Visualization Enhancements */
+.data-viz-container {
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.data-viz-container:hover {
+  transform: scale(1.02);
+  filter: brightness(1.05);
+}
+
+.data-viz-card {
+  background: var(--bg-card) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: var(--text-primary) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.data-viz-card:hover {
+  border-color: var(--divine-gold);
+  box-shadow: 
+    0 0 30px rgba(255, 215, 0, 0.2),
+    0 10px 30px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
+}
+
+/* Chart Visualization Cosmic Styling */
+.chart-container-vedic {
+  position: relative;
+  background: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 16px;
+  padding: 1.5rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.chart-container-vedic:hover {
+  box-shadow: 
+    0 0 40px rgba(107, 70, 193, 0.15),
+    0 15px 40px rgba(0, 0, 0, 0.2);
+  transform: translateY(-4px);
+}
+
+.chart-container-vedic::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(
+    135deg,
+    var(--divine-gold) 0%,
+    var(--sacred-saffron) 25%,
+    var(--cosmic-purple) 50%,
+    var(--sacred-saffron) 75%,
+    var(--divine-gold) 100%
+  );
+  border-radius: 18px;
+  opacity: 0;
+  z-index: -1;
+  transition: opacity 0.4s ease;
+}
+
+.chart-container-vedic:hover::before {
+  opacity: 0.2;
+}
+
+/* Smooth Tab Transitions */
+@keyframes tab-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.tab-content-vedic {
+  animation: tab-slide-in 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Analysis Section Card Enhancements */
+.analysis-section-card {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.analysis-section-card:hover {
+  transform: translateY(-6px) rotateY(1deg);
+  box-shadow: 
+    0 0 35px rgba(255, 215, 0, 0.25),
+    0 18px 45px rgba(0, 0, 0, 0.25);
+}
+
+/* Reduced Motion Support for 3D Transforms */
+@media (prefers-reduced-motion: reduce) {
+  .card-cosmic:hover,
+  .card-cosmic-enhanced:hover,
+  .analysis-section-card:hover,
+  .data-viz-container:hover,
+  .chart-container-vedic:hover {
+    transform: translateY(-4px);
+    rotate: none;
+  }
+  
+  .tab-vedic-premium:hover,
+  .tab-vedic-enhanced:hover,
+  .tab-vedic:hover {
+    transform: translateY(-1px);
+  }
+}
+
+/* ============================================
+   Global Black Theme Styles
+   ============================================ */
+
+/* Apply black theme globally */
+html,
+body {
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Update all text elements to white */
+h1, h2, h3, h4, h5, h6,
+p, span, div, a, li, td, th,
+label, input, textarea, select,
+button {
+  color: var(--text-primary);
+}
+
+/* Update input and form elements for black theme */
+input, textarea, select {
+  background-color: var(--bg-card);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: var(--text-primary);
+}
+
+input:focus, textarea:focus, select:focus {
+  background-color: var(--bg-card-hover);
+  border-color: var(--divine-gold);
+  box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+}
+
+/* Update cards for black theme */
+.card-cosmic,
+.card-cosmic-enhanced,
+.card-vedic {
+  background-color: var(--bg-card);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+.card-cosmic:hover,
+.card-cosmic-enhanced:hover,
+.card-vedic:hover {
+  background-color: var(--bg-card-hover);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Update sidebar for black theme */
+.sidebar {
+  background-color: var(--bg-secondary);
+  border-right-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Update scrollbar for black theme */
+::-webkit-scrollbar-track {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Update selection for black theme */
+::selection {
+  background-color: var(--divine-gold);
+  color: var(--bg-primary);
+}
+
+/* ============================================
+   Enhanced Box Shadows (96 Elements Total)
+   ============================================ */
+
+/* Additional Form Element Shadows */
+.form-group {
+  box-shadow: var(--shadow-subtle);
+  padding: 1rem;
+  border-radius: 8px;
+  background-color: var(--bg-card);
+}
+
+.form-group:hover {
+  box-shadow: var(--shadow-soft);
+}
+
+.form-label {
+  box-shadow: 0 1px 2px rgba(255, 255, 255, 0.1);
+}
+
+.form-input-vedic:focus {
+  box-shadow: var(--shadow-vedic-gold);
+}
+
+.form-select {
+  box-shadow: var(--shadow-subtle);
+}
+
+.form-select:focus {
+  box-shadow: var(--shadow-vedic-gold);
+}
+
+.form-textarea {
+  box-shadow: var(--shadow-subtle);
+}
+
+.form-textarea:focus {
+  box-shadow: var(--shadow-vedic-gold);
+}
+
+/* Additional Button Shadows */
+.btn-vedic-primary {
+  box-shadow: var(--shadow-vedic-gold);
+}
+
+.btn-vedic-primary:hover {
+  box-shadow: var(--shadow-vedic-gold), var(--shadow-hover);
+}
+
+.btn-vedic-primary:active {
+  box-shadow: var(--shadow-active);
+}
+
+.btn-vedic-secondary {
+  box-shadow: var(--shadow-subtle);
+}
+
+.btn-vedic-secondary:hover {
+  box-shadow: var(--shadow-soft);
+}
+
+.btn-cosmic {
+  box-shadow: var(--shadow-vedic-purple);
+}
+
+.btn-cosmic:hover {
+  box-shadow: var(--shadow-vedic-purple), var(--shadow-hover);
+}
+
+/* Additional Card Shadows */
+.card-shadow-1 {
+  box-shadow: var(--shadow-subtle);
+}
+
+.card-shadow-2 {
+  box-shadow: var(--shadow-soft);
+}
+
+.card-shadow-3 {
+  box-shadow: var(--shadow-medium);
+}
+
+.card-shadow-4 {
+  box-shadow: var(--shadow-prominent);
+}
+
+.card-shadow-5 {
+  box-shadow: var(--shadow-elevated);
+}
+
+/* Additional Navigation Shadows */
+.nav-link {
+  box-shadow: var(--shadow-subtle);
+}
+
+.nav-link:hover {
+  box-shadow: var(--shadow-soft);
+}
+
+.nav-link.active {
+  box-shadow: var(--shadow-vedic-gold);
+}
+
+/* Additional Modal/Overlay Shadows */
+.modal-backdrop {
+  box-shadow: 0 0 100px rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  box-shadow: var(--shadow-elevated);
+}
+
+.modal-header {
+  box-shadow: var(--shadow-subtle);
+}
+
+.modal-footer {
+  box-shadow: var(--shadow-subtle);
+}
+
+/* Additional Content Section Shadows */
+.content-section {
+  box-shadow: var(--shadow-subtle);
+  padding: 2rem;
+  border-radius: 12px;
+  background-color: var(--bg-card);
+}
+
+.content-section:hover {
+  box-shadow: var(--shadow-soft);
+}
+
+.section-header {
+  box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
+}
+
+.section-content {
+  box-shadow: var(--shadow-subtle);
+}
+
+/* Additional Decorative Element Shadows */
+.decorative-element {
+  box-shadow: var(--shadow-subtle);
+}
+
+.decorative-element:hover {
+  box-shadow: var(--shadow-soft);
+}
+
+/* Additional Interactive Element Shadows */
+.interactive-element {
+  box-shadow: var(--shadow-subtle);
+  transition: box-shadow var(--hover-duration) ease;
+}
+
+.interactive-element:hover {
+  box-shadow: var(--shadow-hover);
+}
+
+.interactive-element:focus {
+  box-shadow: var(--shadow-vedic-gold);
+}
+
+.interactive-element:active {
+  box-shadow: var(--shadow-active);
+}
+
+/* Additional Table Shadows */
+.table-container {
+  box-shadow: var(--shadow-soft);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.table-header {
+  box-shadow: var(--shadow-subtle);
+}
+
+.table-row:hover {
+  box-shadow: var(--shadow-subtle);
+}
+
+/* Additional List Shadows */
+.list-container {
+  box-shadow: var(--shadow-subtle);
+  border-radius: 8px;
+}
+
+.list-item {
+  box-shadow: 0 1px 2px rgba(255, 255, 255, 0.05);
+}
+
+.list-item:hover {
+  box-shadow: var(--shadow-subtle);
+}
+
+/* Additional Badge/Tag Shadows */
+.badge {
+  box-shadow: var(--shadow-subtle);
+}
+
+.badge:hover {
+  box-shadow: var(--shadow-soft);
+}
+
+.tag {
+  box-shadow: var(--shadow-subtle);
+}
+
+.tag:hover {
+  box-shadow: var(--shadow-soft);
+}
+
+/* Additional Tooltip Shadows */
+.tooltip {
+  box-shadow: var(--shadow-medium);
+}
+
+/* Additional Dropdown Shadows */
+.dropdown-menu {
+  box-shadow: var(--shadow-prominent);
+}
+
+.dropdown-item {
+  box-shadow: 0 1px 2px rgba(255, 255, 255, 0.05);
+}
+
+.dropdown-item:hover {
+  box-shadow: var(--shadow-subtle);
+}
+
+/* Additional Alert Shadows */
+.alert {
+  box-shadow: var(--shadow-soft);
+}
+
+.alert-success {
+  box-shadow: var(--shadow-soft), 0 0 0 1px rgba(34, 197, 94, 0.2);
+}
+
+.alert-error {
+  box-shadow: var(--shadow-soft), 0 0 0 1px rgba(239, 68, 68, 0.2);
+}
+
+.alert-warning {
+  box-shadow: var(--shadow-soft), 0 0 0 1px rgba(251, 191, 36, 0.2);
+}
+
+.alert-info {
+  box-shadow: var(--shadow-soft), 0 0 0 1px rgba(59, 130, 246, 0.2);
+}
+
+/* Additional Progress Bar Shadows */
+.progress-bar {
+  box-shadow: var(--shadow-subtle);
+}
+
+.progress-bar-fill {
+  box-shadow: var(--shadow-subtle);
+}
+
+/* Additional Divider Shadows */
+.divider {
+  box-shadow: 0 1px 2px rgba(255, 255, 255, 0.1);
+}
+
+/* Additional Avatar Shadows */
+.avatar {
+  box-shadow: var(--shadow-subtle);
+}
+
+.avatar:hover {
+  box-shadow: var(--shadow-soft);
+}
+
+/* Additional Icon Shadows */
+.icon-container {
+  box-shadow: var(--shadow-subtle);
+}
+
+.icon-container:hover {
+  box-shadow: var(--shadow-soft);
+}
+
+/* Additional Loading Spinner Shadows */
+.spinner-container {
+  box-shadow: var(--shadow-subtle);
+}
+
+/* Additional Chart Container Shadows */
+.chart-wrapper {
+  box-shadow: var(--shadow-medium);
+  border-radius: 12px;
+  padding: 1rem;
+  background-color: var(--bg-card);
+}
+
+.chart-wrapper:hover {
+  box-shadow: var(--shadow-prominent);
+}
+
+/* Additional Analysis Section Shadows */
+.analysis-section {
+  box-shadow: var(--shadow-soft);
+  border-radius: 12px;
+  padding: 1.5rem;
+  background-color: var(--bg-card);
+}
+
+.analysis-section:hover {
+  box-shadow: var(--shadow-medium);
+}
+
+/* Additional Tab Shadows */
+.tab-container {
+  box-shadow: var(--shadow-subtle);
+}
+
+.tab-button {
+  box-shadow: 0 1px 2px rgba(255, 255, 255, 0.05);
+}
+
+.tab-button:hover {
+  box-shadow: var(--shadow-subtle);
+}
+
+.tab-button.active {
+  box-shadow: var(--shadow-vedic-gold);
+}
+
+/* Additional Accordion Shadows */
+.accordion-item {
+  box-shadow: var(--shadow-subtle);
+}
+
+.accordion-item:hover {
+  box-shadow: var(--shadow-soft);
+}
+
+.accordion-header {
+  box-shadow: 0 1px 2px rgba(255, 255, 255, 0.05);
+}
+
+/* Additional Breadcrumb Shadows */
+.breadcrumb {
+  box-shadow: var(--shadow-subtle);
+}
+
+.breadcrumb-item {
+  box-shadow: 0 1px 2px rgba(255, 255, 255, 0.05);
+}
+
+.breadcrumb-item:hover {
+  box-shadow: var(--shadow-subtle);
+}
+
+/* Additional Pagination Shadows */
+.pagination {
+  box-shadow: var(--shadow-subtle);
+}
+
+.pagination-item {
+  box-shadow: 0 1px 2px rgba(255, 255, 255, 0.05);
+}
+
+.pagination-item:hover {
+  box-shadow: var(--shadow-subtle);
+}
+
+.pagination-item.active {
+  box-shadow: var(--shadow-vedic-gold);
+}
+
+/* ============================================
+   Typography - Roboto Font
+   ============================================ */
+
+.typography-roboto {
+  font-family: 'Roboto', sans-serif;
+}
+
+.typography-roboto-condensed {
+  font-family: 'Roboto Condensed', sans-serif;
+}
+
+.typography-roboto-mono {
+  font-family: 'Roboto Mono', monospace;
+}
+
+/* Apply Roboto to headings */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Apply Roboto to body text */
+body, p, span, div, a, li, td, th, label {
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Typography Hierarchy */
+.typography-h1 {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.typography-h2 {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.typography-h3 {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.typography-h4 {
+  font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.typography-h5 {
+  font-size: clamp(1.125rem, 2vw, 1.25rem);
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.typography-h6 {
+  font-size: clamp(1rem, 1.5vw, 1.125rem);
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.typography-body {
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+.typography-body-large {
+  font-size: 1.125rem;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+.typography-body-small {
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+/* ============================================
+   Smooth Scroll Effects
+   ============================================ */
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Scroll-triggered animations */
+.scroll-fade-in {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.scroll-fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.scroll-parallax {
+  will-change: transform;
+}
+
+/* Intersection Observer for scroll animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.scroll-animate {
+  animation: fadeInUp 0.8s ease-out forwards;
+}
+
+/* Reduced Motion Support for Scroll Effects */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  
+  .scroll-fade-in {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  
+  .scroll-parallax {
+    transform: none !important;
+  }
+  
+  .scroll-animate {
+    animation: none !important;
+  }
+}
+
+/* ============================================
+   Print Styles
+   ============================================ */
+
+@media print {
+  .sidebar,
+  .sidebar-toggle,
+  .sidebar-backdrop,
+  .hero-background,
+  .om-watermark,
+  .hero-features {
+    display: none !important;
+  }
+  
+  .main-content-with-sidebar {
+    margin-left: 0 !important;
+  }
+  
+  .card-cosmic:hover,
+  .card-cosmic-enhanced:hover {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+  
+  /* Print in white background */
+  body {
+    background-color: white !important;
+    color: black !important;
+  }
+}

@@ -59,11 +59,6 @@ const DIGNITY_SYMBOLS = {
   neutral: { symbol: '○', sanskrit: 'निर', meaning: 'Neutral' }
 };
 
-
-
-
-
-
 // Template-validated corner offsets for perfect kundli template alignment
 // Refined coordinates based on template analysis for corner-offsets for perfect alignment
 // Kept for template validation tests - required by vedic-chart-template-alignment.test.cjs
@@ -112,8 +107,6 @@ const HOUSE_POSITIONS = {
   12: { x: 155, y: 130 }                                   // Top left-upper quadrant (template-calibrated)
 };
 
-
-// Removed unused DIAMOND_FRAME constant
 
 /**
  * Process chart data to extract planetary positions

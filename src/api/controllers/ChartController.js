@@ -947,6 +947,16 @@ class ChartController {
       console.log('📦 Request body:', JSON.stringify(req.body, null, 2));
       console.log('📦 Request headers:', JSON.stringify(req.headers, null, 2));
 
+      // PRODUCTION-GRADE: Check if request body is empty or malformed
+      if (!req.body || Object.keys(req.body).length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'Request body is required',
+          error: 'Empty request body. Please provide either chart data or birth data for rendering.',
+          helpText: 'Provide either: (1) Pre-generated chart data (chartData or rasiChart), or (2) Birth data (dateOfBirth, timeOfBirth, and location)'
+        });
+      }
+
       // Extract rendering options from request body
       // CRITICAL FIX: Extract chartType to determine if rendering Rasi or Navamsa chart
       const { width = 800, includeData = false, chartType = 'rasi', ...birthData } = req.body;
@@ -980,8 +990,35 @@ class ChartController {
         console.log('🔍 renderChartSVG: Will generate chart from preprocessed birth data');
       }
 
+      // PRODUCTION-GRADE: Validate that we have either chart data or valid birth data
+      if (!chartDataToRender && !birthDataForGeneration) {
+        return res.status(400).json({
+          success: false,
+          message: 'No chart data or birth data provided',
+          error: 'Request must include either pre-generated chart data (chartData or rasiChart) or valid birth data for chart generation.',
+          helpText: 'Provide either: (1) Pre-generated chart data (chartData or rasiChart), or (2) Birth data (dateOfBirth, timeOfBirth, and location)'
+        });
+      }
+
       // Validate birth data if generation is needed
       if (birthDataForGeneration) {
+        // Check if birth data has any meaningful content
+        const hasBirthDataFields = birthDataForGeneration.dateOfBirth || 
+                                   birthDataForGeneration.timeOfBirth || 
+                                   birthDataForGeneration.placeOfBirth ||
+                                   birthDataForGeneration.latitude ||
+                                   birthDataForGeneration.longitude;
+        
+        if (!hasBirthDataFields) {
+          return res.status(400).json({
+            success: false,
+            message: 'Invalid birth data provided',
+            error: 'Birth data is required but missing required fields.',
+            requiredFields: ['dateOfBirth', 'timeOfBirth', 'placeOfBirth (or latitude/longitude)'],
+            helpText: 'Please provide dateOfBirth, timeOfBirth, and either placeOfBirth or coordinates (latitude, longitude)'
+          });
+        }
+
         const validationResult = validateChartRequest(birthDataForGeneration);
         
         console.log('🔍 Validation result:', {
@@ -993,7 +1030,9 @@ class ChartController {
           return res.status(400).json({
             success: false,
             message: 'Invalid birth data provided',
-            errors: validationResult.errors
+            error: 'Birth data validation failed',
+            errors: validationResult.errors,
+            helpText: 'Please provide valid dateOfBirth, timeOfBirth, and either placeOfBirth or coordinates (latitude, longitude)'
           });
         }
       }

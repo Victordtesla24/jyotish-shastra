@@ -5,6 +5,7 @@ import VedicChartDisplay from '../components/charts/VedicChartDisplay.jsx';
 import { useChart } from '../contexts/ChartContext.js';
 import UIDataSaver from '../components/forms/UIDataSaver.js';
 import NotificationToast from '../components/ui/NotificationToast.jsx';
+import PlanetaryAnimations from '../components/ui/PlanetaryAnimations.jsx';
 
 // Error Boundary Component for ChartPage
 class ChartPageErrorBoundary extends React.Component {
@@ -29,7 +30,8 @@ class ChartPageErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-gradient-vedic-primary relative overflow-hidden flex items-center justify-center">
+        <div className="min-h-screen relative overflow-hidden flex items-center justify-center" style={{ backgroundColor: 'rgb(0, 0, 0)', color: 'rgb(255, 255, 255)' }}>
+          <PlanetaryAnimations count={8} />
           <div className="text-center p-8">
             <h1 className="text-4xl font-cinzel text-gold mb-4">🔮 Cosmic Disturbance Detected</h1>
             <p className="text-lg text-saffron mb-6">The stars seem to be misaligned. Please refresh the page to restore harmony.</p>
@@ -193,9 +195,9 @@ const ChartPage = () => {
 
   if (!currentChart && showRedirectFallback) {
     return (
-      <div className="min-h-screen bg-gradient-vedic-primary relative overflow-hidden flex items-center justify-center">
+      <div className="min-h-screen relative overflow-hidden flex items-center justify-center" style={{ backgroundColor: 'rgb(0, 0, 0)', color: 'rgb(255, 255, 255)' }}>
         {toastNode}
-        <div className="absolute inset-0 pattern-mandala opacity-10" />
+        <PlanetaryAnimations count={8} />
         <div className="card-cosmic backdrop-vedic border-2 border-white/20 shadow-mandala p-10 rounded-3xl max-w-xl text-center relative z-10">
           <div className="text-5xl mb-4">🔄</div>
           <h2 className="text-3xl font-cinzel font-bold text-gradient-vedic mb-4">Fresh Chart Required</h2>
@@ -218,13 +220,9 @@ const ChartPage = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-vedic-primary relative overflow-hidden flex items-center justify-center">
+      <div className="min-h-screen relative overflow-hidden flex items-center justify-center" style={{ backgroundColor: 'rgb(0, 0, 0)', color: 'rgb(255, 255, 255)' }}>
         {toastNode}
-        {/* Cosmic Background Elements */}
-        <div className="absolute inset-0 pattern-mandala opacity-10"></div>
-        <div className="absolute top-20 left-10 symbol-om text-6xl animate-om-rotation opacity-20"></div>
-        <div className="absolute bottom-20 right-12 text-3xl opacity-20 animate-float">✦</div>
-
+        <PlanetaryAnimations count={8} />
         <div className="relative z-10">
           <VedicLoadingSpinner />
         </div>
@@ -234,13 +232,9 @@ const ChartPage = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-vedic-primary relative overflow-hidden flex items-center justify-center">
+      <div className="min-h-screen relative overflow-hidden flex items-center justify-center" style={{ backgroundColor: 'rgb(0, 0, 0)', color: 'rgb(255, 255, 255)' }}>
         {toastNode}
-        {/* Cosmic Background Elements */}
-        <div className="absolute inset-0 pattern-mandala opacity-10"></div>
-        <div className="absolute top-20 left-10 symbol-om text-6xl animate-om-rotation opacity-20"></div>
-        <div className="absolute bottom-20 right-12 text-3xl opacity-20 animate-float">✦</div>
-
+        <PlanetaryAnimations count={8} />
         <div className="card-cosmic backdrop-vedic border-2 border-white/20 shadow-mandala p-8 rounded-3xl max-w-md relative z-10">
           <div className="text-red-400 text-5xl mb-4 text-center">⚠️</div>
           <h2 className="text-2xl font-cinzel font-bold text-gradient-vedic mb-4 text-center">Error</h2>
@@ -260,23 +254,10 @@ const ChartPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-vedic-primary relative overflow-hidden">
+    <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: 'rgb(0, 0, 0)', color: 'rgb(255, 255, 255)' }}>
       {toastNode}
-      {/* Enhanced Cosmic Background Elements */}
-      <div className="absolute inset-0 pattern-mandala opacity-10"></div>
-      <div className="absolute top-20 left-10 symbol-om text-6xl animate-om-rotation opacity-20"></div>
-      <div className="absolute top-40 right-16 symbol-star text-4xl animate-cosmic-drift opacity-30"></div>
-      <div className="absolute bottom-32 left-20 symbol-lotus text-5xl animate-lotus-bloom opacity-25"></div>
-      <div className="absolute bottom-20 right-12 text-3xl opacity-20 animate-float">✦</div>
-      <div className="absolute top-1/3 left-1/4 text-2xl opacity-15 animate-divine-light">🌟</div>
-
-      {/* Floating Cosmic Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-10 left-1/4 w-2 h-2 bg-vedic-gold rounded-full animate-float opacity-60"></div>
-        <div className="absolute top-1/4 right-1/4 w-1 h-1 bg-lunar-silver rounded-full animate-cosmic-drift opacity-40"></div>
-        <div className="absolute bottom-1/4 left-1/3 w-3 h-3 bg-cosmic-purple rounded-full animate-celestial-glow opacity-50"></div>
-        <div className="absolute bottom-10 right-1/3 w-2 h-2 bg-solar-orange rounded-full animate-float opacity-70"></div>
-      </div>
+      {/* White Saturn & Planetary Animations (Matching Chris Cole) */}
+      <PlanetaryAnimations count={8} />
 
       <div className="relative z-10 py-12">
         <div className="vedic-container max-w-7xl mx-auto">
@@ -363,7 +344,7 @@ const ChartPage = () => {
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-12">
 
             {/* Main Rasi Chart */}
-            <div className="card-cosmic backdrop-vedic border-2 border-white/20 shadow-mandala p-8 rounded-3xl hover-celestial">
+            <div className="card-cosmic backdrop-vedic border-2 border-white/20 shadow-mandala p-8 rounded-3xl hover-celestial chart-container-shadow">
               <div className="text-center mb-6">
                 <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-cosmic rounded-full shadow-celestial mb-4 animate-sacred-pulse">
                   <span className="text-2xl text-white">🪐</span>
@@ -389,7 +370,7 @@ const ChartPage = () => {
 
             {/* Navamsa Chart */}
             {chartData?.navamsaChart && (
-              <div className="card-cosmic backdrop-vedic border-2 border-white/20 shadow-mandala p-8 rounded-3xl hover-celestial">
+              <div className="card-cosmic backdrop-vedic border-2 border-white/20 shadow-mandala p-8 rounded-3xl hover-celestial chart-container-shadow">
                 <div className="text-center mb-6">
                   <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-cosmic rounded-full shadow-celestial mb-4 animate-sacred-pulse">
                     <span className="text-2xl text-white">🌙</span>

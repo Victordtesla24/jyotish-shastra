@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext.js';
@@ -9,7 +9,10 @@ import Header from './components/Header.jsx';
 import Footer from './components/Footer.jsx';
 import { Button } from './components/ui';
 import { initializeErrorHandling } from './utils/apiErrorHandler.js';
+import PreLoader from './components/ui/PreLoader.jsx';
 import './styles/vedic-design-system.css';
+import './styles/chris-cole-enhancements.css';
+import Sidebar from './components/navigation/Sidebar.jsx';
 
 // Import pages directly instead of lazy loading to fix mounting issues
 import HomePage from './pages/HomePage.jsx';
@@ -178,13 +181,24 @@ class ErrorBoundary extends React.Component {
 }
 
 function App() {
+  const [isPreloading, setIsPreloading] = useState(true);
+
   // Initialize enhanced error handling
   useEffect(() => {
     initializeErrorHandling();
   }, []);
 
+  const handlePreloadComplete = () => {
+    setIsPreloading(false);
+  };
+
   return (
     <ErrorBoundary>
+      {/* PreLoader - Shows on initial page load */}
+      {isPreloading && (
+        <PreLoader onComplete={handlePreloadComplete} delay={1500} />
+      )}
+      
       <BrowserRouter
         future={{
           v7_startTransition: true,
@@ -195,14 +209,17 @@ function App() {
           <ChartProvider>
             <AnalysisProvider>
               <QueryClientProvider client={queryClient}>
-                <div className="app-container min-h-screen bg-gradient-to-br from-sacred-white to-gray-50 dark:from-dark-bg-primary dark:to-dark-bg-secondary transition-colors duration-300">
+                <div className={`app-container min-h-screen transition-colors duration-300 ${isPreloading ? 'opacity-0' : 'opacity-100 transition-opacity duration-500'}`} data-theme="chris-cole" style={{ backgroundColor: 'rgb(0, 0, 0)', color: 'rgb(255, 255, 255)' }}>
                 {/* PWA Status Banners */}
                 <PWAUpdateBanner />
                 <OfflineBanner />
 
+                {/* Sidebar Navigation */}
+                <Sidebar />
+
                 <Header />
 
-                <main className="flex-grow" id="main-content">
+                <main className="flex-grow main-content-with-sidebar" id="main-content">
                   <Routes>
                   <Route path="/" element={<HomePage />} />
                   <Route path="/chart" element={<ChartPage />} />

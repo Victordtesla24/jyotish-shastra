@@ -194,7 +194,7 @@ const LocationAutoComplete = ({
           required={required}
           disabled={disabled}
           role="combobox"
-          className={`input-vedic pl-10 pr-10 ${errorMessage || error ? 'border-red-500' : ''}`}
+          className={`form-input-vedic pl-10 pr-10 ${errorMessage || error ? 'border-red-500' : ''}`}
           style={{
             paddingLeft: '2.5rem',
             paddingRight: isLoading ? '2.5rem' : '1rem'

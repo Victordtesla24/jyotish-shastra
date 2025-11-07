@@ -33,6 +33,7 @@ import { useAnalysis } from '../contexts/AnalysisContext.js';
 // Import singleton data flow components
 import UIDataSaver from '../components/forms/UIDataSaver.js';
 import ResponseDataToUIDisplayAnalyser from '../components/analysis/ResponseDataToUIDisplayAnalyser.js';
+import PlanetaryAnimations from '../components/ui/PlanetaryAnimations.jsx';
 
 // ===== REUSABLE SUMMARY DISPLAY COMPONENT (ENHANCED) =====
 
@@ -83,7 +84,7 @@ const SummaryDisplay = ({ summary, title = '', compact = false }) => {
           return (
             <div className="flex items-center gap-2">
               <span className="font-semibold text-primary">{value}%</span>
-              <div className="flex-1 bg-gray-200 rounded-full h-2 max-w-[100px]">
+              <div className="flex-1 rounded-full h-2 max-w-[100px]" style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }}>
                 <div 
                   className={`h-2 rounded-full transition-all ${
                     value === 100 ? 'bg-green-500' : value >= 75 ? 'bg-yellow-500' : 'bg-orange-500'
@@ -213,7 +214,7 @@ const LagnaDisplay = ({ data }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {lagna.sign && (
           <div className="insight-card-enhanced group">
-            <div className="card-vedic h-full hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
+            <div className="card-vedic h-full hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl analysis-card-shadow">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 bg-jupiter/20 rounded-full flex items-center justify-center">
                   <span className="vedic-symbol text-jupiter">♃</span>
@@ -241,7 +242,7 @@ const LagnaDisplay = ({ data }) => {
 
         {lagna.degree && (
           <div className="insight-card-enhanced group">
-            <div className="card-vedic h-full hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
+            <div className="card-vedic h-full hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl analysis-card-shadow">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 bg-venus/20 rounded-full flex items-center justify-center">
                   <span className="vedic-symbol text-venus">♀</span>
@@ -258,7 +259,7 @@ const LagnaDisplay = ({ data }) => {
 
         {lagna.nakshatra && (
           <div className="insight-card-enhanced group">
-            <div className="card-vedic h-full hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
+            <div className="card-vedic h-full hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl analysis-card-shadow">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 bg-moon/20 rounded-full flex items-center justify-center">
                   <span className="vedic-symbol text-moon">☽</span>
@@ -281,7 +282,7 @@ const LagnaDisplay = ({ data }) => {
 
       {/* Enhanced Interpretation Section */}
       {lagna.description && (
-        <div className="card-cosmic group hover:shadow-xl transition-all duration-500">
+        <div className="card-cosmic group hover:shadow-xl transition-all duration-500 analysis-card-shadow">
           <div className="flex items-center gap-4 mb-6">
             <div className="w-12 h-12 bg-gradient-to-br from-third-eye-chakra to-crown-chakra rounded-full flex items-center justify-center text-white text-xl">
               🧠
@@ -298,7 +299,7 @@ const LagnaDisplay = ({ data }) => {
 
       {/* Enhanced Characteristics Grid */}
       {lagna.characteristics && Array.isArray(lagna.characteristics) && (
-        <div className="card-sacred group hover:shadow-xl transition-all duration-500">
+        <div className="card-sacred group hover:shadow-xl transition-all duration-500 analysis-card-shadow">
           <div className="flex items-center gap-4 mb-6">
             <div className="w-12 h-12 bg-gradient-to-br from-friendly to-exalted rounded-full flex items-center justify-center text-white text-xl">
               ✨
@@ -322,7 +323,7 @@ const LagnaDisplay = ({ data }) => {
 
       {/* Enhanced Strengths Section */}
       {lagna.strengths && Array.isArray(lagna.strengths) && (
-        <div className="card-vedic group hover:shadow-xl transition-all duration-500">
+        <div className="card-vedic group hover:shadow-xl transition-all duration-500 analysis-card-shadow">
           <div className="flex items-center gap-4 mb-6">
             <div className="w-12 h-12 bg-gradient-to-br from-exalted to-friendly rounded-full flex items-center justify-center text-white text-xl">
               💪
@@ -690,7 +691,7 @@ const AspectsDisplay = ({ data }) => {
 
       {/* Enhanced Major Aspects List */}
       {majorAspects.length > 0 && (
-        <div className="card-cosmic group hover:shadow-xl transition-all duration-500">
+        <div className="card-cosmic group hover:shadow-xl transition-all duration-500 analysis-card-shadow">
           <div className="flex items-center gap-4 mb-6">
             <div className="w-12 h-12 bg-gradient-to-br from-third-eye-chakra to-crown-chakra rounded-full flex items-center justify-center text-white text-xl">
               ⭐
@@ -758,7 +759,7 @@ const AspectsDisplay = ({ data }) => {
 
       {/* Enhanced Patterns Section */}
       {patterns.length > 0 && (
-        <div className="card-sacred group hover:shadow-xl transition-all duration-500">
+        <div className="card-sacred group hover:shadow-xl transition-all duration-500 analysis-card-shadow">
           <div className="flex items-center gap-4 mb-6">
             <div className="w-12 h-12 bg-gradient-to-br from-friendly to-exalted rounded-full flex items-center justify-center text-white text-xl">
               ✨
@@ -784,7 +785,7 @@ const AspectsDisplay = ({ data }) => {
 
       {/* Enhanced Yogas Section */}
       {yogas.length > 0 && (
-        <div className="card-vedic group hover:shadow-xl transition-all duration-500">
+        <div className="card-vedic group hover:shadow-xl transition-all duration-500 analysis-card-shadow">
           <div className="flex items-center gap-4 mb-6">
             <div className="w-12 h-12 bg-gradient-to-br from-exalted to-friendly rounded-full flex items-center justify-center text-white text-xl">
               🕉️
@@ -963,7 +964,7 @@ const ArudhaDisplay = ({ data }) => {
 
       {/* Arudha Lagna Section */}
       {arudhaLagna.lagnaSign && (
-        <div className="card-cosmic group hover:shadow-xl transition-all duration-500">
+        <div className="card-cosmic group hover:shadow-xl transition-all duration-500 analysis-card-shadow">
           <div className="flex items-center gap-4 mb-6">
             <div className="w-12 h-12 bg-gradient-to-br from-jupiter to-gold rounded-full flex items-center justify-center text-white text-xl">
               🌟
@@ -1017,7 +1018,7 @@ const ArudhaDisplay = ({ data }) => {
 
       {/* Arudha Padas Section - Enhanced UI */}
       {Object.keys(filteredArudhaPadas).length > 0 && (
-        <div className="card-cosmic group hover:shadow-xl transition-all duration-500">
+        <div className="card-cosmic group hover:shadow-xl transition-all duration-500 analysis-card-shadow">
           <div className="flex items-center gap-4 mb-6">
             <div className="w-12 h-12 bg-gradient-to-br from-third-eye-chakra to-crown-chakra rounded-full flex items-center justify-center text-white text-xl">
               🏠
@@ -1124,7 +1125,7 @@ const ArudhaDisplay = ({ data }) => {
 
       {/* Image Stability */}
       {Object.keys(imageStability).length > 0 && (
-        <div className="card-vedic group hover:shadow-xl transition-all duration-500">
+        <div className="card-vedic group hover:shadow-xl transition-all duration-500 analysis-card-shadow">
           <div className="flex items-center gap-4 mb-6">
             <div className="w-12 h-12 bg-gradient-to-br from-exalted to-friendly rounded-full flex items-center justify-center text-white text-xl">
               ⚖️
@@ -1190,7 +1191,7 @@ const ArudhaDisplay = ({ data }) => {
 
       {/* Public Image Factors */}
       {publicImageFactors.length > 0 && (
-        <div className="card-cosmic group hover:shadow-xl transition-all duration-500">
+        <div className="card-cosmic group hover:shadow-xl transition-all duration-500 analysis-card-shadow">
           <div className="flex items-center gap-4 mb-6">
             <div className="w-12 h-12 bg-gradient-to-br from-jupiter to-saffron rounded-full flex items-center justify-center text-white text-xl">
               👥
@@ -1227,7 +1228,7 @@ const ArudhaDisplay = ({ data }) => {
 
       {/* Reputation Cycles */}
       {reputationCycles.length > 0 && (
-        <div className="card-cosmic group hover:shadow-xl transition-all duration-500">
+        <div className="card-cosmic group hover:shadow-xl transition-all duration-500 analysis-card-shadow">
           <div className="flex items-center gap-4 mb-6">
             <div className="w-12 h-12 bg-gradient-to-br from-friendly to-exalted rounded-full flex items-center justify-center text-white text-xl">
               🔄
@@ -1271,7 +1272,7 @@ const ArudhaDisplay = ({ data }) => {
 
       {/* Recommendations */}
       {recommendations.length > 0 && (
-        <div className="card-cosmic group hover:shadow-xl transition-all duration-500">
+        <div className="card-cosmic group hover:shadow-xl transition-all duration-500 analysis-card-shadow">
           <div className="flex items-center gap-4 mb-6">
             <div className="w-12 h-12 bg-gradient-to-br from-saffron to-gold rounded-full flex items-center justify-center">
               <FaLightbulb className="text-xl" style={{ color: 'var(--text-white)' }} aria-hidden="true" />
@@ -1479,7 +1480,7 @@ const NavamsaDisplay = ({ data }) => {
 
       {/* Navamsa Chart Visualization */}
       {navamsaChartData && (
-        <div className="card-cosmic group hover:shadow-xl transition-all duration-500">
+        <div className="card-cosmic group hover:shadow-xl transition-all duration-500 analysis-card-shadow">
           <div className="flex items-center gap-4 mb-6">
             <div className="w-12 h-12 bg-gradient-to-br from-saffron to-gold rounded-full flex items-center justify-center">
               <FaChartBar className="text-xl" style={{ color: 'var(--text-white)' }} aria-hidden="true" />
@@ -1498,7 +1499,7 @@ const NavamsaDisplay = ({ data }) => {
       <div className="space-y-8">
         {/* Chart Info */}
         {chartInfo.name && (
-          <div className="card-cosmic group hover:shadow-xl transition-all duration-500">
+          <div className="card-cosmic group hover:shadow-xl transition-all duration-500 analysis-card-shadow">
             <div className="flex items-center gap-4 mb-6">
               <div className="w-12 h-12 bg-gradient-to-br from-saffron to-gold rounded-full flex items-center justify-center text-white text-xl">
                 📊
@@ -1524,7 +1525,7 @@ const NavamsaDisplay = ({ data }) => {
 
         {/* Navamsa Lagna */}
         {navamsaLagna.sign && (
-          <div className="card-cosmic group hover:shadow-xl transition-all duration-500">
+          <div className="card-cosmic group hover:shadow-xl transition-all duration-500 analysis-card-shadow">
             <div className="flex items-center gap-4 mb-6">
               <div className="w-12 h-12 bg-gradient-to-br from-jupiter to-saffron rounded-full flex items-center justify-center text-white text-xl">
                 🌟
@@ -1596,7 +1597,7 @@ const NavamsaDisplay = ({ data }) => {
 
         {/* Vargottama Planets */}
         {vargottamaPlanets.length > 0 && (
-          <div className="card-cosmic group hover:shadow-xl transition-all duration-500">
+          <div className="card-cosmic group hover:shadow-xl transition-all duration-500 analysis-card-shadow">
             <div className="flex items-center gap-4 mb-6">
               <div className="w-12 h-12 bg-gradient-to-br from-gold to-saffron rounded-full flex items-center justify-center text-white text-xl">
                 ⭐
@@ -1638,7 +1639,7 @@ const NavamsaDisplay = ({ data }) => {
 
         {/* Planetary Strengths */}
         {Object.keys(planetaryStrengths).length > 0 && (
-          <div className="card-cosmic group hover:shadow-xl transition-all duration-500">
+          <div className="card-cosmic group hover:shadow-xl transition-all duration-500 analysis-card-shadow">
             <div className="flex items-center gap-4 mb-6">
               <div className="w-12 h-12 bg-gradient-to-br from-exalted to-friendly rounded-full flex items-center justify-center text-white text-xl">
                 💪
@@ -1759,7 +1760,7 @@ const NavamsaDisplay = ({ data }) => {
 
         {/* Marriage Indications */}
         {Object.keys(marriageIndications).length > 0 && (
-          <div className="card-cosmic group hover:shadow-xl transition-all duration-500">
+          <div className="card-cosmic group hover:shadow-xl transition-all duration-500 analysis-card-shadow">
             <div className="flex items-center gap-4 mb-6">
               <div className="w-12 h-12 bg-gradient-to-br from-friendly to-exalted rounded-full flex items-center justify-center text-white text-xl">
                 💒
@@ -1821,7 +1822,7 @@ const NavamsaDisplay = ({ data }) => {
 
         {/* Spiritual Indications */}
         {Object.keys(spiritualIndications).length > 0 && (
-          <div className="card-cosmic group hover:shadow-xl transition-all duration-500">
+          <div className="card-cosmic group hover:shadow-xl transition-all duration-500 analysis-card-shadow">
             <div className="flex items-center gap-4 mb-6">
               <div className="w-12 h-12 bg-gradient-to-br from-third-eye-chakra to-crown-chakra rounded-full flex items-center justify-center text-white text-xl">
                 🕉️
@@ -1873,7 +1874,7 @@ const NavamsaDisplay = ({ data }) => {
 
         {/* Yoga Formations */}
         {yogaFormations.length > 0 && (
-          <div className="card-cosmic group hover:shadow-xl transition-all duration-500">
+          <div className="card-cosmic group hover:shadow-xl transition-all duration-500 analysis-card-shadow">
             <div className="flex items-center gap-4 mb-6">
               <div className="w-12 h-12 bg-gradient-to-br from-friendly to-exalted rounded-full flex items-center justify-center text-white text-xl">
                 🧘
@@ -1928,7 +1929,7 @@ const NavamsaDisplay = ({ data }) => {
 
         {/* Overall Analysis */}
         {(overallAnalysis.summary || overallAnalysis.strengths || overallAnalysis.challenges || overallAnalysis.recommendations) && (
-          <div className="card-cosmic group hover:shadow-xl transition-all duration-500">
+          <div className="card-cosmic group hover:shadow-xl transition-all duration-500 analysis-card-shadow">
             <div className="flex items-center gap-4 mb-6">
               <div className="w-12 h-12 bg-gradient-to-br from-jupiter to-saffron rounded-full flex items-center justify-center text-white text-xl">
                 📋
@@ -2287,7 +2288,7 @@ const DashaDisplay = ({ data }) => {
         {!currentDasha.planet && antardashas.length === 0 && timeline.length === 0 && (
           <div className="text-center text-muted">
             <p>Dasha analysis will be available once comprehensive data is loaded.</p>
-            <pre className="text-xs mt-2 bg-gray-100 p-2 rounded">
+            <pre className="text-xs mt-2 p-2 rounded" style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)', color: 'rgb(255, 255, 255)' }}>
               Available data: {String(Object.keys(dasha), null, 2)}
             </pre>
           </div>
@@ -3207,8 +3208,9 @@ const AnalysisPage = () => {
   // Progressive loading with Vedic-themed spinner
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-vedic-bg flex items-center justify-center p-4">
-        <div className="text-center">
+      <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: 'rgb(0, 0, 0)', color: 'rgb(255, 255, 255)' }}>
+        <PlanetaryAnimations count={8} />
+        <div className="text-center relative z-10">
           <VedicLoadingSpinner
             symbol="mandala"
             size="large"
@@ -3243,8 +3245,9 @@ const AnalysisPage = () => {
   // Error state with Vedic styling
   if (error) {
     return (
-      <div className="min-h-screen bg-vedic-bg flex items-center justify-center p-4">
-        <div className="card-vedic max-w-md w-full text-center">
+      <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: 'rgb(0, 0, 0)', color: 'rgb(255, 255, 255)' }}>
+        <PlanetaryAnimations count={8} />
+        <div className="card-vedic max-w-md w-full text-center relative z-10">
           <ErrorMessage
             message={error.message || error}
             type="error"
@@ -3262,8 +3265,9 @@ const AnalysisPage = () => {
     // Give loadFromComprehensiveAnalysis a chance to run first
     if (!isLoading) {
       return (
-        <div className="min-h-screen bg-vedic-bg flex items-center justify-center p-4">
-          <div className="card-vedic max-w-md w-full text-center">
+        <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: 'rgb(0, 0, 0)', color: 'rgb(255, 255, 255)' }}>
+          <PlanetaryAnimations count={8} />
+          <div className="card-vedic max-w-md w-full text-center relative z-10">
             <div className="flex justify-center mb-4">
               <FaChartBar className="text-4xl" style={{ color: 'var(--vedic-gold)' }} aria-hidden="true" />
             </div>
@@ -3297,7 +3301,7 @@ const AnalysisPage = () => {
     } else {
       // Still loading, show loading state
       return (
-        <div className="min-h-screen bg-vedic-bg flex items-center justify-center p-4">
+        <div className="min-h-screen bg-black flex items-center justify-center p-4">
           <div className="text-center">
             <VedicLoadingSpinner
               symbol="mandala"
@@ -3442,7 +3446,9 @@ const AnalysisPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sacred-white via-white to-sacred-cream bg-cosmic-pattern">
+    <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: 'rgb(0, 0, 0)', color: 'rgb(255, 255, 255)' }}>
+      {/* White Saturn & Planetary Animations (Matching Chris Cole) */}
+      <PlanetaryAnimations count={8} />
       {/* Enhanced Background Pattern */}
       <div className="fixed inset-0 opacity-5 pointer-events-none">
         <div className="absolute inset-0" style={{
@@ -3542,7 +3548,7 @@ const AnalysisPage = () => {
 
             {/* Enhanced Tab Content Container */}
             <div className="card-cosmic-enhanced">
-              <div className="p-8 md:p-12">
+              <div className="p-8 md:p-12 tab-content-vedic">
                 {renderTabContent()}
               </div>
             </div>

@@ -1,10 +1,11 @@
 import React from 'react';
 import '../../styles/vedic-design-system.css';
+import '../../styles/chris-cole-enhancements.css';
 
 /**
  * Vedic Loading Spinner Component
  * Uses consistent Vedic design system with sacred symbols and animations
- * Enhanced with Vedic design system colors
+ * Enhanced with divine loading styles from Chris Cole enhancements
  */
 const VedicLoadingSpinner = ({
   size = 'md',
@@ -93,6 +94,33 @@ const VedicLoadingSpinner = ({
             </div>
           </div>
         );
+      case 'cosmic':
+        return (
+          <div className="relative">
+            <div className={`spinner-cosmic ${getSizeClasses()}`} style={spinnerStyle}></div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="vedic-symbol symbol-star animate-celestial-glow" style={{ color: spinnerColor }}></span>
+            </div>
+          </div>
+        );
+      case 'divine':
+        return (
+          <div className="relative">
+            <div className={`spinner-divine ${getSizeClasses()}`} style={spinnerStyle}></div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="vedic-symbol symbol-om animate-sacred-pulse" style={{ color: spinnerColor }}></span>
+            </div>
+          </div>
+        );
+      case 'celestial':
+        return (
+          <div className="relative">
+            <div className={`spinner-celestial ${getSizeClasses()}`} style={spinnerStyle}></div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="vedic-symbol symbol-planet animate-cosmic-drift" style={{ color: spinnerColor }}></span>
+            </div>
+          </div>
+        );
       default:
         return <div className={`spinner-vedic ${getSizeClasses()}`}></div>;
     }
@@ -103,11 +131,11 @@ const VedicLoadingSpinner = ({
       {getSpinnerComponent()}
       {showText && (
         <div className="flex flex-col items-center gap-2">
-          <p className="text-secondary font-medium">{text}</p>
-          <div className="flex gap-1">
-            <div className="w-2 h-2 bg-saffron rounded-full animate-pulse" style={{animationDelay: '0ms'}}></div>
-            <div className="w-2 h-2 bg-gold rounded-full animate-pulse" style={{animationDelay: '150ms'}}></div>
-            <div className="w-2 h-2 bg-maroon rounded-full animate-pulse" style={{animationDelay: '300ms'}}></div>
+          <p className="loading-text">{text}</p>
+          <div className="loading-dots">
+            <div className="loading-dot"></div>
+            <div className="loading-dot"></div>
+            <div className="loading-dot"></div>
           </div>
         </div>
       )}
