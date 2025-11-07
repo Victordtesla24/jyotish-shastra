@@ -1,5 +1,17 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { 
+  FaChartBar, 
+  FaBullseye, 
+  FaCheckCircle, 
+  FaTimesCircle, 
+  FaExclamationTriangle, 
+  FaLightbulb, 
+  FaCalendarAlt, 
+  FaClock, 
+  FaMapMarkerAlt, 
+  FaSearch 
+} from 'react-icons/fa';
 
 // Import Vedic design system
 import '../styles/vedic-design-system.css';
@@ -47,7 +59,17 @@ const SummaryDisplay = ({ summary, title = '', compact = false }) => {
           <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold ${
             value ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
           }`}>
-            {value ? '✅ Complete' : '❌ Incomplete'}
+            {value ? (
+              <>
+                <FaCheckCircle className="text-sm" aria-hidden="true" />
+                <span>Complete</span>
+              </>
+            ) : (
+              <>
+                <FaTimesCircle className="text-sm" aria-hidden="true" />
+                <span>Incomplete</span>
+              </>
+            )}
           </span>
         );
       }
@@ -388,7 +410,10 @@ const LagnaDisplay = ({ data }) => {
             </p>
             <div className="insight-card">
               <div className="insight-label">Analysis Status</div>
-              <div className="insight-value">✅ Data Available</div>
+              <div className="insight-value flex items-center gap-2">
+                <FaCheckCircle className="text-sm" style={{ color: 'var(--exalted-color)' }} aria-hidden="true" />
+                <span>Data Available</span>
+              </div>
               <div className="insight-detail">Comprehensive Lagna interpretation ready</div>
             </div>
           </div>
@@ -526,7 +551,10 @@ const HouseDisplay = ({ houseNumber, data }) => {
             {/* Challenges */}
             {house.analysis?.challenges && house.analysis.challenges.length > 0 && (
               <div className="mt-4">
-                <h5 className="text-sm font-semibold text-warning mb-2">⚠️ Challenges</h5>
+                <h5 className="text-sm font-semibold text-warning mb-2 flex items-center gap-2">
+                  <FaExclamationTriangle className="text-sm" style={{ color: 'var(--vedic-gold)' }} aria-hidden="true" />
+                  <span>Challenges</span>
+                </h5>
                 <ul className="list-disc list-inside space-y-1">
                   {house.analysis.challenges.map((challenge, index) => (
                     <li key={index} className="text-sm text-muted">{challenge}</li>
@@ -538,7 +566,10 @@ const HouseDisplay = ({ houseNumber, data }) => {
             {/* Recommendations */}
             {house.analysis?.recommendations && house.analysis.recommendations.length > 0 && (
               <div className="mt-4">
-                <h5 className="text-sm font-semibold text-primary mb-2">💡 Recommendations</h5>
+                <h5 className="text-sm font-semibold text-primary mb-2 flex items-center gap-2">
+                  <FaLightbulb className="text-sm" style={{ color: 'var(--vedic-saffron)' }} aria-hidden="true" />
+                  <span>Recommendations</span>
+                </h5>
                 <ul className="list-disc list-inside space-y-1">
                   {house.analysis.recommendations.map((rec, index) => (
                     <li key={index} className="text-sm text-muted">{rec}</li>
@@ -793,7 +824,9 @@ const AspectsDisplay = ({ data }) => {
 const ArudhaDisplay = ({ data }) => {
   if (!data) return (
     <div className="card-cosmic text-center animate-pulse">
-      <div className="text-6xl mb-4 animate-float">🎯</div>
+      <div className="flex justify-center mb-4 animate-float">
+        <FaBullseye className="text-6xl" style={{ color: 'var(--vedic-saffron)' }} aria-hidden="true" />
+      </div>
       <p className="text-muted text-lg">No Arudha Padas data available</p>
     </div>
   );
@@ -916,8 +949,8 @@ const ArudhaDisplay = ({ data }) => {
       {/* Enhanced Header Section */}
       <div className="card-sacred group hover:shadow-xl transition-all duration-500">
         <div className="flex items-center gap-4 mb-6">
-          <div className="w-16 h-16 bg-gradient-to-br from-jupiter to-saffron rounded-full flex items-center justify-center text-3xl animate-glow">
-            🎯
+          <div className="w-16 h-16 bg-gradient-to-br from-jupiter to-saffron rounded-full flex items-center justify-center animate-glow">
+            <FaBullseye className="text-3xl" style={{ color: 'var(--vedic-gold)' }} aria-hidden="true" />
           </div>
           <div>
             <h3 className="text-3xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
@@ -968,7 +1001,7 @@ const ArudhaDisplay = ({ data }) => {
               <div className="card-vedic group hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 bg-gold/20 rounded-full flex items-center justify-center">
-                    <span className="vedic-symbol text-gold">📍</span>
+                    <FaMapMarkerAlt className="text-lg" style={{ color: 'var(--vedic-gold)' }} aria-hidden="true" />
                   </div>
                   <h5 className="text-lg font-semibold text-primary">AL Lord Position</h5>
                 </div>
@@ -1105,7 +1138,7 @@ const ArudhaDisplay = ({ data }) => {
               <div className="card-vedic group hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 bg-exalted/20 rounded-full flex items-center justify-center">
-                    <span className="vedic-symbol text-exalted">📊</span>
+                    <FaChartBar className="text-lg" style={{ color: 'var(--exalted-color)' }} aria-hidden="true" />
                   </div>
                   <h5 className="text-lg font-semibold text-primary">Stability Score</h5>
                 </div>
@@ -1240,8 +1273,8 @@ const ArudhaDisplay = ({ data }) => {
       {recommendations.length > 0 && (
         <div className="card-cosmic group hover:shadow-xl transition-all duration-500">
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-12 h-12 bg-gradient-to-br from-saffron to-gold rounded-full flex items-center justify-center text-white text-xl">
-              💡
+            <div className="w-12 h-12 bg-gradient-to-br from-saffron to-gold rounded-full flex items-center justify-center">
+              <FaLightbulb className="text-xl" style={{ color: 'var(--text-white)' }} aria-hidden="true" />
             </div>
             <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
               Image Enhancement Recommendations
@@ -1275,7 +1308,9 @@ const ArudhaDisplay = ({ data }) => {
       {/* Display when no data available */}
       {!arudhaLagna.lagnaSign && Object.keys(filteredArudhaPadas).length === 0 && (
         <div className="card-vedic text-center">
-          <div className="text-6xl mb-4">🎯</div>
+          <div className="flex justify-center mb-4">
+            <FaBullseye className="text-6xl" style={{ color: 'var(--vedic-saffron)' }} aria-hidden="true" />
+          </div>
           <p className="text-lg text-secondary">Arudha analysis will be available once comprehensive data is loaded.</p>
         </div>
       )}
@@ -1446,8 +1481,8 @@ const NavamsaDisplay = ({ data }) => {
       {navamsaChartData && (
         <div className="card-cosmic group hover:shadow-xl transition-all duration-500">
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-12 h-12 bg-gradient-to-br from-saffron to-gold rounded-full flex items-center justify-center text-white text-xl">
-              📊
+            <div className="w-12 h-12 bg-gradient-to-br from-saffron to-gold rounded-full flex items-center justify-center">
+              <FaChartBar className="text-xl" style={{ color: 'var(--text-white)' }} aria-hidden="true" />
             </div>
             <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
               Navamsa Chart Visualization
@@ -1527,7 +1562,7 @@ const NavamsaDisplay = ({ data }) => {
                 <div className="card-vedic group hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-10 h-10 bg-gold/20 rounded-full flex items-center justify-center">
-                      <span className="vedic-symbol text-gold">📍</span>
+                      <FaMapMarkerAlt className="text-lg" style={{ color: 'var(--vedic-gold)' }} aria-hidden="true" />
                     </div>
                     <h5 className="text-lg font-semibold text-primary">House Position</h5>
                   </div>
@@ -1764,8 +1799,8 @@ const NavamsaDisplay = ({ data }) => {
               {marriageIndications.marriageTiming && (
                 <div className="card-vedic group hover:shadow-lg transition-all duration-300 p-5">
                   <h5 className="text-lg font-semibold text-primary mb-3 flex items-center gap-2">
-                    <span className="vedic-symbol text-saffron">⏰</span>
-                    Marriage Timing Indications
+                    <FaClock className="text-lg" style={{ color: 'var(--vedic-saffron)' }} aria-hidden="true" />
+                    <span>Marriage Timing Indications</span>
                   </h5>
                   <p className="text-secondary leading-relaxed">{marriageIndications.marriageTiming}</p>
                 </div>
@@ -1929,8 +1964,8 @@ const NavamsaDisplay = ({ data }) => {
               {overallAnalysis.challenges && Array.isArray(overallAnalysis.challenges) && overallAnalysis.challenges.length > 0 && (
                 <div className="card-vedic group hover:shadow-lg transition-all duration-300 p-5">
                   <h5 className="text-lg font-semibold text-primary mb-3 flex items-center gap-2">
-                    <span className="vedic-symbol text-enemy">⚠️</span>
-                    Challenges
+                    <FaExclamationTriangle className="text-lg" style={{ color: 'var(--enemy-color)' }} aria-hidden="true" />
+                    <span>Challenges</span>
                   </h5>
                   <ul className="space-y-2">
                     {overallAnalysis.challenges.map((challenge, index) => (
@@ -2068,7 +2103,10 @@ const DashaDisplay = ({ data }) => {
         {/* Antardashas */}
         {antardashas.length > 0 && (
           <div className="antardashas-section">
-            <h4 className="section-title">📅 Antardasha Periods</h4>
+            <h4 className="section-title flex items-center gap-2">
+              <FaCalendarAlt className="text-lg" style={{ color: 'var(--vedic-saffron)' }} aria-hidden="true" />
+              <span>Antardasha Periods</span>
+            </h4>
             <div className="antardashas-grid">
               {antardashas.map((antardasha, index) => (
                 <div key={index} className={`antardasha-card ${antardasha.status === 'current' ? 'current' : ''}`}>
@@ -2103,7 +2141,10 @@ const DashaDisplay = ({ data }) => {
         {/* Timeline */}
         {timeline.length > 0 && (
           <div className="dasha-timeline-section">
-            <h4 className="section-title">⏰ Life Events Timeline</h4>
+            <h4 className="section-title flex items-center gap-2">
+              <FaClock className="text-lg" style={{ color: 'var(--vedic-saffron)' }} aria-hidden="true" />
+              <span>Life Events Timeline</span>
+            </h4>
             <div className="timeline-container">
               {timeline.map((event, index) => (
                 <div key={index} className="timeline-item">
@@ -2199,11 +2240,16 @@ const DashaDisplay = ({ data }) => {
         {/* Recommendations */}
         {recommendations.length > 0 && (
           <div className="dasha-recommendations-section">
-            <h4 className="section-title">💡 Dasha Period Recommendations</h4>
+            <h4 className="section-title flex items-center gap-2">
+              <FaLightbulb className="text-lg" style={{ color: 'var(--vedic-saffron)' }} aria-hidden="true" />
+              <span>Dasha Period Recommendations</span>
+            </h4>
             <div className="recommendations-list">
               {recommendations.map((rec, index) => (
                 <div key={index} className="recommendation-item">
-                  <span className="rec-icon">🎯</span>
+                  <span className="rec-icon">
+                    <FaBullseye className="text-lg" style={{ color: 'var(--vedic-saffron)' }} aria-hidden="true" />
+                  </span>
                   <div className="rec-content">
                     <div className="rec-title">{rec.title || rec.category}</div>
                     <div className="rec-description">{rec.description || rec.text || rec}</div>
@@ -2220,7 +2266,10 @@ const DashaDisplay = ({ data }) => {
         {/* Dasha Sequence (if available) */}
         {dashaSequence.length > 0 && (
           <div className="dasha-sequence-section">
-            <h4 className="section-title">📊 Complete Dasha Sequence</h4>
+            <h4 className="section-title flex items-center gap-2">
+              <FaChartBar className="text-lg" style={{ color: 'var(--vedic-saffron)' }} aria-hidden="true" />
+              <span>Complete Dasha Sequence</span>
+            </h4>
             <div className="sequence-timeline">
               {dashaSequence.map((seq, index) => (
                 <div key={index} className={`sequence-item ${seq.status === 'current' ? 'current' : seq.status === 'completed' ? 'completed' : 'upcoming'}`}>
@@ -2330,7 +2379,7 @@ const PreliminaryDisplay = ({ data }) => {
               {preliminary.challenges.map((challenge, index) => (
                 <div key={index} className="bg-white/50 backdrop-blur-sm p-4 rounded-lg border border-orange/20 hover:border-orange/40 transition-all duration-300">
                   <div className="flex items-start gap-3">
-                    <span className="text-xl">⚠️</span>
+                    <FaExclamationTriangle className="text-xl" style={{ color: 'var(--vedic-gold)' }} aria-hidden="true" />
                     <span className="text-secondary leading-relaxed flex-1">{typeof challenge === 'object' ? String(challenge) : challenge}</span>
                   </div>
                 </div>
@@ -2342,14 +2391,14 @@ const PreliminaryDisplay = ({ data }) => {
         {preliminary.recommendations && Array.isArray(preliminary.recommendations) && preliminary.recommendations.length > 0 && (
           <div className="bg-gradient-to-r from-purple/10 to-pink/10 rounded-xl p-6 border border-purple/20 shadow-lg">
             <h4 className="text-xl font-bold text-primary mb-4 flex items-center gap-2">
-              <span className="text-2xl">🎯</span>
+              <FaBullseye className="text-2xl" style={{ color: 'var(--vedic-saffron)' }} aria-hidden="true" />
               Initial Recommendations
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {preliminary.recommendations.map((rec, index) => (
                 <div key={index} className="bg-white/50 backdrop-blur-sm p-4 rounded-lg border border-purple/20 hover:border-purple/40 transition-all duration-300">
                   <div className="flex items-start gap-3">
-                    <span className="text-xl">💡</span>
+                    <FaLightbulb className="text-xl" style={{ color: 'var(--vedic-saffron)' }} aria-hidden="true" />
                     <span className="text-secondary leading-relaxed flex-1">{typeof rec === 'object' ? String(rec) : rec}</span>
                   </div>
                 </div>
@@ -2362,8 +2411,8 @@ const PreliminaryDisplay = ({ data }) => {
         {preliminary.status && typeof preliminary.status === 'object' && (
           <div className="bg-gradient-to-br from-saffron/10 via-gold/10 to-white rounded-xl p-6 border border-saffron/20 shadow-lg">
             <h4 className="text-xl font-bold text-primary mb-4 flex items-center gap-2">
-              <span className="text-2xl">📊</span>
-              Analysis Status
+              <FaChartBar className="text-2xl" style={{ color: 'var(--vedic-saffron)' }} aria-hidden="true" />
+              <span>Analysis Status</span>
             </h4>
             <SummaryDisplay summary={preliminary.status} title="" compact={false} />
           </div>
@@ -2378,7 +2427,9 @@ const PreliminaryDisplay = ({ data }) => {
 const ComprehensiveDisplay = ({ data }) => {
   if (!data) return (
     <div className="card-cosmic text-center animate-pulse">
-      <div className="text-6xl mb-4 animate-float">📊</div>
+      <div className="flex justify-center mb-4 animate-float">
+        <FaChartBar className="text-6xl" style={{ color: 'var(--vedic-saffron)' }} aria-hidden="true" />
+      </div>
       <p className="text-muted text-lg">No comprehensive analysis data available</p>
     </div>
   );
@@ -2390,8 +2441,8 @@ const ComprehensiveDisplay = ({ data }) => {
       {/* Enhanced Header */}
       <div className="bg-gradient-to-r from-saffron/20 via-gold/20 to-white rounded-xl p-8 border-2 border-saffron/30 shadow-xl">
         <div className="flex items-center gap-4 mb-2">
-          <div className="w-16 h-16 bg-gradient-to-br from-saffron to-gold rounded-full flex items-center justify-center text-3xl animate-glow">
-            📊
+          <div className="w-16 h-16 bg-gradient-to-br from-saffron to-gold rounded-full flex items-center justify-center animate-glow">
+            <FaChartBar className="text-3xl" style={{ color: 'var(--text-white)' }} aria-hidden="true" />
           </div>
           <div>
             <h3 className="text-3xl font-bold text-primary">Comprehensive Analysis</h3>
@@ -2405,8 +2456,8 @@ const ComprehensiveDisplay = ({ data }) => {
         {comprehensive.sections?.section1?.summary && (
           <div className="bg-gradient-to-br from-saffron/10 via-gold/10 to-white rounded-xl p-6 border border-saffron/20 shadow-lg">
             <h4 className="text-xl font-bold text-primary mb-4 flex items-center gap-2">
-              <span className="text-2xl">📊</span>
-              Analysis Status Overview
+              <FaChartBar className="text-2xl" style={{ color: 'var(--vedic-saffron)' }} aria-hidden="true" />
+              <span>Analysis Status Overview</span>
             </h4>
             <SummaryDisplay summary={comprehensive.sections.section1.summary} compact={false} />
           </div>
@@ -2449,13 +2500,13 @@ const ComprehensiveDisplay = ({ data }) => {
                         <div className="flex flex-wrap gap-2 mt-2">
                           {section.questions?.length > 0 && (
                             <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-semibold">
-                              <span>💡</span>
-                              {section.questions.length} insights
+                              <FaLightbulb className="text-xs" style={{ color: 'var(--vedic-saffron)' }} aria-hidden="true" />
+                              <span>{section.questions.length} insights</span>
                             </span>
                           )}
                           {section.analyses && Object.keys(section.analyses).length > 0 && (
                             <span className="inline-flex items-center gap-1 px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-semibold">
-                              <span>🔍</span>
+                              <FaSearch className="text-xs" style={{ color: 'var(--vedic-saffron)' }} aria-hidden="true" />
                               {Object.keys(section.analyses).length} analyses
                             </span>
                           )}
@@ -2708,10 +2759,10 @@ const AnalysisPage = () => {
     preliminary: { url: '/api/v1/analysis/preliminary', label: 'Preliminary', icon: '📋' },
     houses: { url: '/api/v1/analysis/houses', label: 'Houses Analysis', icon: '🏠' },
     aspects: { url: '/api/v1/analysis/aspects', label: 'Planetary Aspects', icon: '🔗' },
-    arudha: { url: '/api/v1/analysis/arudha', label: 'Arudha Padas', icon: '🎯' },
+    arudha: { url: '/api/v1/analysis/arudha', label: 'Arudha Padas', icon: <FaBullseye className="text-lg" style={{ color: 'var(--vedic-saffron)' }} aria-hidden="true" /> },
     navamsa: { url: '/api/v1/analysis/navamsa', label: 'Navamsa Chart', icon: '🔄' },
     dasha: { url: '/api/v1/analysis/dasha', label: 'Dasha Periods', icon: '⏳' },
-    comprehensive: { url: '/api/v1/analysis/comprehensive', label: 'Full Analysis', icon: '📊' }
+    comprehensive: { url: '/api/v1/analysis/comprehensive', label: 'Full Analysis', icon: <FaChartBar className="text-lg" style={{ color: 'var(--vedic-saffron)' }} aria-hidden="true" /> }
   }), []);
 
   // Main tabs configuration
@@ -2719,11 +2770,11 @@ const AnalysisPage = () => {
     { key: 'lagna', label: 'Lagna Analysis', icon: '🌅' },
     { key: 'houses', label: 'Houses (1-12)', icon: '🏠', hasSubTabs: true },
     { key: 'aspects', label: 'Planetary Aspects', icon: '🔗' },
-    { key: 'arudha', label: 'Arudha Padas', icon: '🎯' },
+    { key: 'arudha', label: 'Arudha Padas', icon: <FaBullseye className="text-lg" style={{ color: 'var(--vedic-saffron)' }} aria-hidden="true" /> },
     { key: 'navamsa', label: 'Navamsa Chart', icon: '🔄' },
     { key: 'dasha', label: 'Dasha Periods', icon: '⏳' },
     { key: 'preliminary', label: 'Preliminary', icon: '📋' },
-    { key: 'comprehensive', label: 'Full Analysis', icon: '📊' }
+    { key: 'comprehensive', label: 'Full Analysis', icon: <FaChartBar className="text-lg" style={{ color: 'var(--vedic-saffron)' }} aria-hidden="true" /> }
   ], []);
 
   // House sub-tabs (1-12)
@@ -3213,7 +3264,9 @@ const AnalysisPage = () => {
       return (
         <div className="min-h-screen bg-vedic-bg flex items-center justify-center p-4">
           <div className="card-vedic max-w-md w-full text-center">
-            <div className="text-warning text-4xl mb-4">📊</div>
+            <div className="flex justify-center mb-4">
+              <FaChartBar className="text-4xl" style={{ color: 'var(--vedic-gold)' }} aria-hidden="true" />
+            </div>
             <h2 className="text-xl font-bold text-primary mb-4">No Analysis Data Available</h2>
             <p className="text-muted mb-4">
               Analysis data not found. Please ensure you have generated a birth chart or comprehensive analysis first.
@@ -3263,7 +3316,10 @@ const AnalysisPage = () => {
     const NoDataMessage = ({ analysisType }) => (
       <div className="analysis-section no-data-message text-center py-8" data-section-id={`${activeSection}-no-data`}>
         <h3 className="text-lg font-semibold text-gray-600 mb-2">
-          📊 {analysisType} Analysis
+          <span className="flex items-center gap-2">
+            <FaChartBar className="text-lg" style={{ color: 'var(--vedic-saffron)' }} aria-hidden="true" />
+            <span>{analysisType} Analysis</span>
+          </span>
         </h3>
         <p className="text-gray-500 mb-4">
           Analysis data is being loaded from the comprehensive API response...
@@ -3533,7 +3589,7 @@ const AnalysisPage = () => {
           <div className="card-cosmic max-w-md w-full p-8 relative z-10">
             <div className="text-center mb-6">
               <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center text-white text-2xl mb-4">
-                ⚠️
+                <FaExclamationTriangle className="text-2xl" style={{ color: 'var(--vedic-gold)' }} aria-hidden="true" />
               </div>
               <h2 className="text-2xl font-bold text-white mb-2">Analysis Not Available</h2>
             </div>

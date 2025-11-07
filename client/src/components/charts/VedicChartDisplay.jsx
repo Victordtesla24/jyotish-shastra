@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { FaTimesCircle } from 'react-icons/fa';
 import VedicLoadingSpinner from '../ui/VedicLoadingSpinner.jsx';
 import chartService from '../../services/chartService.js';
 
@@ -66,6 +67,7 @@ const DIGNITY_SYMBOLS = {
 // Template-validated corner offsets for perfect kundli template alignment
 // Refined coordinates based on template analysis for corner-offsets for perfect alignment
 // Kept for template validation tests - required by vedic-chart-template-alignment.test.cjs
+// eslint-disable-next-line no-unused-vars
 const CORNER_OFFSETS = {
   primary: { x: 65, y: 60 },      // Top-right corner offset (template-validated)
   secondary: { x: 65, y: -60 },   // Bottom-right corner offset (template-validated)
@@ -779,7 +781,9 @@ export default function VedicChartDisplay({
     
     return (
       <div className={`bg-red-50 border-2 border-red-200 rounded-lg p-6 text-center ${className}`} style={style}>
-        <div className="text-red-600 mb-4">❌</div>
+        <div className="flex justify-center mb-4">
+          <FaTimesCircle className="text-4xl" style={{ color: 'var(--debilitated-color)' }} aria-hidden="true" />
+        </div>
         <h3 className="text-lg font-semibold text-red-800 mb-2">Chart Rendering Error</h3>
         <p className="text-red-700 mb-2">{errorMessage}</p>
         {errorDetails.length > 0 && (
@@ -806,7 +810,9 @@ export default function VedicChartDisplay({
   if (!birthData) {
     return (
       <div className={`bg-red-50 border-2 border-red-200 rounded-lg p-6 text-center ${className}`} style={style}>
-        <div className="text-red-600 mb-4">❌</div>
+        <div className="flex justify-center mb-4">
+          <FaTimesCircle className="text-4xl" style={{ color: 'var(--debilitated-color)' }} aria-hidden="true" />
+        </div>
         <h3 className="text-lg font-semibold text-red-800 mb-2">Missing Birth Data</h3>
         <p className="text-red-700">Birth data is required for chart rendering.</p>
       </div>

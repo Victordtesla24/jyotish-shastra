@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -8,6 +8,7 @@ import '../styles/vedic-design-system.css';
 
 // Import UI components
 import { Button, Card, Alert, LoadingSpinner } from '../components/ui';
+import { FaCheckCircle, FaMagic, FaExclamationTriangle, FaChartBar } from 'react-icons/fa';
 import BirthDataForm from '../components/forms/BirthDataForm.js';
 import UIDataSaver from '../components/forms/UIDataSaver.js';
 import UIToAPIDataInterpreter from '../components/forms/UIToAPIDataInterpreter.js';
@@ -173,6 +174,9 @@ const BirthTimeRectificationPageEnhanced = () => {
   const [pageStep, setPageStep] = useState('intro');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const resultsRef = useRef(null);
+  // eslint-disable-next-line no-unused-vars
+  const nextStepButtonRef = useRef(null); // Reserved for future focus management enhancements
   const [birthData, setBirthData] = useState(null);
   const [rectificationData, setRectificationData] = useState(null);
   const [lifeEvents, setLifeEvents] = useState([]);
@@ -547,11 +551,27 @@ const BirthTimeRectificationPageEnhanced = () => {
       if (confidence >= 80) {
         setTimeout(() => setPageStep('results'), 1500);
       } else {
-        setTimeout(() => setPageStep('events'), 1500);
+        setTimeout(() => {
+          setPageStep('events');
+          // Move focus to events section after step change
+          setTimeout(() => {
+            const eventsSection = document.querySelector('[data-step="events"]');
+            if (eventsSection) {
+              eventsSection.focus();
+            }
+          }, 100);
+        }, 1500);
       }
     } catch (error) {
       console.error('Quick validation failed:', error);
-      const errorMessage = error.response?.data?.message || error.message || 'Birth time validation failed';
+      let errorMessage = 'Unable to compute rectification. Please check your inputs and try again.';
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message && !error.message.includes('Network')) {
+        errorMessage = error.message;
+      } else if (error.message?.includes('Network') || error.code === 'NETWORK_ERROR') {
+        errorMessage = 'Network error. Please check your connection and try again.';
+      }
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -739,6 +759,12 @@ const BirthTimeRectificationPageEnhanced = () => {
       // Normalize data structure - store rectification object consistently with quick validation
       setRectificationData(normalized);
       setPageStep('results');
+      // Move focus to results section after step change
+      setTimeout(() => {
+        if (resultsRef.current) {
+          resultsRef.current.focus();
+        }
+      }, 100);
       
       dataSaver.saveSession({
         ...dataSaver.loadSession(),
@@ -746,7 +772,14 @@ const BirthTimeRectificationPageEnhanced = () => {
       });
     } catch (error) {
       console.error('Full analysis failed:', error);
-      const errorMessage = error.response?.data?.message || error.message || 'Birth time rectification failed';
+      let errorMessage = 'Unable to compute rectification. Please check your inputs and try again.';
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message && !error.message.includes('Network')) {
+        errorMessage = error.message;
+      } else if (error.message?.includes('Network') || error.code === 'NETWORK_ERROR') {
+        errorMessage = 'Network error. Please check your connection and try again.';
+      }
       setError(errorMessage);
       setPageStep('events');
     } finally {
@@ -861,6 +894,7 @@ const BirthTimeRectificationPageEnhanced = () => {
                         onClick={performQuickValidation}
                         disabled={loading || quickValidationComplete}
                         className="w-full"
+                        aria-label={loading ? "Performing BPHS-BTR Validation" : quickValidationComplete ? "Validation Complete" : "Validate Birth Time"}
                       >
                         {loading ? (
                           <span className="flex items-center gap-3">
@@ -869,12 +903,12 @@ const BirthTimeRectificationPageEnhanced = () => {
                           </span>
                         ) : quickValidationComplete ? (
                           <span className="flex items-center gap-3">
-                            <span>✅</span>
+                            <FaCheckCircle className="text-green-600" style={{ color: 'var(--exalted-color)' }} />
                             <span>Validation Complete</span>
                           </span>
                         ) : (
                           <span className="flex items-center gap-3">
-                            <span>🔮</span>
+                            <FaMagic className="text-vedic-saffron" style={{ color: 'var(--vedic-saffron)' }} />
                             <span>Validate Birth Time</span>
                           </span>
                         )}
@@ -893,24 +927,32 @@ const BirthTimeRectificationPageEnhanced = () => {
                         
                         {safeNumber(rectificationData.confidence) >= 80 ? (
                           <Alert type="success" className="mt-4">
-                            <p className="font-semibold">✅ High Confidence!</p>
+                            <p className="font-semibold flex items-center gap-2">
+                              <FaCheckCircle className="text-green-600" style={{ color: 'var(--exalted-color)' }} />
+                              High Confidence!
+                            </p>
                             <p>Your birth time appears to be accurate with {safeNumber(rectificationData.confidence)}% confidence.</p>
                             <Button
                               variant="secondary"
                               onClick={() => setPageStep('results')}
                               className="mt-3"
+                              aria-label="View rectification results"
                             >
                               View Results
                             </Button>
                           </Alert>
                         ) : (
                           <Alert type="warning" className="mt-4">
-                            <p className="font-semibold">⚠️ Additional Verification Needed</p>
+                            <p className="font-semibold flex items-center gap-2">
+                              <FaExclamationTriangle className="text-yellow-600" style={{ color: 'var(--vedic-gold)' }} />
+                              Additional Verification Needed
+                            </p>
                             <p>Let's improve accuracy by adding some major life events (confidence: {safeNumber(rectificationData.confidence)}%).</p>
                             <Button
                               variant="secondary"
                               onClick={() => setPageStep('events')}
                               className="mt-3"
+                              aria-label="Add life events to improve accuracy"
                             >
                               Add Life Events
                             </Button>
@@ -977,6 +1019,7 @@ const BirthTimeRectificationPageEnhanced = () => {
                             size="sm"
                             onClick={() => removeLifeEvent(event.id)}
                             className="flex-shrink-0 text-red-500 hover:text-red-700"
+                            aria-label={`Remove life event: ${event.category} on ${event.date}`}
                           >
                             ×
                           </Button>
@@ -1051,9 +1094,9 @@ const BirthTimeRectificationPageEnhanced = () => {
                           </p>
                         </div>
                         
-                        <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-4 border-2 border-green-400">
-                          <p className="text-sm text-green-700 mb-2 font-semibold">Rectified Birth Time</p>
-                          <p className="text-2xl font-bold text-green-700">
+                        <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-4 border-2" style={{ borderColor: 'var(--vedic-gold)', backgroundColor: 'var(--vedic-gold-light, #FFF4B3)' }}>
+                          <p className="text-sm mb-2 font-semibold" style={{ color: 'var(--vedic-gold-dark, #DAB800)' }}>Rectified Birth Time</p>
+                          <p className="text-2xl font-bold" style={{ color: 'var(--vedic-gold-dark, #DAB800)' }}>
                             {(rectificationData?.rectifiedTime || rectificationData?.analysis?.bestCandidate?.time) 
                               ? formatTimeToHHMMSS(rectificationData?.rectifiedTime || rectificationData?.analysis?.bestCandidate?.time)
                               : 'Not calculated'}
@@ -1073,18 +1116,18 @@ const BirthTimeRectificationPageEnhanced = () => {
                   </Card>
 
                   {/* Results Display */}
-                  <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-300 shadow-lg">
+                  <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 shadow-lg" style={{ borderColor: 'var(--vedic-gold)', backgroundColor: 'var(--vedic-gold-light, #FFF4B3)' }}>
                     <div className="text-center space-y-6">
                       <h3 className="text-2xl font-bold text-gray-900">Rectification Confidence</h3>
                       
                       <div className="w-full bg-gray-200 rounded-full h-4 mt-4">
                         <div 
-                          className="bg-gradient-to-r from-green-500 to-emerald-600 h-4 rounded-full transition-all duration-2000"
-                          style={{ width: `${safeNumber(rectificationData?.confidence)}%` }}
+                          className="h-4 rounded-full transition-all duration-2000"
+                          style={{ width: `${safeNumber(rectificationData?.confidence)}%`, backgroundColor: 'var(--vedic-gold)' }}
                         />
                       </div>
                       
-                      <div className="text-3xl font-bold text-green-600">
+                      <div className="text-3xl font-bold" style={{ color: 'var(--vedic-gold-dark, #DAB800)' }}>
                         {safeNumber(rectificationData?.confidence)}% Confidence
                       </div>
                     </div>
@@ -1097,13 +1140,16 @@ const BirthTimeRectificationPageEnhanced = () => {
                       whileTap={{ scale: 0.98 }}
                     >
                       <div className="bg-gradient-to-br from-indigo-50 to-blue-50 border-2 border-indigo-300 rounded-xl p-6 text-center">
-                        <div className="text-4xl mb-4">📊</div>
+                        <div className="flex justify-center mb-4">
+                          <FaChartBar className="text-4xl" style={{ color: 'var(--vedic-saffron)' }} aria-hidden="true" />
+                        </div>
                         <h4 className="font-semibold text-gray-900 mb-2">Complete Astrology Analysis</h4>
                         <p className="text-sm text-gray-600 mb-4">
                           Use your rectified birth time for the most comprehensive Vedic astrology reading
                         </p>
                         <Button
                           variant="cosmic"
+                          aria-label="Generate comprehensive astrology analysis with rectified birth time"
                           onClick={() => {
                             try {
                               // Get rectified time from rectification data
@@ -1210,6 +1256,7 @@ const BirthTimeRectificationPageEnhanced = () => {
                             setQuickValidationComplete(false);
                           }}
                           className="w-full"
+                          aria-label="Add more life events to improve rectification accuracy"
                         >
                           Add More Events
                         </Button>
@@ -1234,6 +1281,7 @@ const BirthTimeRectificationPageEnhanced = () => {
             variant="secondary" 
             onClick={() => window.location.reload()}
             className="mt-2"
+            aria-label="Refresh page to reload application"
           >
             Refresh Page
           </Button>
@@ -1253,12 +1301,14 @@ const BirthTimeRectificationPageEnhanced = () => {
             variant="secondary" 
             onClick={() => setError(null)}
             className="mr-2"
+            aria-label="Try again after error"
           >
             Try Again
           </Button>
           <Button 
             variant="cosmic"
             onClick={() => navigate('/')}
+            aria-label="Navigate to home page to generate new chart"
           >
             Generate New Chart
           </Button>
@@ -1294,6 +1344,7 @@ const BirthTimeRectificationPageEnhanced = () => {
                     size="sm"
                     onClick={() => setError(null)}
                     className="text-gray-600 hover:text-gray-900"
+                    aria-label="Close error message"
                   >
                     ×
                   </Button>
@@ -1310,6 +1361,7 @@ const BirthTimeRectificationPageEnhanced = () => {
                 onClick={goToPreviousStep}
                 disabled={pageStep === 'intro' || loading}
                 className="text-gray-600 hover:text-gray-900"
+                aria-label="Go to previous step in rectification process"
               >
                 ← Previous Step
               </Button>
@@ -1333,6 +1385,7 @@ const BirthTimeRectificationPageEnhanced = () => {
                 onClick={goToNextStep}
                 disabled={!goToNextStep || loading}
                 className="text-gray-600 hover:text-gray-900"
+                aria-label="Go to next step in rectification process"
               >
                 Next Step →
               </Button>

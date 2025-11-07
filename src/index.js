@@ -337,20 +337,66 @@ const gracefulShutdown = (signal) => {
 process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
 process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
-// Error handlers
+// Enhanced error handlers with better logging and graceful shutdown
 process.on('uncaughtException', (err) => {
-  console.error('Uncaught Exception:', err);
-  process.exit(1);
-});
-
-process.on('unhandledRejection', (err) => {
-  console.error('Unhandled Rejection:', err);
+  console.error('🚨 Uncaught Exception - Critical Error:', {
+    name: err.name,
+    message: err.message,
+    stack: err.stack,
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
+  
+  // Attempt graceful shutdown
   if (typeof server !== 'undefined') {
     server.close(() => {
+      console.error('🛑 Server closed due to uncaught exception');
       process.exit(1);
     });
+    
+    // Force exit after 5 seconds
+    setTimeout(() => {
+      console.error('⚠️  Forced exit after uncaught exception timeout');
+      process.exit(1);
+    }, 5000);
   } else {
     process.exit(1);
+  }
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('🚨 Unhandled Promise Rejection:', {
+    reason: reason instanceof Error ? {
+      name: reason.name,
+      message: reason.message,
+      stack: reason.stack
+    } : reason,
+    promise: promise,
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
+  
+  // In production, attempt to continue running (log and monitor)
+  // In development, exit to catch issues early
+  if (process.env.NODE_ENV === 'production') {
+    console.warn('⚠️  Continuing despite unhandled rejection (production mode)');
+    // Optionally send to error tracking service
+  } else {
+    // Development: exit to catch issues early
+    if (typeof server !== 'undefined') {
+      server.close(() => {
+        console.error('🛑 Server closed due to unhandled rejection');
+        process.exit(1);
+      });
+      
+      // Force exit after 5 seconds
+      setTimeout(() => {
+        console.error('⚠️  Forced exit after unhandled rejection timeout');
+        process.exit(1);
+      }, 5000);
+    } else {
+      process.exit(1);
+    }
   }
 });
 

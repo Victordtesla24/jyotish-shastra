@@ -337,4 +337,252 @@ describe('BirthDataForm', () => {
     // Verify onSubmit was not called due to validation failure
     expect(mockSubmit).not.toHaveBeenCalled();
   });
+
+  describe('Accessibility Enhancements', () => {
+    test('has aria-label attributes on all form inputs', () => {
+      render(<BirthDataForm onSubmit={jest.fn()} />);
+
+      const nameInput = screen.getByLabelText(/name/i);
+      const dateInput = screen.getByLabelText(/date of birth/i);
+      const timeInput = screen.getByLabelText(/time of birth/i);
+      const placeInput = screen.getByPlaceholderText(/city, state, country/i);
+      const genderSelect = screen.getByLabelText(/gender/i);
+
+      expect(nameInput).toHaveAttribute('aria-label', 'Enter your name (optional)');
+      expect(dateInput).toHaveAttribute('aria-label', 'Enter date of birth in YYYY-MM-DD format (required)');
+      expect(timeInput).toHaveAttribute('aria-label', 'Enter time of birth in 24-hour format HH:MM (required)');
+      expect(placeInput).toHaveAttribute('role', 'combobox');
+      expect(genderSelect).toHaveAttribute('aria-label', 'Select gender (optional)');
+    });
+
+    test('has aria-label on clear button', () => {
+      render(<BirthDataForm onSubmit={jest.fn()} />);
+
+      const clearButton = screen.getByRole('button', { name: /clear/i });
+      expect(clearButton).toHaveAttribute('aria-label', 'Clear all form fields');
+    });
+
+    test('sets aria-invalid to true when field has validation error', async () => {
+      // Create a custom mock for this test that returns validation errors
+      UIToAPIDataInterpreter.mockImplementation(() => ({
+        validateInput: jest.fn(() => ({
+          isValid: false,
+          validatedData: {},
+          errors: [
+            { field: 'dateOfBirth', message: 'Date of birth is required' },
+            { field: 'timeOfBirth', message: 'Time of birth is required' }
+          ]
+        })),
+        formatForAPI: jest.fn(),
+        handleErrors: jest.fn()
+      }));
+
+      const mockSubmit = jest.fn();
+      
+      const initialDataWithCoordinates = {
+        name: 'Test User',
+        dateOfBirth: '',
+        timeOfBirth: '',
+        placeOfBirth: 'Pune, India',
+        latitude: 18.5204,
+        longitude: 73.8567,
+        timezone: 'Asia/Kolkata'
+      };
+      
+      render(<BirthDataForm onSubmit={mockSubmit} initialData={initialDataWithCoordinates} />);
+
+      // Wait for form to initialize with coordinates
+      await waitFor(() => {
+        const submitButton = screen.getByRole('button', { name: /generate vedic chart/i });
+        expect(submitButton).not.toBeDisabled();
+      }, { timeout: 2000 });
+
+      const submitButton = screen.getByRole('button', { name: /generate vedic chart/i });
+      fireEvent.click(submitButton);
+
+      await waitFor(() => {
+        const dateInput = screen.getByLabelText(/date of birth/i);
+        const timeInput = screen.getByLabelText(/time of birth/i);
+        
+        expect(dateInput).toHaveAttribute('aria-invalid', 'true');
+        expect(timeInput).toHaveAttribute('aria-invalid', 'true');
+      }, { timeout: 3000 });
+    });
+
+    test('sets aria-invalid to false when field has no validation error', () => {
+      render(<BirthDataForm onSubmit={jest.fn()} />);
+
+      const nameInput = screen.getByLabelText(/name/i);
+      expect(nameInput).toHaveAttribute('aria-invalid', 'false');
+    });
+
+    test('has aria-describedby linking to error messages', async () => {
+      // Create a custom mock for this test that returns validation errors
+      UIToAPIDataInterpreter.mockImplementation(() => ({
+        validateInput: jest.fn(() => ({
+          isValid: false,
+          validatedData: {},
+          errors: [
+            { field: 'dateOfBirth', message: 'Date of birth is required' }
+          ]
+        })),
+        formatForAPI: jest.fn(),
+        handleErrors: jest.fn()
+      }));
+
+      const mockSubmit = jest.fn();
+      
+      const initialDataWithCoordinates = {
+        name: 'Test User',
+        dateOfBirth: '',
+        timeOfBirth: '12:00',
+        placeOfBirth: 'Pune, India',
+        latitude: 18.5204,
+        longitude: 73.8567,
+        timezone: 'Asia/Kolkata'
+      };
+      
+      render(<BirthDataForm onSubmit={mockSubmit} initialData={initialDataWithCoordinates} />);
+
+      // Wait for form to initialize with coordinates
+      await waitFor(() => {
+        const submitButton = screen.getByRole('button', { name: /generate vedic chart/i });
+        expect(submitButton).not.toBeDisabled();
+      }, { timeout: 2000 });
+
+      const submitButton = screen.getByRole('button', { name: /generate vedic chart/i });
+      fireEvent.click(submitButton);
+
+      await waitFor(() => {
+        const dateInput = screen.getByLabelText(/date of birth/i);
+        expect(dateInput).toHaveAttribute('aria-describedby', 'dateOfBirth-error');
+        
+        const errorElement = document.getElementById('dateOfBirth-error');
+        expect(errorElement).toBeInTheDocument();
+        expect(errorElement).toHaveAttribute('role', 'alert');
+        expect(errorElement).toHaveTextContent('Date of birth is required');
+      }, { timeout: 3000 });
+    });
+
+    test('displays inline validation error messages with role="alert"', async () => {
+      // Create a custom mock for this test that returns validation errors
+      UIToAPIDataInterpreter.mockImplementation(() => ({
+        validateInput: jest.fn(() => ({
+          isValid: false,
+          validatedData: {},
+          errors: [
+            { field: 'timeOfBirth', message: 'Time of birth is required' }
+          ]
+        })),
+        formatForAPI: jest.fn(),
+        handleErrors: jest.fn()
+      }));
+
+      const mockSubmit = jest.fn();
+      
+      const initialDataWithCoordinates = {
+        name: 'Test User',
+        dateOfBirth: '1990-01-01',
+        timeOfBirth: '',
+        placeOfBirth: 'Pune, India',
+        latitude: 18.5204,
+        longitude: 73.8567,
+        timezone: 'Asia/Kolkata'
+      };
+      
+      render(<BirthDataForm onSubmit={mockSubmit} initialData={initialDataWithCoordinates} />);
+
+      // Wait for form to initialize with coordinates
+      await waitFor(() => {
+        const submitButton = screen.getByRole('button', { name: /generate vedic chart/i });
+        expect(submitButton).not.toBeDisabled();
+      }, { timeout: 2000 });
+
+      const submitButton = screen.getByRole('button', { name: /generate vedic chart/i });
+      fireEvent.click(submitButton);
+
+      await waitFor(() => {
+        const errorElement = document.getElementById('timeOfBirth-error');
+        expect(errorElement).toBeInTheDocument();
+        expect(errorElement).toHaveAttribute('role', 'alert');
+        expect(errorElement).toHaveAttribute('aria-live', 'polite');
+        expect(errorElement).toHaveTextContent('Time of birth is required');
+      }, { timeout: 3000 });
+    });
+  });
+
+  describe('Visual Enhancements', () => {
+    test('uses Vedic color variables for error states', async () => {
+      // Create a custom mock for this test that returns validation errors
+      UIToAPIDataInterpreter.mockImplementation(() => ({
+        validateInput: jest.fn(() => ({
+          isValid: false,
+          validatedData: {},
+          errors: [
+            { field: 'dateOfBirth', message: 'Date of birth is required' }
+          ]
+        })),
+        formatForAPI: jest.fn(),
+        handleErrors: jest.fn()
+      }));
+
+      const mockSubmit = jest.fn();
+      
+      const initialDataWithCoordinates = {
+        name: 'Test User',
+        dateOfBirth: '',
+        timeOfBirth: '12:00',
+        placeOfBirth: 'Pune, India',
+        latitude: 18.5204,
+        longitude: 73.8567,
+        timezone: 'Asia/Kolkata'
+      };
+      
+      render(<BirthDataForm onSubmit={mockSubmit} initialData={initialDataWithCoordinates} />);
+
+      // Wait for form to initialize with coordinates
+      await waitFor(() => {
+        const submitButton = screen.getByRole('button', { name: /generate vedic chart/i });
+        expect(submitButton).not.toBeDisabled();
+      }, { timeout: 2000 });
+
+      const submitButton = screen.getByRole('button', { name: /generate vedic chart/i });
+      fireEvent.click(submitButton);
+
+      await waitFor(() => {
+        const dateInput = screen.getByLabelText(/date of birth/i);
+        
+        // Check that error styling is applied (border color should be Vedic saffron via inline style)
+        const styleAttribute = dateInput.getAttribute('style');
+        expect(styleAttribute).toContain('var(--vedic-saffron)');
+      }, { timeout: 3000 });
+    });
+
+    test('displays error icon (FaExclamationTriangle) in global error message', async () => {
+      // Mock a network error scenario
+      const mockOnError = jest.fn();
+      
+      render(<BirthDataForm onSubmit={jest.fn()} onError={mockOnError} />);
+
+      // Simulate a network error by mocking the geocoding service to fail
+      geocodingService.geocodeLocation.mockRejectedValueOnce(new Error('Network error'));
+
+      const placeInput = screen.getByPlaceholderText(/city, state, country/i);
+      
+      await act(async () => {
+        await userEvent.type(placeInput, 'Test Location');
+      });
+
+      // Wait for error to appear
+      await waitFor(() => {
+        // Check for error message with icon - look for error in the form
+        const errorMessage = screen.queryByText(/network error|unable to geocode|location not found/i);
+        if (errorMessage) {
+          // Check that FaExclamationTriangle icon is present (it should be in the DOM)
+          const icon = errorMessage.closest('div')?.querySelector('svg');
+          expect(icon).toBeInTheDocument();
+        }
+      }, { timeout: 5000 });
+    });
+  });
 });

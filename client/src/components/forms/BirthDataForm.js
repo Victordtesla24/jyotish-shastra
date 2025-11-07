@@ -4,9 +4,13 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { FaUser, FaCalendarAlt, FaClock, FaMapMarkerAlt, FaVenusMars, FaExclamationTriangle, FaTrash, FaGlobe } from 'react-icons/fa';
 import geocodingService from '../../services/geocodingService.js';
 import UIDataSaver from './UIDataSaver.js';
 import UIToAPIDataInterpreter from './UIToAPIDataInterpreter.js';
+import Tooltip from '../ui/Tooltip.jsx';
+import LocationAutoComplete from '../ui/LocationAutoComplete.jsx';
+import '../../styles/vedic-design-system.css';
 import './BirthDataForm.css';
 
 const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
@@ -440,12 +444,24 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
 
     } catch (error) {
       console.error('Form submission error:', error);
-      const errorData = dataInterpreter?.handleErrors ? dataInterpreter.handleErrors(error) : { userMessage: error.message };
+      let userMessage = 'An error occurred. Please try again.';
+      
+      if (error.response?.data?.message) {
+        userMessage = error.response.data.message;
+      } else if (error.message?.includes('location') || error.message?.includes('Location')) {
+        userMessage = 'Location not found. Please verify the place name and try again.';
+      } else if (error.message?.includes('Network') || error.code === 'NETWORK_ERROR' || error.code === 'ECONNABORTED') {
+        userMessage = 'Network error. Please check your connection and try again.';
+      } else if (error.message && !error.message.includes('Network')) {
+        userMessage = error.message;
+      }
+      
+      const errorData = dataInterpreter?.handleErrors ? dataInterpreter.handleErrors(error) : { userMessage };
 
       if (onError) {
         onError(errorData);
       } else {
-        setErrors({ submit: errorData?.userMessage || 'An error occurred. Please try again.' });
+        setErrors({ submit: userMessage });
       }
     } finally {
       setLoading(false);
@@ -481,7 +497,7 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
           {/* Name Field */}
           <div className="form-group-vedic">
             <label htmlFor="name" className="form-label-vedic flex items-center space-x-2">
-              <span className="text-vedic-gold">👤</span>
+              <FaUser className="text-vedic-gold" style={{ color: 'var(--vedic-gold)' }} />
               <span>Name</span>
               <span className="text-xs text-white/60 font-normal">(Optional)</span>
             </label>
@@ -497,13 +513,17 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
                 className={`form-input-vedic transition-all duration-300 pl-12 ${
                   errors.name ? 'border-red-400 bg-red-50/10' : 'focus:shadow-cosmic'
                 }`}
+                style={errors.name ? { borderColor: 'var(--vedic-saffron)', backgroundColor: 'var(--vedic-saffron-light, rgba(255, 179, 102, 0.1))' } : {}}
+                aria-invalid={errors.name ? 'true' : 'false'}
+                aria-describedby={errors.name ? 'name-error' : 'name-help'}
+                aria-label="Enter your name (optional)"
               />
               <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-vedic-gold text-lg">
-                🕉️
+                <FaUser className="text-vedic-gold" style={{ color: 'var(--vedic-gold)' }} />
               </div>
             </div>
             {errors.name && (
-              <div className="alert-error text-sm mt-1 animate-fade-in" role="alert">
+              <div id="name-error" className="alert-error text-sm mt-1 animate-fade-in" role="alert" aria-live="polite">
                 {errors.name}
               </div>
             )}
@@ -512,7 +532,7 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
           {/* Gender Field */}
           <div className="form-group-vedic">
             <label htmlFor="gender" className="form-label-vedic flex items-center space-x-2">
-              <span className="text-vedic-gold">⚧</span>
+              <FaVenusMars className="text-vedic-gold" style={{ color: 'var(--vedic-gold)' }} />
               <span>Gender</span>
               <span className="text-xs text-white/60 font-normal">(Optional)</span>
             </label>
@@ -526,6 +546,10 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
                 className={`form-select-vedic transition-all duration-300 pl-12 ${
                   errors.gender ? 'border-red-400 bg-red-50/10' : 'focus:shadow-cosmic'
                 }`}
+                style={errors.gender ? { borderColor: 'var(--vedic-saffron)', backgroundColor: 'var(--vedic-saffron-light, rgba(255, 179, 102, 0.1))' } : {}}
+                aria-invalid={errors.gender ? 'true' : 'false'}
+                aria-describedby={errors.gender ? 'gender-error' : undefined}
+                aria-label="Select gender (optional)"
               >
                 <option value="prefer_not_to_say">Prefer not to say</option>
                 <option value="male">Male</option>
@@ -533,11 +557,11 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
                 <option value="other">Other</option>
               </select>
               <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-vedic-gold text-lg">
-                ⚖️
+                <FaVenusMars className="text-vedic-gold" style={{ color: 'var(--vedic-gold)' }} />
               </div>
             </div>
             {errors.gender && (
-              <div className="alert-error text-sm mt-1 animate-fade-in">
+              <div id="gender-error" className="alert-error text-sm mt-1 animate-fade-in" role="alert" aria-live="polite">
                 {errors.gender}
               </div>
             )}
@@ -546,9 +570,12 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
           {/* Date of Birth Field */}
           <div className="form-group-vedic">
             <label htmlFor="dateOfBirth" className="form-label-vedic flex items-center space-x-2">
-              <span className="text-vedic-gold">📅</span>
+              <FaCalendarAlt className="text-vedic-gold" style={{ color: 'var(--vedic-gold)' }} />
               <span>Date of Birth</span>
               <span className="text-red-400 text-sm">*</span>
+              <Tooltip content="Enter your date of birth in YYYY-MM-DD format. This is required for accurate chart calculations.">
+                <span></span>
+              </Tooltip>
             </label>
             <div className="relative">
               <input
@@ -564,13 +591,17 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
                 className={`form-input-vedic transition-all duration-300 pl-12 ${
                   errors.dateOfBirth ? 'border-red-400 bg-red-50/10' : 'focus:shadow-cosmic'
                 }`}
+                style={errors.dateOfBirth ? { borderColor: 'var(--vedic-saffron)', backgroundColor: 'var(--vedic-saffron-light, rgba(255, 179, 102, 0.1))' } : {}}
+                aria-invalid={errors.dateOfBirth ? 'true' : 'false'}
+                aria-describedby={errors.dateOfBirth ? 'dateOfBirth-error' : undefined}
+                aria-label="Enter date of birth in YYYY-MM-DD format (required)"
               />
               <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-vedic-gold text-lg">
-                🌅
+                <FaCalendarAlt className="text-vedic-gold" style={{ color: 'var(--vedic-gold)' }} />
               </div>
             </div>
             {errors.dateOfBirth && (
-              <div className="alert-error text-sm mt-1 animate-fade-in" role="alert">
+              <div id="dateOfBirth-error" className="alert-error text-sm mt-1 animate-fade-in" role="alert" aria-live="polite">
                 {errors.dateOfBirth}
               </div>
             )}
@@ -579,9 +610,12 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
           {/* Time of Birth Field */}
           <div className="form-group-vedic">
             <label htmlFor="timeOfBirth" className="form-label-vedic flex items-center space-x-2">
-              <span className="text-vedic-gold">⏰</span>
+              <FaClock className="text-vedic-gold" style={{ color: 'var(--vedic-gold)' }} />
               <span>Time of Birth</span>
               <span className="text-red-400 text-sm">*</span>
+              <Tooltip content="Use 24-hour format (HH:MM) for precise calculations. Example: 14:30 for 2:30 PM.">
+                <span></span>
+              </Tooltip>
             </label>
             <div className="relative">
               <input
@@ -595,16 +629,20 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
                 className={`form-input-vedic transition-all duration-300 pl-12 ${
                   errors.timeOfBirth ? 'border-red-400 bg-red-50/10' : 'focus:shadow-cosmic'
                 }`}
+                style={errors.timeOfBirth ? { borderColor: 'var(--vedic-saffron)', backgroundColor: 'var(--vedic-saffron-light, rgba(255, 179, 102, 0.1))' } : {}}
+                aria-invalid={errors.timeOfBirth ? 'true' : 'false'}
+                aria-describedby={errors.timeOfBirth ? 'timeOfBirth-error' : 'timeOfBirth-help'}
+                aria-label="Enter time of birth in 24-hour format HH:MM (required)"
               />
               <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-vedic-gold text-lg">
-                🕐
+                <FaClock className="text-vedic-gold" style={{ color: 'var(--vedic-gold)' }} />
               </div>
             </div>
-            <small className="text-white/60 text-xs mt-1 block">
+            <small id="timeOfBirth-help" className="text-white/60 text-xs mt-1 block">
               Use 24-hour format (HH:MM) for precise calculations
             </small>
             {errors.timeOfBirth && (
-              <div className="alert-error text-sm mt-1 animate-fade-in" role="alert">
+              <div id="timeOfBirth-error" className="alert-error text-sm mt-1 animate-fade-in" role="alert" aria-live="polite">
                 {errors.timeOfBirth}
               </div>
             )}
@@ -614,27 +652,33 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
         {/* Place of Birth Field - Full Width */}
         <div className="form-group-vedic">
           <label htmlFor="placeOfBirth" className="form-label-vedic flex items-center space-x-2">
-            <span className="text-vedic-gold">🌍</span>
+            <FaMapMarkerAlt className="text-vedic-gold" style={{ color: 'var(--vedic-gold)' }} />
             <span>Place of Birth</span>
             <span className="text-red-400 text-sm">*</span>
+            <Tooltip content="Enter your place of birth (City, State, Country). The system will automatically find coordinates and timezone.">
+              <span></span>
+            </Tooltip>
           </label>
           <div className="relative">
-            <input
-              type="text"
-              id="placeOfBirth"
-              name="placeOfBirth"
+            <LocationAutoComplete
               value={formData.placeOfBirth}
-              onChange={handleChange}
+              onChange={(value) => handleChange({ target: { name: 'placeOfBirth', value } })}
+              onLocationSelect={(location) => {
+                setCoordinates({
+                  latitude: location.latitude,
+                  longitude: location.longitude,
+                  timezone: location.timezone
+                });
+                setFormData(prev => ({
+                  ...prev,
+                  placeOfBirth: location.placeOfBirth
+                }));
+              }}
               placeholder="City, State, Country (e.g., Mumbai, Maharashtra, India)"
-              required
-              data-testid="place-input"
-              className={`form-input-vedic transition-all duration-300 pl-12 ${
-                errors.placeOfBirth ? 'border-red-400 bg-red-50/10' : 'focus:shadow-cosmic'
-              }`}
+              required={true}
+              error={errors.placeOfBirth}
+              className="w-full"
             />
-            <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-vedic-gold text-lg">
-              📍
-            </div>
 
             {/* Geocoding Status */}
             {geocoding && (
@@ -646,8 +690,8 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
 
           {/* Location Success Message */}
           {coordinates.latitude && coordinates.longitude && !geocoding && (
-            <div className="flex items-center space-x-2 mt-2 text-sm text-green-400">
-              <span className="text-green-400">✓</span>
+            <div className="flex items-center space-x-2 mt-2 text-sm" style={{ color: 'var(--vedic-gold)' }}>
+              <span style={{ color: 'var(--vedic-gold)' }}>✓</span>
               <span>
                 Location found: {coordinates.latitude.toFixed(4)}°, {coordinates.longitude.toFixed(4)}°
               </span>
@@ -666,7 +710,7 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
 
           {/* Location Error */}
           {errors.placeOfBirth && (
-            <div className="alert-error text-sm mt-1 animate-fade-in" role="alert">
+            <div id="placeOfBirth-error" className="alert-error text-sm mt-1 animate-fade-in" role="alert" aria-live="polite">
               {errors.placeOfBirth}
             </div>
           )}
@@ -695,10 +739,10 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
 
         {/* Global Form Error */}
         {errors.submit && (
-          <div className="alert-error p-4 rounded-xl border border-red-400/20 animate-fade-in">
+          <div className="alert-error p-4 rounded-xl border animate-fade-in" style={{ borderColor: 'var(--vedic-saffron)', backgroundColor: 'var(--vedic-saffron-light, rgba(255, 179, 102, 0.1))' }}>
             <div className="flex items-center space-x-2">
-              <span className="text-red-400 text-lg">⚠️</span>
-              <span className="text-red-300">{errors.submit}</span>
+              <FaExclamationTriangle className="text-lg" style={{ color: 'var(--vedic-saffron)' }} />
+              <span style={{ color: 'var(--vedic-saffron-dark, #E6751A)' }}>{errors.submit}</span>
             </div>
           </div>
         )}
@@ -709,10 +753,11 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
             type="button"
             onClick={handleClear}
             disabled={loading}
-                className="btn-vedic btn-secondary flex-1 sm:flex-none disabled:opacity-50 disabled:cursor-not-allowed"
+            className="btn-vedic btn-secondary flex-1 sm:flex-none disabled:opacity-50 disabled:cursor-not-allowed"
+            aria-label="Clear all form fields"
           >
             <span className="flex items-center justify-center space-x-2">
-              <span>🗑️</span>
+              <FaTrash className="text-vedic-gold" style={{ color: 'var(--vedic-gold)' }} />
               <span>Clear Form</span>
             </span>
           </button>
@@ -751,7 +796,7 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
                 </>
               ) : (
                 <>
-                  <span>🪐</span>
+                  <FaGlobe className="text-vedic-gold" style={{ color: 'var(--vedic-gold)' }} />
                   <span>Generate Vedic Chart</span>
                 </>
               )}

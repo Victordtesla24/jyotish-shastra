@@ -453,7 +453,7 @@ class HouseLayoutManager {
         position: 'relative',
         width: `${sizeConfig.chartSize}px`,
         height: `${sizeConfig.chartSize}px`,
-        fontFamily: 'Arial, sans-serif',
+        fontFamily: 'var(--font-english, Inter, Roboto, sans-serif)',
         fontSize: `${sizeConfig.fontSize}px`
       },
 

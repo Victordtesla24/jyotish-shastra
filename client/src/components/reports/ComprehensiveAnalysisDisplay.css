@@ -4,7 +4,7 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
-  font-family: 'Inter', -apple-system, system-ui, sans-serif;
+  font-family: var(--font-english, 'Inter', -apple-system, system-ui, sans-serif);
 }
 
 .main-title {

@@ -419,7 +419,7 @@ const rectificationAnalyzeRequestSchema = Joi.object({
         description: Joi.string().min(3).max(200).required()
       }))
       .default([]),
-    timeRange: Joi.object({ hours: Joi.number().min(1).max(6).default(2) })
+    timeRange: Joi.object({ hours: Joi.number().min(1).max(24).default(2) })
   }).default({})
 });
 
@@ -438,7 +438,7 @@ const rectificationWithEventsRequestSchema = Joi.object({
     methods: Joi.array()
       .items(Joi.string().valid('praanapada', 'moon', 'gulika', 'events'))
       .default(['praanapada', 'moon', 'gulika', 'events']),
-    timeRange: Joi.object({ hours: Joi.number().min(1).max(6).default(2) })
+    timeRange: Joi.object({ hours: Joi.number().min(1).max(24).default(2) })
   }).default({})
 });
 

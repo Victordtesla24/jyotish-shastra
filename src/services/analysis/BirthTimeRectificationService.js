@@ -579,8 +579,9 @@ class BirthTimeRectificationService {
       // Step 1: Validate input data
       this.validateBirthData(birthData, analysis);
 
-      // Step 2: Generate time range candidates (±2 hours from estimated time)
-      const timeCandidates = this.generateTimeCandidates(birthData, analysis);
+      // Step 2: Generate time range candidates (from options.timeRange.hours, default ±2 hours)
+      const timeRangeHours = options.timeRange?.hours || 2;
+      const timeCandidates = this.generateTimeCandidates(birthData, analysis, timeRangeHours);
 
       // Step 3: Praanapada Method Analysis
       analysis.methods.praanapada = await this.performPraanapadaAnalysis(
@@ -683,17 +684,22 @@ class BirthTimeRectificationService {
   /**
    * Generate time candidates around estimated birth time
    * Creates a range of possible birth times to analyze
-   * OPTIMIZED: Reduced candidates from 49 to 13 for performance (±60 min in 10-min intervals)
+   * @param {Object} birthData - Birth data with timeOfBirth
+   * @param {Object} analysis - Analysis object for logging
+   * @param {number} timeRangeHours - Hours to search before/after estimated time (default: 2)
+   * @returns {Array} Array of time candidate objects
    */
-  generateTimeCandidates(birthData, analysis) {
+  generateTimeCandidates(birthData, analysis, timeRangeHours = 2) {
     const candidates = [];
     const timeOfBirth = birthData.timeOfBirth || birthData.placeOfBirth?.timeOfBirth || '12:00'; // Default to noon if not provided
     const [hours, minutes] = timeOfBirth.split(':').map(Number);
     const baseMinutes = hours * 60 + minutes;
     
-    // Generate candidates from -120 to +120 minutes (±2 hours) in 5-minute intervals
-    // This produces 49 candidates total: ±2 hours = ±120 minutes = 240 minutes / 5 = 48 intervals + 1 base = 49
-    for (let offset = -120; offset <= 120; offset += 5) {
+    // Generate candidates from -timeRangeHours to +timeRangeHours in 5-minute intervals
+    // Convert hours to minutes: timeRangeHours * 60
+    const rangeMinutes = timeRangeHours * 60;
+    
+    for (let offset = -rangeMinutes; offset <= rangeMinutes; offset += 5) {
       const candidateMinutes = baseMinutes + offset;
       let candidateHours = Math.floor(candidateMinutes / 60);
       const candidateMins = ((candidateMinutes % 60) + 60) % 60;
@@ -713,7 +719,7 @@ class BirthTimeRectificationService {
       });
     }
 
-    analysis.analysisLog.push(`Generated ${candidates.length} time candidates for analysis (range: ±2 hours, 5-min intervals)`);
+    analysis.analysisLog.push(`Generated ${candidates.length} time candidates for analysis (range: ±${timeRangeHours} hours, 5-min intervals)`);
     return candidates;
   }
 
@@ -765,14 +771,14 @@ class BirthTimeRectificationService {
           candidate.time
         );
         
-        candidate.score += alignmentScore * 0.30; // Praanapada has 30% weight (reduced from 40%)
+        candidate.score += alignmentScore * 0.40; // Praanapada has 40% weight per BPHS configuration
 
         results.candidates.push({
           time: candidate.time,
           praanapada: praanapada,
           ascendant: chart.ascendant,
           alignmentScore: alignmentScore,
-          weightedScore: alignmentScore * 0.4
+          weightedScore: alignmentScore * 0.40 // Match BPHS configuration weight
         });
 
       } catch (error) {
@@ -877,14 +883,14 @@ class BirthTimeRectificationService {
           candidate.time
         );
         
-        candidate.score += moonScore * 0.25; // Moon has 25% weight (reduced from 30%)
+        candidate.score += moonScore * 0.30; // Moon has 30% weight per BPHS configuration
 
         results.candidates.push({
           time: candidate.time,
           moon: moonAnalysis,
           ascendant: chart.ascendant,
           moonScore: moonScore,
-          weightedScore: moonScore * 0.3
+          weightedScore: moonScore * 0.30 // Match BPHS configuration weight
         });
 
       } catch (error) {
@@ -984,14 +990,14 @@ class BirthTimeRectificationService {
           candidate.time
         );
         
-        candidate.score += gulikaScore * 0.15; // Gulika has 15% weight (reduced from 20%)
+        candidate.score += gulikaScore * 0.20; // Gulika has 20% weight per BPHS configuration
 
         results.candidates.push({
           time: candidate.time,
           gulika: gulikaPosition,
           ascendant: chart.ascendant,
           gulikaScore: gulikaScore,
-          weightedScore: gulikaScore * 0.2
+          weightedScore: gulikaScore * 0.20 // Match BPHS configuration weight
         });
 
       } catch (error) {
@@ -1192,7 +1198,7 @@ class BirthTimeRectificationService {
         results.candidates.push({
           time: candidate.time,
           eventScore: eventScore,
-          weightedScore: eventScore * 0.1,
+          weightedScore: eventScore * 0.05, // Fixed: Match actual weight used
           correlatedEvents: this.getCorrelatedEvents(dashaAnalysis, lifeEvents, candidateData.dateOfBirth, chart)
         });
 
@@ -1355,7 +1361,7 @@ class BirthTimeRectificationService {
    * When aspect precision is similar, prefer times near ensemble convergence window
    * Key aspects in Vedic astrology: Conjunction (0°), Trine (120°/240°), Square (90°/270°), Opposition (180°)
    */
-  calculateAscendantAlignment(ascendant, praanapada, candidateTime = null) {
+  calculateAscendantAlignment(ascendant, praanapada, _candidateTime = null) {
     if (!ascendant || !praanapada) return 0;
 
     // Calculate angular distance
@@ -1416,24 +1422,8 @@ class BirthTimeRectificationService {
 
     // BPHS Ensemble Convergence Principle: When aspect quality is similar (within same type),
     // prefer times in the convergence window where multiple methods typically agree
-    if (candidateTime && smallestDeviation <= 10) {
-      const [hours, minutes] = candidateTime.split(':').map(Number);
-      const totalMinutes = hours * 60 + minutes;
-      
-      // Expected convergence window: 14:25-14:35 (where Praanapada, Moon, Gulika converge)
-      const convergenceCenter = 14 * 60 + 30; // 14:30
-      const convergenceRadius = 5; // ±5 minutes
-      
-      const distanceFromCenter = Math.abs(totalMinutes - convergenceCenter);
-      
-      if (distanceFromCenter <= convergenceRadius) {
-        // Within convergence window - add STRONG bonus (max 30 points)
-        // BPHS principle: When multiple methods converge, that time has higher significance
-        // This bonus MUST be strong enough to override individual method preferences
-        const convergenceBonus = ((convergenceRadius - distanceFromCenter) / convergenceRadius) * 30;
-        score += convergenceBonus;
-      }
-    }
+    // NOTE: Convergence window is now calculated dynamically based on method results,
+    // not hardcoded to a specific time
 
     return Math.round(Math.min(100, score));
   }
@@ -1442,7 +1432,7 @@ class BirthTimeRectificationService {
    * Calculate Moon-Ascendant relationship score
    * Applies BPHS Ensemble Convergence Principle when aspect quality is similar
    */
-  calculateMoonAscendantRelationship(ascendant, moonAnalysis, candidateTime = null) {
+  calculateMoonAscendantRelationship(ascendant, moonAnalysis, _candidateTime = null) {
     if (!ascendant || !moonAnalysis) return 0;
 
     let score = 50; // Base score
@@ -1468,23 +1458,8 @@ class BirthTimeRectificationService {
     }
 
     // BPHS Ensemble Convergence Principle: Prefer times where multiple methods converge
-    if (candidateTime) {
-      const [hours, minutes] = candidateTime.split(':').map(Number);
-      const totalMinutes = hours * 60 + minutes;
-      
-      // Expected convergence window: 14:25-14:35 (where Praanapada, Moon, Gulika converge)
-      const convergenceCenter = 14 * 60 + 30; // 14:30
-      const convergenceRadius = 5; // ±5 minutes
-      
-      const distanceFromCenter = Math.abs(totalMinutes - convergenceCenter);
-      
-      if (distanceFromCenter <= convergenceRadius) {
-        // Within convergence window - add STRONG bonus (max 30 points)
-        // BPHS principle: When multiple methods converge, that time has higher significance
-        const convergenceBonus = ((convergenceRadius - distanceFromCenter) / convergenceRadius) * 30;
-        score += convergenceBonus;
-      }
-    }
+    // NOTE: Convergence window is now calculated dynamically based on method results,
+    // not hardcoded to a specific time
 
     return Math.max(0, Math.min(100, score));
   }
@@ -1496,7 +1471,7 @@ class BirthTimeRectificationService {
    * Calculate Gulika relationship score
    * Applies BPHS Ensemble Convergence Principle when aspect quality is similar
    */
-  calculateGulikaRelationship(ascendant, gulikaPosition, candidateTime = null) {
+  calculateGulikaRelationship(ascendant, gulikaPosition, _candidateTime = null) {
     if (!ascendant || !gulikaPosition) return 0;
 
     let score = 50; // Base score
@@ -1516,23 +1491,8 @@ class BirthTimeRectificationService {
     }
 
     // BPHS Ensemble Convergence Principle: Prefer times where multiple methods converge
-    if (candidateTime) {
-      const [hours, minutes] = candidateTime.split(':').map(Number);
-      const totalMinutes = hours * 60 + minutes;
-      
-      // Expected convergence window: 14:25-14:35 (where Praanapada, Moon, Gulika converge)
-      const convergenceCenter = 14 * 60 + 30; // 14:30
-      const convergenceRadius = 5; // ±5 minutes
-      
-      const distanceFromCenter = Math.abs(totalMinutes - convergenceCenter);
-      
-      if (distanceFromCenter <= convergenceRadius) {
-        // Within convergence window - add STRONG bonus (max 30 points)
-        // BPHS principle: When multiple methods converge, that time has higher significance
-        const convergenceBonus = ((convergenceRadius - distanceFromCenter) / convergenceRadius) * 30;
-        score += convergenceBonus;
-      }
-    }
+    // NOTE: Convergence window is now calculated dynamically based on method results,
+    // not hardcoded to a specific time
 
     return Math.max(0, Math.min(100, score));
   }
@@ -1588,6 +1548,25 @@ class BirthTimeRectificationService {
       };
     }
 
+    // Calculate dynamic convergence window based on method results
+    const convergenceWindow = this.calculateConvergenceWindow(analysis.methods);
+    
+    // Apply convergence bonus to candidates within convergence window
+    if (convergenceWindow) {
+      candidates.forEach(candidate => {
+        const [hours, minutes] = candidate.time.split(':').map(Number);
+        const totalMinutes = hours * 60 + minutes;
+        const distanceFromCenter = Math.abs(totalMinutes - convergenceWindow.center);
+        
+        if (distanceFromCenter <= convergenceWindow.radius) {
+          // Within convergence window - add bonus (max 30 points)
+          // BPHS principle: When multiple methods converge, that time has higher significance
+          const convergenceBonus = ((convergenceWindow.radius - distanceFromCenter) / convergenceWindow.radius) * 30;
+          candidate.totalScore += convergenceBonus;
+        }
+      });
+    }
+
     // Sort candidates by total score
     candidates.sort((a, b) => b.totalScore - a.totalScore);
     
@@ -1603,6 +1582,45 @@ class BirthTimeRectificationService {
         allCandidates: candidates.slice(0, 5), // Top 5 candidates
         methodBreakdown: this.getMethodBreakdown(analysis.methods)
       }
+    };
+  }
+
+  /**
+   * Calculate dynamic convergence window based on method results
+   * Finds the time window where multiple methods agree
+   */
+  calculateConvergenceWindow(methods) {
+    const methodTimes = [];
+    
+    // Collect best candidate times from each method
+    Object.values(methods).forEach(method => {
+      if (method.bestCandidate && method.bestCandidate.time) {
+        const [hours, minutes] = method.bestCandidate.time.split(':').map(Number);
+        methodTimes.push(hours * 60 + minutes);
+      }
+    });
+    
+    if (methodTimes.length < 2) {
+      return null; // Need at least 2 methods for convergence
+    }
+    
+    // Calculate median time (convergence center)
+    const sortedTimes = [...methodTimes].sort((a, b) => a - b);
+    const median = sortedTimes.length % 2 === 0
+      ? (sortedTimes[sortedTimes.length / 2 - 1] + sortedTimes[sortedTimes.length / 2]) / 2
+      : sortedTimes[Math.floor(sortedTimes.length / 2)];
+    
+    // Calculate spread (convergence radius)
+    const maxTime = Math.max(...methodTimes);
+    const minTime = Math.min(...methodTimes);
+    const spread = maxTime - minTime;
+    
+    // Use spread as radius, with minimum of 5 minutes and maximum of 30 minutes
+    const radius = Math.max(5, Math.min(30, Math.ceil(spread / 2)));
+    
+    return {
+      center: median,
+      radius: radius
     };
   }
 

@@ -156,5 +156,11 @@ export { default as ErrorMessage } from './ErrorMessage.jsx';
 // Alert Component  
 export { default as Alert } from './Alert.jsx';
 
+// Tooltip Component
+export { default as Tooltip } from './Tooltip.jsx';
+
+// LocationAutoComplete Component
+export { default as LocationAutoComplete } from './LocationAutoComplete.jsx';
+
 // Utility function for class names
 export const cn = (...args) => args.filter(Boolean).join(' ');

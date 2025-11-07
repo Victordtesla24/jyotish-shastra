@@ -1,4 +1,11 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { 
+  FaChartBar, 
+  FaBullseye, 
+  FaExclamationTriangle, 
+  FaLightbulb, 
+  FaSearch 
+} from 'react-icons/fa';
 import { useAnalysis } from '../../contexts/AnalysisContext.js';
 import ResponseDataToUIDisplayAnalyser from '../analysis/ResponseDataToUIDisplayAnalyser.js';
 
@@ -354,7 +361,7 @@ const ComprehensiveAnalysisDisplay = ({ analysisData }) => {
                       <div className="card-vedic bg-sacred/50">
                         <div className="flex items-center gap-3 mb-4">
                           <div className="w-8 h-8 bg-third-eye-chakra/20 rounded-full flex items-center justify-center">
-                            <span className="vedic-symbol text-third-eye-chakra">🔍</span>
+                            <FaSearch className="text-lg" style={{ color: 'var(--third-eye-chakra)' }} aria-hidden="true" />
                           </div>
                           <h5 className="text-lg font-semibold text-primary">Question Details</h5>
                         </div>
@@ -482,7 +489,7 @@ const ComprehensiveAnalysisDisplay = ({ analysisData }) => {
                     {planetData.strength?.interpretation && (
                       <div className="card-vedic bg-exalted/10 p-4">
                         <div className="flex items-center gap-2 mb-2">
-                          <span className="vedic-symbol text-exalted">💡</span>
+                          <FaLightbulb className="text-sm" style={{ color: 'var(--exalted-color)' }} aria-hidden="true" />
                           <span className="text-sm font-medium text-secondary">Interpretation</span>
                         </div>
                         <p className="text-sm text-secondary italic leading-relaxed">
@@ -788,8 +795,8 @@ const ComprehensiveAnalysisDisplay = ({ analysisData }) => {
     return (
       <div className="space-vedic">
         <h3 className="text-2xl font-bold text-saffron mb-6 flex items-center gap-3">
-          <span className="w-10 h-10 bg-gradient-to-br from-saffron/20 to-gold/20 text-saffron rounded-full flex items-center justify-center text-xl">
-            📊
+          <span className="w-10 h-10 bg-gradient-to-br from-saffron/20 to-gold/20 rounded-full flex items-center justify-center">
+            <FaChartBar className="text-xl" style={{ color: 'var(--vedic-saffron)' }} aria-hidden="true" />
           </span>
           Comprehensive Report
           <span className="ml-auto text-base font-normal text-muted">
@@ -810,7 +817,7 @@ const ComprehensiveAnalysisDisplay = ({ analysisData }) => {
                      card.key?.includes('PERSONALITY') ? '🌟' :
                      card.key?.includes('EMOTIONAL') ? '💭' :
                      card.key?.includes('LAGNA') ? '🌅' :
-                     card.key?.includes('ARUDHA') ? '🎯' :
+                     card.key?.includes('ARUDHA') ? <FaBullseye className="text-xl" style={{ color: 'var(--vedic-saffron)' }} aria-hidden="true" /> :
                      '✨'}
                   </span>
                 </div>
@@ -830,7 +837,7 @@ const ComprehensiveAnalysisDisplay = ({ analysisData }) => {
     );
   };
 
-  const GenericAnalysisDisplay = ({ data, title, icon = "📊" }) => {
+  const GenericAnalysisDisplay = ({ data, title, icon = <FaChartBar className="text-2xl" style={{ color: 'var(--vedic-saffron)' }} aria-hidden="true" /> }) => {
     if (!data || typeof data !== 'object') return null;
 
     const entries = Object.entries(data);
@@ -838,7 +845,7 @@ const ComprehensiveAnalysisDisplay = ({ analysisData }) => {
     return (
       <div className="space-vedic">
         <h3 className="text-2xl font-bold text-saffron mb-6 flex items-center gap-3">
-          <span className="w-10 h-10 bg-muted/20 text-muted rounded-full flex items-center justify-center">{icon}</span>
+          <span className="w-10 h-10 bg-muted/20 rounded-full flex items-center justify-center">{icon}</span>
           {title}
           <span className="ml-auto text-base font-normal text-muted">
             {entries.length} item{entries.length !== 1 ? 's' : ''}
@@ -1015,7 +1022,7 @@ const ComprehensiveAnalysisDisplay = ({ analysisData }) => {
         <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg shadow-sm">
           <div className="flex items-start gap-3">
             <div className="flex-shrink-0">
-              <span className="text-2xl">⚠️</span>
+              <FaExclamationTriangle className="text-2xl" style={{ color: 'var(--vedic-gold)' }} aria-hidden="true" />
             </div>
             <div className="flex-1">
               <h4 className="text-lg font-semibold text-yellow-800 mb-1">
@@ -1040,7 +1047,9 @@ const ComprehensiveAnalysisDisplay = ({ analysisData }) => {
       {/* Display when no sections available */}
       {Object.keys(sectionsData).length === 0 ? (
         <div className="card-cosmic text-center py-12">
-          <div className="text-6xl mb-4">📊</div>
+          <div className="flex justify-center mb-4">
+            <FaChartBar className="text-6xl" style={{ color: 'var(--vedic-saffron)' }} aria-hidden="true" />
+          </div>
           <h3 className="text-2xl font-bold text-primary mb-4">
             No Analysis Data Available
           </h3>
