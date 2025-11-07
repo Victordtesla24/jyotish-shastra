@@ -216,7 +216,7 @@ const LagnaDisplay = ({ data }) => {
           <div className="insight-card-enhanced group">
             <div className="card-vedic h-full hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl analysis-card-shadow">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-jupiter/20 rounded-full flex items-center justify-center">
+                <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
                   <span className="vedic-symbol text-jupiter">♃</span>
                 </div>
                 <h4 className="text-lg font-semibold text-primary">Ascendant Sign</h4>
@@ -226,13 +226,13 @@ const LagnaDisplay = ({ data }) => {
                 {lagna.signLord && (
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-secondary">Ruled by:</span>
-                    <span className="badge-vedic bg-gold/20 text-gold">{lagna.signLord}</span>
+                    <span className="badge-vedic bg-white/10 text-white">{lagna.signLord}</span>
                   </div>
                 )}
                 {lagna.element && (
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-secondary">Element:</span>
-                    <span className="badge-vedic bg-earth-element/20 text-earth-element">{lagna.element}</span>
+                    <span className="badge-vedic bg-white/10 text-white">{lagna.element}</span>
                   </div>
                 )}
               </div>
@@ -244,7 +244,7 @@ const LagnaDisplay = ({ data }) => {
           <div className="insight-card-enhanced group">
             <div className="card-vedic h-full hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl analysis-card-shadow">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-venus/20 rounded-full flex items-center justify-center">
+                <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
                   <span className="vedic-symbol text-venus">♀</span>
                 </div>
                 <h4 className="text-lg font-semibold text-primary">Exact Degree</h4>
@@ -261,7 +261,7 @@ const LagnaDisplay = ({ data }) => {
           <div className="insight-card-enhanced group">
             <div className="card-vedic h-full hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl analysis-card-shadow">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-moon/20 rounded-full flex items-center justify-center">
+                <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
                   <span className="vedic-symbol text-moon">☽</span>
                 </div>
                 <h4 className="text-lg font-semibold text-primary">Nakshatra</h4>
@@ -271,7 +271,7 @@ const LagnaDisplay = ({ data }) => {
                 {lagna.nakshatraPada && (
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-secondary">Pada:</span>
-                    <span className="badge-vedic bg-moon/20 text-moon">{lagna.nakshatraPada}</span>
+                    <span className="badge-vedic bg-white/10 text-white">{lagna.nakshatraPada}</span>
                   </div>
                 )}
               </div>
@@ -311,7 +311,7 @@ const LagnaDisplay = ({ data }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {lagna.characteristics.map((char, index) => (
               <div key={index} className="characteristic-item-enhanced group">
-                <div className="flex items-center gap-3 p-4 bg-sacred/50 rounded-lg hover:bg-sacred transition-all duration-300 hover:transform hover:scale-105">
+                <div className="flex items-center gap-3 p-4 bg-white/10 rounded-lg hover:bg-white/15 transition-all duration-300 hover:transform hover:scale-105">
                   <span className="text-saffron group-hover:animate-pulse">✨</span>
                   <span className="text-secondary group-hover:text-primary transition-colors duration-300">{char}</span>
                 </div>
@@ -335,7 +335,7 @@ const LagnaDisplay = ({ data }) => {
           <div className="space-y-4">
             {lagna.strengths.map((strength, index) => (
               <div key={index} className="strength-item-enhanced group">
-                <div className="flex items-center gap-4 p-4 bg-exalted/10 rounded-lg hover:bg-exalted/20 transition-all duration-300 hover:transform hover:scale-105">
+                <div className="flex items-center gap-4 p-4 bg-white/10 rounded-lg hover:bg-white/15 transition-all duration-300 hover:transform hover:scale-105">
                   <span className="text-exalted group-hover:animate-pulse">💪</span>
                   <span className="text-secondary group-hover:text-primary transition-colors duration-300">
                     {typeof strength === 'object' ? String(strength) : strength}
@@ -679,7 +679,7 @@ const AspectsDisplay = ({ data }) => {
 
         <div className="card-vedic group hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 bg-enemy/20 rounded-full flex items-center justify-center">
+                <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
               <span className="vedic-symbol text-enemy">⚠</span>
             </div>
             <h4 className="text-lg font-semibold text-primary">Challenging Aspects</h4>
@@ -771,7 +771,7 @@ const AspectsDisplay = ({ data }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {patterns.map((pattern, index) => (
               <div key={index} className="pattern-item-enhanced group">
-                <div className="flex items-center gap-3 p-4 bg-sacred/50 rounded-lg hover:bg-sacred transition-all duration-300 hover:transform hover:scale-105">
+                <div className="flex items-center gap-3 p-4 bg-white/10 rounded-lg hover:bg-white/15 transition-all duration-300 hover:transform hover:scale-105">
                   <span className="text-saffron group-hover:animate-pulse">✨</span>
                   <span className="text-secondary group-hover:text-primary transition-colors duration-300">
                     {pattern}
@@ -797,7 +797,7 @@ const AspectsDisplay = ({ data }) => {
           <div className="space-y-4">
             {yogas.map((yoga, index) => (
               <div key={index} className="yoga-item-enhanced group">
-                <div className="flex items-center gap-4 p-4 bg-exalted/10 rounded-lg hover:bg-exalted/20 transition-all duration-300 hover:transform hover:scale-105">
+                <div className="flex items-center gap-4 p-4 bg-white/10 rounded-lg hover:bg-white/15 transition-all duration-300 hover:transform hover:scale-105">
                   <span className="text-exalted group-hover:animate-pulse">🕉️</span>
                   <span className="text-secondary group-hover:text-primary transition-colors duration-300">
                     {yoga}
@@ -976,7 +976,7 @@ const ArudhaDisplay = ({ data }) => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="card-vedic group hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-jupiter/20 rounded-full flex items-center justify-center">
+                <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
                   <span className="vedic-symbol text-jupiter">⭐</span>
                 </div>
                 <h5 className="text-lg font-semibold text-primary">Arudha Lagna Sign</h5>
@@ -988,7 +988,7 @@ const ArudhaDisplay = ({ data }) => {
             {arudhaLagna.lagnaLord && (
               <div className="card-vedic group hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-saffron/20 rounded-full flex items-center justify-center">
+                  <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
                     <span className="vedic-symbol text-saffron">👑</span>
                   </div>
                   <h5 className="text-lg font-semibold text-primary">Arudha Lagna Lord</h5>
@@ -1001,7 +1001,7 @@ const ArudhaDisplay = ({ data }) => {
             {arudhaLagna.lagnaLordPosition?.sign && (
               <div className="card-vedic group hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-gold/20 rounded-full flex items-center justify-center">
+                  <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
                     <FaMapMarkerAlt className="text-lg" style={{ color: 'var(--vedic-gold)' }} aria-hidden="true" />
                   </div>
                   <h5 className="text-lg font-semibold text-primary">AL Lord Position</h5>
@@ -1138,7 +1138,7 @@ const ArudhaDisplay = ({ data }) => {
             {imageStability.stabilityScore !== undefined && (
               <div className="card-vedic group hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-exalted/20 rounded-full flex items-center justify-center">
+                  <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
                     <FaChartBar className="text-lg" style={{ color: 'var(--exalted-color)' }} aria-hidden="true" />
                   </div>
                   <h5 className="text-lg font-semibold text-primary">Stability Score</h5>
@@ -1537,7 +1537,7 @@ const NavamsaDisplay = ({ data }) => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="card-vedic group hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-jupiter/20 rounded-full flex items-center justify-center">
+                  <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
                     <span className="vedic-symbol text-jupiter">⭐</span>
                   </div>
                   <h5 className="text-lg font-semibold text-primary">Navamsa Lagna Sign</h5>
@@ -1549,7 +1549,7 @@ const NavamsaDisplay = ({ data }) => {
               {navamsaLagna.lord && navamsaLagna.lord !== 'Unknown' && (
                 <div className="card-vedic group hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 bg-saffron/20 rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
                       <span className="vedic-symbol text-saffron">👑</span>
                     </div>
                     <h5 className="text-lg font-semibold text-primary">Navamsa Lagna Lord</h5>
@@ -1562,7 +1562,7 @@ const NavamsaDisplay = ({ data }) => {
               {navamsaLagna.house !== undefined && (
                 <div className="card-vedic group hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 bg-gold/20 rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
                       <FaMapMarkerAlt className="text-lg" style={{ color: 'var(--vedic-gold)' }} aria-hidden="true" />
                     </div>
                     <h5 className="text-lg font-semibold text-primary">House Position</h5>

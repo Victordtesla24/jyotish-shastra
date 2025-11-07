@@ -231,7 +231,7 @@ const LocationAutoComplete = ({
         <ul
           id="location-suggestions"
           ref={suggestionsRef}
-          className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto"
+          className="absolute z-50 w-full mt-1 bg-black/95 border border-white/20 rounded-lg shadow-lg max-h-60 overflow-auto backdrop-blur-sm"
           role="listbox"
         >
           {suggestions.map((suggestion, index) => (
@@ -239,12 +239,12 @@ const LocationAutoComplete = ({
               key={index}
               role="option"
               aria-selected={selectedIndex === index}
-              className={`px-4 py-2 cursor-pointer hover:bg-vedic-saffron-light ${
-                selectedIndex === index ? 'bg-vedic-saffron-light' : ''
+              className={`px-4 py-2 cursor-pointer text-white hover:bg-white/10 ${
+                selectedIndex === index ? 'bg-white/10' : ''
               }`}
               style={{
                 backgroundColor: selectedIndex === index 
-                  ? 'var(--vedic-saffron-light)' 
+                  ? 'rgba(255, 255, 255, 0.1)' 
                   : 'transparent'
               }}
               onMouseDown={() => handleSuggestionSelect(suggestion)}
@@ -252,11 +252,11 @@ const LocationAutoComplete = ({
             >
               <div className="flex items-center">
                 <FaMapMarkerAlt 
-                  className="text-vedic-saffron mr-2" 
-                  style={{ color: 'var(--vedic-saffron)' }}
+                  className="mr-2" 
+                  style={{ color: 'rgb(255, 255, 255)' }}
                   aria-hidden="true"
                 />
-                <span>{suggestion.formatted || suggestion.display}</span>
+                <span className="text-white">{suggestion.formatted || suggestion.display}</span>
               </div>
             </li>
           ))}

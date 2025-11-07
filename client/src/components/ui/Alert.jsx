@@ -14,30 +14,30 @@ export const Alert = ({
   const baseClasses = 'p-4 rounded-lg border flex items-start gap-3';
   
   const variants = {
-    info: 'bg-blue-50 border-blue-200 text-blue-800',
-    success: 'bg-green-50 border-green-200 text-green-800',
-    warning: 'bg-yellow-50 border-yellow-200 text-yellow-800',
-    error: 'bg-red-50 border-red-200 text-red-800',
+    info: 'bg-white/5 border-white/20 text-white',
+    success: 'bg-white/5 border-white/20 text-white',
+    warning: 'bg-white/5 border-white/20 text-white',
+    error: 'bg-white/5 border-white/20 text-white',
   };
   
   const variantStyles = {
     success: {
-      backgroundColor: 'var(--vedic-gold-light, #FFF4B3)',
-      borderColor: 'var(--vedic-gold, #FFD700)',
-      color: 'var(--vedic-gold-dark, #DAB800)'
+      backgroundColor: 'rgba(255, 255, 255, 0.05)',
+      borderColor: 'rgba(255, 255, 255, 0.2)',
+      color: 'rgb(255, 255, 255)'
     },
     error: {
-      backgroundColor: 'var(--vedic-saffron-light, #FFB366)',
-      borderColor: 'var(--vedic-saffron, #FF9933)',
-      color: 'var(--vedic-saffron-dark, #E6751A)'
+      backgroundColor: 'rgba(255, 255, 255, 0.05)',
+      borderColor: 'rgba(255, 255, 255, 0.2)',
+      color: 'rgb(255, 255, 255)'
     }
   };
   
   const icons = {
-    info: <FaInfoCircle className="text-blue-600" style={{ color: 'var(--own-sign-color)' }} />,
-    success: <FaCheckCircle className="text-green-600" style={{ color: 'var(--exalted-color)' }} />,
-    warning: <FaExclamationTriangle className="text-yellow-600" style={{ color: 'var(--vedic-gold)' }} />,
-    error: <FaTimesCircle className="text-red-600" style={{ color: 'var(--debilitated-color)' }} />,
+    info: <FaInfoCircle style={{ color: 'rgb(255, 255, 255)' }} />,
+    success: <FaCheckCircle style={{ color: 'rgb(255, 255, 255)' }} />,
+    warning: <FaExclamationTriangle style={{ color: 'rgb(255, 255, 255)' }} />,
+    error: <FaTimesCircle style={{ color: 'rgb(255, 255, 255)' }} />,
   };
 
   // Parse field-specific errors from validation messages
@@ -105,7 +105,7 @@ export const Alert = ({
         {suggestion && (
           <div className="mt-3 pt-2 border-t border-current border-opacity-20">
             <div className="text-sm font-medium flex items-center gap-2">
-              <FaLightbulb className="text-vedic-gold" style={{ color: 'var(--vedic-gold)' }} />
+              <FaLightbulb style={{ color: 'rgb(255, 255, 255)' }} />
               Suggestion:
             </div>
             <div className="text-sm opacity-90">{suggestion}</div>
