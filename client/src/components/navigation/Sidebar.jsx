@@ -17,7 +17,7 @@ const Sidebar = () => {
     { path: '/', label: 'Home', icon: '🏠', ariaLabel: 'Navigate to Home' },
     { path: '/chart', label: 'Chart', icon: '✨', ariaLabel: 'Navigate to Chart Generation' },
     { path: '/analysis', label: 'Analysis', icon: '📊', ariaLabel: 'Navigate to Analysis' },
-    { path: '/btr', label: 'Birth Time Rectification', icon: '🕐', ariaLabel: 'Navigate to Birth Time Rectification' }
+    { path: '/birth-time-rectification', label: 'Birth Time Rectification', icon: '🕐', ariaLabel: 'Navigate to Birth Time Rectification' }
   ];
 
   // Breakpoint detection

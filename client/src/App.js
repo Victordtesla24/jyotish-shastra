@@ -5,14 +5,14 @@ import { ThemeProvider } from './contexts/ThemeContext.js';
 import { ChartProvider } from './contexts/ChartContext.js';
 import { AnalysisProvider } from './contexts/AnalysisContext.js';
 import usePWA from './hooks/usePWA.js';
-import Header from './components/Header.jsx';
+import TopNav from './components/navigation/TopNav.jsx';
 import Footer from './components/Footer.jsx';
 import { Button } from './components/ui';
 import { initializeErrorHandling } from './utils/apiErrorHandler.js';
 import PreLoader from './components/ui/PreLoader.jsx';
 import './styles/vedic-design-system.css';
 import './styles/chris-cole-enhancements.css';
-import Sidebar from './components/navigation/Sidebar.jsx';
+import './styles/visual-components-protection.css';
 
 // Import pages directly instead of lazy loading to fix mounting issues
 import HomePage from './pages/HomePage.jsx';
@@ -73,7 +73,7 @@ const PWAInstallBanner = () => {
   if (!isInstallable) return null;
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:max-w-sm bg-white dark:bg-dark-surface border border-gray-200 dark:border-dark-border rounded-lg shadow-cosmic p-4 z-40">
+    <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:max-w-sm rounded-lg shadow-cosmic p-4 z-40" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)', border: '1px solid' }}>
       <div className="flex items-start space-x-3">
         <div className="flex-shrink-0">
           <div className="w-10 h-10 bg-gradient-cosmic rounded-lg flex items-center justify-center">
@@ -81,10 +81,10 @@ const PWAInstallBanner = () => {
           </div>
         </div>
         <div className="flex-1 min-w-0">
-          <h4 className="font-medium text-earth-brown dark:text-dark-text-primary mb-1">
+          <h4 className="font-medium text-primary mb-1">
             Install Jyotish Shastra
           </h4>
-          <p className="text-sm text-wisdom-gray dark:text-dark-text-secondary mb-3">
+          <p className="text-sm text-secondary mb-3">
             Get quick access to your cosmic insights with our app!
           </p>
           <div className="flex space-x-2">
@@ -110,7 +110,7 @@ const OfflineBanner = () => {
   if (isOnline) return null;
 
   return (
-    <div className="fixed top-0 left-0 right-0 bg-yellow-600 text-white p-2 z-50">
+    <div className="fixed top-0 left-0 right-0 bg-black/95 border-b border-white/20 text-white p-2 z-50">
       <div className="container-vedic text-center">
         <span className="font-medium">
           ⚠️ You're offline. Some features may be limited.
@@ -134,8 +134,6 @@ class ErrorBoundary extends React.Component {
   }
 
   async componentDidCatch(error, errorInfo) {
-    console.error('App Error:', error, errorInfo);
-    
     // Log error to backend via errorLogger
     try {
       const errorLogger = (await import('./utils/errorLogger.js')).default;
@@ -148,21 +146,20 @@ class ErrorBoundary extends React.Component {
         timestamp: new Date().toISOString()
       });
     } catch (logError) {
-      // Silently fail if error logging fails
-      console.debug('Error logging failed:', logError);
+      // Silently fail if error logging fails - no console output
     }
   }
 
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-gradient-to-br from-sacred-white to-gray-50 dark:from-dark-bg-primary dark:to-dark-bg-secondary flex items-center justify-center p-4">
+        <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: 'var(--bg-primary)' }}>
           <div className="text-center max-w-md">
             <div className="text-6xl mb-4">🔮</div>
-            <h1 className="font-accent text-2xl text-earth-brown dark:text-dark-text-primary mb-4">
+            <h1 className="font-accent text-2xl text-primary mb-4">
               Cosmic Disturbance Detected
             </h1>
-            <p className="text-wisdom-gray dark:text-dark-text-secondary mb-6">
+            <p className="text-secondary mb-6">
               The stars seem to be misaligned. Please refresh the page to restore harmony.
             </p>
             <Button
@@ -181,23 +178,41 @@ class ErrorBoundary extends React.Component {
 }
 
 function App() {
+  // FORCE preloader to show FIRST - initialize to true and NEVER skip
   const [isPreloading, setIsPreloading] = useState(true);
+  const [isAppReady, setIsAppReady] = useState(false);
 
   // Initialize enhanced error handling
   useEffect(() => {
     initializeErrorHandling();
+    
+    // Mark app as ready after initialization
+    // This ensures preloader has time to render
+    const readyTimer = setTimeout(() => {
+      setIsAppReady(true);
+    }, 100);
+    
+    return () => clearTimeout(readyTimer);
   }, []);
 
   const handlePreloadComplete = () => {
-    setIsPreloading(false);
+    // Add small delay before hiding to ensure smooth transition
+    setTimeout(() => {
+      setIsPreloading(false);
+    }, 300);
   };
 
   return (
     <ErrorBoundary>
-      {/* PreLoader - Shows on initial page load */}
-      {isPreloading && (
-        <PreLoader onComplete={handlePreloadComplete} delay={1500} />
-      )}
+      {/* PreLoader - ALWAYS shows FIRST on initial page load */}
+      {/* Render preloader OUTSIDE of ALL other components */}
+      {/* Uses position: fixed with full screen overlay at z-index: 99999 */}
+      {/* CRITICAL: Preloader renders BEFORE app content to ensure visibility */}
+      <PreLoader 
+        onComplete={handlePreloadComplete} 
+        delay={8000}
+        isVisible={isPreloading}
+      />
       
       <BrowserRouter
         future={{
@@ -209,17 +224,21 @@ function App() {
           <ChartProvider>
             <AnalysisProvider>
               <QueryClientProvider client={queryClient}>
-                <div className={`app-container min-h-screen transition-colors duration-300 ${isPreloading ? 'opacity-0' : 'opacity-100 transition-opacity duration-500'}`} data-theme="chris-cole" style={{ backgroundColor: 'rgb(0, 0, 0)', color: 'rgb(255, 255, 255)' }}>
+                <div className={`app-container min-h-screen transition-colors duration-300 ${isPreloading ? 'opacity-0' : 'opacity-100 transition-opacity duration-500'}`} data-theme="chris-cole">
                 {/* PWA Status Banners */}
                 <PWAUpdateBanner />
                 <OfflineBanner />
 
-                {/* Sidebar Navigation */}
-                <Sidebar />
+                {/* Top Navigation (Chris Cole Style) - EXACTLY matching Chris Cole */}
+                <TopNav />
 
-                <Header />
+                {/* Sidebar Navigation - REMOVED to match Chris Cole (no sidebar) */}
+                {/* <Sidebar /> */}
 
-                <main className="flex-grow main-content-with-sidebar" id="main-content">
+                {/* Header - REMOVED to match Chris Cole (no header) */}
+                {/* <Header /> */}
+
+                <main className="flex-grow main-content-chris-cole" id="main-content">
                   <Routes>
                   <Route path="/" element={<HomePage />} />
                   <Route path="/chart" element={<ChartPage />} />
@@ -235,10 +254,10 @@ function App() {
                     <div className="min-h-screen flex items-center justify-center p-4">
                       <div className="text-center max-w-md">
                         <div className="text-8xl mb-6 animate-float">🌌</div>
-                        <h1 className="font-accent text-4xl text-earth-brown dark:text-dark-text-primary mb-4">
+                        <h1 className="font-accent text-4xl text-primary mb-4">
                           404 - Lost in the Cosmos
                         </h1>
-                        <p className="text-lg text-wisdom-gray dark:text-dark-text-secondary mb-8 leading-relaxed">
+                        <p className="text-lg text-secondary mb-8 leading-relaxed">
                           The cosmic path you seek does not exist in our realm.
                           Let us guide you back to the sacred knowledge.
                         </p>

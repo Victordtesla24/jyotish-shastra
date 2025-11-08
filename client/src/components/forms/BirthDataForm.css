@@ -1,210 +1,356 @@
-/* Birth Data Form Styles */
+/**
+ * BirthDataForm - Chris Cole Minimal Aesthetic
+ * Enhanced styling matching Chris Cole's clean, minimal design
+ */
 
-.birth-data-form {
-  max-width: 600px;
+/* ============================================
+   Form Container - Minimal Chris Cole Style
+   ============================================ */
+.form-vedic {
+  max-width: 100%;
   margin: 0 auto;
-  padding: 2rem;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 0;
+  background: transparent;
 }
 
-.form-header {
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
-.form-header h2 {
-  color: #1a237e;
-  font-size: 1.75rem;
-  margin-bottom: 0.5rem;
-}
-
-.form-description {
-  color: #666;
-  font-size: 0.95rem;
-}
-
-.form-group {
-  margin-bottom: 1.5rem;
-}
-
-.form-group label {
-  display: block;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 0.5rem;
-  font-size: 0.95rem;
-}
-
-.form-group .required {
-  color: #dc3545;
-}
-
-.form-group .optional {
-  color: #6c757d;
-  font-weight: normal;
-  font-size: 0.85rem;
-}
-
-.form-group input,
-.form-group select {
-  width: 100%;
-  padding: 0.75rem;
-  border: 2px solid #e0e0e0;
-  border-radius: 6px;
-  font-size: 1rem;
-  transition: border-color 0.3s ease;
-}
-
-.form-group input:focus,
-.form-group select:focus {
-  outline: none;
-  border-color: #3949ab;
-  box-shadow: 0 0 0 3px rgba(57, 73, 171, 0.1);
-}
-
-.form-group input.error,
-.form-group select.error {
-  border-color: #dc3545;
-}
-
-.error-message {
-  display: block;
-  color: #dc3545;
-  font-size: 0.85rem;
-  margin-top: 0.25rem;
-}
-
-.help-text {
-  display: block;
-  color: #6c757d;
-  font-size: 0.85rem;
-  margin-top: 0.25rem;
-}
-
-/* Geocoding Status */
-.geocoding-status {
+.space-vedic {
   display: flex;
-  align-items: center;
-  color: #3949ab;
-  font-size: 0.85rem;
-  margin-top: 0.5rem;
+  flex-direction: column;
+  gap: 2rem; /* Generous spacing matching Chris Cole */
 }
 
-.spinner {
-  display: inline-block;
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgba(57, 73, 171, 0.3);
-  border-top-color: #3949ab;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  margin-right: 0.5rem;
+/* ============================================
+   Form Groups - Minimal Styling
+   ============================================ */
+.form-group-vedic {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-/* Coordinates Display */
-.coordinates-display {
-  margin-top: 0.5rem;
-}
-
-.success-text {
-  color: #28a745;
-  font-size: 0.85rem;
-}
-
-/* Suggestions List */
-.suggestions-list {
-  background: #f8f9fa;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  margin-top: 0.5rem;
-  padding: 0.75rem;
-  list-style: none;
-}
-
-.suggestions-list li {
-  color: #666;
-  font-size: 0.85rem;
+/* ============================================
+   Labels - Clean Typography
+   ============================================ */
+.form-label-vedic {
+  font-family: 'Roboto', sans-serif;
+  font-size: 11px; /* Small, minimal labels */
+  font-weight: 400;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4); /* Subtle label color */
   margin-bottom: 0.25rem;
+  transition: color 0.3s ease;
 }
 
-.suggestions-list li:last-child {
-  margin-bottom: 0;
+.form-label-vedic svg {
+  width: 12px;
+  height: 12px;
+  opacity: 0.6;
 }
 
-/* Form Error Message */
-.form-error-message {
-  background: #f8d7da;
-  border: 1px solid #f5c6cb;
-  color: #721c24;
-  padding: 0.75rem 1rem;
-  border-radius: 4px;
-  margin-bottom: 1rem;
-}
-
-/* Form Actions */
-.form-actions {
-  display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
-  margin-top: 2rem;
-}
-
-.btn {
-  padding: 0.75rem 1.5rem;
+/* ============================================
+   Input Fields - Minimal Chris Cole Style
+   ============================================ */
+.form-input-vedic,
+.form-select-vedic {
+  width: 100%;
+  padding: 1rem 1rem 1rem 3rem; /* Extra left padding for icons */
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 300;
+  letter-spacing: 0.5px;
+  color: rgba(255, 255, 255, 0.9);
+  background-color: transparent;
   border: none;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15); /* Minimal bottom border only */
+  border-radius: 0; /* No border radius - clean lines */
+  outline: none;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.form-input-vedic::placeholder,
+.form-select-vedic::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+  font-weight: 300;
+  letter-spacing: 0.5px;
+}
+
+/* Focus State - Minimal golden underline */
+.form-input-vedic:focus,
+.form-select-vedic:focus {
+  border-bottom-color: rgba(255, 215, 0, 0.6); /* Golden accent */
+  background-color: rgba(255, 255, 255, 0.02); /* Very subtle background */
+  transform: translateY(-2px); /* Subtle lift on focus */
+}
+
+/* Hover State - Subtle feedback */
+.form-input-vedic:hover:not(:focus),
+.form-select-vedic:hover:not(:focus) {
+  border-bottom-color: rgba(255, 255, 255, 0.25);
+  background-color: rgba(255, 255, 255, 0.01);
+}
+
+/* Icon Positioning */
+.form-group-vedic .relative {
+  position: relative;
+}
+
+.form-group-vedic .absolute {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 215, 0, 0.4); /* Subtle golden icons */
+  font-size: 14px;
+  pointer-events: none;
   transition: all 0.3s ease;
 }
 
-.btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+/* Icon glow on focus */
+.form-input-vedic:focus ~ .absolute,
+.form-select-vedic:focus ~ .absolute {
+  color: rgba(255, 215, 0, 0.8);
+  transform: translateY(-50%) scale(1.1);
 }
 
+/* ============================================
+   Error States - Minimal but Clear
+   ============================================ */
+.form-input-vedic[aria-invalid="true"],
+.form-select-vedic[aria-invalid="true"] {
+  border-bottom-color: rgba(255, 153, 51, 0.5); /* Saffron error color */
+  background-color: rgba(255, 153, 51, 0.03);
+}
+
+.alert-error {
+  font-family: 'Roboto', sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  color: rgba(255, 153, 51, 0.9);
+  padding: 0.5rem 0;
+  margin-top: 0.25rem;
+}
+
+/* ============================================
+   Buttons - Chris Cole Minimal Style
+   ============================================ */
+.btn-vedic {
+  font-family: 'Roboto', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 1rem 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0; /* No border radius - clean lines */
+  background: transparent;
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-vedic::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 215, 0, 0.1);
+  transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-vedic:hover::before {
+  left: 0;
+}
+
+.btn-vedic:hover {
+  border-color: rgba(255, 215, 0, 0.5);
+  color: rgba(255, 215, 0, 0.9);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.1);
+}
+
+.btn-vedic:active {
+  transform: translateY(0);
+}
+
+/* Primary Button */
 .btn-primary {
-  background: #3949ab;
-  color: white;
+  border-color: rgba(255, 215, 0, 0.4);
+  background: rgba(255, 215, 0, 0.05);
+  color: rgba(255, 215, 0, 0.95);
 }
 
-.btn-primary:hover:not(:disabled) {
-  background: #303f9f;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(57, 73, 171, 0.3);
+.btn-primary:hover {
+  border-color: rgba(255, 215, 0, 0.8);
+  background: rgba(255, 215, 0, 0.1);
+  box-shadow: 0 6px 16px rgba(255, 215, 0, 0.15);
 }
 
+/* Secondary Button */
 .btn-secondary {
-  background: #e0e0e0;
-  color: #333;
+  border-color: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.7);
 }
 
-.btn-secondary:hover:not(:disabled) {
-  background: #d5d5d5;
+.btn-secondary:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.95);
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .birth-data-form {
-    padding: 1.5rem;
+/* Disabled State */
+.btn-vedic:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none !important;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ============================================
+   Loading States - Minimal Spinner
+   ============================================ */
+.loading-vedic {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.spinner-vedic {
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top-color: rgba(255, 215, 0, 0.6);
+  border-radius: 50%;
+  animation: spin-minimal 1s linear infinite;
+}
+
+@keyframes spin-minimal {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================================
+   Success Messages - Minimal Feedback
+   ============================================ */
+.text-vedic-gold {
+  font-family: 'Roboto', sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 1px;
+  color: rgba(255, 215, 0, 0.8);
+}
+
+/* ============================================
+   Grid Layout - Clean Spacing
+   ============================================ */
+.grid {
+  display: grid;
+  gap: 2rem;
+}
+
+.grid-cols-1 {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .grid-cols-1.md\:grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ============================================
+   Helper Text - Subtle and Minimal
+   ============================================ */
+.text-muted {
+  font-family: 'Roboto', sans-serif;
+  font-size: 10px;
+  font-weight: 300;
+  letter-spacing: 0.5px;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.text-xs {
+  font-size: 10px;
+}
+
+.text-sm {
+  font-size: 11px;
+}
+
+/* ============================================
+   Animations - Smooth and Subtle
+   ============================================ */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+/* ============================================
+   Mobile Responsiveness
+   ============================================ */
+@media (max-width: 640px) {
+  .form-vedic {
+    padding: 0;
   }
 
-  .form-header h2 {
-    font-size: 1.5rem;
+  .space-vedic {
+    gap: 1.5rem;
   }
 
-  .form-actions {
-    flex-direction: column;
+  .btn-vedic {
+    padding: 0.875rem 1.5rem;
+    font-size: 10px;
   }
 
-  .btn {
-    width: 100%;
+  .form-input-vedic,
+  .form-select-vedic {
+    font-size: 13px;
+    padding: 0.875rem 0.875rem 0.875rem 2.5rem;
+  }
+}
+
+/* ============================================
+   Accessibility - Focus Indicators
+   ============================================ */
+.btn-vedic:focus-visible,
+.form-input-vedic:focus-visible,
+.form-select-vedic:focus-visible {
+  outline: 2px solid rgba(255, 215, 0, 0.5);
+  outline-offset: 2px;
+}
+
+/* ============================================
+   Reduced Motion Support
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  .btn-vedic,
+  .form-input-vedic,
+  .form-select-vedic,
+  .btn-vedic::before,
+  .spinner-vedic,
+  .animate-fade-in {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .btn-vedic:hover,
+  .form-input-vedic:focus,
+  .form-select-vedic:focus {
+    transform: none !important;
   }
 }

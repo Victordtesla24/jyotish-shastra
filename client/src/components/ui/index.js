@@ -15,10 +15,10 @@ export const Button = forwardRef(({
   const baseClasses = 'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
 
   const variants = {
-    primary: 'bg-cosmic-purple text-white hover:bg-cosmic-purple-dark focus:ring-cosmic-purple',
-    secondary: 'bg-white text-earth-brown border border-gray-300 hover:bg-gray-50 focus:ring-gray-300 dark:bg-dark-surface dark:text-dark-text-primary dark:border-dark-border dark:hover:bg-dark-hover',
+    primary: 'text-white focus:ring-cosmic-purple',
+    secondary: 'text-primary border focus:ring-gray-300',
     cosmic: 'bg-gradient-to-r from-cosmic-purple to-cosmic-pink text-white hover:from-cosmic-purple-dark hover:to-cosmic-pink-dark focus:ring-cosmic-purple',
-    ghost: 'text-earth-brown hover:bg-gray-100 focus:ring-gray-300 dark:text-dark-text-primary dark:hover:bg-dark-hover',
+    ghost: 'text-primary hover:bg-card-hover focus:ring-gray-300',
     danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
   };
 
@@ -35,11 +35,39 @@ export const Button = forwardRef(({
     className
   );
 
+  const getButtonStyle = () => {
+    if (variant === 'primary') {
+      return { background: 'linear-gradient(135deg, #FFD700 0%, #FF9933 100%)', color: '#000000' };
+    } else if (variant === 'secondary') {
+      return { backgroundColor: 'transparent', borderColor: 'var(--border-color)', color: 'var(--text-primary)' };
+    } else if (variant === 'ghost') {
+      return { backgroundColor: 'transparent', color: 'var(--text-primary)' };
+    }
+    return {};
+  };
+
   return (
     <button
       ref={ref}
       className={classes}
+      style={getButtonStyle()}
       disabled={disabled || loading}
+      onMouseEnter={(e) => {
+        if (variant === 'secondary') {
+          e.currentTarget.style.borderColor = 'var(--divine-gold)';
+          e.currentTarget.style.backgroundColor = 'var(--bg-card-hover)';
+        } else if (variant === 'ghost') {
+          e.currentTarget.style.backgroundColor = 'var(--bg-card-hover)';
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (variant === 'secondary') {
+          e.currentTarget.style.borderColor = 'var(--border-color)';
+          e.currentTarget.style.backgroundColor = 'transparent';
+        } else if (variant === 'ghost') {
+          e.currentTarget.style.backgroundColor = 'transparent';
+        }
+      }}
       {...props}
     >
       {loading && (
@@ -60,9 +88,10 @@ export const Card = ({ children, className, ...props }) => {
   return (
     <div
       className={clsx(
-        'bg-white dark:bg-dark-surface rounded-lg shadow-md border border-gray-200 dark:border-dark-border',
+        'rounded-lg shadow-md border',
         className
       )}
+      style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)', ...props.style }}
       {...props}
     >
       {children}

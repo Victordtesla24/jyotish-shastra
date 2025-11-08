@@ -248,36 +248,38 @@ async function testUIDataFlow() {
 
 // Root cause analysis function (step 7 requirement)
 async function analyzeErrors() {
-  console.log('\n🔍 ROOT CAUSE ANALYSIS...');
-  
-  const testStatus = await testAllAPIEndpoints();
-  if (!testStatus) {
-    console.error('🚨 CRITICAL: Multiple API failures detected');
+  try {
+    console.log('\n🔍 ROOT CAUSE ANALYSIS...');
     
-    // Search for common causes
-    console.log('\n🔍 CHECKING BIRTH DATA VALIDATION:');
-    try {
-      const validData = dataInterpreter.validateInput(testBirthData.default);
-      console.log(`✅ Birth data validation: ${validData.isValid ? 'PASSED' : 'FAILED'}`);
-    } catch (error) {
-      console.log(`❌ Data validation failed: ${error.message}`);
+    const testStatus = await testAllAPIEndpoints();
+    if (!testStatus) {
+      console.error('🚨 CRITICAL: Multiple API failures detected');
+      
+      // Search for common causes
+      console.log('\n🔍 CHECKING BIRTH DATA VALIDATION:');
+      try {
+        const validData = dataInterpreter.validateInput(testBirthData.default);
+        console.log(`✅ Birth data validation: ${validData.isValid ? 'PASSED' : 'FAILED'}`);
+      } catch (error) {
+        console.log(`❌ Data validation failed: ${error.message}`);
+      }
+      
+      console.log('\n🔍 CHECKING API RESPONSE STRUCTURES:');
+      const quickResult = testBTRQuickValidation();
+      if (!quickResult.success) {
+        console.log('❌ Quick validation API structure mismatch detected');
+      }
+      
+      console.log('\n🔍 CHECKING BTR WITH EVENTS API:');
+      const eventsResult = testBTRWithLifeEvents();
+      if (!eventsResult.success) {
+        console.log(`❌ Events API structure mismatch: ${eventsResult.error}`);
+      }
+      
+      console.log('\n🔍 ERROR RESEARCH:');
+      console.log('Backend console logs show validation failures for API requests');
+      console.log('Frontend console shows validation errors in data mapping');
     }
-    
-    console.log('\n🔍 CHECKING API RESPONSE STRUCTURES:');
-    const quickResult = testBTRQuickValidation();
-    if (!quickResult.success) {
-      console.log('❌ Quick validation API structure mismatch detected');
-    }
-    
-    console.log('\n🔍 CHECKING BTR WITH EVENTS API:');
-    const eventsResult = testBTRWithLifeEvents();
-    if (!eventsResult.success) {
-      console.log(`❌ Events API structure mismatch: ${eventsResult.error}`);
-    }
-    
-    console.log('\n🔍 ERROR RESEARCH:');
-    console.log('Backend console logs show validation failures for API requests');
-    console.log('Frontend console shows validation errors in data mapping');
   } catch (error) {
     console.error('Error analysis failed:', error);
   }
@@ -337,26 +339,28 @@ async function main() {
       console.log('\n🎉 PRODUCTION VALIDATION SUCCESSFUL!');
       console.log('🚀 ALL REQUIREMENTS FULLY MET!');
       console.log('\n✅ BPHS-BTR System Is Production Ready!');
+      return true;
     }
   
-    return true;
+    return false;
   } catch (error) {
     console.error('\n❌ VALIDATION FAILED:', error.message);
     console.log('\n🔧 REQUIRES IMMEDIATE FIXES');
-      return false;
-  }
     
     console.log('\n🔧 Running comprehensive error research (Step 7 requirement)');
     const researchSolutions = await researchOnlineSolutions(error.message);
-    console.log('🔍 ONLINE SOLUTIONS FOUND:', researchSolutions.join(', '));
+    console.log('🔍 ONLINE SOLUTIONS FOUND:', researchSolutions.map(s => s.solution || s).join(', '));
     console.log('🔧 IMPLEMENTING BEST SOLUTION...');
     
     // Apply best solution
     try {
-      applyBestSolution(researchSolutions[0]);
-      return true;
-    } catch (error) {
-      console.error('Solution implementation failed:', error.message);
+      if (researchSolutions[0]) {
+        applyBestSolution(researchSolutions[0]);
+        return true;
+      }
+      return false;
+    } catch (solutionError) {
+      console.error('Solution implementation failed:', solutionError.message);
       return false;
     }
   } finally {
@@ -385,7 +389,7 @@ async function researchOnlineSolutions(errorMessage) {
     },
     {
       solution: "Use correct HTTP status checking",
-      description: "Check for response.data.success before accessing nested properties"
+      description: "Check for response.data.success before accessing nested properties",
       implementation: "Add validation for response success flag"
     }
   ];
@@ -424,5 +428,3 @@ async function analyzeRootCause(error) {
     process.exit(1);
   }
 })();
-export { testHealthEndpoint, testChartGeneration, testBTRQuickValidation, testBTRMethodsInfo, testBTRWithLifeEvents, testDataConsistency };
-} from './test-btr-api-integration';

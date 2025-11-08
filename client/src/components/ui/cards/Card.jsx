@@ -10,9 +10,10 @@ export const Card = React.forwardRef(({ className, ...props }, ref) => {
     <div
       ref={ref}
       className={cn(
-        'bg-white dark:bg-dark-surface rounded-lg shadow-md border border-gray-200 dark:border-dark-border shadow-soft',
+        'rounded-lg shadow-md border shadow-soft',
         className
       )}
+      style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)', ...props.style }}
       {...props}
     />
   );
@@ -45,7 +46,7 @@ export const CardTitle = React.forwardRef(({ className, children, ...props }, re
     <h3
       ref={ref}
       className={cn(
-        'text-2xl font-semibold leading-none tracking-tight text-gray-900 dark:text-dark-text-primary',
+          'text-2xl font-semibold leading-none tracking-tight text-primary',
         className
       )}
       aria-label={children || 'Card title'}
@@ -66,7 +67,7 @@ export const CardDescription = React.forwardRef(({ className, ...props }, ref) =
   return (
     <p
       ref={ref}
-      className={cn('text-sm text-gray-500 dark:text-dark-text-secondary', className)}
+      className={cn('text-sm text-secondary', className)}
       {...props}
     />
   );
@@ -111,7 +112,7 @@ CardFooter.displayName = 'CardFooter';
  * Variant definitions for different card styles
  */
 export const cardVariants = {
-  default: 'bg-white dark:bg-dark-surface',
+  default: '',
   sacred: 'card-sacred',
   cosmic: 'card-cosmic',
   vedic: 'card-vedic',

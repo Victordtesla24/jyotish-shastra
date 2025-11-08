@@ -83,29 +83,29 @@
   --strength-poor: #DC143C;           /* Poor - Red */
 
   /* === NEUTRAL & BACKGROUND COLORS === */
-  --sacred-white: #FFFEF7;            /* Warm white background */
-  --sacred-cream: #FFF8DC;            /* Cream background */
-  --wisdom-gray: #6B7280;             /* Text gray */
-  --earth-brown: #8B4513;             /* Earth brown */
+  --sacred-white: #FFFFFF;            /* White text */
+  --sacred-cream: #CCCCCC;            /* Light gray text */
+  --wisdom-gray: #CCCCCC;             /* Text gray */
+  --earth-brown: #CCCCCC;             /* Text color */
   --sky-blue: #87CEEB;                /* Light sky blue */
 
   /* === TEXT COLORS === */
-  --text-primary: #1F2937;            /* Dark gray - primary text */
-  --text-secondary: #4B5563;          /* Medium gray - secondary text */
-  --text-muted: #9CA3AF;              /* Light gray - muted text */
+  --text-primary: #FFFFFF;            /* White - primary text */
+  --text-secondary: #CCCCCC;          /* Light gray - secondary text */
+  --text-muted: #999999;              /* Medium gray - muted text */
   --text-white: #FFFFFF;              /* Pure white text */
-  --text-gold: var(--vedic-gold-dark); /* Gold text for emphasis */
+  --text-gold: var(--vedic-gold);     /* Gold text for emphasis */
 
   /* === BACKGROUND COLORS === */
-  --bg-primary: #FFFFFF;              /* Primary white background */
-  --bg-secondary: var(--sacred-white); /* Secondary warm background */
-  --bg-subtle: var(--sacred-cream);   /* Subtle cream background */
-  --bg-overlay: rgba(255, 255, 255, 0.95); /* Semi-transparent overlay */
+  --bg-primary: #000000;              /* Primary black background */
+  --bg-secondary: #1A1A1A;            /* Secondary dark gray background */
+  --bg-subtle: #252525;               /* Subtle dark gray background */
+  --bg-overlay: rgba(0, 0, 0, 0.8);   /* Semi-transparent overlay */
 
   /* === BORDER COLORS === */
-  --border-light: #E5E7EB;            /* Light border */
-  --border-medium: #D1D5DB;           /* Medium border */
-  --border-dark: #9CA3AF;             /* Dark border */
+  --border-light: #505050;            /* Mid gray border */
+  --border-medium: #505050;           /* Mid gray border */
+  --border-dark: #505050;             /* Mid gray border */
   --border-accent: var(--vedic-gold); /* Accent border */
 
   /* === SHADOW DEFINITIONS === */
@@ -279,7 +279,7 @@
 }
 
 .btn-ghost:hover:not(:disabled) {
-  background: var(--bg-subtle);
+  background: #252525;
   color: var(--vedic-saffron);
 }
 
@@ -293,7 +293,7 @@
    ============================================= */
 
   .card-vedic {
-  background: var(--bg-primary);
+  background: var(--bg-secondary);
   border: 1px solid var(--border-light);
   border-radius: var(--radius-xl);
   padding: var(--space-6);
@@ -314,14 +314,14 @@
 }
 
 .card-vedic:hover {
-  transform: translateY(-2px);
+  transform: translateY(-4px); /* Matching Chris Cole design */
   box-shadow: var(--shadow-lg);
   border-color: var(--border-accent);
 }
 
 /* Card Variants */
 .card-sacred {
-  background: linear-gradient(135deg, var(--sacred-white) 0%, var(--sacred-cream) 100%);
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, #252525 100%);
   box-shadow: var(--shadow-sacred);
 }
 
@@ -330,7 +330,7 @@
 }
 
 .card-cosmic {
-  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--sky-blue) 5%);
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, #252525 100%);
   box-shadow: var(--shadow-cosmic);
 }
 
@@ -347,7 +347,7 @@
   padding: var(--space-3) var(--space-4);
   border: 1px solid var(--border-medium);
   border-radius: var(--radius-md);
-  background: var(--bg-primary);
+  background: var(--bg-secondary);
   color: var(--text-primary);
   font-size: var(--text-base);
   transition: all var(--duration-normal) var(--ease-out);
@@ -359,13 +359,18 @@
   box-shadow: 0 0 0 3px rgba(255, 153, 51, 0.1);
 }
 
+.input-vedic::placeholder {
+  color: #CCCCCC;
+  opacity: 0.6;
+}
+
 .input-vedic:invalid {
   border-color: var(--debilitated-color);
 }
 
 .input-vedic:disabled {
-  background: var(--bg-subtle);
-  color: var(--text-muted);
+  background: #252525;
+  color: #666666;
   cursor: not-allowed;
 }
 
@@ -519,7 +524,7 @@
 
 .nav-item:hover {
   color: var(--vedic-saffron);
-  background: var(--bg-subtle);
+  background: #252525;
 }
 
 .nav-item.active {
@@ -576,14 +581,14 @@
 
 .tab-vedic:hover {
   color: var(--vedic-saffron);
-  background: var(--bg-subtle);
+  background: #252525;
   border-bottom-color: var(--vedic-saffron);
 }
 
 .tab-vedic.active {
   color: var(--vedic-saffron);
   border-bottom-color: var(--vedic-saffron);
-  background: var(--bg-subtle);
+  background: #252525;
   font-weight: 600;
 }
 
@@ -652,7 +657,7 @@
 
 .tab-vedic-enhanced:hover {
   color: var(--vedic-saffron);
-  background: var(--bg-subtle);
+  background: #252525;
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }

@@ -6,6 +6,7 @@ import { useChart } from '../contexts/ChartContext.js';
 import UIDataSaver from '../components/forms/UIDataSaver.js';
 import NotificationToast from '../components/ui/NotificationToast.jsx';
 import PlanetaryAnimations from '../components/ui/PlanetaryAnimations.jsx';
+import { initScrollReveals, cleanupScrollTriggers } from '../lib/scroll.js';
 
 // Error Boundary Component for ChartPage
 class ChartPageErrorBoundary extends React.Component {
@@ -30,7 +31,7 @@ class ChartPageErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen relative overflow-hidden flex items-center justify-center" style={{ backgroundColor: 'rgb(0, 0, 0)', color: 'rgb(255, 255, 255)' }}>
+        <div className="min-h-screen relative overflow-hidden flex items-center justify-center">
           <PlanetaryAnimations count={8} />
           <div className="text-center p-8">
             <h1 className="text-4xl font-cinzel text-gold mb-4">🔮 Cosmic Disturbance Detected</h1>
@@ -80,6 +81,15 @@ const ChartPage = () => {
       }
     }
   }, [currentChart]);
+
+  // Initialize scroll/parallax effects
+  useEffect(() => {
+    initScrollReveals();
+    
+    return () => {
+      cleanupScrollTriggers();
+    };
+  }, []);
 
   useEffect(() => {
     if (!currentChart) {
@@ -195,13 +205,13 @@ const ChartPage = () => {
 
   if (!currentChart && showRedirectFallback) {
     return (
-      <div className="min-h-screen relative overflow-hidden flex items-center justify-center" style={{ backgroundColor: 'rgb(0, 0, 0)', color: 'rgb(255, 255, 255)' }}>
+      <div className="min-h-screen relative overflow-hidden flex items-center justify-center">
         {toastNode}
         <PlanetaryAnimations count={8} />
-        <div className="card-cosmic backdrop-vedic border-2 border-white/20 shadow-mandala p-10 rounded-3xl max-w-xl text-center relative z-10">
+        <div className="card-cosmic shadow-mandala p-10 rounded-3xl max-w-xl text-center relative z-10" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
           <div className="text-5xl mb-4">🔄</div>
           <h2 className="text-3xl font-cinzel font-bold text-gradient-vedic mb-4">Fresh Chart Required</h2>
-          <p className="text-white/80 mb-6">
+          <p className="text-secondary mb-6">
             We could not find a recent chart in this browser session. Please regenerate your birth chart to explore the analysis features.
           </p>
           <button
@@ -220,7 +230,7 @@ const ChartPage = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen relative overflow-hidden flex items-center justify-center" style={{ backgroundColor: 'rgb(0, 0, 0)', color: 'rgb(255, 255, 255)' }}>
+      <div className="min-h-screen relative overflow-hidden flex items-center justify-center">
         {toastNode}
         <PlanetaryAnimations count={8} />
         <div className="relative z-10">
@@ -232,13 +242,13 @@ const ChartPage = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen relative overflow-hidden flex items-center justify-center" style={{ backgroundColor: 'rgb(0, 0, 0)', color: 'rgb(255, 255, 255)' }}>
+      <div className="min-h-screen relative overflow-hidden flex items-center justify-center">
         {toastNode}
         <PlanetaryAnimations count={8} />
-        <div className="card-cosmic backdrop-vedic border-2 border-white/20 shadow-mandala p-8 rounded-3xl max-w-md relative z-10">
+        <div className="card-cosmic shadow-mandala p-8 rounded-3xl max-w-md relative z-10" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
           <div className="text-red-400 text-5xl mb-4 text-center">⚠️</div>
           <h2 className="text-2xl font-cinzel font-bold text-gradient-vedic mb-4 text-center">Error</h2>
-          <p className="text-white/80 mb-6 text-center font-devanagari">{error.message || error}</p>
+          <p className="text-secondary mb-6 text-center font-devanagari">{error.message || error}</p>
           <button
             onClick={() => navigate('/')}
             className="btn-primary w-full"
@@ -254,7 +264,7 @@ const ChartPage = () => {
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: 'rgb(0, 0, 0)', color: 'rgb(255, 255, 255)' }}>
+    <div className="min-h-screen relative overflow-hidden">
       {toastNode}
       {/* White Saturn & Planetary Animations (Matching Chris Cole) */}
       <PlanetaryAnimations count={8} />
@@ -265,7 +275,7 @@ const ChartPage = () => {
           {/* Premium Header Section */}
           <div className="text-center mb-12">
             <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-cosmic rounded-full shadow-celestial mb-6 animate-sacred-pulse">
-              <span className="text-3xl text-white">📊</span>
+              <span className="text-3xl">📊</span>
             </div>
 
             <h1 className="section-title-vedic text-5xl md:text-6xl font-cinzel font-bold mb-6 text-gradient-vedic drop-shadow-2xl">
@@ -273,10 +283,10 @@ const ChartPage = () => {
             </h1>
 
             <div className="max-w-3xl mx-auto mb-8">
-              <p className="text-lg md:text-xl text-white font-devanagari font-medium mb-2 drop-shadow-lg">
+              <p className="text-lg md:text-xl text-primary font-devanagari font-medium mb-2">
                 जन्म कुंडली - Cosmic Blueprint of Your Soul
               </p>
-              <p className="text-white/80 drop-shadow-md">
+              <p className="text-secondary">
                 Traditional Vedic astrology chart revealing your celestial destiny
               </p>
             </div>
@@ -285,7 +295,10 @@ const ChartPage = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
               <button
                 onClick={() => navigate('/')}
-                className="btn-secondary px-8 py-3 text-white border-2 border-white/30 hover:border-white/50 hover:bg-white/10 transition-all duration-300 rounded-xl font-cinzel font-medium"
+                className="btn-secondary px-8 py-3 text-primary border-2 transition-all duration-300 rounded-xl font-cinzel font-medium"
+                style={{ borderColor: 'var(--border-color)' }}
+                onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--divine-gold)'; e.currentTarget.style.backgroundColor = 'var(--bg-card-hover)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border-color)'; e.currentTarget.style.backgroundColor = 'transparent'; }}
               >
                 <span className="flex items-center justify-center space-x-2">
                   <span>🏠</span>
@@ -294,7 +307,7 @@ const ChartPage = () => {
               </button>
               <button
                 onClick={() => navigate('/analysis')}
-                className="btn-primary px-8 py-3 bg-gradient-cosmic text-white hover:shadow-celestial hover:-translate-y-1 transition-all duration-300 rounded-xl font-cinzel font-medium"
+                className="btn-primary px-8 py-3 bg-gradient-cosmic text-primary hover:shadow-celestial hover:-translate-y-1 transition-all duration-300 rounded-xl font-cinzel font-medium"
               >
                 <span className="flex items-center justify-center space-x-2">
                   <span>🔮</span>
@@ -323,7 +336,7 @@ const ChartPage = () => {
                     navigate('/birth-time-rectification');
                   }
                 }}
-                className="btn-primary px-8 py-3 bg-gradient-to-r from-saffron to-gold text-white hover:shadow-celestial hover:-translate-y-1 transition-all duration-300 rounded-xl font-cinzel font-medium"
+                className="btn-primary px-8 py-3 bg-gradient-to-r from-saffron to-gold text-primary hover:shadow-celestial hover:-translate-y-1 transition-all duration-300 rounded-xl font-cinzel font-medium"
               >
                 <span className="flex items-center justify-center space-x-2">
                   <span>🕉️</span>
@@ -344,20 +357,20 @@ const ChartPage = () => {
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-12">
 
             {/* Main Rasi Chart */}
-            <div className="card-cosmic backdrop-vedic border-2 border-white/20 shadow-mandala p-8 rounded-3xl hover-celestial chart-container-shadow">
+            <div className="card-cosmic shadow-mandala p-8 rounded-3xl hover-celestial chart-container-shadow reveal stagger-reveal" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
               <div className="text-center mb-6">
                 <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-cosmic rounded-full shadow-celestial mb-4 animate-sacred-pulse">
-                  <span className="text-2xl text-white">🪐</span>
+                  <span className="text-2xl">🪐</span>
                 </div>
                 <h2 className="text-2xl md:text-3xl font-cinzel font-bold text-gradient-accent mb-2">
                   Rasi Chart (D1)
                 </h2>
-                <p className="text-white/70 font-devanagari">
+                <p className="text-secondary font-devanagari">
                   Primary birth chart showing planetary positions
                 </p>
               </div>
 
-              <div className="bg-white/10 rounded-2xl p-6 backdrop-blur-sm border border-white/20">
+              <div className="rounded-2xl p-6 border" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                 <VedicChartDisplay
                   chartData={chartData?.rasiChart || chartData}
                   chartType="rasi"
@@ -370,20 +383,20 @@ const ChartPage = () => {
 
             {/* Navamsa Chart */}
             {chartData?.navamsaChart && (
-              <div className="card-cosmic backdrop-vedic border-2 border-white/20 shadow-mandala p-8 rounded-3xl hover-celestial chart-container-shadow">
+              <div className="card-cosmic shadow-mandala p-8 rounded-3xl hover-celestial chart-container-shadow reveal stagger-reveal" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                 <div className="text-center mb-6">
                   <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-cosmic rounded-full shadow-celestial mb-4 animate-sacred-pulse">
-                    <span className="text-2xl text-white">🌙</span>
+                    <span className="text-2xl">🌙</span>
                   </div>
                   <h2 className="text-2xl md:text-3xl font-cinzel font-bold text-gradient-accent mb-2">
                     Navamsa Chart (D9)
                   </h2>
-                  <p className="text-white/70 font-devanagari">
+                  <p className="text-secondary font-devanagari">
                     Marriage and spiritual destiny chart
                   </p>
                 </div>
 
-                <div className="bg-white/10 rounded-2xl p-6 backdrop-blur-sm border border-white/20">
+                <div className="rounded-2xl p-6 border" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                   <VedicChartDisplay
                     chartData={chartData.navamsaChart}
                     chartType="navamsa"
@@ -397,73 +410,73 @@ const ChartPage = () => {
           </div>
 
           {/* Birth Details Card */}
-          <div className="card-cosmic backdrop-vedic border-2 border-white/20 shadow-mandala p-8 rounded-3xl mb-8">
+          <div className="card-cosmic shadow-mandala p-8 rounded-3xl mb-8 reveal" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
             <div className="text-center mb-6">
               <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-cosmic rounded-full shadow-celestial mb-4 animate-sacred-pulse">
-                <span className="text-2xl text-white">📋</span>
+                <span className="text-2xl">📋</span>
               </div>
               <h3 className="text-2xl md:text-3xl font-cinzel font-bold text-gradient-accent mb-2">
                 Birth Details
               </h3>
-              <p className="text-white/70 font-devanagari">
+              <p className="text-secondary font-devanagari">
                 Sacred information used for calculations
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {/* Name */}
-              <div className="bg-white/10 rounded-xl p-4 backdrop-blur-sm border border-white/20">
+              <div className="rounded-xl p-4 border shadow-sm" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                 <div className="flex items-center space-x-3 mb-2">
                   <span className="text-vedic-gold text-xl">👤</span>
-                  <span className="text-white/70 font-devanagari text-sm">Name:</span>
+                  <span className="text-secondary font-devanagari text-sm">Name:</span>
                 </div>
-                <span className="text-white font-cinzel font-medium text-lg">
+                <span className="text-primary font-cinzel font-medium text-lg">
                   {chartData?.birthData?.name || 'N/A'}
                 </span>
               </div>
 
               {/* Date */}
-              <div className="bg-white/10 rounded-xl p-4 backdrop-blur-sm border border-white/20">
+              <div className="rounded-xl p-4 border shadow-sm" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                 <div className="flex items-center space-x-3 mb-2">
                   <span className="text-vedic-gold text-xl">📅</span>
-                  <span className="text-white/70 font-devanagari text-sm">Date:</span>
+                  <span className="text-secondary font-devanagari text-sm">Date:</span>
                 </div>
-                <span className="text-white font-cinzel font-medium text-lg">
+                <span className="text-primary font-cinzel font-medium text-lg">
                   {chartData?.birthData?.dateOfBirth ?
                     new Date(chartData.birthData.dateOfBirth).toLocaleDateString() : 'N/A'}
                 </span>
               </div>
 
               {/* Time */}
-              <div className="bg-white/10 rounded-xl p-4 backdrop-blur-sm border border-white/20">
+              <div className="rounded-xl p-4 border shadow-sm" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                 <div className="flex items-center space-x-3 mb-2">
                   <span className="text-vedic-gold text-xl">⏰</span>
-                  <span className="text-white/70 font-devanagari text-sm">Time:</span>
+                  <span className="text-secondary font-devanagari text-sm">Time:</span>
                 </div>
-                <span className="text-white font-cinzel font-medium text-lg">
+                <span className="text-primary font-cinzel font-medium text-lg">
                   {chartData?.birthData?.timeOfBirth || 'N/A'}
                 </span>
               </div>
 
               {/* Place */}
-              <div className="bg-white/10 rounded-xl p-4 backdrop-blur-sm border border-white/20 lg:col-span-2">
+              <div className="rounded-xl p-4 border lg:col-span-2" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                 <div className="flex items-center space-x-3 mb-2">
                   <span className="text-vedic-gold text-xl">🌍</span>
-                  <span className="text-white/70 font-devanagari text-sm">Place:</span>
+                  <span className="text-secondary font-devanagari text-sm">Place:</span>
                 </div>
-                <span className="text-white font-cinzel font-medium text-lg">
+                <span className="text-primary font-cinzel font-medium text-lg">
                   {chartData?.birthData?.geocodingInfo?.formattedAddress ||
                    `${chartData?.birthData?.latitude?.toFixed(4) || 'N/A'}, ${chartData?.birthData?.longitude?.toFixed(4) || 'N/A'}`}
                 </span>
               </div>
 
               {/* Coordinates */}
-              <div className="bg-white/10 rounded-xl p-4 backdrop-blur-sm border border-white/20">
+              <div className="rounded-xl p-4 border shadow-sm" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                 <div className="flex items-center space-x-3 mb-2">
                   <span className="text-vedic-gold text-xl">📍</span>
-                  <span className="text-white/70 font-devanagari text-sm">Coordinates:</span>
+                  <span className="text-secondary font-devanagari text-sm">Coordinates:</span>
                 </div>
-                <div className="text-white font-mono text-sm">
+                <div className="text-primary font-mono text-sm">
                   <div>{chartData?.birthData?.latitude?.toFixed(4) || 'N/A'}° N</div>
                   <div>{chartData?.birthData?.longitude?.toFixed(4) || 'N/A'}° E</div>
                 </div>
@@ -473,42 +486,42 @@ const ChartPage = () => {
 
           {/* Dasha Information Card */}
           {chartData?.dashaInfo && (
-            <div className="card-cosmic backdrop-vedic border-2 border-white/20 shadow-mandala p-8 rounded-3xl">
+            <div className="card-cosmic shadow-mandala p-8 rounded-3xl reveal" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
               <div className="text-center mb-6">
                 <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-cosmic rounded-full shadow-celestial mb-4 animate-sacred-pulse">
-                  <span className="text-2xl text-white">⏳</span>
+                  <span className="text-2xl">⏳</span>
                 </div>
                 <h3 className="text-2xl md:text-3xl font-cinzel font-bold text-gradient-accent mb-2">
                   Dasha Information
                 </h3>
-                <p className="text-white/70 font-devanagari">
+                <p className="text-secondary font-devanagari">
                   Planetary time periods governing your life
                 </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Birth Dasha */}
-                <div className="bg-white/10 rounded-xl p-4 backdrop-blur-sm border border-white/20">
+                <div className="rounded-xl p-4 border shadow-sm" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                   <div className="flex items-center space-x-3 mb-2">
                     <span className="text-vedic-gold text-xl">🎂</span>
-                    <span className="text-white/70 font-devanagari text-sm">Birth Dasha:</span>
+                    <span className="text-secondary font-devanagari text-sm">Birth Dasha:</span>
                   </div>
-                  <span className="text-white font-cinzel font-medium text-lg">
+                  <span className="text-primary font-cinzel font-medium text-lg">
                     {chartData.dashaInfo.birthDasha}
                   </span>
                 </div>
 
                 {/* Current Dasha */}
                 {chartData.dashaInfo.currentDasha && (
-                  <div className="bg-white/10 rounded-xl p-4 backdrop-blur-sm border border-white/20">
+                  <div className="rounded-xl p-4 border shadow-sm" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                     <div className="flex items-center space-x-3 mb-2">
                       <span className="text-vedic-gold text-xl">🔄</span>
-                      <span className="text-white/70 font-devanagari text-sm">Current Dasha:</span>
+                      <span className="text-secondary font-devanagari text-sm">Current Dasha:</span>
                     </div>
-                    <div className="text-white font-cinzel font-medium text-lg">
+                    <div className="text-primary font-cinzel font-medium text-lg">
                       {chartData.dashaInfo.currentDasha.planet}
                     </div>
-                    <div className="text-white/60 text-sm mt-1">
+                    <div className="text-muted text-sm mt-1">
                       {chartData.dashaInfo.currentDasha.remainingYears?.toFixed(1)} years remaining
                     </div>
                   </div>
@@ -528,10 +541,10 @@ const ChartPage = () => {
               </div>
               <span className="symbol-lotus text-3xl animate-lotus-bloom">🪷</span>
             </div>
-            <p className="text-white/70 font-devanagari text-lg">
+            <p className="text-secondary font-devanagari text-lg">
               May the stars guide your path to enlightenment
             </p>
-            <p className="text-white/60 text-sm mt-2">
+            <p className="text-muted text-sm mt-2">
               Generated with Swiss Ephemeris precision
             </p>
           </div>

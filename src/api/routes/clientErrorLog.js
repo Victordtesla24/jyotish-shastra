@@ -19,7 +19,16 @@ router.post('/log-client-error', async (req, res) => {
                     `UserAgent: ${userAgent}\n` +
                     `---\n`;
 
-    const logPath = path.join(__dirname, '../../../logs/servers/front-end-server-logs.log');
+    const logDir = path.join(__dirname, '../../../logs/servers');
+    const logPath = path.join(logDir, 'front-end-server-logs.log');
+    
+    // Ensure directory exists
+    try {
+      await fs.access(logDir);
+    } catch {
+      await fs.mkdir(logDir, { recursive: true });
+    }
+    
     await fs.appendFile(logPath, logEntry);
 
     res.json({ success: true });

@@ -65,8 +65,8 @@ class ErrorBoundary extends React.Component {
       }
 
       return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
-          <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+        <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: 'var(--bg-primary)' }}>
+          <div className="max-w-md w-full rounded-lg shadow-lg p-6" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)', border: '1px solid' }}>
             <div className="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 dark:bg-red-900 rounded-full mb-4">
               <svg
                 className="w-6 h-6 text-red-600 dark:text-red-400"
@@ -83,20 +83,20 @@ class ErrorBoundary extends React.Component {
               </svg>
             </div>
             
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white text-center mb-2">
+            <h2 className="text-xl font-semibold text-primary text-center mb-2">
               Something went wrong
             </h2>
             
-            <p className="text-gray-600 dark:text-gray-300 text-center mb-4">
+            <p className="text-secondary text-center mb-4">
               We're sorry, but an unexpected error occurred. Please try refreshing the page.
             </p>
 
             {showDetails && this.state.error && (
-              <details className="mt-4 p-4 bg-gray-100 dark:bg-gray-700 rounded text-sm">
-                <summary className="cursor-pointer font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <details className="mt-4 p-4 rounded text-sm" style={{ backgroundColor: 'var(--bg-card)' }}>
+                <summary className="cursor-pointer font-medium text-primary mb-2">
                   Error Details
                 </summary>
-                <div className="text-red-600 dark:text-red-400 font-mono text-xs overflow-auto">
+                <div className="text-red-400 font-mono text-xs overflow-auto">
                   <div className="mb-2">
                     <strong>Error:</strong> {this.state.error.toString()}
                   </div>
@@ -121,7 +121,10 @@ class ErrorBoundary extends React.Component {
               </button>
               <button
                 onClick={() => window.location.href = '/'}
-                className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg transition-colors"
+                className="flex-1 px-4 py-2 rounded-lg transition-colors"
+                style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)', border: '1px solid var(--border-color)' }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-card-hover)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-card)'}
               >
                 Go Home
               </button>

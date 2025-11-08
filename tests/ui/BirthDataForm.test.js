@@ -78,6 +78,12 @@ beforeEach(() => {
 describe('BirthDataForm', () => {
   afterEach(() => {
     jest.clearAllMocks();
+    // Reset prototype methods to default
+    UIToAPIDataInterpreter.prototype.validateInput = jest.fn((data) => ({
+      isValid: true,
+      validatedData: data,
+      errors: []
+    }));
   });
 
   test('renders all form fields correctly', () => {
@@ -121,19 +127,21 @@ describe('BirthDataForm', () => {
     const placeInput = screen.getByLabelText(/place of birth/i);
 
     // Type a location
-    await userEvent.type(placeInput, 'Pune, India');
+    await act(async () => {
+      await userEvent.type(placeInput, 'Pune, India');
+    });
 
     // Wait for debounced geocoding (component has 3-second debounce)
     await waitFor(() => {
       expect(geocodingService.geocodeLocation).toHaveBeenCalledWith('Pune, India');
-    }, { timeout: 5000 });
+    }, { timeout: 6000 });
 
     // Check if coordinates are displayed
     await waitFor(() => {
       expect(screen.getByText(/location found/i)).toBeInTheDocument();
       expect(screen.getByText(/18.5204/)).toBeInTheDocument();
       expect(screen.getByText(/73.8567/)).toBeInTheDocument();
-    });
+    }, { timeout: 2000 });
   });
 
   test('shows error when geocoding fails', async () => {
@@ -364,17 +372,17 @@ describe('BirthDataForm', () => {
 
     test('sets aria-invalid to true when field has validation error', async () => {
       // Create a custom mock for this test that returns validation errors
-      UIToAPIDataInterpreter.mockImplementation(() => ({
-        validateInput: jest.fn(() => ({
-          isValid: false,
-          validatedData: {},
-          errors: [
-            { field: 'dateOfBirth', message: 'Date of birth is required' },
-            { field: 'timeOfBirth', message: 'Time of birth is required' }
-          ]
-        })),
-        formatForAPI: jest.fn(),
-        handleErrors: jest.fn()
+      // Mock the prototype method directly to ensure it works with useMemo
+      // Use string errors that match the component's error parsing logic
+      // Reset the mock first to ensure it's clean
+      jest.clearAllMocks();
+      UIToAPIDataInterpreter.prototype.validateInput = jest.fn(() => ({
+        isValid: false,
+        validatedData: {},
+        errors: [
+          'Please enter a valid birth date',
+          'Please enter a valid birth time (HH:MM or HH:MM:SS format)'
+        ]
       }));
 
       const mockSubmit = jest.fn();
@@ -398,7 +406,14 @@ describe('BirthDataForm', () => {
       }, { timeout: 2000 });
 
       const submitButton = screen.getByRole('button', { name: /generate vedic chart/i });
-      fireEvent.click(submitButton);
+      await act(async () => {
+        fireEvent.click(submitButton);
+      });
+
+      // Verify that validateInput was called
+      await waitFor(() => {
+        expect(UIToAPIDataInterpreter.prototype.validateInput).toHaveBeenCalled();
+      }, { timeout: 1000 });
 
       await waitFor(() => {
         const dateInput = screen.getByLabelText(/date of birth/i);
@@ -418,16 +433,14 @@ describe('BirthDataForm', () => {
 
     test('has aria-describedby linking to error messages', async () => {
       // Create a custom mock for this test that returns validation errors
-      UIToAPIDataInterpreter.mockImplementation(() => ({
-        validateInput: jest.fn(() => ({
-          isValid: false,
-          validatedData: {},
-          errors: [
-            { field: 'dateOfBirth', message: 'Date of birth is required' }
-          ]
-        })),
-        formatForAPI: jest.fn(),
-        handleErrors: jest.fn()
+      // Mock the prototype method directly to ensure it works with useMemo
+      // Use string errors that match the component's error parsing logic
+      UIToAPIDataInterpreter.prototype.validateInput = jest.fn(() => ({
+        isValid: false,
+        validatedData: {},
+        errors: [
+          'Please enter a valid birth date'
+        ]
       }));
 
       const mockSubmit = jest.fn();
@@ -451,7 +464,9 @@ describe('BirthDataForm', () => {
       }, { timeout: 2000 });
 
       const submitButton = screen.getByRole('button', { name: /generate vedic chart/i });
-      fireEvent.click(submitButton);
+      await act(async () => {
+        fireEvent.click(submitButton);
+      });
 
       await waitFor(() => {
         const dateInput = screen.getByLabelText(/date of birth/i);
@@ -460,22 +475,20 @@ describe('BirthDataForm', () => {
         const errorElement = document.getElementById('dateOfBirth-error');
         expect(errorElement).toBeInTheDocument();
         expect(errorElement).toHaveAttribute('role', 'alert');
-        expect(errorElement).toHaveTextContent('Date of birth is required');
+        expect(errorElement).toHaveTextContent('Please enter a valid birth date');
       }, { timeout: 3000 });
     });
 
     test('displays inline validation error messages with role="alert"', async () => {
       // Create a custom mock for this test that returns validation errors
-      UIToAPIDataInterpreter.mockImplementation(() => ({
-        validateInput: jest.fn(() => ({
-          isValid: false,
-          validatedData: {},
-          errors: [
-            { field: 'timeOfBirth', message: 'Time of birth is required' }
-          ]
-        })),
-        formatForAPI: jest.fn(),
-        handleErrors: jest.fn()
+      // Mock the prototype method directly to ensure it works with useMemo
+      // Use string errors that match the component's error parsing logic
+      UIToAPIDataInterpreter.prototype.validateInput = jest.fn(() => ({
+        isValid: false,
+        validatedData: {},
+        errors: [
+          'Please enter a valid birth time (HH:MM or HH:MM:SS format)'
+        ]
       }));
 
       const mockSubmit = jest.fn();
@@ -499,14 +512,16 @@ describe('BirthDataForm', () => {
       }, { timeout: 2000 });
 
       const submitButton = screen.getByRole('button', { name: /generate vedic chart/i });
-      fireEvent.click(submitButton);
+      await act(async () => {
+        fireEvent.click(submitButton);
+      });
 
       await waitFor(() => {
         const errorElement = document.getElementById('timeOfBirth-error');
         expect(errorElement).toBeInTheDocument();
         expect(errorElement).toHaveAttribute('role', 'alert');
         expect(errorElement).toHaveAttribute('aria-live', 'polite');
-        expect(errorElement).toHaveTextContent('Time of birth is required');
+        expect(errorElement).toHaveTextContent('Please enter a valid birth time (HH:MM or HH:MM:SS format)');
       }, { timeout: 3000 });
     });
   });
@@ -514,16 +529,14 @@ describe('BirthDataForm', () => {
   describe('Visual Enhancements', () => {
     test('uses Vedic color variables for error states', async () => {
       // Create a custom mock for this test that returns validation errors
-      UIToAPIDataInterpreter.mockImplementation(() => ({
-        validateInput: jest.fn(() => ({
-          isValid: false,
-          validatedData: {},
-          errors: [
-            { field: 'dateOfBirth', message: 'Date of birth is required' }
-          ]
-        })),
-        formatForAPI: jest.fn(),
-        handleErrors: jest.fn()
+      // Mock the prototype method directly to ensure it works with useMemo
+      // Use string errors that match the component's error parsing logic
+      UIToAPIDataInterpreter.prototype.validateInput = jest.fn(() => ({
+        isValid: false,
+        validatedData: {},
+        errors: [
+          'Please enter a valid birth date'
+        ]
       }));
 
       const mockSubmit = jest.fn();
@@ -547,13 +560,19 @@ describe('BirthDataForm', () => {
       }, { timeout: 2000 });
 
       const submitButton = screen.getByRole('button', { name: /generate vedic chart/i });
-      fireEvent.click(submitButton);
+      await act(async () => {
+        fireEvent.click(submitButton);
+      });
 
       await waitFor(() => {
         const dateInput = screen.getByLabelText(/date of birth/i);
         
+        // Check that error is set first
+        expect(dateInput).toHaveAttribute('aria-invalid', 'true');
+        
         // Check that error styling is applied (border color should be Vedic saffron via inline style)
         const styleAttribute = dateInput.getAttribute('style');
+        expect(styleAttribute).toBeTruthy();
         expect(styleAttribute).toContain('var(--vedic-saffron)');
       }, { timeout: 3000 });
     });

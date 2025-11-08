@@ -145,7 +145,7 @@ const ReportPage = () => {
       <div className="min-h-screen flex items-center justify-center">
         <Card className="p-6 max-w-md">
           <h2 className="text-xl font-bold text-red-600 mb-4">Error</h2>
-          <p className="text-wisdom-gray dark:text-dark-text-secondary mb-4">{error}</p>
+          <p className="text-secondary mb-4">{error}</p>
           <Button onClick={() => navigate('/comprehensive-analysis')} variant="primary">
             Back to Analysis
           </Button>
@@ -158,10 +158,10 @@ const ReportPage = () => {
     <div className="min-h-screen py-8">
       <div className="container-vedic max-w-4xl mx-auto">
         <div className="mb-6">
-          <h1 className="font-accent text-3xl text-earth-brown dark:text-dark-text-primary mb-2">
+          <h1 className="font-accent text-3xl text-primary mb-2">
             Your Vedic Astrology Report
           </h1>
-          <p className="text-wisdom-gray dark:text-dark-text-secondary">
+          <p className="text-secondary">
             Complete analysis ready for download
           </p>
         </div>
@@ -169,10 +169,10 @@ const ReportPage = () => {
         <Card className="p-6 mb-6">
           <div className="text-center py-8">
             <div className="text-6xl mb-4">📄</div>
-            <h2 className="text-xl font-bold text-earth-brown dark:text-dark-text-primary mb-4">
+            <h2 className="text-xl font-bold text-primary mb-4">
               Your Comprehensive Report is Ready
             </h2>
-            <p className="text-wisdom-gray dark:text-dark-text-secondary mb-6 max-w-md mx-auto">
+            <p className="text-secondary mb-6 max-w-md mx-auto">
               Download your complete Vedic astrology analysis including birth chart,
               planetary positions, dasha periods, and personalized predictions.
             </p>
@@ -196,10 +196,10 @@ const ReportPage = () => {
         </Card>
 
         {/* Preview Section */}
-        <div ref={componentRef} className="bg-white">
+        <div ref={componentRef} style={{ backgroundColor: 'var(--bg-primary)' }}>
           <div className="print-only text-center mb-8 hidden">
             <h1 className="text-3xl font-bold mb-2">Vedic Astrology Report</h1>
-            <p className="text-gray-600">Generated on {new Date().toLocaleDateString()}</p>
+            <p className="text-secondary">Generated on {new Date().toLocaleDateString()}</p>
             <hr className="my-4" />
           </div>
 
@@ -236,7 +236,7 @@ const ReportPage = () => {
           </div>
 
           <Card className="p-6 print:shadow-none print:border-0">
-            <h3 className="text-lg font-bold text-earth-brown dark:text-dark-text-primary mb-4 print:hidden">
+            <h3 className="text-lg font-bold text-primary mb-4 print:hidden">
               Report Preview
             </h3>
             <div className="max-h-96 overflow-y-auto print:max-h-none print:overflow-visible">
@@ -252,7 +252,7 @@ const ReportPage = () => {
         </div>
 
         <div className="mt-6 text-center">
-          <p className="text-sm text-wisdom-gray dark:text-dark-text-secondary">
+          <p className="text-sm text-secondary">
             Report generated on {new Date().toLocaleDateString()} at {new Date().toLocaleTimeString()}
           </p>
         </div>

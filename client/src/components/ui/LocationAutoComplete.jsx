@@ -19,7 +19,8 @@ const LocationAutoComplete = ({
   disabled = false,
   error = null,
   showSuggestions = true,
-  debounceMs = 300
+  debounceMs = 300,
+  id = undefined
 }) => {
   const [inputValue, setInputValue] = useState(value);
   const [suggestions, setSuggestions] = useState([]);
@@ -184,6 +185,7 @@ const LocationAutoComplete = ({
         </div>
         <input
           ref={inputRef}
+          id={id}
           type="text"
           value={inputValue}
           onChange={handleInputChange}
@@ -200,7 +202,7 @@ const LocationAutoComplete = ({
             paddingRight: isLoading ? '2.5rem' : '1rem'
           }}
           aria-invalid={errorMessage || error ? 'true' : 'false'}
-          aria-describedby={errorMessage || error ? 'location-error' : undefined}
+          aria-describedby={errorMessage || error ? (id ? `${id}-error` : 'location-error') : undefined}
           aria-autocomplete="list"
           aria-expanded={isOpen}
           aria-controls="location-suggestions"
@@ -218,7 +220,7 @@ const LocationAutoComplete = ({
 
       {(errorMessage || error) && (
         <p 
-          id="location-error"
+          id={id ? `${id}-error` : 'location-error'}
           className="mt-1 text-sm text-red-600"
           role="alert"
           aria-live="polite"

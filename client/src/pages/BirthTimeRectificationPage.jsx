@@ -856,16 +856,16 @@ const BirthTimeRectificationPageEnhanced = () => {
               className="space-y-8"
             >
               <div className="text-center space-y-6">
-                <h2 className="text-3xl font-bold" style={{ color: 'rgb(255, 255, 255)' }}>Your Birth Details</h2>
-                <p className="text-lg" style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                <h2 className="text-3xl font-bold text-primary">Your Birth Details</h2>
+                <p className="text-lg text-secondary">
                   Confirm your birth information and perform quick BPHS validation
                 </p>
               </div>
 
               {birthData ? (
-                <Card className="border-2 border-white/20 shadow-lg" style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)', color: 'rgb(255, 255, 255)' }}>
+                <Card className="border-2 shadow-lg" style={{ borderColor: 'var(--border-color)' }}>
                   <div className="space-y-6">
-                    <h3 className="text-xl font-semibold mb-4" style={{ color: 'rgb(255, 255, 255)' }}>Your Birth Information</h3>
+                    <h3 className="text-xl font-semibold mb-4 text-primary">Your Birth Information</h3>
                     
                     <div className="grid md:grid-cols-2 gap-6">
                       <div className="space-y-3">
@@ -888,7 +888,7 @@ const BirthTimeRectificationPageEnhanced = () => {
                       </div>
                     </div>
 
-                    <div className="pt-6 border-t border-gray-200">
+                    <div className="pt-6 border-t" style={{ borderColor: 'var(--border-color)' }}>
                       <Button
                         variant="cosmic"
                         size="lg"
@@ -917,8 +917,8 @@ const BirthTimeRectificationPageEnhanced = () => {
                     </div>
 
                     {rectificationData && (
-                      <div className="mt-6 p-6 rounded-lg border border-white/20" style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)', color: 'rgb(255, 255, 255)' }}>
-                        <h4 className="font-bold mb-4" style={{ color: 'rgb(255, 255, 255)' }}>Quick Validation Results</h4>
+                      <div className="mt-6 p-6 rounded-lg border" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
+                        <h4 className="font-bold mb-4 text-primary">Quick Validation Results</h4>
                         <div className="space-y-3">
                           <p><strong>Confidence Score:</strong> {safeNumber(rectificationData.confidence)}%</p>
                           <p><strong>Alignment Score:</strong> {safeNumber(rectificationData.alignmentScore)}</p>
@@ -964,7 +964,7 @@ const BirthTimeRectificationPageEnhanced = () => {
                   </div>
                 </Card>
               ) : (
-                <Card className="border-2 border-white/20 shadow-lg" style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)', color: 'rgb(255, 255, 255)' }}>
+                <Card className="border-2 shadow-lg" style={{ borderColor: 'var(--border-color)' }}>
                   <BirthDataForm 
                     onSubmit={null}
                     onError={setError}
@@ -983,8 +983,8 @@ const BirthTimeRectificationPageEnhanced = () => {
               className="space-y-8"
             >
               <div className="text-center space-y-6">
-                <h2 className="text-3xl font-bold" style={{ color: 'rgb(255, 255, 255)' }}>Major Life Events Questionnaire</h2>
-                <p className="text-lg" style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                <h2 className="text-3xl font-bold text-primary">Major Life Events Questionnaire</h2>
+                <p className="text-lg text-secondary">
                   Answer simple questions about your life events to dramatically improve BTR accuracy
                 </p>
               </div>
@@ -1000,18 +1000,18 @@ const BirthTimeRectificationPageEnhanced = () => {
               />
 
               {lifeEvents.length > 0 && (
-                <Card className="border-2 border-white/20 shadow-lg" style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)', color: 'rgb(255, 255, 255)' }}>
+                <Card className="border-2 shadow-lg" style={{ borderColor: 'var(--border-color)' }}>
                   <div className="space-y-6">
-                    <h3 className="text-xl font-semibold" style={{ color: 'rgb(255, 255, 255)' }}>Your Life Events ({lifeEvents.length})</h3>
+                    <h3 className="text-xl font-semibold text-primary">Your Life Events ({lifeEvents.length})</h3>
                     <div className="space-y-3 max-h-60 overflow-y-auto">
                       {lifeEvents.map((event, index) => (
-                        <div key={event.id} className="flex items-start gap-3 p-3 rounded-lg border border-white/20" style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)' }}>
-                          <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0" style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', color: 'rgb(255, 255, 255)' }}>
+                        <div key={event.id} className="flex items-start gap-3 p-3 rounded-lg border" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
+                          <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0 text-primary" style={{ backgroundColor: 'var(--bg-card)' }}>
                             {index + 1}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="font-semibold truncate" style={{ color: 'rgb(255, 255, 255)' }}>{event.description}</p>
-                            <p className="text-sm" style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                            <p className="font-semibold truncate text-primary">{event.description}</p>
+                            <p className="text-sm text-secondary">
                               {event.date} • {event.category} • {event.importance} importance
                             </p>
                           </div>
@@ -1041,14 +1041,14 @@ const BirthTimeRectificationPageEnhanced = () => {
               className="text-center space-y-8 py-12"
             >
               <div className="text-6xl animate-pulse">🔮</div>
-              <h2 className="text-3xl font-bold" style={{ color: 'rgb(255, 255, 255)' }}>BPHS-BTR Analysis in Progress</h2>
-              <p className="text-lg" style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+              <h2 className="text-3xl font-bold text-primary">BPHS-BTR Analysis in Progress</h2>
+              <p className="text-lg text-secondary">
                 Calculating your precise birth time using ancient Sanskrit mathematics...
               </p>
               
               <div className="space-y-4">
                 <LoadingSpinner size="xl" />
-                <div className="space-y-2" style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                <div className="space-y-2 text-secondary">
                   <p>Analyzing Praanapada alignments...</p>
                   <p>Calculating Moon position correlations...</p>
                   <p>Evaluating Gulika mathematical precision...</p>
@@ -1073,8 +1073,8 @@ const BirthTimeRectificationPageEnhanced = () => {
                   className="text-center"
                 >
                   <div className="text-6xl mb-4 animate-pulse">✨</div>
-                  <h2 className="text-3xl font-bold" style={{ color: 'rgb(255, 255, 255)' }}>Your Cosmic Birth Moment Revealed</h2>
-                  <p className="text-lg max-w-2xl mx-auto leading-relaxed" style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                  <h2 className="text-3xl font-bold text-primary">Your Cosmic Birth Moment Revealed</h2>
+                  <p className="text-lg max-w-2xl mx-auto leading-relaxed text-secondary">
                     Your precise birth time has been calculated using ancient BPHS mathematics combined with your life events
                   </p>
                 </motion.div>
@@ -1083,19 +1083,19 @@ const BirthTimeRectificationPageEnhanced = () => {
               {rectificationData && (
                 <div className="space-y-6">
                   {/* Birth Time Comparison Display */}
-                  <Card className="border-2 border-white/20 shadow-lg" style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)', color: 'rgb(255, 255, 255)' }}>
+                  <Card className="border-2 shadow-lg" style={{ borderColor: 'var(--border-color)' }}>
                     <div className="text-center space-y-4">
-                      <h3 className="text-2xl font-bold" style={{ color: 'rgb(255, 255, 255)' }}>Birth Time Rectification</h3>
+                      <h3 className="text-2xl font-bold text-primary">Birth Time Rectification</h3>
                       
                       <div className="grid md:grid-cols-2 gap-6 mt-6">
-                        <div className="rounded-lg p-4 border-2 border-white/20" style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)', color: 'rgb(255, 255, 255)' }}>
-                          <p className="text-sm mb-2" style={{ color: 'rgba(255, 255, 255, 0.7)' }}>Original Birth Time</p>
-                          <p className="text-2xl font-bold" style={{ color: 'rgb(255, 255, 255)' }}>
+                        <div className="rounded-lg p-4 border-2" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
+                          <p className="text-sm mb-2 text-secondary">Original Birth Time</p>
+                          <p className="text-2xl font-bold text-primary">
                             {birthData?.timeOfBirth ? formatTimeToHHMMSS(birthData.timeOfBirth) : 'Not provided'}
                           </p>
                         </div>
                         
-                        <div className="rounded-lg p-4 border-2" style={{ borderColor: 'var(--divine-gold)', backgroundColor: 'rgba(255, 215, 0, 0.1)', color: 'rgb(255, 255, 255)' }}>
+                        <div className="rounded-lg p-4 border-2 border-gold bg-yellow-50">
                           <p className="text-sm mb-2 font-semibold" style={{ color: 'var(--vedic-gold-dark, #DAB800)' }}>Rectified Birth Time</p>
                           <p className="text-2xl font-bold" style={{ color: 'var(--vedic-gold-dark, #DAB800)' }}>
                             {(rectificationData?.rectifiedTime || rectificationData?.analysis?.bestCandidate?.time) 
@@ -1107,8 +1107,8 @@ const BirthTimeRectificationPageEnhanced = () => {
                       
                       {rectificationData?.rectifiedTime && birthData?.timeOfBirth && 
                        rectificationData.rectifiedTime !== birthData.timeOfBirth && (
-                        <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                          <p className="text-sm text-yellow-800">
+                        <div className="mt-4 p-3 border rounded-lg" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
+                          <p className="text-sm text-primary">
                             <strong>Note:</strong> Your birth time has been adjusted based on BPHS mathematical analysis.
                           </p>
                         </div>
@@ -1117,9 +1117,9 @@ const BirthTimeRectificationPageEnhanced = () => {
                   </Card>
 
                   {/* Results Display */}
-                  <Card className="border-2 shadow-lg" style={{ borderColor: 'var(--divine-gold)', backgroundColor: 'rgba(255, 215, 0, 0.1)', color: 'rgb(255, 255, 255)' }}>
+                  <Card className="border-2 border-gold shadow-lg bg-yellow-50">
                     <div className="text-center space-y-6">
-                      <h3 className="text-2xl font-bold" style={{ color: 'rgb(255, 255, 255)' }}>Rectification Confidence</h3>
+                      <h3 className="text-2xl font-bold text-primary">Rectification Confidence</h3>
                       
                       <div className="w-full rounded-full h-4 mt-4" style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }}>
                         <div 
@@ -1140,12 +1140,12 @@ const BirthTimeRectificationPageEnhanced = () => {
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
-                      <div className="border-2 border-white/20 rounded-xl p-6 text-center" style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)', color: 'rgb(255, 255, 255)' }}>
+                      <div className="border-2 rounded-xl p-6 text-center" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                         <div className="flex justify-center mb-4">
                           <FaChartBar className="text-4xl" style={{ color: 'var(--vedic-saffron)' }} aria-hidden="true" />
                         </div>
-                        <h4 className="font-semibold mb-2" style={{ color: 'rgb(255, 255, 255)' }}>Complete Astrology Analysis</h4>
-                        <p className="text-sm mb-4" style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                        <h4 className="font-semibold mb-2 text-primary">Complete Astrology Analysis</h4>
+                        <p className="text-sm mb-4 text-secondary">
                           Use your rectified birth time for the most comprehensive Vedic astrology reading
                         </p>
                         <Button
@@ -1243,10 +1243,10 @@ const BirthTimeRectificationPageEnhanced = () => {
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
-                      <div className="border-2 border-white/20 rounded-xl p-6 text-center" style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)', color: 'rgb(255, 255, 255)' }}>
+                      <div className="border-2 rounded-xl p-6 text-center" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                         <div className="text-4xl mb-4">🔄</div>
-                        <h4 className="font-semibold mb-2" style={{ color: 'rgb(255, 255, 255)' }}>Refine Further</h4>
-                        <p className="text-sm mb-4" style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                        <h4 className="font-semibold mb-2 text-primary">Refine Further</h4>
+                        <p className="text-sm mb-4 text-secondary">
                           Add more life events or try different calculation methods
                         </p>
                         <Button
@@ -1320,7 +1320,7 @@ const BirthTimeRectificationPageEnhanced = () => {
 
   // Main Render - Production Grade
   return (
-    <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: 'rgb(0, 0, 0)', color: 'rgb(255, 255, 255)' }}>
+    <div className="min-h-screen relative overflow-hidden">
       {/* White Saturn & Planetary Animations (Matching Chris Cole) */}
       <PlanetaryAnimations count={8} />
       
@@ -1344,7 +1344,7 @@ const BirthTimeRectificationPageEnhanced = () => {
                     variant="ghost"
                     size="sm"
                     onClick={() => setError(null)}
-                    style={{ color: 'rgba(255, 255, 255, 0.7)' }}
+                    className="text-secondary"
                     aria-label="Close error message"
                   >
                     ×
@@ -1361,7 +1361,7 @@ const BirthTimeRectificationPageEnhanced = () => {
                 variant="ghost"
                 onClick={goToPreviousStep}
                 disabled={pageStep === 'intro' || loading}
-                className="text-gray-600 hover:text-gray-900"
+                className="text-secondary hover:text-primary"
                 aria-label="Go to previous step in rectification process"
               >
                 ← Previous Step
@@ -1372,7 +1372,7 @@ const BirthTimeRectificationPageEnhanced = () => {
                   <div
                     key={step}
                     className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                      pageStep === step ? 'bg-indigo-600 scale-125' : 
+                      pageStep === step ? 'bg-white/10 scale-125' : 
                       ['intro', 'verification', 'events', 'analysis', 'results'].indexOf(step) < 
                       ['intro', 'verification', 'events', 'analysis', 'results'].indexOf(pageStep) 
                       ? 'rgba(255, 255, 255, 0.4)' : 'rgba(255, 255, 255, 0.2)'
@@ -1385,7 +1385,7 @@ const BirthTimeRectificationPageEnhanced = () => {
                 variant="ghost"
                 onClick={goToNextStep}
                 disabled={!goToNextStep || loading}
-                className="text-gray-600 hover:text-gray-900"
+                className="text-secondary hover:text-primary"
                 aria-label="Go to next step in rectification process"
               >
                 Next Step →

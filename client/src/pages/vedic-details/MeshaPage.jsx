@@ -18,10 +18,10 @@ const MeshaPage = () => {
             ← Back
           </Button>
 
-          <h1 className="font-accent text-4xl text-earth-brown dark:text-dark-text-primary mb-2">
+          <h1 className="font-accent text-4xl text-primary mb-2">
             मेष राशि (Mesha Rashi)
           </h1>
-          <p className="text-lg text-wisdom-gray dark:text-dark-text-secondary">
+          <p className="text-lg text-secondary">
             Aries - The Ram (March 21 - April 19)
           </p>
         </div>
@@ -29,10 +29,10 @@ const MeshaPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
             <Card className="p-6 mb-6">
-              <h2 className="text-2xl font-bold text-earth-brown dark:text-dark-text-primary mb-4">
+              <h2 className="text-2xl font-bold text-primary mb-4">
                 About Mesha Rashi
               </h2>
-              <div className="prose prose-sm text-wisdom-gray dark:text-dark-text-secondary">
+              <div className="prose prose-sm text-secondary">
                 <p className="mb-4">
                   Mesha (Aries) is the first sign of the zodiac, ruled by Mars (Mangal).
                   It represents new beginnings, leadership, and pioneering spirit. Those born
@@ -47,15 +47,15 @@ const MeshaPage = () => {
             </Card>
 
             <Card className="p-6">
-              <h3 className="text-xl font-bold text-earth-brown dark:text-dark-text-primary mb-4">
+              <h3 className="text-xl font-bold text-primary mb-4">
                 Personality Traits
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <h4 className="font-semibold text-earth-brown dark:text-dark-text-primary mb-2">
+                  <h4 className="font-semibold text-primary mb-2">
                     Strengths
                   </h4>
-                  <ul className="list-disc list-inside text-sm text-wisdom-gray dark:text-dark-text-secondary space-y-1">
+                  <ul className="list-disc list-inside text-sm text-secondary space-y-1">
                     <li>Courageous and confident</li>
                     <li>Natural leadership abilities</li>
                     <li>Enthusiastic and optimistic</li>
@@ -64,10 +64,10 @@ const MeshaPage = () => {
                   </ul>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-earth-brown dark:text-dark-text-primary mb-2">
+                  <h4 className="font-semibold text-primary mb-2">
                     Challenges
                   </h4>
-                  <ul className="list-disc list-inside text-sm text-wisdom-gray dark:text-dark-text-secondary space-y-1">
+                  <ul className="list-disc list-inside text-sm text-secondary space-y-1">
                     <li>Can be impulsive</li>
                     <li>Sometimes impatient</li>
                     <li>May appear aggressive</li>
@@ -81,52 +81,52 @@ const MeshaPage = () => {
 
           <div>
             <Card className="p-6 mb-6">
-              <h3 className="text-xl font-bold text-earth-brown dark:text-dark-text-primary mb-4">
+              <h3 className="text-xl font-bold text-primary mb-4">
                 Quick Facts
               </h3>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-wisdom-gray dark:text-dark-text-secondary">Element:</span>
+                  <span className="text-secondary">Element:</span>
                   <span className="font-semibold">Fire (अग्नि)</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-wisdom-gray dark:text-dark-text-secondary">Quality:</span>
+                  <span className="text-secondary">Quality:</span>
                   <span className="font-semibold">Cardinal</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-wisdom-gray dark:text-dark-text-secondary">Ruling Planet:</span>
+                  <span className="text-secondary">Ruling Planet:</span>
                   <span className="font-semibold">Mars (मंगल)</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-wisdom-gray dark:text-dark-text-secondary">Symbol:</span>
+                  <span className="text-secondary">Symbol:</span>
                   <span className="font-semibold">Ram</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-wisdom-gray dark:text-dark-text-secondary">Lucky Color:</span>
+                  <span className="text-secondary">Lucky Color:</span>
                   <span className="font-semibold">Red</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-wisdom-gray dark:text-dark-text-secondary">Lucky Day:</span>
+                  <span className="text-secondary">Lucky Day:</span>
                   <span className="font-semibold">Tuesday</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-wisdom-gray dark:text-dark-text-secondary">Lucky Numbers:</span>
+                  <span className="text-secondary">Lucky Numbers:</span>
                   <span className="font-semibold">1, 8, 17</span>
                 </div>
               </div>
             </Card>
 
             <Card className="p-6">
-              <h3 className="text-xl font-bold text-earth-brown dark:text-dark-text-primary mb-4">
+              <h3 className="text-xl font-bold text-primary mb-4">
                 Compatibility
               </h3>
               <div className="space-y-2 text-sm">
                 <div>
-                  <span className="text-wisdom-gray dark:text-dark-text-secondary">Most Compatible:</span>
+                  <span className="text-secondary">Most Compatible:</span>
                   <p className="font-semibold">Leo, Sagittarius, Gemini</p>
                 </div>
                 <div>
-                  <span className="text-wisdom-gray dark:text-dark-text-secondary">Least Compatible:</span>
+                  <span className="text-secondary">Least Compatible:</span>
                   <p className="font-semibold">Cancer, Capricorn</p>
                 </div>
               </div>

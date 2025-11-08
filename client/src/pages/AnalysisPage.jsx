@@ -28,6 +28,9 @@ import BirthTimeRectification from '../components/BirthTimeRectification.jsx';
 
 // Import contexts
 import { useChart } from '../contexts/ChartContext.js';
+
+// Import scroll utilities
+import { initScrollReveals, initStaggeredReveals, cleanupScrollTriggers } from '../lib/scroll.js';
 import { useAnalysis } from '../contexts/AnalysisContext.js';
 
 // Import singleton data flow components
@@ -58,7 +61,7 @@ const SummaryDisplay = ({ summary, title = '', compact = false }) => {
       if (typeof value === 'boolean') {
         return (
           <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold ${
-            value ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+            'border text-primary'
           }`}>
             {value ? (
               <>
@@ -87,7 +90,7 @@ const SummaryDisplay = ({ summary, title = '', compact = false }) => {
               <div className="flex-1 rounded-full h-2 max-w-[100px]" style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }}>
                 <div 
                   className={`h-2 rounded-full transition-all ${
-                    value === 100 ? 'bg-green-500' : value >= 75 ? 'bg-yellow-500' : 'bg-orange-500'
+                    'bg-white/10'
                   }`}
                   style={{ width: `${value}%` }}
                 />
@@ -159,7 +162,7 @@ const SummaryDisplay = ({ summary, title = '', compact = false }) => {
         {title && <h4 className="summary-title mb-4">{title}</h4>}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {statusItems.map(([key, value]) => (
-            <div key={key} className="bg-white/50 backdrop-blur-sm p-4 rounded-lg border border-sacred/20 hover:border-saffron/40 transition-all duration-300 hover:shadow-md">
+            <div key={key} className="p-4 rounded-lg border hover:border-gold transition-all duration-300 hover:shadow-md" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
               <div className="text-xs font-semibold text-secondary uppercase tracking-wide mb-2">
                 {formatLabel(key)}
               </div>
@@ -216,7 +219,7 @@ const LagnaDisplay = ({ data }) => {
           <div className="insight-card-enhanced group">
             <div className="card-vedic h-full hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl analysis-card-shadow">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
+                <div className="w-10 h-10 border rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                   <span className="vedic-symbol text-jupiter">♃</span>
                 </div>
                 <h4 className="text-lg font-semibold text-primary">Ascendant Sign</h4>
@@ -226,13 +229,13 @@ const LagnaDisplay = ({ data }) => {
                 {lagna.signLord && (
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-secondary">Ruled by:</span>
-                    <span className="badge-vedic bg-white/10 text-white">{lagna.signLord}</span>
+                    <span className="badge-vedic border text-primary" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>{lagna.signLord}</span>
                   </div>
                 )}
                 {lagna.element && (
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-secondary">Element:</span>
-                    <span className="badge-vedic bg-white/10 text-white">{lagna.element}</span>
+                    <span className="badge-vedic border text-primary" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>{lagna.element}</span>
                   </div>
                 )}
               </div>
@@ -244,7 +247,7 @@ const LagnaDisplay = ({ data }) => {
           <div className="insight-card-enhanced group">
             <div className="card-vedic h-full hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl analysis-card-shadow">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
+                <div className="w-10 h-10 border rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                   <span className="vedic-symbol text-venus">♀</span>
                 </div>
                 <h4 className="text-lg font-semibold text-primary">Exact Degree</h4>
@@ -261,7 +264,7 @@ const LagnaDisplay = ({ data }) => {
           <div className="insight-card-enhanced group">
             <div className="card-vedic h-full hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl analysis-card-shadow">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
+                <div className="w-10 h-10 border rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                   <span className="vedic-symbol text-moon">☽</span>
                 </div>
                 <h4 className="text-lg font-semibold text-primary">Nakshatra</h4>
@@ -271,7 +274,7 @@ const LagnaDisplay = ({ data }) => {
                 {lagna.nakshatraPada && (
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-secondary">Pada:</span>
-                    <span className="badge-vedic bg-white/10 text-white">{lagna.nakshatraPada}</span>
+                    <span className="badge-vedic border text-primary" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>{lagna.nakshatraPada}</span>
                   </div>
                 )}
               </div>
@@ -284,7 +287,7 @@ const LagnaDisplay = ({ data }) => {
       {lagna.description && (
         <div className="card-cosmic group hover:shadow-xl transition-all duration-500 analysis-card-shadow">
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-12 h-12 bg-gradient-to-br from-third-eye-chakra to-crown-chakra rounded-full flex items-center justify-center text-white text-xl">
+            <div className="w-12 h-12 bg-gradient-to-br from-third-eye-chakra to-crown-chakra rounded-full flex items-center justify-center text-primary text-xl">
               🧠
             </div>
             <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
@@ -301,7 +304,7 @@ const LagnaDisplay = ({ data }) => {
       {lagna.characteristics && Array.isArray(lagna.characteristics) && (
         <div className="card-sacred group hover:shadow-xl transition-all duration-500 analysis-card-shadow">
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-12 h-12 bg-gradient-to-br from-friendly to-exalted rounded-full flex items-center justify-center text-white text-xl">
+            <div className="w-12 h-12 bg-gradient-to-br from-friendly to-exalted rounded-full flex items-center justify-center text-primary text-xl">
               ✨
             </div>
             <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
@@ -311,7 +314,7 @@ const LagnaDisplay = ({ data }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {lagna.characteristics.map((char, index) => (
               <div key={index} className="characteristic-item-enhanced group">
-                <div className="flex items-center gap-3 p-4 bg-white/10 rounded-lg hover:bg-white/15 transition-all duration-300 hover:transform hover:scale-105">
+                <div className="flex items-center gap-3 p-4 border rounded-lg transition-all duration-300 hover:transform hover:scale-105" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-card-hover)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-card)'}>
                   <span className="text-saffron group-hover:animate-pulse">✨</span>
                   <span className="text-secondary group-hover:text-primary transition-colors duration-300">{char}</span>
                 </div>
@@ -325,7 +328,7 @@ const LagnaDisplay = ({ data }) => {
       {lagna.strengths && Array.isArray(lagna.strengths) && (
         <div className="card-vedic group hover:shadow-xl transition-all duration-500 analysis-card-shadow">
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-12 h-12 bg-gradient-to-br from-exalted to-friendly rounded-full flex items-center justify-center text-white text-xl">
+            <div className="w-12 h-12 bg-gradient-to-br from-exalted to-friendly rounded-full flex items-center justify-center text-primary text-xl">
               💪
             </div>
             <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
@@ -335,7 +338,7 @@ const LagnaDisplay = ({ data }) => {
           <div className="space-y-4">
             {lagna.strengths.map((strength, index) => (
               <div key={index} className="strength-item-enhanced group">
-                <div className="flex items-center gap-4 p-4 bg-white/10 rounded-lg hover:bg-white/15 transition-all duration-300 hover:transform hover:scale-105">
+                <div className="flex items-center gap-4 p-4 border rounded-lg transition-all duration-300 hover:transform hover:scale-105" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-card-hover)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-card)'}>
                   <span className="text-exalted group-hover:animate-pulse">💪</span>
                   <span className="text-secondary group-hover:text-primary transition-colors duration-300">
                     {typeof strength === 'object' ? String(strength) : strength}
@@ -593,7 +596,7 @@ const HouseDisplay = ({ houseNumber, data }) => {
 
         {/* House Data (for debugging) */}
         {house.houseData && (
-          <div className="mt-4 p-3 bg-gray-50 rounded">
+          <div className="mt-4 p-3 rounded" style={{ backgroundColor: 'var(--bg-card)' }}>
             <h5 className="text-sm font-semibold mb-2">House Information</h5>
             <div className="text-xs space-y-1">
               {house.houseData.name && <div><strong>Name:</strong> {house.houseData.name}</div>}
@@ -657,7 +660,7 @@ const AspectsDisplay = ({ data }) => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="card-vedic group hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 bg-jupiter/20 rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 border rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
               <span className="vedic-symbol text-jupiter">♃</span>
             </div>
             <h4 className="text-lg font-semibold text-primary">Total Aspects</h4>
@@ -668,7 +671,7 @@ const AspectsDisplay = ({ data }) => {
 
         <div className="card-vedic group hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 bg-exalted/20 rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 border rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
               <span className="vedic-symbol text-exalted">✓</span>
             </div>
             <h4 className="text-lg font-semibold text-primary">Benefic Aspects</h4>
@@ -679,7 +682,7 @@ const AspectsDisplay = ({ data }) => {
 
         <div className="card-vedic group hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
           <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
+                <div className="w-10 h-10 border rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
               <span className="vedic-symbol text-enemy">⚠</span>
             </div>
             <h4 className="text-lg font-semibold text-primary">Challenging Aspects</h4>
@@ -693,7 +696,7 @@ const AspectsDisplay = ({ data }) => {
       {majorAspects.length > 0 && (
         <div className="card-cosmic group hover:shadow-xl transition-all duration-500 analysis-card-shadow">
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-12 h-12 bg-gradient-to-br from-third-eye-chakra to-crown-chakra rounded-full flex items-center justify-center text-white text-xl">
+            <div className="w-12 h-12 bg-gradient-to-br from-third-eye-chakra to-crown-chakra rounded-full flex items-center justify-center text-primary text-xl">
               ⭐
             </div>
             <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
@@ -707,13 +710,13 @@ const AspectsDisplay = ({ data }) => {
               
               return (
                 <div key={index} className={`aspect-item-enhanced group ${
-                  isPositive ? 'bg-exalted/5 border-exalted/20' : 'bg-enemy/5 border-enemy/20'
+                  'border'
                 }`}>
                   <div className="card-vedic hover:transform hover:scale-105 transition-all duration-300 hover:shadow-lg">
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-4">
                         <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                          isPositive ? 'bg-exalted/20' : 'bg-enemy/20'
+                          'border'
                         }`}>
                           <span className={`vedic-symbol ${isPositive ? 'text-exalted' : 'text-enemy'}`}>
                             {isPositive ? '✓' : '⚠'}
@@ -745,7 +748,7 @@ const AspectsDisplay = ({ data }) => {
                     </div>
 
                     {aspect.description && (
-                      <div className="bg-sacred/50 p-4 rounded-lg">
+                      <div className="border p-4 rounded-lg" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                         <p className="text-secondary leading-relaxed">{aspect.description}</p>
                       </div>
                     )}
@@ -761,7 +764,7 @@ const AspectsDisplay = ({ data }) => {
       {patterns.length > 0 && (
         <div className="card-sacred group hover:shadow-xl transition-all duration-500 analysis-card-shadow">
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-12 h-12 bg-gradient-to-br from-friendly to-exalted rounded-full flex items-center justify-center text-white text-xl">
+            <div className="w-12 h-12 bg-gradient-to-br from-friendly to-exalted rounded-full flex items-center justify-center text-primary text-xl">
               ✨
             </div>
             <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
@@ -771,7 +774,7 @@ const AspectsDisplay = ({ data }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {patterns.map((pattern, index) => (
               <div key={index} className="pattern-item-enhanced group">
-                <div className="flex items-center gap-3 p-4 bg-white/10 rounded-lg hover:bg-white/15 transition-all duration-300 hover:transform hover:scale-105">
+                <div className="flex items-center gap-3 p-4 border rounded-lg transition-all duration-300 hover:transform hover:scale-105" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-card-hover)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-card)'}>
                   <span className="text-saffron group-hover:animate-pulse">✨</span>
                   <span className="text-secondary group-hover:text-primary transition-colors duration-300">
                     {pattern}
@@ -787,7 +790,7 @@ const AspectsDisplay = ({ data }) => {
       {yogas.length > 0 && (
         <div className="card-vedic group hover:shadow-xl transition-all duration-500 analysis-card-shadow">
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-12 h-12 bg-gradient-to-br from-exalted to-friendly rounded-full flex items-center justify-center text-white text-xl">
+            <div className="w-12 h-12 bg-gradient-to-br from-exalted to-friendly rounded-full flex items-center justify-center text-primary text-xl">
               🕉️
             </div>
             <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
@@ -797,7 +800,7 @@ const AspectsDisplay = ({ data }) => {
           <div className="space-y-4">
             {yogas.map((yoga, index) => (
               <div key={index} className="yoga-item-enhanced group">
-                <div className="flex items-center gap-4 p-4 bg-white/10 rounded-lg hover:bg-white/15 transition-all duration-300 hover:transform hover:scale-105">
+                <div className="flex items-center gap-4 p-4 border rounded-lg transition-all duration-300 hover:transform hover:scale-105" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-card-hover)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-card)'}>
                   <span className="text-exalted group-hover:animate-pulse">🕉️</span>
                   <span className="text-secondary group-hover:text-primary transition-colors duration-300">
                     {yoga}
@@ -813,7 +816,7 @@ const AspectsDisplay = ({ data }) => {
       {allAspects.length === 0 && patterns.length === 0 && yogas.length === 0 && (
         <div className="text-center text-muted">
           <p className="text-lg">Planetary aspects analysis will be available once comprehensive data is loaded.</p>
-          <pre className="text-xs mt-2 bg-gray-100 p-2 rounded">
+          <pre className="text-xs mt-2 p-2 rounded" style={{ backgroundColor: 'var(--bg-card)' }}>
             Data structure: {String(Object.keys(aspects), null, 2)}
           </pre>
         </div>
@@ -966,7 +969,7 @@ const ArudhaDisplay = ({ data }) => {
       {arudhaLagna.lagnaSign && (
         <div className="card-cosmic group hover:shadow-xl transition-all duration-500 analysis-card-shadow">
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-12 h-12 bg-gradient-to-br from-jupiter to-gold rounded-full flex items-center justify-center text-white text-xl">
+            <div className="w-12 h-12 bg-gradient-to-br from-jupiter to-gold rounded-full flex items-center justify-center text-primary text-xl">
               🌟
             </div>
             <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
@@ -976,7 +979,7 @@ const ArudhaDisplay = ({ data }) => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="card-vedic group hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
+                <div className="w-10 h-10 border rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                   <span className="vedic-symbol text-jupiter">⭐</span>
                 </div>
                 <h5 className="text-lg font-semibold text-primary">Arudha Lagna Sign</h5>
@@ -988,7 +991,7 @@ const ArudhaDisplay = ({ data }) => {
             {arudhaLagna.lagnaLord && (
               <div className="card-vedic group hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
+                  <div className="w-10 h-10 border rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                     <span className="vedic-symbol text-saffron">👑</span>
                   </div>
                   <h5 className="text-lg font-semibold text-primary">Arudha Lagna Lord</h5>
@@ -1001,7 +1004,7 @@ const ArudhaDisplay = ({ data }) => {
             {arudhaLagna.lagnaLordPosition?.sign && (
               <div className="card-vedic group hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
+                  <div className="w-10 h-10 border rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                     <FaMapMarkerAlt className="text-lg" style={{ color: 'var(--vedic-gold)' }} aria-hidden="true" />
                   </div>
                   <h5 className="text-lg font-semibold text-primary">AL Lord Position</h5>
@@ -1020,7 +1023,7 @@ const ArudhaDisplay = ({ data }) => {
       {Object.keys(filteredArudhaPadas).length > 0 && (
         <div className="card-cosmic group hover:shadow-xl transition-all duration-500 analysis-card-shadow">
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-12 h-12 bg-gradient-to-br from-third-eye-chakra to-crown-chakra rounded-full flex items-center justify-center text-white text-xl">
+            <div className="w-12 h-12 bg-gradient-to-br from-third-eye-chakra to-crown-chakra rounded-full flex items-center justify-center text-primary text-xl">
               🏠
             </div>
             <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
@@ -1052,11 +1055,11 @@ const ArudhaDisplay = ({ data }) => {
               }
               
               return (
-                <div key={key} className="group bg-white/5 border border-white/10 hover:border-saffron/30 transition-all duration-300 rounded-lg overflow-hidden">
-                  <div className="card-vedic hover:shadow-lg transition-all duration-300 p-5 bg-gradient-to-br from-white/5 to-white/10">
+                <div key={key} className="group border hover:border-gold transition-all duration-300 rounded-lg overflow-hidden" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
+                  <div className="card-vedic hover:shadow-lg transition-all duration-300 p-5" style={{ backgroundColor: 'var(--bg-card)' }}>
                     <div className="flex items-start gap-4 mb-4">
                       <div className="w-14 h-14 rounded-full flex items-center justify-center bg-gradient-to-br from-saffron to-gold flex-shrink-0 shadow-lg">
-                        <span className="text-white text-base font-bold">
+                        <span className="text-primary text-base font-bold">
                           {houseKey}
                         </span>
                       </div>
@@ -1085,7 +1088,7 @@ const ArudhaDisplay = ({ data }) => {
 
                     {/* Detailed Information */}
                     {(houseLord || description || padaData.lordPlacedInHouse || padaData.distanceToLord !== undefined) && (
-                      <div className="bg-white/5 p-4 rounded-lg space-y-2 mt-4 border-t border-white/10">
+                      <div className="p-4 rounded-lg space-y-2 mt-4 border-t" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                         {houseLord && (
                           <div className="flex flex-wrap items-center gap-2 text-sm">
                             <span className="font-semibold text-primary">House Lord:</span>
@@ -1111,7 +1114,7 @@ const ArudhaDisplay = ({ data }) => {
                           </div>
                         )}
                         {description && (
-                          <p className="text-secondary leading-relaxed mt-3 pt-3 border-t border-white/10">{description}</p>
+                          <p className="text-secondary leading-relaxed mt-3 pt-3 border-t" style={{ borderColor: 'var(--border-color)' }}>{description}</p>
                         )}
                       </div>
                     )}
@@ -1127,7 +1130,7 @@ const ArudhaDisplay = ({ data }) => {
       {Object.keys(imageStability).length > 0 && (
         <div className="card-vedic group hover:shadow-xl transition-all duration-500 analysis-card-shadow">
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-12 h-12 bg-gradient-to-br from-exalted to-friendly rounded-full flex items-center justify-center text-white text-xl">
+            <div className="w-12 h-12 bg-gradient-to-br from-exalted to-friendly rounded-full flex items-center justify-center text-primary text-xl">
               ⚖️
             </div>
             <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
@@ -1138,7 +1141,7 @@ const ArudhaDisplay = ({ data }) => {
             {imageStability.stabilityScore !== undefined && (
               <div className="card-vedic group hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
+                  <div className="w-10 h-10 border rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                     <FaChartBar className="text-lg" style={{ color: 'var(--exalted-color)' }} aria-hidden="true" />
                   </div>
                   <h5 className="text-lg font-semibold text-primary">Stability Score</h5>
@@ -1157,7 +1160,7 @@ const ArudhaDisplay = ({ data }) => {
                   {imageStability.stabilityFactors.map((factor, index) => {
                     const factorText = typeof factor === 'object' ? (factor.name || factor.description || factor.text || String(factor)) : factor;
                     return (
-                      <div key={index} className="flex items-center gap-2 p-2 bg-exalted/10 rounded">
+                      <div key={index} className="flex items-center gap-2 p-2 border rounded" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                         <span className="text-exalted">✓</span>
                         <span className="text-secondary">{factorText}</span>
                       </div>
@@ -1176,7 +1179,7 @@ const ArudhaDisplay = ({ data }) => {
                   {imageStability.volatilityFactors.map((factor, index) => {
                     const factorText = typeof factor === 'object' ? (factor.name || factor.description || factor.text || String(factor)) : factor;
                     return (
-                      <div key={index} className="flex items-center gap-2 p-2 bg-enemy/10 rounded">
+                      <div key={index} className="flex items-center gap-2 p-2 border rounded" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                         <span className="text-enemy">⚠</span>
                         <span className="text-secondary">{factorText}</span>
                       </div>
@@ -1193,7 +1196,7 @@ const ArudhaDisplay = ({ data }) => {
       {publicImageFactors.length > 0 && (
         <div className="card-cosmic group hover:shadow-xl transition-all duration-500 analysis-card-shadow">
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-12 h-12 bg-gradient-to-br from-jupiter to-saffron rounded-full flex items-center justify-center text-white text-xl">
+            <div className="w-12 h-12 bg-gradient-to-br from-jupiter to-saffron rounded-full flex items-center justify-center text-primary text-xl">
               👥
             </div>
             <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
@@ -1230,7 +1233,7 @@ const ArudhaDisplay = ({ data }) => {
       {reputationCycles.length > 0 && (
         <div className="card-cosmic group hover:shadow-xl transition-all duration-500 analysis-card-shadow">
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-12 h-12 bg-gradient-to-br from-friendly to-exalted rounded-full flex items-center justify-center text-white text-xl">
+            <div className="w-12 h-12 bg-gradient-to-br from-friendly to-exalted rounded-full flex items-center justify-center text-primary text-xl">
               🔄
             </div>
             <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
@@ -1256,7 +1259,7 @@ const ArudhaDisplay = ({ data }) => {
                       {cycleObj.characteristics.map((char, i) => {
                         const charText = typeof char === 'object' ? (char.name || char.text || String(char)) : char;
                         return (
-                          <span key={i} className="badge-vedic bg-friendly/20 text-friendly text-xs px-2 py-1 rounded">
+                          <span key={i} className="badge-vedic border text-primary text-xs px-2 py-1 rounded" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                             {charText}
                           </span>
                         );
@@ -1275,7 +1278,7 @@ const ArudhaDisplay = ({ data }) => {
         <div className="card-cosmic group hover:shadow-xl transition-all duration-500 analysis-card-shadow">
           <div className="flex items-center gap-4 mb-6">
             <div className="w-12 h-12 bg-gradient-to-br from-saffron to-gold rounded-full flex items-center justify-center">
-              <FaLightbulb className="text-xl" style={{ color: 'var(--text-white)' }} aria-hidden="true" />
+              <FaLightbulb className="text-xl text-primary" aria-hidden="true" />
             </div>
             <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
               Image Enhancement Recommendations
@@ -1293,7 +1296,7 @@ const ArudhaDisplay = ({ data }) => {
                         {recObj.text || recObj.description || recObj}
                       </p>
                       {recObj.category && (
-                        <span className="inline-block mt-2 badge-vedic bg-saffron/20 text-saffron text-xs px-2 py-1 rounded">
+                        <span className="inline-block mt-2 badge-vedic border text-primary text-xs px-2 py-1 rounded" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                           {recObj.category}
                         </span>
                       )}
@@ -1483,7 +1486,7 @@ const NavamsaDisplay = ({ data }) => {
         <div className="card-cosmic group hover:shadow-xl transition-all duration-500 analysis-card-shadow">
           <div className="flex items-center gap-4 mb-6">
             <div className="w-12 h-12 bg-gradient-to-br from-saffron to-gold rounded-full flex items-center justify-center">
-              <FaChartBar className="text-xl" style={{ color: 'var(--text-white)' }} aria-hidden="true" />
+              <FaChartBar className="text-xl text-primary" aria-hidden="true" />
             </div>
             <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
               Navamsa Chart Visualization
@@ -1501,7 +1504,7 @@ const NavamsaDisplay = ({ data }) => {
         {chartInfo.name && (
           <div className="card-cosmic group hover:shadow-xl transition-all duration-500 analysis-card-shadow">
             <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-saffron to-gold rounded-full flex items-center justify-center text-white text-xl">
+              <div className="w-12 h-12 bg-gradient-to-br from-saffron to-gold rounded-full flex items-center justify-center text-primary text-xl">
                 📊
               </div>
               <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
@@ -1514,7 +1517,7 @@ const NavamsaDisplay = ({ data }) => {
                 <p className="text-secondary leading-relaxed">{chartInfo.description}</p>
               )}
               {chartInfo.significance && (
-                <div className="bg-white/5 p-4 rounded-lg">
+                <div className="p-4 rounded-lg border" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                   <div className="text-sm font-semibold text-primary mb-2">Significance:</div>
                   <p className="text-secondary">{chartInfo.significance}</p>
                 </div>
@@ -1527,7 +1530,7 @@ const NavamsaDisplay = ({ data }) => {
         {navamsaLagna.sign && (
           <div className="card-cosmic group hover:shadow-xl transition-all duration-500 analysis-card-shadow">
             <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-jupiter to-saffron rounded-full flex items-center justify-center text-white text-xl">
+              <div className="w-12 h-12 bg-gradient-to-br from-jupiter to-saffron rounded-full flex items-center justify-center text-primary text-xl">
                 🌟
               </div>
               <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
@@ -1537,7 +1540,7 @@ const NavamsaDisplay = ({ data }) => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="card-vedic group hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
+                  <div className="w-10 h-10 border rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                     <span className="vedic-symbol text-jupiter">⭐</span>
                   </div>
                   <h5 className="text-lg font-semibold text-primary">Navamsa Lagna Sign</h5>
@@ -1549,7 +1552,7 @@ const NavamsaDisplay = ({ data }) => {
               {navamsaLagna.lord && navamsaLagna.lord !== 'Unknown' && (
                 <div className="card-vedic group hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 border rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                       <span className="vedic-symbol text-saffron">👑</span>
                     </div>
                     <h5 className="text-lg font-semibold text-primary">Navamsa Lagna Lord</h5>
@@ -1562,7 +1565,7 @@ const NavamsaDisplay = ({ data }) => {
               {navamsaLagna.house !== undefined && (
                 <div className="card-vedic group hover:transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 border rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                       <FaMapMarkerAlt className="text-lg" style={{ color: 'var(--vedic-gold)' }} aria-hidden="true" />
                     </div>
                     <h5 className="text-lg font-semibold text-primary">House Position</h5>
@@ -1574,13 +1577,13 @@ const NavamsaDisplay = ({ data }) => {
             </div>
 
             {navamsaLagna.significance && (
-              <div className="mt-6 bg-white/5 p-4 rounded-lg border-t border-white/10">
+              <div className="mt-6 p-4 rounded-lg border-t" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                 <p className="text-secondary leading-relaxed">{navamsaLagna.significance}</p>
               </div>
             )}
 
             {navamsaLagna.characteristics && Array.isArray(navamsaLagna.characteristics) && navamsaLagna.characteristics.length > 0 && (
-              <div className="mt-6 bg-white/5 p-4 rounded-lg border-t border-white/10">
+              <div className="mt-6 p-4 rounded-lg border-t" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                 <h5 className="text-lg font-semibold text-primary mb-3">Spiritual Characteristics:</h5>
                 <ul className="space-y-2">
                   {navamsaLagna.characteristics.map((char, index) => (
@@ -1599,7 +1602,7 @@ const NavamsaDisplay = ({ data }) => {
         {vargottamaPlanets.length > 0 && (
           <div className="card-cosmic group hover:shadow-xl transition-all duration-500 analysis-card-shadow">
             <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-gold to-saffron rounded-full flex items-center justify-center text-white text-xl">
+              <div className="w-12 h-12 bg-gradient-to-br from-gold to-saffron rounded-full flex items-center justify-center text-primary text-xl">
                 ⭐
               </div>
               <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
@@ -1615,9 +1618,9 @@ const NavamsaDisplay = ({ data }) => {
                 const planetName = typeof planet === 'object' && planet !== null ? (planet.planet || planet.name || '') : planet;
                 const planetSign = typeof planet === 'object' && planet !== null ? (planet.sign || '') : '';
                 return (
-                  <div key={index} className="card-vedic group hover:transform hover:scale-[1.02] transition-all duration-300 hover:shadow-lg border border-white/10">
+                  <div key={index} className="card-vedic group hover:transform hover:scale-[1.02] transition-all duration-300 hover:shadow-lg border" style={{ borderColor: 'var(--border-color)' }}>
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-gold to-saffron rounded-full flex items-center justify-center text-white font-bold">
+                      <div className="w-10 h-10 bg-gradient-to-br from-gold to-saffron rounded-full flex items-center justify-center text-primary font-bold">
                         {formatPlanetName(planetName).charAt(0)}
                       </div>
                       <div>
@@ -1627,7 +1630,7 @@ const NavamsaDisplay = ({ data }) => {
                         )}
                       </div>
                     </div>
-                    <div className="bg-white/5 p-3 rounded-lg">
+                    <div className="p-3 rounded-lg border" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                       <div className="text-sm text-secondary">Enhanced strength and stability</div>
                     </div>
                   </div>
@@ -1641,7 +1644,7 @@ const NavamsaDisplay = ({ data }) => {
         {Object.keys(planetaryStrengths).length > 0 && (
           <div className="card-cosmic group hover:shadow-xl transition-all duration-500 analysis-card-shadow">
             <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-exalted to-friendly rounded-full flex items-center justify-center text-white text-xl">
+              <div className="w-12 h-12 bg-gradient-to-br from-exalted to-friendly rounded-full flex items-center justify-center text-primary text-xl">
                 💪
               </div>
               <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
@@ -1676,12 +1679,12 @@ const NavamsaDisplay = ({ data }) => {
                 }
 
                 return (
-                  <div key={planet} className="card-vedic group hover:transform hover:scale-[1.02] transition-all duration-300 hover:shadow-lg border border-white/10 rounded-lg overflow-hidden">
-                    <div className="bg-gradient-to-br from-white/5 to-white/10 p-5">
+                  <div key={planet} className="card-vedic group hover:transform hover:scale-[1.02] transition-all duration-300 hover:shadow-lg border rounded-lg overflow-hidden" style={{ borderColor: 'var(--border-color)' }}>
+                    <div className="p-5" style={{ backgroundColor: 'var(--bg-card)' }}>
                       <div className="flex items-start justify-between gap-4 mb-4">
                         <div className="flex items-center gap-3 flex-1 min-w-0">
                           <div className="w-14 h-14 rounded-full flex items-center justify-center bg-gradient-to-br from-saffron to-gold flex-shrink-0 shadow-lg">
-                            <span className="text-white text-lg font-bold">
+                            <span className="text-primary text-lg font-bold">
                               {formatPlanetName(planet).charAt(0)}
                             </span>
                           </div>
@@ -1698,9 +1701,9 @@ const NavamsaDisplay = ({ data }) => {
                         </div>
                       </div>
 
-                      <div className="bg-white/5 p-4 rounded-lg space-y-3 border-t border-white/10">
+                      <div className="p-4 rounded-lg space-y-3 border-t" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                         {strengthValue > 0 && (
-                          <div className="w-full bg-white/10 rounded-full h-2.5 mb-2">
+                          <div className="w-full rounded-full h-2.5 mb-2" style={{ backgroundColor: 'var(--bg-secondary)' }}>
                             <div
                               className="bg-gradient-to-r from-saffron to-gold h-2.5 rounded-full transition-all duration-300"
                               style={{ width: `${Math.min((strengthValue / 10) * 100, 100)}%` }}
@@ -1732,7 +1735,7 @@ const NavamsaDisplay = ({ data }) => {
                         </div>
                         
                         {strengthObj.effects && Array.isArray(strengthObj.effects) && strengthObj.effects.length > 0 && (
-                          <div className="mt-3 pt-3 border-t border-white/10">
+                          <div className="mt-3 pt-3 border-t" style={{ borderColor: 'var(--border-color)' }}>
                             <div className="text-xs font-semibold text-primary mb-2">Effects:</div>
                             <ul className="space-y-1">
                               {strengthObj.effects.map((effect, idx) => {
@@ -1762,7 +1765,7 @@ const NavamsaDisplay = ({ data }) => {
         {Object.keys(marriageIndications).length > 0 && (
           <div className="card-cosmic group hover:shadow-xl transition-all duration-500 analysis-card-shadow">
             <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-friendly to-exalted rounded-full flex items-center justify-center text-white text-xl">
+              <div className="w-12 h-12 bg-gradient-to-br from-friendly to-exalted rounded-full flex items-center justify-center text-primary text-xl">
                 💒
               </div>
               <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
@@ -1824,7 +1827,7 @@ const NavamsaDisplay = ({ data }) => {
         {Object.keys(spiritualIndications).length > 0 && (
           <div className="card-cosmic group hover:shadow-xl transition-all duration-500 analysis-card-shadow">
             <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-third-eye-chakra to-crown-chakra rounded-full flex items-center justify-center text-white text-xl">
+              <div className="w-12 h-12 bg-gradient-to-br from-third-eye-chakra to-crown-chakra rounded-full flex items-center justify-center text-primary text-xl">
                 🕉️
               </div>
               <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
@@ -1876,7 +1879,7 @@ const NavamsaDisplay = ({ data }) => {
         {yogaFormations.length > 0 && (
           <div className="card-cosmic group hover:shadow-xl transition-all duration-500 analysis-card-shadow">
             <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-friendly to-exalted rounded-full flex items-center justify-center text-white text-xl">
+              <div className="w-12 h-12 bg-gradient-to-br from-friendly to-exalted rounded-full flex items-center justify-center text-primary text-xl">
                 🧘
               </div>
               <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
@@ -1890,14 +1893,14 @@ const NavamsaDisplay = ({ data }) => {
               {yogaFormations.map((yoga, index) => {
                 const yogaObj = typeof yoga === 'object' && yoga !== null ? yoga : { name: yoga };
                 return (
-                  <div key={index} className="card-vedic group hover:transform hover:scale-[1.02] transition-all duration-300 hover:shadow-lg border border-white/10">
+                  <div key={index} className="card-vedic group hover:transform hover:scale-[1.02] transition-all duration-300 hover:shadow-lg border" style={{ borderColor: 'var(--border-color)' }}>
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-friendly to-exalted rounded-full flex items-center justify-center text-white font-bold">
+                      <div className="w-10 h-10 bg-gradient-to-br from-friendly to-exalted rounded-full flex items-center justify-center text-primary font-bold">
                         🧘
                       </div>
                       <h5 className="text-lg font-bold text-primary">{yogaObj.name || 'Yoga Formation'}</h5>
                     </div>
-                    <div className="bg-white/5 p-4 rounded-lg space-y-2">
+                    <div className="p-4 rounded-lg space-y-2 border" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                       {yogaObj.description && (
                         <p className="text-secondary leading-relaxed text-sm">{yogaObj.description}</p>
                       )}
@@ -1931,7 +1934,7 @@ const NavamsaDisplay = ({ data }) => {
         {(overallAnalysis.summary || overallAnalysis.strengths || overallAnalysis.challenges || overallAnalysis.recommendations) && (
           <div className="card-cosmic group hover:shadow-xl transition-all duration-500 analysis-card-shadow">
             <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-jupiter to-saffron rounded-full flex items-center justify-center text-white text-xl">
+              <div className="w-12 h-12 bg-gradient-to-br from-jupiter to-saffron rounded-full flex items-center justify-center text-primary text-xl">
                 📋
               </div>
               <h4 className="text-2xl font-bold text-primary group-hover:text-saffron transition-colors duration-300">
@@ -2339,7 +2342,7 @@ const PreliminaryDisplay = ({ data }) => {
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {preliminary.keyPlacements.map((placement, index) => (
-                <div key={index} className="bg-white/50 backdrop-blur-sm p-4 rounded-lg border border-blue/20 hover:border-blue/40 transition-all duration-300 hover:shadow-md">
+                <div key={index} className="p-4 rounded-lg border hover:border-blue-400 transition-all duration-300 hover:shadow-md" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                   <div className="font-bold text-lg text-primary mb-2">{placement.planet}</div>
                   <div className="text-sm text-secondary space-y-1">
                     <div>Sign: <span className="font-semibold text-saffron">{placement.sign}</span></div>
@@ -2359,7 +2362,7 @@ const PreliminaryDisplay = ({ data }) => {
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {preliminary.strengths.map((strength, index) => (
-                <div key={index} className="bg-white/50 backdrop-blur-sm p-4 rounded-lg border border-green/20 hover:border-green/40 transition-all duration-300">
+                <div key={index} className="p-4 rounded-lg border hover:border-green-400 transition-all duration-300" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                   <div className="flex items-start gap-3">
                     <span className="text-xl">✨</span>
                     <span className="text-secondary leading-relaxed flex-1">{typeof strength === 'object' ? String(strength) : strength}</span>
@@ -2378,7 +2381,7 @@ const PreliminaryDisplay = ({ data }) => {
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {preliminary.challenges.map((challenge, index) => (
-                <div key={index} className="bg-white/50 backdrop-blur-sm p-4 rounded-lg border border-orange/20 hover:border-orange/40 transition-all duration-300">
+                <div key={index} className="p-4 rounded-lg border hover:border-orange-400 transition-all duration-300" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                   <div className="flex items-start gap-3">
                     <FaExclamationTriangle className="text-xl" style={{ color: 'var(--vedic-gold)' }} aria-hidden="true" />
                     <span className="text-secondary leading-relaxed flex-1">{typeof challenge === 'object' ? String(challenge) : challenge}</span>
@@ -2397,7 +2400,7 @@ const PreliminaryDisplay = ({ data }) => {
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {preliminary.recommendations.map((rec, index) => (
-                <div key={index} className="bg-white/50 backdrop-blur-sm p-4 rounded-lg border border-purple/20 hover:border-purple/40 transition-all duration-300">
+                <div key={index} className="p-4 rounded-lg border hover:border-purple-400 transition-all duration-300" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                   <div className="flex items-start gap-3">
                     <FaLightbulb className="text-xl" style={{ color: 'var(--vedic-saffron)' }} aria-hidden="true" />
                     <span className="text-secondary leading-relaxed flex-1">{typeof rec === 'object' ? String(rec) : rec}</span>
@@ -2443,7 +2446,7 @@ const ComprehensiveDisplay = ({ data }) => {
       <div className="bg-gradient-to-r from-saffron/20 via-gold/20 to-white rounded-xl p-8 border-2 border-saffron/30 shadow-xl">
         <div className="flex items-center gap-4 mb-2">
           <div className="w-16 h-16 bg-gradient-to-br from-saffron to-gold rounded-full flex items-center justify-center animate-glow">
-            <FaChartBar className="text-3xl" style={{ color: 'var(--text-white)' }} aria-hidden="true" />
+            <FaChartBar className="text-3xl text-primary" aria-hidden="true" />
           </div>
           <div>
             <h3 className="text-3xl font-bold text-primary">Comprehensive Analysis</h3>
@@ -2488,7 +2491,8 @@ const ComprehensiveDisplay = ({ data }) => {
                 return (
                   <div 
                     key={sectionKey} 
-                    className="group bg-white rounded-xl p-6 border-2 border-sacred/20 hover:border-saffron/60 transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+                    className="group rounded-xl p-6 border-2 border-sacred/20 hover:border-saffron/60 transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+                    style={{ backgroundColor: 'var(--bg-card)' }}
                   >
                     <div className="flex items-start gap-3 mb-3">
                       <div className="text-3xl group-hover:scale-110 transition-transform">
@@ -2500,19 +2504,19 @@ const ComprehensiveDisplay = ({ data }) => {
                         </div>
                         <div className="flex flex-wrap gap-2 mt-2">
                           {section.questions?.length > 0 && (
-                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-semibold">
+                            <span className="inline-flex items-center gap-1 px-2 py-1 border text-primary rounded-full text-xs font-semibold" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                               <FaLightbulb className="text-xs" style={{ color: 'var(--vedic-saffron)' }} aria-hidden="true" />
                               <span>{section.questions.length} insights</span>
                             </span>
                           )}
                           {section.analyses && Object.keys(section.analyses).length > 0 && (
-                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-semibold">
+                            <span className="inline-flex items-center gap-1 px-2 py-1 border text-primary rounded-full text-xs font-semibold" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                               <FaSearch className="text-xs" style={{ color: 'var(--vedic-saffron)' }} aria-hidden="true" />
                               {Object.keys(section.analyses).length} analyses
                             </span>
                           )}
                           {section.houses && Object.keys(section.houses).length > 0 && (
-                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold">
+                            <span className="inline-flex items-center gap-1 px-2 py-1 border text-primary rounded-full text-xs font-semibold" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                               <span>🏠</span>
                               {Object.keys(section.houses).length} houses
                             </span>
@@ -2557,7 +2561,7 @@ const ComprehensiveDisplay = ({ data }) => {
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {comprehensive.keyInsights.map((insight, index) => (
-                <div key={index} className="bg-white/50 backdrop-blur-sm p-4 rounded-lg border border-blue/20 hover:border-blue/40 transition-all duration-300">
+                <div key={index} className="p-4 rounded-lg border hover:border-blue-400 transition-all duration-300" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                   <div className="flex items-start gap-3">
                     <span className="text-xl">💎</span>
                     <span className="text-secondary leading-relaxed flex-1">{insight}</span>
@@ -2576,14 +2580,14 @@ const ComprehensiveDisplay = ({ data }) => {
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {Object.entries(comprehensive.lifeAreas).map(([area, assessment]) => (
-                <div key={area} className="bg-white/50 backdrop-blur-sm p-5 rounded-lg border border-green/20 hover:border-green/40 transition-all duration-300 hover:shadow-md">
+                <div key={area} className="p-5 rounded-lg border hover:border-green-400 transition-all duration-300 hover:shadow-md" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                   <div className="font-bold text-lg text-primary mb-2">{area}</div>
                   <div className="flex items-center gap-2 mb-3">
                     <div className="text-2xl font-bold text-saffron">{assessment.rating}/10</div>
-                    <div className="flex-1 bg-gray-200 rounded-full h-2">
+                    <div className="flex-1 rounded-full h-2" style={{ backgroundColor: 'var(--bg-secondary)' }}>
                       <div 
                         className={`h-2 rounded-full transition-all ${
-                          assessment.rating >= 8 ? 'bg-green-500' : assessment.rating >= 6 ? 'bg-yellow-500' : 'bg-orange-500'
+                          'bg-white/10'
                         }`}
                         style={{ width: `${(assessment.rating / 10) * 100}%` }}
                       />
@@ -2629,6 +2633,19 @@ const AnalysisPage = () => {
   const [analysisData, setAnalysisData] = useState({});
   const [activeHouse, setActiveHouse] = useState(1);
   const [loadingStages, setLoadingStages] = useState({});
+
+  // Initialize scroll/parallax effects
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      initScrollReveals();
+      initStaggeredReveals('.stagger-reveal', 0.1);
+    }, 100);
+    
+    return () => {
+      clearTimeout(timer);
+      cleanupScrollTriggers();
+    };
+  }, []);
 
   // Load analysis data on component mount using the data layer
   useEffect(() => {
@@ -3208,7 +3225,7 @@ const AnalysisPage = () => {
   // Progressive loading with Vedic-themed spinner
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: 'rgb(0, 0, 0)', color: 'rgb(255, 255, 255)' }}>
+      <div className="min-h-screen flex items-center justify-center p-4">
         <PlanetaryAnimations count={8} />
         <div className="text-center relative z-10">
           <VedicLoadingSpinner
@@ -3245,7 +3262,7 @@ const AnalysisPage = () => {
   // Error state with Vedic styling
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: 'rgb(0, 0, 0)', color: 'rgb(255, 255, 255)' }}>
+      <div className="min-h-screen flex items-center justify-center p-4">
         <PlanetaryAnimations count={8} />
         <div className="card-vedic max-w-md w-full text-center relative z-10">
           <ErrorMessage
@@ -3265,7 +3282,7 @@ const AnalysisPage = () => {
     // Give loadFromComprehensiveAnalysis a chance to run first
     if (!isLoading) {
       return (
-        <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: 'rgb(0, 0, 0)', color: 'rgb(255, 255, 255)' }}>
+        <div className="min-h-screen flex items-center justify-center p-4">
           <PlanetaryAnimations count={8} />
           <div className="card-vedic max-w-md w-full text-center relative z-10">
             <div className="flex justify-center mb-4">
@@ -3319,16 +3336,16 @@ const AnalysisPage = () => {
     // Helper function to show no data message
     const NoDataMessage = ({ analysisType }) => (
       <div className="analysis-section no-data-message text-center py-8" data-section-id={`${activeSection}-no-data`}>
-        <h3 className="text-lg font-semibold text-gray-600 mb-2">
+        <h3 className="text-lg font-semibold text-secondary mb-2">
           <span className="flex items-center gap-2">
             <FaChartBar className="text-lg" style={{ color: 'var(--vedic-saffron)' }} aria-hidden="true" />
             <span>{analysisType} Analysis</span>
           </span>
         </h3>
-        <p className="text-gray-500 mb-4">
+        <p className="text-secondary mb-4">
           Analysis data is being loaded from the comprehensive API response...
         </p>
-        <div className="text-sm text-gray-400">
+        <div className="text-sm text-muted">
           Available data: {Object.keys(analysisData).join(', ') || 'None'}
         </div>
       </div>
@@ -3446,7 +3463,7 @@ const AnalysisPage = () => {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: 'rgb(0, 0, 0)', color: 'rgb(255, 255, 255)' }}>
+    <div className="min-h-screen relative overflow-hidden">
       {/* White Saturn & Planetary Animations (Matching Chris Cole) */}
       <PlanetaryAnimations count={8} />
       {/* Enhanced Background Pattern */}
@@ -3502,7 +3519,7 @@ const AnalysisPage = () => {
 
             {/* Enhanced Main Tab Navigation */}
             <div className="mb-8">
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gold/20 overflow-hidden">
+              <div className="backdrop-blur-sm rounded-2xl shadow-xl border border-gold/20 overflow-hidden" style={{ backgroundColor: 'rgba(26, 26, 26, 0.8)' }}>
                 <div className="tabs-vedic-enhanced">
                   <div className="tab-list-enhanced">
                     {mainTabs.map((tab) => (
@@ -3594,21 +3611,21 @@ const AnalysisPage = () => {
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
           <div className="card-cosmic max-w-md w-full p-8 relative z-10">
             <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center text-white text-2xl mb-4">
+              <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center text-primary text-2xl mb-4">
                 <FaExclamationTriangle className="text-2xl" style={{ color: 'var(--vedic-gold)' }} aria-hidden="true" />
               </div>
-              <h2 className="text-2xl font-bold text-white mb-2">Analysis Not Available</h2>
+              <h2 className="text-2xl font-bold text-primary mb-2">Analysis Not Available</h2>
             </div>
             
-            <p className="text-white/90 text-center mb-6 leading-relaxed">
+            <p className="text-secondary text-center mb-6 leading-relaxed">
               {error.message || 'Analysis data is not available. Please generate your birth chart first by filling out the birth data form.'}
             </p>
 
             {error.action === 'navigate_home' && (
               <div className="space-y-4">
-                <div className="bg-white/10 rounded-lg p-4 border border-white/20">
-                  <p className="text-white/80 text-sm mb-3">To proceed with analysis:</p>
-                  <ol className="text-white/90 text-sm space-y-2 list-decimal list-inside">
+                <div className="rounded-lg p-4 border" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
+                  <p className="text-secondary text-sm mb-3">To proceed with analysis:</p>
+                  <ol className="text-primary text-sm space-y-2 list-decimal list-inside">
                     <li>Fill out your birth data form</li>
                     <li>Click "Generate Vedic Chart"</li>
                     <li>Return here to view your complete analysis</li>

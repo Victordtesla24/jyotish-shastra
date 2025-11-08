@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import FloatingElements from './FloatingElements.jsx';
 import PlanetaryAnimations from './PlanetaryAnimations.jsx';
 
 /**
@@ -27,14 +26,15 @@ const HeroSection = ({
   const y = useTransform(scrollYProgress, [0, 1], [0, 100]);
   const opacity = useTransform(scrollYProgress, [0, 0.5, 1], [1, 0.8, 0]);
 
-  // Initialize starfield animation
+  // Initialize starfield animation - EXACTLY matching Chris Cole's subtle starfield
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
     const stars = [];
-    const starCount = 150;
+    // Subtle, minimal stars - matching Chris Cole exactly
+    const starCount = 100; // Reduced for subtlety
 
     // Set canvas size
     const resizeCanvas = () => {
@@ -44,28 +44,30 @@ const HeroSection = ({
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    // Create stars
+    // Create stars - EXACTLY matching Chris Cole's scattered visible star pattern
     for (let i = 0; i < starCount; i++) {
       stars.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        radius: Math.random() * 1.5 + 0.5,
-        opacity: Math.random() * 0.5 + 0.3,
-        twinkleSpeed: Math.random() * 0.02 + 0.01
+        radius: Math.random() * 1.5 + 0.8, // Larger for better visibility like Chris Cole
+        opacity: Math.random() * 0.4 + 0.5, // Higher base opacity (0.5-0.9)
+        twinkleSpeed: Math.random() * 0.008 + 0.004 // Slower, subtle twinkle
       });
     }
 
-    // Animate starfield
+    // Animate starfield - EXACTLY matching Chris Cole's subtle visible stars
     let twinkleOffset = 0;
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      twinkleOffset += 0.01;
+      twinkleOffset += 0.004; // Slower animation for subtlety
 
       stars.forEach((star, index) => {
-        const twinkle = Math.sin(twinkleOffset + index * star.twinkleSpeed) * 0.3 + 0.7;
+        const twinkle = Math.sin(twinkleOffset + index * star.twinkleSpeed) * 0.15 + 0.85; // Very subtle twinkle
         ctx.beginPath();
         ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity * twinkle})`;
+        // Ensure stars are clearly visible - matching Chris Cole's white dots
+        const finalOpacity = Math.max(star.opacity * twinkle, 0.5);
+        ctx.fillStyle = `rgba(255, 255, 255, ${finalOpacity})`; // Bright white stars
         ctx.fill();
       });
 
@@ -120,18 +122,16 @@ const HeroSection = ({
     >
       {/* Cosmic Background */}
       <div className="hero-background">
-        <canvas ref={canvasRef} className="starfield-canvas" aria-hidden="true" />
+        <canvas ref={canvasRef} className="starfield-canvas parallax-bg" aria-hidden="true" />
         <div className="cosmic-gradient" aria-hidden="true" />
-        {/* Floating Vedic Elements */}
-        <FloatingElements count={8} />
-        {/* White Saturn & Planetary Animations */}
-        <PlanetaryAnimations count={8} />
+        {/* White Saturn - EXACTLY matching Chris Cole's left-side planet */}
+        <PlanetaryAnimations count={1} />
       </div>
 
       {/* Hero Content */}
       <div className="hero-content">
-        {/* Title Section */}
-        {(title || subtitle) && (
+        {/* Title Section - Hidden to match Chris Cole's minimal design */}
+        {false && (title || subtitle) && (
           <motion.div className="hero-header" variants={itemVariants}>
             {title && (
               <h1 className="hero-title typography-roboto typography-h1">
@@ -151,40 +151,44 @@ const HeroSection = ({
           {children}
         </motion.div>
 
-        {/* Decorative Om Symbol */}
-        <motion.div
-          className="om-watermark"
-          variants={itemVariants}
-          aria-hidden="true"
-        >
-          ॐ
-        </motion.div>
+        {/* Decorative Om Symbol - HIDDEN to match Chris Cole's minimal design */}
+        {false && (
+          <motion.div
+            className="om-watermark"
+            variants={itemVariants}
+            aria-hidden="true"
+          >
+            ॐ
+          </motion.div>
+        )}
       </div>
 
-      {/* Feature Cards (Optional) */}
-      <motion.div className="hero-features" variants={itemVariants}>
-        <div className="feature-card feature-card-shadow">
-          <span className="feature-icon" aria-hidden="true">🌟</span>
-          <h3 className="feature-title typography-roboto typography-h5">Authentic Vedic Calculations</h3>
-          <p className="feature-description typography-roboto typography-body-small">
-            Swiss Ephemeris powered precision
-          </p>
-        </div>
-        <div className="feature-card feature-card-shadow">
-          <span className="feature-icon" aria-hidden="true">📊</span>
-          <h3 className="feature-title typography-roboto typography-h5">Comprehensive Analysis</h3>
-          <p className="feature-description typography-roboto typography-body-small">
-            In-depth astrological insights
-          </p>
-        </div>
-        <div className="feature-card feature-card-shadow">
-          <span className="feature-icon" aria-hidden="true">🕐</span>
-          <h3 className="feature-title typography-roboto typography-h5">Birth Time Rectification</h3>
-          <p className="feature-description typography-roboto typography-body-small">
-            BPHS-aligned methodology
-          </p>
-        </div>
-      </motion.div>
+      {/* Feature Cards - HIDDEN to match Chris Cole's minimal design */}
+      {false && (
+        <motion.div className="hero-features" variants={itemVariants}>
+          <div className="feature-card feature-card-shadow">
+            <span className="feature-icon" aria-hidden="true">🌟</span>
+            <h3 className="feature-title typography-roboto typography-h5">Authentic Vedic Calculations</h3>
+            <p className="feature-description typography-roboto typography-body-small">
+              Swiss Ephemeris powered precision
+            </p>
+          </div>
+          <div className="feature-card feature-card-shadow">
+            <span className="feature-icon" aria-hidden="true">📊</span>
+            <h3 className="feature-title typography-roboto typography-h5">Comprehensive Analysis</h3>
+            <p className="feature-description typography-roboto typography-body-small">
+              In-depth astrological insights
+            </p>
+          </div>
+          <div className="feature-card feature-card-shadow">
+            <span className="feature-icon" aria-hidden="true">🕐</span>
+            <h3 className="feature-title typography-roboto typography-h5">Birth Time Rectification</h3>
+            <p className="feature-description typography-roboto typography-body-small">
+              BPHS-aligned methodology
+            </p>
+          </div>
+        </motion.div>
+      )}
     </motion.section>
   );
 };

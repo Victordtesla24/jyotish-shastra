@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BirthDataForm from '../components/forms/BirthDataForm.js';
 import { Card } from '../components/ui';
@@ -7,6 +7,7 @@ import UIDataSaver from '../components/forms/UIDataSaver.js';
 import { getApiUrl } from '../utils/apiConfig.js';
 import chartService from '../services/chartService.js';
 import HeroSection from '../components/ui/HeroSection.jsx';
+import { initScrollReveals, initParallaxBackground, cleanupScrollTriggers } from '../lib/scroll.js';
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -23,6 +24,16 @@ const HomePage = () => {
     } catch (error) {
       console.warn('⚠️ HomePage: Failed to load existing session on mount:', error.message);
     }
+  }, []);
+
+  // Initialize scroll/parallax effects
+  useEffect(() => {
+    initScrollReveals();
+    initParallaxBackground('.parallax-bg', '.hero-section');
+    
+    return () => {
+      cleanupScrollTriggers();
+    };
   }, []);
 
   const handleFormSubmit = async (formData) => {
@@ -153,17 +164,51 @@ const HomePage = () => {
 
   return (
     <HeroSection
-      title="Jyotish Shastra"
-      subtitle="Ancient Wisdom, Modern Precision"
+      title=""
+      subtitle=""
     >
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <Card className="max-w-2xl w-full p-8 bg-card backdrop-blur-sm card-shadow-prominent shadow-prominent">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-white mb-2 typography-roboto typography-h2">
-              Begin Your Journey
+      {/* Main Content - Enhanced Chris Cole Style with Centered Layout */}
+      <div className="main-content-chris-cole-enhanced" style={{
+        position: 'relative',
+        width: '100%',
+        maxWidth: '800px',
+        margin: '0 auto',
+        padding: '4rem 2rem',
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center'
+      }}>
+        <Card className="w-full bg-transparent border-none shadow-none reveal" style={{
+          background: 'transparent',
+          border: 'none',
+          boxShadow: 'none',
+          padding: 0
+        }}>
+          {/* Title Section - Minimal Chris Cole Style */}
+          <div className="mb-12 text-center">
+            <h2 style={{
+              fontFamily: "'Roboto Condensed', sans-serif",
+              fontSize: '24px',
+              fontWeight: 300,
+              color: 'rgba(255, 255, 255, 0.9)',
+              textTransform: 'uppercase',
+              letterSpacing: '4px',
+              marginBottom: '1rem',
+              lineHeight: '1.4'
+            }}>
+              BEGIN YOUR JOURNEY
             </h2>
-            <p className="text-white/80 typography-roboto typography-body">
-              Discover your Vedic astrology chart and comprehensive analysis
+            <p style={{
+              fontFamily: "'Roboto', sans-serif",
+              fontSize: '12px',
+              fontWeight: 300,
+              color: 'rgba(255, 255, 255, 0.5)',
+              textTransform: 'uppercase',
+              letterSpacing: '2px',
+              lineHeight: '1.6'
+            }}>
+              DISCOVER YOUR VEDIC ASTROLOGY CHART
             </p>
           </div>
 

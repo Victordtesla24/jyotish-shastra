@@ -2,96 +2,195 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Enhanced Google Fonts Import */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@300;400;500;600;700&display=swap');
+/* Chris Cole Typography - Roboto Font Family Only */
+/* Note: Roboto fonts are loaded via index.html for better performance */
 
 /* Base Layer */
 @layer base {
   :root {
-    /* Vedic Color System */
-    --vedic-saffron: #FF9933;
-    --vedic-gold: #FFD700;
-    --vedic-maroon: #800000;
-    --vedic-navy: #000080;
-    --vedic-lotus: #FFC0CB;
-    --cosmic-purple: #6B46C1;
-    --stellar-blue: #1E40AF;
-    --lunar-silver: #C0C0C0;
-    --solar-orange: #F97316;
-    --sacred-white: #FFFEF7;
-    --wisdom-gray: #6B7280;
-    --earth-brown: #92400E;
+    /* Chris Cole Color System - Aligned with chris-cole-enhancements.css */
+    /* Base Neutrals - Black Theme */
+    --color-black: #000000;
+    --color-dark-gray: #1A1A1A;
+    --color-mid-gray: #505050;
+    --color-light-gray: #CCCCCC;
+    --color-white: #FFFFFF;
 
-  /* Animation Durations */
-  --animation-fast: 150ms;
-  --animation-normal: 300ms;
-  --animation-slow: 500ms;
-  --animation-slower: 700ms;
-  
-  /* Shadow Elevations */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
-  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+    /* Vedic Accents (30%) - Strategic Highlights */
+    --divine-gold: #FFD700;
+    --sacred-saffron: #FF9933;
+    
+    /* Legacy Vedic Colors (for backward compatibility) */
+    --vedic-gold: #FFD700;
+    --vedic-saffron: #FF9933;
+    
+    /* Animation Durations */
+    --animation-fast: 150ms;
+    --animation-normal: 300ms;
+    --animation-slow: 500ms;
+    --animation-slower: 700ms;
+    
+    /* Shadow Elevations - Chris Cole Style */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+    --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
 
     /* Spacing */
     --space-vedic: 1.618rem;
     --border-radius-vedic: 0.625rem;
   }
 
+  /* Chris Cole Global HTML - Clean, Minimal Foundation */
   html {
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-weight: 400;
+    line-height: 1.6;
+    background-color: #000000;
   }
 
+  /* Chris Cole Body - Pure Black Background, White Text */
   body {
-    @apply font-sans antialiased;
-    background-color: var(--bg-primary, rgb(0, 0, 0));
-    color: var(--text-primary, rgb(255, 255, 255));
+    @apply antialiased;
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-weight: 400;
+    background-color: var(--bg-primary, #000000);
+    color: var(--text-primary, #FFFFFF);
     transition: background-color var(--animation-normal) ease, color var(--animation-normal) ease;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
   }
 
-  /* Focus styles */
+  /* Chris Cole Focus States - Golden Outline for Accessibility */
+  *:focus {
+    outline: none;
+  }
+  
   *:focus-visible {
-    outline: 2px solid var(--vedic-saffron);
-    outline-offset: 2px;
-    border-radius: var(--border-radius-vedic);
+    outline: 3px solid var(--divine-gold, #FFD700);
+    outline-offset: 3px;
+    border-radius: 4px;
+    transition: outline var(--animation-fast) ease;
   }
 
-  /* Typography */
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline: 3px solid var(--divine-gold, #FFD700);
+    outline-offset: 3px;
+  }
+
+  /* Chris Cole Typography - Roboto Font Family Hierarchy */
   h1, h2, h3, h4, h5, h6 {
     @apply m-0 leading-tight;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 300;
+    letter-spacing: 0.02em;
+    color: #FFFFFF;
   }
 
-  /* Scrollbar */
+  h1 {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 100;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  h2 {
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 300;
+    letter-spacing: 0.03em;
+  }
+
+  h3 {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 400;
+  }
+
+  h4 {
+    font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+    font-weight: 500;
+  }
+
+  h5, h6 {
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    font-weight: 500;
+  }
+  
+  p {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+    line-height: 1.8;
+    margin: 0 0 1rem 0;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  span, a, li, label, button, input, textarea, select {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+  }
+
+  a {
+    color: var(--divine-gold, #FFD700);
+    text-decoration: none;
+    transition: color var(--animation-fast) ease;
+  }
+
+  a:hover {
+    color: var(--sacred-saffron, #FF9933);
+  }
+
+  /* Chris Cole Scrollbar - Minimal Black Theme */
   ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 10px;
+    height: 10px;
   }
 
   ::-webkit-scrollbar-track {
-    background-color: #F9FAFB;
-    border-radius: 4px;
+    background-color: #000000;
+    border-left: 1px solid #1A1A1A;
   }
 
   ::-webkit-scrollbar-thumb {
-    background-color: #E2E8F0;
-    border-radius: 4px;
-    transition: opacity var(--animation-normal) ease;
+    background-color: #505050;
+    border-radius: 0;
+    border: 2px solid #000000;
+    transition: background-color var(--animation-normal) ease;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background-color: #CBD5E1;
+    background-color: #666666;
   }
 
-  /* Selection */
+  ::-webkit-scrollbar-thumb:active {
+    background-color: var(--divine-gold, #FFD700);
+  }
+
+  /* Firefox Scrollbar */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #505050 #000000;
+  }
+
+  /* Text Selection - Chris Cole Gold Accent */
   ::selection {
-    background-color: var(--vedic-saffron);
-    color: white;
+    background-color: rgba(255, 215, 0, 0.3);
+    color: #FFFFFF;
+    text-shadow: none;
+  }
+
+  ::-moz-selection {
+    background-color: rgba(255, 215, 0, 0.3);
+    color: #FFFFFF;
+    text-shadow: none;
   }
 }
 
@@ -136,13 +235,15 @@
 
   /* Card Styles */
   .card-vedic {
-    @apply bg-white rounded-xl border border-gray-200 p-6;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    @apply rounded-xl border p-6;
+    background-color: #1A1A1A;
+    border-color: #505050;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     transition: all var(--animation-normal) ease;
   }
 
   .card-vedic:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
     transform: translateY(-2px);
   }
 
@@ -158,13 +259,21 @@
 
   /* Input Styles */
   .input-vedic {
-    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent;
+    @apply w-full px-4 py-3 border rounded-lg focus:ring-2 focus:border-transparent;
+    background-color: #1A1A1A;
+    border-color: #505050;
+    color: #FFFFFF;
     transition: all var(--animation-normal) ease;
   }
 
   .input-vedic:focus {
     border-color: var(--vedic-saffron);
     box-shadow: 0 0 0 3px rgba(255, 153, 51, 0.1);
+  }
+
+  .input-vedic::placeholder {
+    color: #CCCCCC;
+    opacity: 0.6;
   }
 
   .form-input-vedic {
@@ -186,19 +295,19 @@
 
   /* Alert Styles */
   .alert-success {
-    @apply bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg;
+    @apply bg-white/10 border border-white/20 text-white px-4 py-3 rounded-lg;
   }
 
   .alert-error {
-    @apply bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg;
+    @apply bg-white/10 border border-white/20 text-white px-4 py-3 rounded-lg;
   }
 
   .alert-warning {
-    @apply bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg;
+    @apply bg-white/10 border border-white/20 text-white px-4 py-3 rounded-lg;
   }
 
   .alert-info {
-    @apply bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-lg;
+    @apply bg-white/10 border border-white/20 text-white px-4 py-3 rounded-lg;
   }
 
   /* Navigation */
@@ -213,7 +322,12 @@
   }
 
   .nav-link-inactive {
-    @apply text-gray-600 hover:text-gray-900 hover:bg-gray-50;
+    color: #CCCCCC;
+  }
+
+  .nav-link-inactive:hover {
+    color: #FFFFFF;
+    background-color: #252525;
   }
 
   /* Vedic specific components */
@@ -302,8 +416,9 @@
 
   /* Chart utilities */
   .chart-container {
-    @apply relative w-full h-96 bg-white rounded-xl overflow-hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    @apply relative w-full h-96 rounded-xl overflow-hidden;
+    background-color: #1A1A1A;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   }
 
   .house-number {
@@ -749,7 +864,7 @@
 
 /* Enhanced Card Styles */
 .card-enhanced {
-  background: white;
+    background: #1A1A1A;
   border-radius: 1rem;
   padding: 1.5rem;
   box-shadow: var(--shadow-md);
@@ -763,7 +878,7 @@
 }
 
 .card-enhanced-bordered {
-  background: linear-gradient(white, white) padding-box,
+    background: linear-gradient(#1A1A1A, #1A1A1A) padding-box,
               linear-gradient(135deg, var(--vedic-saffron), var(--vedic-gold)) border-box;
   border: 2px solid transparent;
   border-radius: 1rem;
@@ -780,9 +895,9 @@
 .shimmer {
   background: linear-gradient(
     90deg,
-    #f3f4f6 0px,
-    #e5e7eb 40px,
-    #f3f4f6 80px
+    #252525 0px,
+    #1A1A1A 40px,
+    #252525 80px
   );
   background-size: 1000px 100%;
   animation: shimmer 2s infinite linear;

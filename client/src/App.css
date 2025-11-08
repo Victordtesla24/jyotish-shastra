@@ -1,162 +1,514 @@
+/**
+ * App.css - Chris Cole Minimal Aesthetic
+ * Jyotish Shastra Vedic Astrology Application
+ * 
+ * Design Philosophy:
+ * - Pure black background (#000000)
+ * - White text (#FFFFFF) with strategic opacity levels
+ * - Minimal, spacious layouts with generous whitespace
+ * - Roboto font family (100, 300, 400, 500, 700 weights)
+ * - Vedic gold accents (#FFD700) used sparingly for hierarchy
+ * - Chris Cole-inspired typography and spacing
+ * 
+ * Reference: https://hellochriscole.webflow.io/
+ */
+
+/* ============================================
+   App Container - Chris Cole Black Theme
+   ============================================ */
 .App {
-  text-align: center;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background-color: var(--bg-primary, #000000);
+  color: var(--text-primary, #FFFFFF);
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-weight: 400;
+  position: relative;
+  overflow-x: hidden;
 }
 
+/* Smooth transitions for all App state changes */
+.App * {
+  transition-property: background-color, color, border-color, transform, opacity;
+  transition-duration: 300ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Disable transitions for motion-sensitive users */
+@media (prefers-reduced-motion: reduce) {
+  .App * {
+    transition: none !important;
+  }
+}
+
+/* ============================================
+   App Header - Minimal Chris Cole Style
+   ============================================ */
 .App-header {
-  background-color: #1a237e;
-  padding: 20px;
-  color: white;
-}
-
-.App-header h1 {
-  margin: 0;
-  font-size: 2.5rem;
-  font-weight: 600;
-}
-
-.App-header p {
-  margin: 5px 0 0 0;
-  font-size: 1.1rem;
-  opacity: 0.9;
-}
-
-.App-nav {
-  background-color: #3949ab;
-  padding: 0;
-  display: flex;
-  justify-content: center;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.App-nav button {
-  background: none;
-  border: none;
-  color: white;
-  padding: 15px 30px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  border-bottom: 3px solid transparent;
-}
-
-.App-nav button:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-.App-nav button.active {
-  border-bottom-color: #ffc107;
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-.App-nav button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.App-main {
-  flex: 1;
-  padding: 40px 20px;
-  background-color: #f5f5f5;
-  overflow-y: auto;
+  background-color: #000000;
+  padding: 4rem 2rem 3rem 2rem;
+  color: #FFFFFF;
+  border-bottom: 1px solid rgba(80, 80, 80, 0.3);
+  text-align: center;
   position: relative;
 }
 
-.App-footer {
-  background-color: #1a237e;
-  color: white;
-  padding: 20px;
-  font-size: 0.9rem;
+.App-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--divine-gold, #FFD700), transparent);
 }
 
-/* Loading Overlay */
-.loading-overlay {
+.App-header h1 {
+  margin: 0 0 1rem 0;
+  font-size: clamp(1.75rem, 4vw, 3rem);
+  font-weight: 100;
+  font-family: 'Roboto', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: rgba(255, 255, 255, 0.95);
+  line-height: 1.2;
+}
+
+.App-header p {
+  margin: 0;
+  font-size: clamp(0.75rem, 1.5vw, 0.875rem);
+  opacity: 0.5;
+  font-weight: 300;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  font-family: 'Roboto', sans-serif;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* ============================================
+   App Navigation - Chris Cole Refined Button States
+   ============================================ */
+.App-nav {
+  background-color: #000000;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  border-bottom: 1px solid rgba(80, 80, 80, 0.2);
+  position: relative;
+}
+
+.App-nav button {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  padding: 1.25rem 2.5rem;
+  font-size: clamp(0.75rem, 1.5vw, 0.875rem);
+  font-weight: 300;
+  font-family: 'Roboto', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border-bottom: 2px solid transparent;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Hover state with subtle background */
+.App-nav button::before {
+  content: '';
   position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, transparent, rgba(255, 215, 0, 0.05));
+  opacity: 0;
+  transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: -1;
+}
+
+.App-nav button:hover {
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: 0.2em;
+}
+
+.App-nav button:hover::before {
+  opacity: 1;
+}
+
+/* Active state with golden underline */
+.App-nav button.active {
+  border-bottom-color: var(--divine-gold, #FFD700);
+  color: rgba(255, 255, 255, 1);
+  font-weight: 400;
+}
+
+.App-nav button.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--divine-gold, #FFD700), transparent);
+  animation: shimmer-nav 2s ease-in-out infinite;
+}
+
+@keyframes shimmer-nav {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.App-nav button:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ============================================
+   App Main Content - Generous Spacing
+   ============================================ */
+.App-main {
+  flex: 1;
+  padding: clamp(2rem, 6vw, 5rem) clamp(1rem, 4vw, 3rem);
+  background-color: #000000;
+  color: #FFFFFF;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  max-width: 1600px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Smooth scroll for main content */
+.App-main {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Fade-in animation for main content */
+.App-main > * {
+  animation: fade-in-up 0.6s ease-out;
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================
+   App Footer - Subtle Chris Cole Styling
+   ============================================ */
+.App-footer {
+  background-color: #000000;
+  color: rgba(255, 255, 255, 0.3);
+  padding: clamp(2rem, 4vw, 3rem) clamp(1rem, 3vw, 2rem);
+  font-size: clamp(0.625rem, 1.2vw, 0.75rem);
+  font-weight: 300;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  text-align: center;
+  border-top: 1px solid rgba(80, 80, 80, 0.2);
+  font-family: 'Roboto', sans-serif;
+  position: relative;
+}
+
+.App-footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.4), transparent);
+}
+
+.App-footer:hover {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* ============================================
+   Loading Overlay - Chris Cole Minimal Design
+   ============================================ */
+.loading-overlay {
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(0, 0, 0, 0.98);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 9999;
+  animation: overlay-fade-in 0.3s ease-out;
+}
+
+@keyframes overlay-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .loading-spinner {
-  width: 50px;
-  height: 50px;
-  border: 4px solid #e0e0e0;
-  border-top-color: #3949ab;
+  width: 64px;
+  height: 64px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-top-color: rgba(255, 215, 0, 0.6);
+  border-right-color: rgba(255, 215, 0, 0.4);
   border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 1rem;
+  animation: spin 1.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+  margin-bottom: 2rem;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.1);
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-overlay p {
-  color: #3949ab;
-  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: clamp(0.625rem, 1.2vw, 0.75rem);
+  font-weight: 300;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
   margin-top: 1rem;
+  font-family: 'Roboto', sans-serif;
+  animation: pulse-text 2s ease-in-out infinite;
 }
 
-/* Error Message */
+@keyframes pulse-text {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.8; }
+}
+
+/* ============================================
+   Error Message - Chris Cole Minimal Aesthetics
+   ============================================ */
 .error-message {
-  background: #f8d7da;
-  border: 1px solid #f5c6cb;
-  color: #721c24;
-  padding: 1rem;
-  margin: 1rem auto;
-  max-width: 600px;
-  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(255, 107, 53, 0.2);
+  border-left: 3px solid rgba(255, 107, 53, 0.8);
+  color: rgba(255, 255, 255, 0.95);
+  padding: clamp(1rem, 3vw, 1.5rem);
+  margin: clamp(1rem, 3vw, 2rem) auto;
+  max-width: 640px;
+  border-radius: 4px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 1.5rem;
+  animation: slide-in 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .error-message p {
   margin: 0;
   flex: 1;
+  font-size: clamp(0.8rem, 1.5vw, 0.875rem);
+  line-height: 1.6;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .error-message button {
   background: transparent;
-  border: 1px solid #721c24;
-  color: #721c24;
-  padding: 0.25rem 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.8);
+  padding: 0.625rem 1.25rem;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: clamp(0.7rem, 1.3vw, 0.75rem);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: 'Roboto', sans-serif;
+  white-space: nowrap;
 }
 
 .error-message button:hover {
-  background: #721c24;
-  color: white;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 1);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-/* Responsive adjustments */
+.error-message button:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* ============================================
+   Responsive Adjustments - Mobile First
+   ============================================ */
 @media (max-width: 768px) {
   .App-header h1 {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
+    letter-spacing: 4px;
+  }
+
+  .App-header p {
+    font-size: 0.75rem;
+    letter-spacing: 1.5px;
+  }
+
+  .App-nav {
+    flex-wrap: wrap;
   }
 
   .App-nav button {
-    padding: 12px 20px;
-    font-size: 0.9rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.75rem;
+    letter-spacing: 1.5px;
   }
 
   .App-main {
-    padding: 20px 10px;
+    padding: 1.5rem 1rem;
+  }
+
+  .App-footer {
+    padding: 1.5rem 1rem;
+    font-size: 0.625rem;
   }
 
   .error-message {
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 1rem;
+    padding: 1rem;
   }
 
   .error-message button {
     width: 100%;
+  }
+
+  .loading-spinner {
+    width: 50px;
+    height: 50px;
+  }
+
+  .loading-overlay p {
+    font-size: 0.625rem;
+    letter-spacing: 3px;
+  }
+}
+
+/* ============================================
+   Tablet Adjustments
+   ============================================ */
+@media (min-width: 769px) and (max-width: 1023px) {
+  .App-header h1 {
+    font-size: 2rem;
+    letter-spacing: 5px;
+  }
+
+  .App-nav button {
+    padding: 0.875rem 1.5rem;
+  }
+
+  .App-main {
+    padding: 2rem 1.25rem;
+  }
+}
+
+/* ============================================
+   Accessibility Enhancements
+   ============================================ */
+.App-nav button:focus-visible,
+.error-message button:focus-visible {
+  outline: 2px solid var(--divine-gold, #FFD700);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .loading-spinner {
+    animation: none;
+  }
+
+  .error-message {
+    animation: none;
+  }
+}
+
+/* ============================================
+   Print Styles
+   ============================================ */
+@media print {
+  .App-header,
+  .App-nav,
+  .App-footer,
+  .loading-overlay {
+    display: none !important;
+  }
+
+  .App-main {
+    padding: 0 !important;
+  }
+
+  body {
+    background-color: white !important;
+    color: black !important;
+  }
+}
+
+/* ============================================
+   High Contrast Mode Support
+   ============================================ */
+@media (prefers-contrast: high) {
+  .App-nav button {
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .App-nav button.active {
+    border: 2px solid var(--divine-gold, #FFD700);
+  }
+
+  .error-message {
+    border-width: 2px;
   }
 }

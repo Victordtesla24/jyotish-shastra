@@ -1,163 +1,73 @@
-import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useEffect, useRef, useState } from 'react';
 
 /**
- * PreLoader Component
- * Vedic-themed pre-loading animation similar to Chris Cole's "loading" text
- * Features: Fade-in content after loading, maintains starfield canvas as background
+ * Chris Cole inspired pre-loader with concentric ring animation.
+ * The animation mirrors the template reference using lightweight CSS
+ * so it renders instantly without layout thrashing.
  */
-const PreLoader = ({ onComplete, delay = 1500 }) => {
+export const MIN_VISIBLE_DURATION = 1000;
+export const POST_HIDE_DELAY = 250;
+
+const PreLoader = ({ onComplete, delay = MIN_VISIBLE_DURATION }) => {
   const [isVisible, setIsVisible] = useState(true);
-  const [loadingProgress, setLoadingProgress] = useState(0);
+  const completionRef = useRef(false);
+  const hideTimerRef = useRef(null);
+  const completeTimerRef = useRef(null);
 
   useEffect(() => {
-    // Simulate loading progress
-    const progressInterval = setInterval(() => {
-      setLoadingProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(progressInterval);
-          return 100;
-        }
-        return prev + 2;
-      });
-    }, 30);
+    const visibleDuration = Math.max(delay, MIN_VISIBLE_DURATION);
 
-    // Hide preloader after delay
-    const timer = setTimeout(() => {
+    hideTimerRef.current = window.setTimeout(() => {
       setIsVisible(false);
-      if (onComplete) {
-        setTimeout(() => {
+
+      completeTimerRef.current = window.setTimeout(() => {
+        if (!completionRef.current && typeof onComplete === 'function') {
+          completionRef.current = true;
           onComplete();
-        }, 500); // Wait for fade-out animation
-      }
-    }, delay);
+        }
+      }, POST_HIDE_DELAY);
+    }, visibleDuration);
 
     return () => {
-      clearInterval(progressInterval);
-      clearTimeout(timer);
+      if (hideTimerRef.current) {
+        window.clearTimeout(hideTimerRef.current);
+      }
+      if (completeTimerRef.current) {
+        window.clearTimeout(completeTimerRef.current);
+      }
+      if (!completionRef.current && typeof onComplete === 'function') {
+        completionRef.current = true;
+        onComplete();
+      }
     };
   }, [delay, onComplete]);
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        duration: 0.5,
-        staggerChildren: 0.1
-      }
-    },
-    exit: {
-      opacity: 0,
-      transition: {
-        duration: 0.5
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.6,
-        ease: [0.25, 0.46, 0.45, 0.94]
-      }
-    }
-  };
+  if (!isVisible) {
+    return null;
+  }
 
   return (
-    <AnimatePresence>
-      {isVisible && (
-        <motion.div
-          className="preloader-vedic"
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          exit="exit"
-        >
-          {/* Cosmic Background */}
-          <div className="preloader-background" aria-hidden="true" />
-          
-          {/* Loading Content */}
-          <motion.div
-            className="preloader-content"
-            variants={itemVariants}
-          >
-            {/* Om Symbol */}
-            <motion.div
-              className="preloader-om"
-              animate={{
-                rotate: [0, 360],
-                scale: [1, 1.1, 1]
-              }}
-              transition={{
-                rotate: {
-                  duration: 8,
-                  repeat: Infinity,
-                  ease: "linear"
-                },
-                scale: {
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }
-              }}
-              aria-hidden="true"
-            >
-              ॐ
-            </motion.div>
-
-            {/* Loading Text - Matching Chris Cole Style */}
-            <motion.h2
-              className="preloader-text typography-roboto"
-              variants={itemVariants}
-              style={{ 
-                color: 'white',
-                fontSize: '1.5rem',
-                fontWeight: 300,
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase'
-              }}
-            >
-              loading
-            </motion.h2>
-
-            {/* Progress Bar */}
-            <motion.div
-              className="preloader-progress-container"
-              variants={itemVariants}
-            >
-              <div className="preloader-progress-bar">
-                <motion.div
-                  className="preloader-progress-fill"
-                  initial={{ width: 0 }}
-                  animate={{ width: `${loadingProgress}%` }}
-                  transition={{
-                    duration: 0.3,
-                    ease: "easeOut"
-                  }}
-                />
-              </div>
-              <span className="preloader-progress-text">
-                {loadingProgress}%
-              </span>
-            </motion.div>
-
-            {/* Sacred Message */}
-            <motion.p
-              className="preloader-message"
-              variants={itemVariants}
-            >
-              Ancient Wisdom, Modern Precision
-            </motion.p>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+    <div
+      className="preloader-overlay"
+      data-preloader="chris-cole"
+      data-testid="preloader-chris-cole"
+      role="status"
+      aria-live="polite"
+    >
+      <div className="preloader-core" aria-hidden="true">
+        <div className="preloader-rings">
+          {Array.from({ length: 8 }).map((_, index) => (
+            <span
+              key={`ring-${index + 1}`}
+              className={`preloader-ring preloader-ring-${index + 1}`}
+              data-testid="preloader-ring"
+            />
+          ))}
+          <span className="preloader-core-dot" />
+        </div>
+      </div>
+    </div>
   );
 };
 
 export default PreLoader;
-
