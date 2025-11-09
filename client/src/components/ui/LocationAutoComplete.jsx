@@ -19,7 +19,8 @@ const LocationAutoComplete = ({
   disabled = false,
   error = null,
   showSuggestions = true,
-  debounceMs = 300
+  debounceMs = 300,
+  id = undefined
 }) => {
   const [inputValue, setInputValue] = useState(value);
   const [suggestions, setSuggestions] = useState([]);
@@ -184,6 +185,7 @@ const LocationAutoComplete = ({
         </div>
         <input
           ref={inputRef}
+          id={id}
           type="text"
           value={inputValue}
           onChange={handleInputChange}
@@ -194,13 +196,13 @@ const LocationAutoComplete = ({
           required={required}
           disabled={disabled}
           role="combobox"
-          className={`input-vedic pl-10 pr-10 ${errorMessage || error ? 'border-red-500' : ''}`}
+          className={`form-input-vedic pl-10 pr-10 ${errorMessage || error ? 'border-red-500' : ''}`}
           style={{
             paddingLeft: '2.5rem',
             paddingRight: isLoading ? '2.5rem' : '1rem'
           }}
           aria-invalid={errorMessage || error ? 'true' : 'false'}
-          aria-describedby={errorMessage || error ? 'location-error' : undefined}
+          aria-describedby={errorMessage || error ? (id ? `${id}-error` : 'location-error') : undefined}
           aria-autocomplete="list"
           aria-expanded={isOpen}
           aria-controls="location-suggestions"
@@ -218,7 +220,7 @@ const LocationAutoComplete = ({
 
       {(errorMessage || error) && (
         <p 
-          id="location-error"
+          id={id ? `${id}-error` : 'location-error'}
           className="mt-1 text-sm text-red-600"
           role="alert"
           aria-live="polite"
@@ -231,7 +233,7 @@ const LocationAutoComplete = ({
         <ul
           id="location-suggestions"
           ref={suggestionsRef}
-          className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto"
+          className="absolute z-50 w-full mt-1 bg-black/95 border border-white/20 rounded-lg shadow-lg max-h-60 overflow-auto backdrop-blur-sm"
           role="listbox"
         >
           {suggestions.map((suggestion, index) => (
@@ -239,12 +241,12 @@ const LocationAutoComplete = ({
               key={index}
               role="option"
               aria-selected={selectedIndex === index}
-              className={`px-4 py-2 cursor-pointer hover:bg-vedic-saffron-light ${
-                selectedIndex === index ? 'bg-vedic-saffron-light' : ''
+              className={`px-4 py-2 cursor-pointer text-white hover:bg-white/10 ${
+                selectedIndex === index ? 'bg-white/10' : ''
               }`}
               style={{
                 backgroundColor: selectedIndex === index 
-                  ? 'var(--vedic-saffron-light)' 
+                  ? 'rgba(255, 255, 255, 0.1)' 
                   : 'transparent'
               }}
               onMouseDown={() => handleSuggestionSelect(suggestion)}
@@ -252,11 +254,11 @@ const LocationAutoComplete = ({
             >
               <div className="flex items-center">
                 <FaMapMarkerAlt 
-                  className="text-vedic-saffron mr-2" 
-                  style={{ color: 'var(--vedic-saffron)' }}
+                  className="mr-2" 
+                  style={{ color: 'rgb(255, 255, 255)' }}
                   aria-hidden="true"
                 />
-                <span>{suggestion.formatted || suggestion.display}</span>
+                <span className="text-white">{suggestion.formatted || suggestion.display}</span>
               </div>
             </li>
           ))}

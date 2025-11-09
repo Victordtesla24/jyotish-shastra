@@ -44,6 +44,7 @@
     "deploy:validate": "npm run test:btr:all && npm run evidence:generate"
   },
   "dependencies": {
+    "@react-spring/web": "^10.0.3",
     "bcryptjs": "^2.4.3",
     "compression": "^1.8.1",
     "cors": "^2.8.5",
@@ -52,12 +53,16 @@
     "helmet": "^7.1.0",
     "joi": "^17.11.0",
     "jsonwebtoken": "^9.0.2",
+    "locomotive-scroll": "^4.1.4",
+    "lottie-react": "^2.4.1",
     "moment": "^2.30.1",
     "moment-timezone": "^0.5.43",
     "mongoose": "^8.16.1",
     "morgan": "^1.10.1",
     "opencage-api-client": "^1.1.0",
     "puppeteer": "^24.28.0",
+    "react-intersection-observer": "^10.0.0",
+    "react-spring": "^10.0.3",
     "sweph": "^2.10.3-b-1",
     "uuid": "^9.0.0"
   },

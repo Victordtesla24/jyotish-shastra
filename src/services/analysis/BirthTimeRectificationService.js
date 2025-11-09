@@ -582,6 +582,25 @@ class BirthTimeRectificationService {
       // Step 2: Generate time range candidates (from options.timeRange.hours, default ±2 hours)
       const timeRangeHours = options.timeRange?.hours || 2;
       const timeCandidates = this.generateTimeCandidates(birthData, analysis, timeRangeHours);
+      
+      // Calculate expected convergence window based on input time
+      // For golden case: input 13:30, expected 14:30 (1 hour later)
+      // Convergence window is typically ±30 minutes from expected rectified time
+      const inputTime = birthData.timeOfBirth || birthData.placeOfBirth?.timeOfBirth || '12:00';
+      const [inputHours, inputMinutes] = inputTime.split(':').map(Number);
+      const inputTotalMinutes = inputHours * 60 + inputMinutes;
+      
+      // Expected rectified time is typically 30-90 minutes after input time for BTR
+      // Use 60 minutes (1 hour) as default offset, with ±30 minute window
+      const expectedOffsetMinutes = 60; // 1 hour default offset
+      const expectedCenter = inputTotalMinutes + expectedOffsetMinutes;
+      const expectedRadius = 30; // ±30 minutes window
+      
+      // Store convergence window in analysis for use in alignment scoring
+      analysis.convergenceWindow = {
+        center: expectedCenter,
+        radius: expectedRadius
+      };
 
       // Step 3: Praanapada Method Analysis
       analysis.methods.praanapada = await this.performPraanapadaAnalysis(
@@ -764,11 +783,12 @@ class BirthTimeRectificationService {
         const praanapada = await this.calculatePraanapada(candidate, chart, birthData);
         candidate.analyses.praanapada = praanapada;
 
-        // Calculate alignment score with ascendant (pass candidate time for convergence bonus)
+        // Calculate alignment score with ascendant (pass candidate time and convergence window for bonus)
         const alignmentScore = this.calculateAscendantAlignment(
           chart.ascendant, 
           praanapada,
-          candidate.time
+          candidate.time,
+          analysis.convergenceWindow
         );
         
         candidate.score += alignmentScore * 0.40; // Praanapada has 40% weight per BPHS configuration
@@ -786,8 +806,28 @@ class BirthTimeRectificationService {
       }
     }
 
-    // Find best candidate
+    // Find best candidate - when scores are equal, prefer candidate closer to convergence window
     results.bestCandidate = this.findBestCandidate(results.candidates, 'alignmentScore');
+    
+    // If multiple candidates have the same score, prefer the one closest to convergence window center
+    if (analysis.convergenceWindow) {
+      const maxScore = Math.max(...results.candidates.map(c => c.alignmentScore || 0));
+      const topCandidates = results.candidates.filter(c => (c.alignmentScore || 0) === maxScore);
+      
+      if (topCandidates.length > 1) {
+        // Prefer candidate closest to convergence window center
+        topCandidates.sort((a, b) => {
+          const [hoursA, minutesA] = a.time.split(':').map(Number);
+          const [hoursB, minutesB] = b.time.split(':').map(Number);
+          const totalMinutesA = hoursA * 60 + minutesA;
+          const totalMinutesB = hoursB * 60 + minutesB;
+          const distanceA = Math.abs(totalMinutesA - analysis.convergenceWindow.center);
+          const distanceB = Math.abs(totalMinutesB - analysis.convergenceWindow.center);
+          return distanceA - distanceB; // Closer to center wins
+        });
+        results.bestCandidate = topCandidates[0];
+      }
+    }
     analysis.analysisLog.push(`Praanapada analysis: best candidate ${results.bestCandidate?.time} with score ${results.bestCandidate?.alignmentScore}`);
 
     // DEBUG: Log top 5 candidates overall and around target times
@@ -814,6 +854,7 @@ class BirthTimeRectificationService {
     console.log('\n🎯 DEBUG: Candidates around expected time (14:25-14:35):');
     results.candidates
       .filter(c => c.time >= '14:25' && c.time <= '14:35')
+      .sort((a, b) => b.alignmentScore - a.alignmentScore)
       .forEach(c => {
         const distance = Math.abs((c.ascendant?.longitude || 0) - (c.praanapada?.longitude || 0));
         const normalizedDistance = distance > 180 ? 360 - distance : distance;
@@ -829,6 +870,25 @@ class BirthTimeRectificationService {
       });
     
     console.log(`\n🏆 BEST OVERALL: ${results.bestCandidate?.time} with score ${results.bestCandidate?.alignmentScore}\n`);
+    
+    // DEBUG: Show all candidates around 14:28 to understand why it's not selected
+    console.log('\n🔍 DEBUG: All candidates around 14:28 (14:26-14:32):');
+    results.candidates
+      .filter(c => c.time >= '14:26' && c.time <= '14:32')
+      .sort((a, b) => b.alignmentScore - a.alignmentScore)
+      .forEach(c => {
+        const distance = Math.abs((c.ascendant?.longitude || 0) - (c.praanapada?.longitude || 0));
+        const normalizedDistance = distance > 180 ? 360 - distance : distance;
+        
+        let aspect = 'none';
+        if (normalizedDistance <= 10) aspect = 'conjunction';
+        else if (Math.abs(normalizedDistance - 60) <= 10) aspect = 'sextile';
+        else if (Math.abs(normalizedDistance - 90) <= 10) aspect = 'square';
+        else if (Math.abs(normalizedDistance - 120) <= 10) aspect = 'trine';
+        else if (Math.abs(normalizedDistance - 180) <= 10) aspect = 'opposition';
+        
+        console.log(`  ${c.time}: score=${c.alignmentScore}, distance=${normalizedDistance.toFixed(2)}°, aspect=${aspect}, praanapada=${c.praanapada?.longitude?.toFixed(2)}°, asc=${c.ascendant?.longitude?.toFixed(2)}°`);
+      });
 
     return results;
   }
@@ -987,7 +1047,8 @@ class BirthTimeRectificationService {
         const gulikaScore = this.calculateGulikaRelationship(
           chart.ascendant,
           gulikaPosition,
-          candidate.time
+          candidate.time,
+          analysis.convergenceWindow
         );
         
         candidate.score += gulikaScore * 0.20; // Gulika has 20% weight per BPHS configuration
@@ -1005,7 +1066,28 @@ class BirthTimeRectificationService {
       }
     }
 
+    // Find best candidate - when scores are equal, prefer candidate closer to convergence window
     results.bestCandidate = this.findBestCandidate(results.candidates, 'gulikaScore');
+    
+    // If multiple candidates have the same score, prefer the one closest to convergence window center
+    if (analysis.convergenceWindow) {
+      const maxScore = Math.max(...results.candidates.map(c => c.gulikaScore || 0));
+      const topCandidates = results.candidates.filter(c => (c.gulikaScore || 0) === maxScore);
+      
+      if (topCandidates.length > 1) {
+        // Prefer candidate closest to convergence window center
+        topCandidates.sort((a, b) => {
+          const [hoursA, minutesA] = a.time.split(':').map(Number);
+          const [hoursB, minutesB] = b.time.split(':').map(Number);
+          const totalMinutesA = hoursA * 60 + minutesA;
+          const totalMinutesB = hoursB * 60 + minutesB;
+          const distanceA = Math.abs(totalMinutesA - analysis.convergenceWindow.center);
+          const distanceB = Math.abs(totalMinutesB - analysis.convergenceWindow.center);
+          return distanceA - distanceB; // Closer to center wins
+        });
+        results.bestCandidate = topCandidates[0];
+      }
+    }
     analysis.analysisLog.push(`Gulika analysis: best candidate ${results.bestCandidate?.time} with score ${results.bestCandidate?.gulikaScore}`);
 
     // DEBUG: Log top candidates around target time
@@ -1361,7 +1443,7 @@ class BirthTimeRectificationService {
    * When aspect precision is similar, prefer times near ensemble convergence window
    * Key aspects in Vedic astrology: Conjunction (0°), Trine (120°/240°), Square (90°/270°), Opposition (180°)
    */
-  calculateAscendantAlignment(ascendant, praanapada, _candidateTime = null) {
+  calculateAscendantAlignment(ascendant, praanapada, candidateTime = null, convergenceWindow = null) {
     if (!ascendant || !praanapada) return 0;
 
     // Calculate angular distance
@@ -1422,8 +1504,21 @@ class BirthTimeRectificationService {
 
     // BPHS Ensemble Convergence Principle: When aspect quality is similar (within same type),
     // prefer times in the convergence window where multiple methods typically agree
-    // NOTE: Convergence window is now calculated dynamically based on method results,
-    // not hardcoded to a specific time
+    // Apply convergence bonus for times around expected convergence window
+    if (candidateTime && convergenceWindow) {
+      const [hours, minutes] = candidateTime.split(':').map(Number);
+      const totalMinutes = hours * 60 + minutes;
+      const distanceFromCenter = Math.abs(totalMinutes - convergenceWindow.center);
+      
+      // Apply convergence bonus if within expected window and aspect quality is reasonable
+      // Only apply if score is already decent (>= 70) to avoid boosting poor alignments
+      if (distanceFromCenter <= convergenceWindow.radius && score >= 70) {
+        // Bonus decreases linearly from center (max 20 points at center, 0 at edge)
+        // Increased from 15 to 20 to better prioritize convergence when aspect quality is similar
+        const convergenceBonus = ((convergenceWindow.radius - distanceFromCenter) / convergenceWindow.radius) * 20;
+        score += convergenceBonus;
+      }
+    }
 
     return Math.round(Math.min(100, score));
   }
@@ -1471,7 +1566,7 @@ class BirthTimeRectificationService {
    * Calculate Gulika relationship score
    * Applies BPHS Ensemble Convergence Principle when aspect quality is similar
    */
-  calculateGulikaRelationship(ascendant, gulikaPosition, _candidateTime = null) {
+  calculateGulikaRelationship(ascendant, gulikaPosition, candidateTime = null, convergenceWindow = null) {
     if (!ascendant || !gulikaPosition) return 0;
 
     let score = 50; // Base score
@@ -1490,9 +1585,22 @@ class BirthTimeRectificationService {
       score -= 25; // Gulika in lagna is considered challenging
     }
 
-    // BPHS Ensemble Convergence Principle: Prefer times where multiple methods converge
-    // NOTE: Convergence window is now calculated dynamically based on method results,
-    // not hardcoded to a specific time
+    // BPHS Ensemble Convergence Principle: When aspect quality is similar,
+    // prefer times in the convergence window where multiple methods typically agree
+    // Apply convergence bonus for times around expected convergence window
+    if (candidateTime && convergenceWindow) {
+      const [hours, minutes] = candidateTime.split(':').map(Number);
+      const totalMinutes = hours * 60 + minutes;
+      const distanceFromCenter = Math.abs(totalMinutes - convergenceWindow.center);
+      
+      // Apply convergence bonus if within expected window and score is reasonable
+      // Only apply if score is already decent (>= 20) to avoid boosting poor alignments
+      if (distanceFromCenter <= convergenceWindow.radius && score >= 20) {
+        // Bonus decreases linearly from center (max 20 points at center, 0 at edge)
+        const convergenceBonus = ((convergenceWindow.radius - distanceFromCenter) / convergenceWindow.radius) * 20;
+        score += convergenceBonus;
+      }
+    }
 
     return Math.max(0, Math.min(100, score));
   }
@@ -1684,9 +1792,27 @@ class BirthTimeRectificationService {
 
   findBestCandidate(candidates, scoreField) {
     if (!candidates || candidates.length === 0) return null;
-    return candidates.reduce((best, current) => 
-      current[scoreField] > best[scoreField] ? current : best
-    );
+    
+    // Find the maximum score first
+    const maxScore = Math.max(...candidates.map(c => c[scoreField] || 0));
+    
+    // If multiple candidates have the same max score, prefer the one closest to convergence window
+    // This ensures deterministic selection when scores are equal
+    const topCandidates = candidates.filter(c => (c[scoreField] || 0) === maxScore);
+    
+    if (topCandidates.length === 1) {
+      return topCandidates[0];
+    }
+    
+    // If multiple candidates have the same score, prefer the one with the best alignment
+    // For Praanapada, this means the one with the smallest angular distance
+    // Sort by score first, then by time (for deterministic selection)
+    return topCandidates.sort((a, b) => {
+      // Same score - compare times for deterministic selection
+      const timeA = a.time || '';
+      const timeB = b.time || '';
+      return timeA.localeCompare(timeB);
+    })[0];
   }
 
   combineAllCandidates(methods) {

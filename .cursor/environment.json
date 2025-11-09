@@ -33,5 +33,7 @@
       "includeTimestamp": true,
       "detailedAnalysis": true
     }
-  }
+  },
+  "install": "npm install",
+  "start": "npm run dev && cd client && npm run start"
 }

@@ -230,7 +230,7 @@ const InteractiveLifeEventsQuestionnaire = ({
   const ProgressBar = () => (
     <div className="mb-8">
       <div className="flex justify-between items-center mb-2">
-        <span className="text-sm font-medium text-gray-600">
+        <span className="text-sm font-medium text-secondary">
           Life Events Progress
         </span>
         <span className="text-sm font-bold text-indigo-600">
@@ -254,8 +254,8 @@ const InteractiveLifeEventsQuestionnaire = ({
       className="space-y-6"
     >
       <div className="text-center space-y-4">
-        <h2 className="text-3xl font-bold text-gray-900">Life Events Categories</h2>
-        <p className="text-lg text-gray-600">
+        <h2 className="text-3xl font-bold text-primary">Life Events Categories</h2>
+        <p className="text-lg text-secondary">
           Select categories to provide life events that help improve birth time accuracy
         </p>
       </div>
@@ -273,17 +273,18 @@ const InteractiveLifeEventsQuestionnaire = ({
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => !isCompleted && handleCategorySelect(key)}
-              className={`bg-white border-2 rounded-xl p-6 cursor-pointer transition-all duration-300 ${
+              className={`border-2 rounded-xl p-6 cursor-pointer transition-all duration-300 ${
                 isCompleted 
-                  ? 'border-green-400 bg-green-50' 
+                  ? 'border-green-400' 
                   : 'border-indigo-200 hover:border-indigo-400 hover:shadow-lg'
               }`}
+              style={{ backgroundColor: isCompleted ? 'rgba(34, 197, 94, 0.1)' : 'var(--bg-card)' }}
             >
               <div className="text-center space-y-3">
                 <div className="text-4xl">{category.icon}</div>
-                <h3 className="font-bold text-gray-900">{category.title}</h3>
-                <p className="text-sm text-gray-600">{category.description}</p>
-                <p className="text-xs text-gray-500">{category.questions.length} questions</p>
+                <h3 className="font-bold text-primary">{category.title}</h3>
+                <p className="text-sm text-secondary">{category.description}</p>
+                <p className="text-xs text-muted">{category.questions.length} questions</p>
                 
                 {categoryAnswers.length > 0 && (
                   <div className="text-xs bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full">
@@ -335,8 +336,8 @@ const InteractiveLifeEventsQuestionnaire = ({
           <div className="flex items-center gap-3">
             <div className="text-3xl">{currentCategory.icon}</div>
             <div>
-              <h3 className="text-xl font-bold text-gray-900">{currentCategory.title}</h3>
-              <p className="text-sm text-gray-600">
+              <h3 className="text-xl font-bold text-primary">{currentCategory.title}</h3>
+              <p className="text-sm text-secondary">
                 Question {currentQuestionIndex + 1} of {currentCategory.questions.length}
               </p>
             </div>
@@ -344,20 +345,20 @@ const InteractiveLifeEventsQuestionnaire = ({
           <Button 
             variant="ghost"
             onClick={handleBackToCategories}
-            className="text-gray-600"
+            className="text-secondary"
           >
             ← Back to Categories
           </Button>
         </div>
 
-        <Card className="bg-white border-2 border-indigo-200 shadow-lg">
+        <Card className="border-2 border-indigo-200 shadow-lg" style={{ borderColor: 'var(--border-color)' }}>
           <div className="space-y-6">
             <div>
-              <h4 className="text-lg font-semibold text-gray-900 mb-2">
+              <h4 className="text-lg font-semibold text-primary mb-2">
                 {currentQuestion.text}
               </h4>
               {currentQuestion.hint && (
-                <p className="text-sm text-gray-600 italic">{currentQuestion.hint}</p>
+                <p className="text-sm text-secondary italic">{currentQuestion.hint}</p>
               )}
             </div>
 
@@ -372,7 +373,8 @@ const InteractiveLifeEventsQuestionnaire = ({
                   }}
                   defaultValue={currentAnswer?.date || ''}
                   placeholder="Select date..."
-                  className={`w-full px-4 py-3 rounded-lg border ${currentAnswer?.date ? 'border-indigo-400' : 'border-gray-300'} bg-white focus:outline-none focus:border-indigo-500 focus:bg-indigo-50`}
+                  className={`w-full px-4 py-3 rounded-lg border ${currentAnswer?.date ? 'border-indigo-400' : ''} focus:outline-none focus:border-indigo-500`}
+                  style={{ backgroundColor: 'var(--bg-card)', borderColor: currentAnswer?.date ? '#818cf8' : 'var(--border-color)', color: 'var(--text-primary)' }}
                   required
                 />
               </div>
@@ -387,7 +389,8 @@ const InteractiveLifeEventsQuestionnaire = ({
                     }
                   }}
                   defaultValue={currentAnswer?.answer || ''}
-                  className={`w-full px-4 py-3 rounded-lg border ${currentAnswer?.answer ? 'border-indigo-400' : 'border-gray-300'} bg-white focus:outline-none focus:border-indigo-500 focus:bg-indigo-50 mb-3`}
+                  className={`w-full px-4 py-3 rounded-lg border ${currentAnswer?.answer ? 'border-indigo-400' : ''} focus:outline-none focus:border-indigo-500 mb-3`}
+                  style={{ backgroundColor: 'var(--bg-card)', borderColor: currentAnswer?.answer ? '#818cf8' : 'var(--border-color)', color: 'var(--text-primary)' }}
                 >
                   <option value="">Select an option...</option>
                   {currentQuestion.options.map(option => (
@@ -403,7 +406,8 @@ const InteractiveLifeEventsQuestionnaire = ({
                     }
                   }}
                   defaultValue={currentAnswer?.date || ''}
-                  className={`w-full px-4 py-3 rounded-lg border ${currentAnswer?.date ? 'border-indigo-400' : 'border-gray-300'} bg-white focus:outline-none focus:border-indigo-500 focus:bg-indigo-50`}
+                  className={`w-full px-4 py-3 rounded-lg border ${currentAnswer?.date ? 'border-indigo-400' : ''} focus:outline-none focus:border-indigo-500`}
+                  style={{ backgroundColor: 'var(--bg-card)', borderColor: currentAnswer?.date ? '#818cf8' : 'var(--border-color)', color: 'var(--text-primary)' }}
                   required
                 />
               </div>
@@ -422,7 +426,7 @@ const InteractiveLifeEventsQuestionnaire = ({
                 <Button 
                   variant="ghost"
                   onClick={() => handleSkipQuestion(currentQuestion.id)}
-                  className="text-gray-500"
+                  className="text-muted"
                 >
                   Skip
                 </Button>

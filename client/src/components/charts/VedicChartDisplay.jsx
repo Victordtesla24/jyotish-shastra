@@ -59,16 +59,11 @@ const DIGNITY_SYMBOLS = {
   neutral: { symbol: '○', sanskrit: 'निर', meaning: 'Neutral' }
 };
 
-
-
-
-
-
 // Template-validated corner offsets for perfect kundli template alignment
 // Refined coordinates based on template analysis for corner-offsets for perfect alignment
 // Kept for template validation tests - required by vedic-chart-template-alignment.test.cjs
-// eslint-disable-next-line no-unused-vars
-const CORNER_OFFSETS = {
+// Exported for test validation - not used in runtime but required by test suite
+export const CORNER_OFFSETS = {
   primary: { x: 65, y: 60 },      // Top-right corner offset (template-validated)
   secondary: { x: 65, y: -60 },   // Bottom-right corner offset (template-validated)
   tertiary: { x: -65, y: 60 },    // Top-left corner offset (template-validated)
@@ -112,8 +107,6 @@ const HOUSE_POSITIONS = {
   12: { x: 155, y: 130 }                                   // Top left-upper quadrant (template-calibrated)
 };
 
-
-// Removed unused DIAMOND_FRAME constant
 
 /**
  * Process chart data to extract planetary positions
@@ -780,14 +773,14 @@ export default function VedicChartDisplay({
     const errorDetails = error.details || [];
     
     return (
-      <div className={`bg-red-50 border-2 border-red-200 rounded-lg p-6 text-center ${className}`} style={style}>
+      <div className={`bg-white/10 border-2 border-white/20 rounded-lg p-6 text-center ${className}`} style={style}>
         <div className="flex justify-center mb-4">
-          <FaTimesCircle className="text-4xl" style={{ color: 'var(--debilitated-color)' }} aria-hidden="true" />
+          <FaTimesCircle className="text-4xl" style={{ color: 'rgb(255, 255, 255)' }} aria-hidden="true" />
         </div>
-        <h3 className="text-lg font-semibold text-red-800 mb-2">Chart Rendering Error</h3>
-        <p className="text-red-700 mb-2">{errorMessage}</p>
+        <h3 className="text-lg font-semibold text-white mb-2">Chart Rendering Error</h3>
+        <p className="text-white mb-2">{errorMessage}</p>
         {errorDetails.length > 0 && (
-          <div className="text-red-600 text-sm mb-4 mt-2">
+          <div className="text-white text-sm mb-4 mt-2">
             <p className="font-semibold mb-1">Details:</p>
             <ul className="list-disc list-inside text-left">
               {errorDetails.map((detail, idx) => (
@@ -798,7 +791,7 @@ export default function VedicChartDisplay({
         )}
         <button
           onClick={() => window.location.reload()}
-          className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors mt-4"
+          className="bg-white/20 text-white px-4 py-2 rounded hover:bg-white/30 transition-colors mt-4"
         >
           Refresh Page
         </button>
@@ -826,7 +819,7 @@ export default function VedicChartDisplay({
         className={`rounded-lg p-6 ${className}`}
         style={{
           ...style,
-          backgroundColor: '#FFF8E1',
+          backgroundColor: '#1A1A1A',
           border: '2px solid #8B4513',
           minWidth: `${CHART_SIZE + 100}px`,
           width: 'max-content',

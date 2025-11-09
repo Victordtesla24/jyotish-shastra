@@ -1,0 +1,317 @@
+/**
+ * HomePage Sectioned Layout Styles
+ * Chris Cole-inspired section-based design for Jyotish Shastra
+ */
+
+/* Global Section Styling */
+.homepage-sectioned {
+  background-color: #000000;
+  color: #FFFFFF;
+  overflow-x: hidden;
+}
+
+.homepage-sectioned section {
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+  scroll-snap-align: start;
+}
+
+/* Smooth Scroll Container */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Section Content Wrapper */
+.section-content-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 80px 40px;
+}
+
+/* ============================================
+   HERO SECTION
+   ============================================ */
+.section-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Vertical Navigation - Chris Cole Style */
+.vertical-navigation-chris-cole {
+  position: fixed;
+  right: 15%;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.vertical-nav-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  align-items: flex-end;
+}
+
+.vertical-nav-item {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: visible; /* Changed from hidden to visible to prevent clipping */
+  /* FIX: Ensure no duplicate rendering or ghosting */
+  text-shadow: none !important;
+  transform: none !important;
+}
+
+/* FIX: Ensure no pseudo-elements causing duplication */
+.vertical-nav-item::before,
+.vertical-nav-item::after {
+  display: none !important;
+  content: none !important;
+}
+
+/* CHRIS COLE EXACT MENU SPECIFICATIONS - Navigation Headings */
+/* CRITICAL FIX: Single text rendering - no ghosting - OVERRIDDEN by chris-cole-enhancements.css */
+/* This file should not duplicate rules - chris-cole-enhancements.css has the authoritative rules */
+
+/* FIX: Pseudo-elements handled by chris-cole-enhancements.css - no duplication here */
+
+/* Hover effect handled by chris-cole-enhancements.css - no duplication here */
+
+/* StarLetterAnimation button styling */
+.chris-cole-nav-link {
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  position: relative !important;
+  /* FIX: Ensure no duplicate rendering or ghosting */
+  text-shadow: none !important;
+  transform: none !important;
+}
+
+/* FIX: Ensure no pseudo-elements on nav link causing duplication */
+.chris-cole-nav-link::before,
+.chris-cole-nav-link::after {
+  display: none !important;
+  content: none !important;
+}
+
+/* Flying letter styling (GSAP handles animation in HomePage.jsx) */
+.flying-letter {
+  display: inline-block !important;
+  will-change: transform, opacity;
+}
+
+/* ============================================
+   ABOUT SECTION
+   ============================================ */
+.section-about {
+  background-color: #000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chris-cole-biography {
+  animation: fadeInUp 1s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.chris-cole-specialties > div {
+  transition: all 0.3s ease;
+}
+
+.chris-cole-specialties > div:hover {
+  transform: translateY(-4px);
+}
+
+.chris-cole-specialties > div:hover h5 {
+  color: rgba(255, 255, 255, 1) !important;
+}
+
+/* ============================================
+   ANALYSIS SECTION
+   ============================================ */
+.section-analysis {
+  background-color: #000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ============================================
+   BIRTH CHART SECTION
+   ============================================ */
+.section-birth-chart {
+  background-color: #000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chris-cole-work-section {
+  animation: fadeInUp 1s ease-out 0.2s both;
+}
+
+/* ============================================
+   CONTACT SECTION
+   ============================================ */
+.section-contact {
+  background-color: #000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.section-contact form {
+  animation: fadeInUp 1s ease-out 0.3s both;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+/* Tablet (768px - 1023px) */
+@media (max-width: 1023px) {
+  .vertical-navigation-chris-cole {
+    right: 5%;
+  }
+
+  .chris-cole-nav-heading {
+    font-size: 48px !important;
+  }
+
+  .chris-cole-specialties {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+
+  .section-content-wrapper {
+    padding: 60px 30px;
+  }
+}
+
+/* Mobile (< 768px) */
+@media (max-width: 767px) {
+  .vertical-navigation-chris-cole {
+    position: relative;
+    right: auto;
+    top: auto;
+    transform: none;
+    margin: 60px auto;
+    align-items: center;
+  }
+
+  .vertical-nav-menu {
+    align-items: center;
+    gap: 24px;
+  }
+
+  .chris-cole-nav-heading {
+    font-size: 32px !important;
+    line-height: 48px !important;
+  }
+
+  .chris-cole-biography {
+    padding: 40px 30px !important;
+  }
+
+  .chris-cole-specialties {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 24px !important;
+  }
+
+  .chris-cole-work-section h1 {
+    font-size: 36px !important;
+  }
+
+  .section-content-wrapper {
+    padding: 40px 20px;
+  }
+
+  .section-contact h1 {
+    font-size: 36px !important;
+  }
+}
+
+/* ============================================
+   SCROLL INDICATORS
+   ============================================ */
+.scroll-indicator {
+  position: fixed;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  40% {
+    transform: translateX(-50%) translateY(-10px);
+  }
+  60% {
+    transform: translateX(-50%) translateY(-5px);
+  }
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+.vertical-nav-item:focus {
+  outline: 2px solid #FFD700;
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vertical-nav-item:active .chris-cole-nav-heading,
+  .chris-cole-biography,
+  .chris-cole-work-section,
+  .section-contact form {
+    animation: none !important;
+  }
+
+  .scroll-indicator {
+    animation: none !important;
+  }
+}
+
+/* ============================================
+   SECTION TRANSITIONS
+   ============================================ */
+section {
+  transition: opacity 0.6s ease-out;
+}
+
+section.section-visible {
+  opacity: 1;
+}
+
+section.section-hidden {
+  opacity: 0.3;
+}
+

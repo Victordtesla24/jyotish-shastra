@@ -1,0 +1,346 @@
+/**
+ * Chris Cole Enhancements CSS
+ * EXACTLY matching implementation plan specifications
+ * Implementation Plan: @implementation-plan-UI.md
+ */
+
+/* ============================================
+   GLOBAL RESET & BASE STYLES
+   ============================================ */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  background-color: #000000;
+  color: #FFFFFF;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* ============================================
+   HERO SECTION & STARFIELD
+   ============================================ */
+
+.hero-section {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #000000;
+}
+
+.starfield-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  background-color: transparent;
+}
+
+/* ============================================
+   SATURN PLANET & RINGS
+   ============================================ */
+
+:root {
+  --chris-cole-saturn-size: 500px;
+  --chris-cole-saturn-left: 27.3%;
+  --chris-cole-saturn-top: 40.1%;
+}
+
+body .saturn-chris-cole {
+  position: absolute !important;
+  width: var(--chris-cole-saturn-size) !important;
+  height: var(--chris-cole-saturn-size) !important;
+  top: var(--chris-cole-saturn-top) !important;
+  left: var(--chris-cole-saturn-left) !important;
+  margin: 0 !important;
+  transform: translate(-50%, -50%) !important;
+  opacity: 1 !important;
+  pointer-events: none !important;
+  z-index: 2 !important;
+}
+
+.planetary-animations-container-chris-cole {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 1;
+  background-color: transparent;
+}
+
+/* Saturn Rings Animation - IMPROVED smooth rotation */
+@keyframes saturn-rings-rotate {
+  from {
+    transform: rotate(-15deg);
+  }
+  to {
+    transform: rotate(345deg);
+  }
+}
+
+.saturn-rings {
+  animation: saturn-rings-rotate 120s linear infinite;
+  transform-origin: 100px 100px;
+  transform-box: fill-box;
+  will-change: transform;
+}
+
+@media (max-width: 1024px) {
+  :root {
+    --chris-cole-saturn-size: 400px;
+    --chris-cole-saturn-left: 25%;
+    --chris-cole-saturn-top: 38%;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --chris-cole-saturn-size: 300px;
+    --chris-cole-saturn-left: 50%;
+    --chris-cole-saturn-top: 30%;
+  }
+}
+
+/* ============================================
+   NAVIGATION MENU - FIX GHOSTING ISSUE
+   ============================================ */
+
+/* CRITICAL FIX: Remove all duplicate rendering sources */
+.vertical-nav-item {
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+  cursor: pointer !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  position: relative !important;
+  overflow: visible !important;
+  /* FIX: Remove all sources of duplication */
+  text-shadow: none !important;
+  transform: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+/* FIX: Disable all pseudo-elements that could cause duplication */
+.vertical-nav-item::before,
+.vertical-nav-item::after {
+  display: none !important;
+  content: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* CHRIS COLE EXACT MENU SPECIFICATIONS - Navigation Headings */
+/* CRITICAL FIX: Single text rendering - no ghosting - COMPLETE OVERRIDE */
+/* Maximum specificity to override all other rules */
+.chris-cole-nav-heading,
+.vertical-nav-item .chris-cole-nav-heading,
+.chris-cole-nav-link .chris-cole-nav-heading,
+.vertical-nav-item .chris-cole-nav-link .chris-cole-nav-heading,
+div.vertical-nav-item button.chris-cole-nav-link h1.chris-cole-nav-heading {
+  font-family: 'Roboto', sans-serif !important;
+  font-size: 63.968px !important;
+  font-weight: 100 !important;
+  color: rgba(255, 255, 255, 0.6) !important;
+  letter-spacing: 6px !important;
+  line-height: 89.5552px !important;
+  text-transform: uppercase !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: right !important;
+  display: block !important;
+  position: relative !important;
+  transition: color 0.3s ease !important;
+  /* CRITICAL FIX: Remove ALL duplication sources - maximum specificity */
+  text-shadow: none !important;
+  transform: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+  text-rendering: optimizeLegibility !important;
+  /* Ensure single rendering - no transforms or filters */
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+  /* Remove any potential duplication */
+  outline: none !important;
+  border: none !important;
+  background: transparent !important;
+  /* Force single text node */
+  white-space: nowrap !important;
+  overflow: visible !important;
+  /* CRITICAL: Force single layer rendering - prevent browser subpixel rendering issues */
+  isolation: isolate !important;
+  will-change: auto !important;
+  /* Remove any potential duplication from parent */
+  opacity: 1 !important;
+  visibility: visible !important;
+  /* CRITICAL: Force hardware acceleration - use translateZ(0) only, no other transforms */
+  -webkit-transform: translateZ(0) !important;
+  transform: translateZ(0) !important;
+  /* CRITICAL: Override any conflicting transform rules */
+  -webkit-transform-style: flat !important;
+  transform-style: flat !important;
+  /* CRITICAL: Prevent subpixel rendering that causes ghosting */
+  -webkit-font-feature-settings: normal !important;
+  font-feature-settings: normal !important;
+  /* CRITICAL: Ensure single text rendering layer */
+  contain: layout style paint !important;
+}
+
+/* FIX: Disable ALL pseudo-elements on headings - maximum specificity */
+.chris-cole-nav-heading::before,
+.chris-cole-nav-heading::after,
+.vertical-nav-item .chris-cole-nav-heading::before,
+.vertical-nav-item .chris-cole-nav-heading::after,
+.chris-cole-nav-link .chris-cole-nav-heading::before,
+.chris-cole-nav-link .chris-cole-nav-heading::after {
+  display: none !important;
+  content: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  position: absolute !important;
+  pointer-events: none !important;
+}
+
+/* Menu Hover Effect - Implementation Plan Requirement */
+/* CRITICAL: Only change color, no filters or transforms that could cause ghosting */
+.vertical-nav-item:hover .chris-cole-nav-heading,
+.chris-cole-nav-link:hover .chris-cole-nav-heading {
+  color: rgba(255, 255, 255, 1) !important;
+  /* NO filter or transform - causes ghosting */
+  filter: none !important;
+  transform: none !important;
+  text-shadow: none !important;
+}
+
+/* StarLetterAnimation button styling */
+/* CRITICAL: Ensure no duplication from button element */
+.chris-cole-nav-link {
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  cursor: pointer !important;
+  transition: color 0.3s ease !important;
+  position: relative !important;
+  /* FIX: Remove ALL duplication sources */
+  text-shadow: none !important;
+    transform: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+  outline: none !important;
+  /* Ensure single rendering */
+  display: block !important;
+  overflow: visible !important;
+}
+
+/* FIX: Disable ALL pseudo-elements on nav link - maximum specificity */
+.chris-cole-nav-link::before,
+.chris-cole-nav-link::after,
+.vertical-nav-item .chris-cole-nav-link::before,
+.vertical-nav-item .chris-cole-nav-link::after {
+    display: none !important;
+  content: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  position: absolute !important;
+  pointer-events: none !important;
+}
+
+/* Flying letter styling (GSAP handles animation in HomePage.jsx) */
+.flying-letter {
+  display: inline-block !important;
+  will-change: transform, opacity;
+}
+
+/* ============================================
+   STAR-TO-LETTER ANIMATION CANVAS
+   ============================================ */
+
+.star-letter-canvas {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  pointer-events: none !important;
+  z-index: 250 !important;
+  display: block !important;
+}
+
+/* ============================================
+   HERO TITLE
+   ============================================ */
+
+.hero-title {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Roboto Condensed', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  z-index: 10;
+  margin: 0;
+  padding: 0;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 1023px) {
+  .chris-cole-nav-heading {
+    font-size: 48px !important;
+    line-height: 67.2px !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .chris-cole-nav-heading {
+    font-size: 32px !important;
+    line-height: 48px !important;
+    letter-spacing: 4px !important;
+}
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+
+.vertical-nav-item:focus {
+  outline: 2px solid #FFD700;
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .saturn-rings {
+    animation: none !important;
+  }
+  
+  .flying-letter {
+    animation: none !important;
+}
+}

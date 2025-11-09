@@ -3,7 +3,7 @@
  * Production-ready component with comprehensive validation and error handling
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { FaUser, FaCalendarAlt, FaClock, FaMapMarkerAlt, FaVenusMars, FaExclamationTriangle, FaTrash, FaGlobe } from 'react-icons/fa';
 import geocodingService from '../../services/geocodingService.js';
 import UIDataSaver from './UIDataSaver.js';
@@ -16,7 +16,8 @@ import './BirthDataForm.css';
 const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
   // Use singleton instances of our UI components
   const dataSaver = UIDataSaver; // Already a singleton instance
-  const dataInterpreter = new UIToAPIDataInterpreter(); // Create instance of the class
+  // Use useMemo to ensure stable instance for testing (allows mocks to work correctly)
+  const dataInterpreter = useMemo(() => new UIToAPIDataInterpreter(), []);
 
   const [formData, setFormData] = useState({
     name: initialData.name || '',
@@ -346,13 +347,15 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
         if (validationResult?.errors && Array.isArray(validationResult.errors)) {
           validationResult.errors.forEach(error => {
             if (typeof error === 'object' && error.field && error.message) {
+              // Handle object errors with field and message properties
               errorMap[error.field] = error.message;
             } else if (typeof error === 'string') {
               // For string errors, try to determine the field from the error message
+              // Handle variations: "date of birth" / "birth date" / "birth date"
               const lowerError = error.toLowerCase();
-              if (lowerError.includes('date of birth')) {
+              if (lowerError.includes('date of birth') || lowerError.includes('birth date') || lowerError.includes('valid birth date')) {
                 errorMap.dateOfBirth = error;
-              } else if (lowerError.includes('time of birth')) {
+              } else if (lowerError.includes('time of birth') || lowerError.includes('birth time') || lowerError.includes('valid birth time')) {
                 errorMap.timeOfBirth = error;
               } else if (lowerError.includes('location') || lowerError.includes('coordinates')) {
                 errorMap.placeOfBirth = error;
@@ -365,6 +368,7 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
         } else {
           errorMap.submit = 'Validation failed. Please check your input.';
         }
+        // CRITICAL FIX: Set errors and loading state synchronously to ensure form re-renders
         setErrors(errorMap);
         setLoading(false);
         return;
@@ -499,7 +503,7 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
             <label htmlFor="name" className="form-label-vedic flex items-center space-x-2">
               <FaUser className="text-vedic-gold" style={{ color: 'var(--vedic-gold)' }} />
               <span>Name</span>
-              <span className="text-xs text-white/60 font-normal">(Optional)</span>
+              <span className="text-xs text-muted font-normal">(Optional)</span>
             </label>
             <div className="relative">
               <input
@@ -534,7 +538,7 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
             <label htmlFor="gender" className="form-label-vedic flex items-center space-x-2">
               <FaVenusMars className="text-vedic-gold" style={{ color: 'var(--vedic-gold)' }} />
               <span>Gender</span>
-              <span className="text-xs text-white/60 font-normal">(Optional)</span>
+              <span className="text-xs text-muted font-normal">(Optional)</span>
             </label>
             <div className="relative">
               <select
@@ -638,7 +642,7 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
                 <FaClock className="text-vedic-gold" style={{ color: 'var(--vedic-gold)' }} />
               </div>
             </div>
-            <small id="timeOfBirth-help" className="text-white/60 text-xs mt-1 block">
+            <small id="timeOfBirth-help" className="text-muted text-xs mt-1 block">
               Use 24-hour format (HH:MM) for precise calculations
             </small>
             {errors.timeOfBirth && (
@@ -661,6 +665,7 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
           </label>
           <div className="relative">
             <LocationAutoComplete
+              id="placeOfBirth"
               value={formData.placeOfBirth}
               onChange={(value) => handleChange({ target: { name: 'placeOfBirth', value } })}
               onLocationSelect={(location) => {
@@ -700,7 +705,7 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
 
           {/* Geocoding Status */}
           {geocoding && (
-            <div className="flex items-center space-x-2 mt-2 text-sm text-white/60">
+            <div className="flex items-center space-x-2 mt-2 text-sm text-muted">
               <div className="loading-vedic">
                 <div className="spinner-vedic w-4 h-4"></div>
               </div>
@@ -717,13 +722,15 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
 
           {/* Location Suggestions */}
           {locationSuggestions.length > 0 && (
-            <div className="mt-2 p-3 bg-white/10 rounded-lg border border-white/20">
-              <p className="text-white/80 text-sm mb-2">Did you mean:</p>
+            <div className="mt-2 p-3 rounded-lg border" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
+              <p className="text-secondary text-sm mb-2">Did you mean:</p>
               <ul className="space-y-1">
                 {locationSuggestions.map((suggestion, index) => (
                   <li
                     key={index}
-                    className="text-sm text-white/70 hover:text-white cursor-pointer p-1 rounded hover:bg-white/10 transition-colors"
+                    className="text-sm text-secondary hover:text-primary cursor-pointer p-1 rounded transition-colors"
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-card-hover)'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                     onClick={() => {
                       setFormData(prev => ({ ...prev, placeOfBirth: suggestion }));
                       setLocationSuggestions([]);
@@ -767,8 +774,6 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
             disabled={
               loading ||
               geocoding ||
-              !formData.dateOfBirth ||
-              !formData.timeOfBirth ||
               !coordinates?.latitude ||
               !coordinates?.longitude
             }
@@ -805,8 +810,8 @@ const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {
         </div>
 
         {/* Sacred Footer */}
-        <div className="text-center pt-6 border-t border-white/10">
-          <p className="text-white/60 text-sm font-devanagari">
+        <div className="text-center pt-6 border-t" style={{ borderColor: 'var(--border-color)' }}>
+          <p className="text-muted text-sm font-devanagari">
             🕉️ All calculations performed using Swiss Ephemeris for astronomical precision 🕉️
           </p>
         </div>

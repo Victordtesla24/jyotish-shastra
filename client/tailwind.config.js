@@ -125,6 +125,10 @@ module.exports = {
         'cinzel': ['Cinzel', 'serif'],
         'devanagari': ['Noto Sans Devanagari', 'sans-serif'],
         'inter': ['Inter', 'sans-serif'],
+        'roboto': ['Roboto', 'sans-serif'],
+        'roboto-condensed': ['Roboto Condensed', 'sans-serif'],
+        'roboto-mono': ['Roboto Mono', 'monospace'],
+        'sans': ['Roboto', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
 
       spacing: {

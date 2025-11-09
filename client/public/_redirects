@@ -1,4 +1,0 @@
-# React Router redirects for Render static site
-# All routes should serve index.html to enable client-side routing
-/*    /index.html   200
-

@@ -5,6 +5,7 @@
 
 module.exports = {
   devServer: {
+    port: 3002,
     allowedHosts: 'all',
     historyApiFallback: true, // Enable client-side routing for React Router
     client: {
