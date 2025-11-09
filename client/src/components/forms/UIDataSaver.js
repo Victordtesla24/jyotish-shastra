@@ -217,7 +217,10 @@ const prepareBirthDataForStorage = (data) => {
     timeOfBirth: normalized.data.timeOfBirth,
     latitude: normalized.data.latitude,
     longitude: normalized.data.longitude,
-    timezone: normalized.data.timezone
+    timezone: normalized.data.timezone,
+    // Include placeOfBirth if available (required by API validator)
+    ...(data.placeOfBirth && { placeOfBirth: data.placeOfBirth }),
+    ...(data.gender && { gender: data.gender })
   };
 };
 

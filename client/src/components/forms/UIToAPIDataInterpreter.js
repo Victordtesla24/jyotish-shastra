@@ -111,7 +111,8 @@ class UIToAPIDataInterpreter {
         ...(validatedData.longitude && { longitude: validatedData.longitude }),
         ...(validatedData.timezone && { timezone: validatedData.timezone }),
         ...(validatedData.placeOfBirth && { placeOfBirth: validatedData.placeOfBirth }),
-        ...(validatedData.gender && { gender: validatedData.gender }),
+        // Only include gender if it's a valid API value (exclude "prefer_not_to_say")
+        ...(validatedData.gender && validatedData.gender !== 'prefer_not_to_say' && { gender: validatedData.gender }),
         formatted: true
       };
 

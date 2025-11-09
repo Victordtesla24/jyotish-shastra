@@ -31,8 +31,8 @@ const ComprehensiveAnalysisPage = () => {
         return;
       }
 
-      const birthData = UIDataSaver.getBirthData();
-      if (!birthData) {
+      const birthDataStamped = UIDataSaver.getBirthData();
+      if (!birthDataStamped || !birthDataStamped.data) {
         const errorMessage = 'No birth data found. Please generate your birth chart first.';
         setError(errorMessage);
         setIsLoading(false);
@@ -43,12 +43,21 @@ const ComprehensiveAnalysisPage = () => {
         return;
       }
 
+      // Extract the actual birth data from the stamped object
+      const birthData = birthDataStamped.data;
+
+      // Filter out invalid gender value ("prefer_not_to_say" is not accepted by API)
+      const apiPayload = { ...birthData };
+      if (apiPayload.gender === 'prefer_not_to_say') {
+        delete apiPayload.gender;
+      }
+
       const response = await fetch(getApiUrl('/api/v1/analysis/comprehensive'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(birthData),
+        body: JSON.stringify(apiPayload),
       });
 
       if (!response.ok) {
@@ -63,19 +72,25 @@ const ComprehensiveAnalysisPage = () => {
 
       const apiData = await response.json();
 
-      if (!apiData.analysis || !apiData.analysis.sections || Object.keys(apiData.analysis.sections).length === 0) {
+      // Handle nested response structure: { success: true, data: { success: true, analysis: {...} } }
+      const actualApiData = apiData.data || apiData;
+
+      if (!actualApiData.analysis || !actualApiData.analysis.sections || Object.keys(actualApiData.analysis.sections).length === 0) {
         throw new Error('Sections data is missing from API response. Expected analysis.sections with 8 sections (section1-section8).');
       }
 
-      const processedData = ResponseDataToUIDisplayAnalyser.processComprehensiveAnalysis(apiData);
+      const processedData = ResponseDataToUIDisplayAnalyser.processComprehensiveAnalysis(actualApiData);
 
-      if (!processedData || !processedData.sectionsData || Object.keys(processedData.sectionsData).length === 0) {
+      // Check for sections or sectionsData (processor returns 'sections')
+      if (!processedData || (!processedData.sections && !processedData.sectionsData) || 
+          (processedData.sections && Object.keys(processedData.sections).length === 0) ||
+          (processedData.sectionsData && Object.keys(processedData.sectionsData).length === 0)) {
         throw new Error(
           'Failed to load comprehensive analysis. Please verify your birth data and try again.'
         );
       }
 
-      UIDataSaver.saveComprehensiveAnalysis(apiData);
+      UIDataSaver.saveComprehensiveAnalysis(actualApiData);
       setAnalysisData(processedData);
     } catch (err) {
       const errorMessage = err.message || 'Failed to load comprehensive analysis. Please verify your birth data and try again.';

@@ -7,7 +7,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { FaMapMarkerAlt, FaSpinner } from 'react-icons/fa';
 import geocodingService from '../../services/geocodingService.js';
-import '../../styles/vedic-design-system.css';
 
 const LocationAutoComplete = ({
   value = '',

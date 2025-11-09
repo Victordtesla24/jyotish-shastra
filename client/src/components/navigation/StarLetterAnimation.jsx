@@ -10,46 +10,64 @@ import { createPortal } from 'react-dom';
  * to form the first letter of the menu item name in the star field
  * 
  * Pattern:
- * - ABOUT: "A" on RIGHT side (x: 0.55-0.65)
- * - BIRTH CHART: "B" on LEFT side (x: 0.05-0.15)
- * - ANALYSIS: "A" on LEFT side (x: 0.05-0.15) - using A2 coordinates
- * - CONTACT: "C" on RIGHT side (x: 0.55-0.65)
+ * - ABOUT: "A" on RIGHT side (x: 0.60-0.70)
+ * - BIRTH CHART: "B" on LEFT side (x: 0.02-0.12)
+ * - ANALYSIS: "A" on LEFT side (x: 0.02-0.12) - using A2 coordinates
+ * - BTR: "B" on RIGHT side (x: 0.60-0.70) - using B2 coordinates
+ * - CONTACT: "C" on RIGHT side (x: 0.60-0.70)
  */
 
 // Letter coordinate definitions (normalized 0-1)
 // Positioned in star field areas - away from menu (right: 15% = x: 0.85) and Saturn (left: 27.3% = x: 0.273)
-// Left-side letters: far left star field (x: 0.05-0.15)
-// Right-side letters: center-right star field (x: 0.55-0.65)
+// Left-side letters: far left star field (x: 0.02-0.12)
+// Right-side letters: center star field (x: 0.60-0.70) - repositioned to avoid menu overlap
+// Updated coordinates to prevent overlap with:
+//   - Saturn planet zone: x: 0.15-0.40, y: 0.25-0.55
+//   - Menu zone: x: 0.80-0.95, y: 0.30-0.70
 const LETTER_COORDS = {
+  // Right‑side "A" (for ABOUT, etc.) repositioned to x: 0.60-0.70 to avoid menu at x: 0.80-0.95
   A: [
-    { x: 0.55, y: 0.52 },  // Bottom left - center-right star field
-    { x: 0.60, y: 0.28 },  // Apex - center-right star field
-    { x: 0.65, y: 0.52 },  // Bottom right - center-right star field
-    { x: 0.57, y: 0.42 },  // Crossbar left - center-right star field
-    { x: 0.63, y: 0.42 }   // Crossbar right - center-right star field
+    { x: 0.60, y: 0.60 }, // bottom left
+    { x: 0.65, y: 0.36 }, // apex
+    { x: 0.70, y: 0.60 }, // bottom right
+    { x: 0.62, y: 0.50 }, // crossbar left
+    { x: 0.68, y: 0.50 }  // crossbar right
   ],
+  // Left‑side "A" (A2) placed near the far left of the star field (safe zone)
   A2: [
-    { x: 0.05, y: 0.52 },  // Bottom left - far left star field
-    { x: 0.10, y: 0.28 },  // Apex - far left star field
-    { x: 0.15, y: 0.52 },  // Bottom right - far left star field
-    { x: 0.07, y: 0.42 },  // Crossbar left - far left star field
-    { x: 0.13, y: 0.42 }   // Crossbar right - far left star field
+    { x: 0.02, y: 0.60 }, // bottom left
+    { x: 0.07, y: 0.36 }, // apex
+    { x: 0.12, y: 0.60 }, // bottom right
+    { x: 0.04, y: 0.50 }, // crossbar left
+    { x: 0.10, y: 0.50 }  // crossbar right
   ],
+  // Left‑side "B" in safe zone far left
   B: [
-    { x: 0.07, y: 0.30 },  // Top left vertical - far left star field
-    { x: 0.07, y: 0.42 },  // Middle left vertical - far left star field
-    { x: 0.07, y: 0.54 },  // Bottom left vertical - far left star field
-    { x: 0.13, y: 0.32 },  // Top right curve - far left star field
-    { x: 0.13, y: 0.40 },  // Upper middle right - far left star field
-    { x: 0.15, y: 0.46 },  // Lower middle right - far left star field
-    { x: 0.15, y: 0.52 }   // Bottom right curve - far left star field
+    { x: 0.04, y: 0.38 }, // top left vertical
+    { x: 0.04, y: 0.50 }, // middle left vertical
+    { x: 0.04, y: 0.62 }, // bottom left vertical
+    { x: 0.10, y: 0.40 }, // top right curve
+    { x: 0.10, y: 0.48 }, // upper middle right
+    { x: 0.12, y: 0.54 }, // lower middle right
+    { x: 0.12, y: 0.60 }  // bottom right curve
   ],
+  // Right‑side "B" (B2) for BTR menu item - repositioned to x: 0.60-0.70 to avoid menu at x: 0.80-0.95
+  B2: [
+    { x: 0.60, y: 0.38 }, // top left vertical
+    { x: 0.60, y: 0.50 }, // middle left vertical
+    { x: 0.60, y: 0.62 }, // bottom left vertical
+    { x: 0.66, y: 0.40 }, // top right curve
+    { x: 0.66, y: 0.48 }, // upper middle right
+    { x: 0.68, y: 0.54 }, // lower middle right
+    { x: 0.68, y: 0.60 }  // bottom right curve
+  ],
+  // Right‑side "C" repositioned to x: 0.60-0.70 to avoid menu at x: 0.80-0.95
   C: [
-    { x: 0.60, y: 0.32 },  // Top right - center-right star field
-    { x: 0.56, y: 0.35 },  // Top curve - center-right star field
-    { x: 0.54, y: 0.42 },  // Middle left - center-right star field
-    { x: 0.56, y: 0.49 },  // Bottom curve - center-right star field
-    { x: 0.60, y: 0.52 }   // Bottom right - center-right star field
+    { x: 0.65, y: 0.40 }, // top right
+    { x: 0.61, y: 0.43 }, // top curve
+    { x: 0.60, y: 0.50 }, // middle left
+    { x: 0.61, y: 0.57 }, // bottom curve
+    { x: 0.65, y: 0.60 }  // bottom right
   ]
 };
 
@@ -66,6 +84,16 @@ const LETTER_SEGMENTS = {
     [3, 4]   // Crossbar
   ],
   B: [
+    [0, 1],  // Top to middle vertical line
+    [1, 2],  // Middle to bottom vertical line
+    [0, 3],  // Top left to top right curve
+    [3, 4],  // Top right curve to middle
+    [1, 4],  // Middle left to middle right
+    [4, 5],  // Middle to lower curve
+    [5, 6],  // Lower curve to bottom
+    [2, 6]   // Bottom left to bottom right
+  ],
+  B2: [
     [0, 1],  // Top to middle vertical line
     [1, 2],  // Middle to bottom vertical line
     [0, 3],  // Top left to top right curve
@@ -279,8 +307,9 @@ const StarLetterAnimation = ({
             width: '100vw',
             height: '100vh',
             pointerEvents: 'none',
-            zIndex: 250,
+            zIndex: 50,
             display: isHovered ? 'block' : 'none',
+            visibility: isHovered ? 'visible' : 'hidden',
           }}
           aria-hidden="true"
         />,

@@ -17,6 +17,8 @@ import './styles/chris-cole-enhancements.css';
  * Routes configured for Chris Cole-inspired design
  */
 function App() {
+  // Show preloader on every page load/refresh
+  // Track if preloader animation has completed
   const [isPreloaderComplete, setIsPreloaderComplete] = useState(false);
 
   const handlePreloaderComplete = () => {
@@ -30,6 +32,7 @@ function App() {
           <AnalysisProvider>
             {!isPreloaderComplete && (
               <PreLoader 
+                key="preloader"
                 delay={2000} 
                 onComplete={handlePreloaderComplete} 
               />

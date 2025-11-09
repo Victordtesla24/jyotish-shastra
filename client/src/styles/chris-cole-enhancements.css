@@ -282,7 +282,7 @@ div.vertical-nav-item button.chris-cole-nav-link h1.chris-cole-nav-heading {
   width: 100vw !important;
   height: 100vh !important;
   pointer-events: none !important;
-  z-index: 250 !important;
+  z-index: 50 !important;
   display: block !important;
 }
 

@@ -275,7 +275,7 @@ const SaturnCanvasAnimation = ({ className = '', style = {} }) => {
 
   return (
     <div
-      className={`saturn-canvas-container ${className}`.trim()}
+      className={`saturn-canvas-container parallax-bg ${className}`.trim()}
       style={{
         position: 'absolute',
         top: 0,

@@ -3,16 +3,19 @@ import { useNavigate } from 'react-router-dom';
 import VedicChartDisplay from '../components/charts/VedicChartDisplay.jsx';
 import { useChart } from '../contexts/ChartContext.js';
 import UIDataSaver from '../components/forms/UIDataSaver.js';
+import BirthDataForm from '../components/forms/BirthDataForm.js';
+import chartService from '../services/chartService.js';
 import NotificationToast from '../components/ui/NotificationToast.jsx';
 import HeroSection from '../components/ui/HeroSection.jsx';
 import { initScrollReveals, cleanupScrollTriggers } from '../lib/scroll.js';
 
 const ChartPage = () => {
   const navigate = useNavigate();
-  const { currentChart, isLoading, error } = useChart();
+  const { currentChart, isLoading, error, setCurrentChart, setLoading, setError } = useChart();
   const [chartData, setChartData] = useState(null);
   const [redirectToast, setRedirectToast] = useState(null);
   const [showRedirectFallback, setShowRedirectFallback] = useState(false);
+  const [isGeneratingChart, setIsGeneratingChart] = useState(false);
 
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -37,11 +40,48 @@ const ChartPage = () => {
     };
   }, []);
 
+  // Handle chart form submission
+  const handleChartSubmit = async (birthData) => {
+    try {
+      setIsGeneratingChart(true);
+      setLoading(true);
+      setError(null);
+
+      const result = await chartService.generateChart(birthData);
+      
+      if (result && result.raw && result.transformed) {
+        // Store the raw API response in the format ChartPage expects
+        const chartId = result.transformed.chartId || `chart_${Date.now()}`;
+        const chartToStore = {
+          id: chartId,
+          chartData: result.raw, // Store raw API response with success and data structure
+          birthData: birthData,
+          generatedAt: new Date().toISOString()
+        };
+        
+        // Note: BirthDataForm already calls setBirthData before onSubmit,
+        // so birth data should already be saved in UIDataSaver
+        
+        setCurrentChart(chartToStore);
+        setIsGeneratingChart(false);
+        setLoading(false);
+      } else {
+        throw new Error('Invalid chart generation response');
+      }
+    } catch (err) {
+      console.error('Chart generation error:', err);
+      setError({
+        message: err.message || 'Failed to generate chart',
+        code: 'CHART_GENERATION_ERROR'
+      });
+      setIsGeneratingChart(false);
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!currentChart) {
-      if (!showRedirectFallback) {
-        navigate('/');
-      }
+      // Don't redirect - show form instead
       return;
     }
 
@@ -50,7 +90,7 @@ const ChartPage = () => {
     const apiResponse = currentChart.chartData;
 
     if (!currentChart || !currentChart.chartData) {
-      navigate('/');
+      // Chart data is missing, form will be shown by the conditional render above
       return;
     }
 
@@ -103,6 +143,28 @@ const ChartPage = () => {
     />
   ) : null;
 
+  // Show birth data form when no chart exists
+  if (!currentChart && !showRedirectFallback) {
+    return (
+      <HeroSection title="Generate Your Birth Chart" subtitle="Enter your birth details to create your Vedic astrology chart">
+        {toastNode}
+        <div className="chris-cole-page-content">
+          <div className="chris-cole-card" style={{ maxWidth: '800px', margin: '0 auto' }}>
+            <BirthDataForm
+              onSubmit={handleChartSubmit}
+              onError={(err) => {
+                setError({
+                  message: err.message || 'Failed to process birth data',
+                  code: 'FORM_ERROR'
+                });
+              }}
+            />
+          </div>
+        </div>
+      </HeroSection>
+    );
+  }
+
   if (!currentChart && showRedirectFallback) {
     return (
       <HeroSection title="Fresh Chart Required" subtitle="Please regenerate your birth chart">
@@ -112,19 +174,22 @@ const ChartPage = () => {
             <p className="chris-cole-text">
               We could not find a recent chart in this browser session. Please regenerate your birth chart to explore the analysis features.
             </p>
-            <button
-              onClick={() => navigate('/')}
-              className="chris-cole-button"
-            >
-              Go to Birth Data Form
-            </button>
+            <BirthDataForm
+              onSubmit={handleChartSubmit}
+              onError={(err) => {
+                setError({
+                  message: err.message || 'Failed to process birth data',
+                  code: 'FORM_ERROR'
+                });
+              }}
+            />
           </div>
         </div>
       </HeroSection>
     );
   }
 
-  if (isLoading) {
+  if (isLoading || isGeneratingChart) {
     return (
       <HeroSection title="Loading Chart" subtitle="Please wait...">
         {toastNode}

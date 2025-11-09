@@ -10,7 +10,6 @@ import UIDataSaver from './UIDataSaver.js';
 import UIToAPIDataInterpreter from './UIToAPIDataInterpreter.js';
 import Tooltip from '../ui/Tooltip.jsx';
 import LocationAutoComplete from '../ui/LocationAutoComplete.jsx';
-import '../../styles/vedic-design-system.css';
 import './BirthDataForm.css';
 
 const BirthDataForm = ({ onSubmit, onError, initialData = {} }) => {

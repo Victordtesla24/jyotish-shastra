@@ -114,7 +114,7 @@ const HomePage = () => {
       ref: btrRef,
       id: 'birth-time-rectification',
       label: 'BTR', 
-      letter: 'R', 
+      letter: 'B2', 
       position: 'right',
       key: 'btr'
     },
@@ -168,7 +168,7 @@ const HomePage = () => {
       {/* ABOUT SECTION */}
       <section ref={aboutRef} id="about" className="section-about">
         <div className="section-content-wrapper">
-          <div className="chris-cole-biography" style={{
+          <div className="chris-cole-biography reveal" style={{
             border: '1px solid rgba(255, 255, 255, 0.35)',
             padding: '60px 80px',
             maxWidth: '700px',
@@ -199,7 +199,7 @@ const HomePage = () => {
       {/* BIRTH CHART SECTION */}
       <section ref={birthChartRef} id="birth-chart" className="section-birth-chart">
         <div className="section-content-wrapper">
-          <div className="chris-cole-work-section" style={{
+          <div className="chris-cole-work-section reveal" style={{
             textAlign: 'center',
             marginTop: '80px',
             marginBottom: '40px'
@@ -236,7 +236,7 @@ const HomePage = () => {
       {/* ANALYSIS SECTION */}
       <section ref={analysisRef} id="analysis" className="section-analysis">
         <div className="section-content-wrapper">
-          <div className="chris-cole-work-section" style={{
+          <div className="chris-cole-work-section reveal" style={{
             textAlign: 'center',
             marginTop: '80px',
             marginBottom: '40px'
@@ -273,7 +273,7 @@ const HomePage = () => {
       {/* BIRTH TIME RECTIFICATION SECTION */}
       <section ref={btrRef} id="birth-time-rectification" className="section-btr">
         <div className="section-content-wrapper">
-          <div className="chris-cole-work-section" style={{
+          <div className="chris-cole-work-section reveal" style={{
             textAlign: 'center',
             marginTop: '80px',
             marginBottom: '40px'
@@ -310,7 +310,7 @@ const HomePage = () => {
       {/* CONTACT SECTION */}
       <section ref={contactRef} id="contact" className="section-contact">
         <div className="section-content-wrapper">
-          <div style={{
+          <div className="reveal" style={{
             maxWidth: '600px',
             margin: '0 auto',
             padding: '80px 40px'
