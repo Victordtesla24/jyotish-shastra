@@ -270,6 +270,43 @@ const HomePage = () => {
         </div>
       </section>
 
+      {/* BIRTH TIME RECTIFICATION SECTION */}
+      <section ref={btrRef} id="birth-time-rectification" className="section-btr">
+        <div className="section-content-wrapper">
+          <div className="chris-cole-work-section" style={{
+            textAlign: 'center',
+            marginTop: '80px',
+            marginBottom: '40px'
+          }}>
+            <h1 style={{
+              fontFamily: "'Roboto', sans-serif",
+              fontSize: '63.968px',
+              fontWeight: 100,
+              color: 'rgba(255, 255, 255, 0.6)',
+              letterSpacing: '6px',
+              textTransform: 'uppercase',
+              marginBottom: '24px',
+              cursor: 'pointer'
+            }}
+            onClick={() => navigate('/birth-time-rectification')}
+            >
+              BTR
+            </h1>
+            <h5 style={{
+              fontFamily: "'Roboto Condensed', sans-serif",
+              fontSize: '16px',
+              fontWeight: 300,
+              color: 'rgba(255, 255, 255, 0.5)',
+              letterSpacing: '2px',
+              textTransform: 'uppercase',
+              marginBottom: '60px'
+            }}>
+              (BIRTH TIME RECTIFICATION)
+            </h5>
+          </div>
+        </div>
+      </section>
+
       {/* CONTACT SECTION */}
       <section ref={contactRef} id="contact" className="section-contact">
         <div className="section-content-wrapper">
