@@ -26,10 +26,6 @@ const PreLoader = ({ onComplete, delay = MIN_VISIBLE_DURATION }) => {
   const progressTimerRef = useRef(null);
 
   useEffect(() => {
-    console.log('[PreLoader] Mounted - Starting animation with delay:', delay);
-  }, [delay]);
-
-  useEffect(() => {
     // Ensure the preloader remains visible at least for the configured delay
     const visibleDuration = Math.max(delay, MIN_VISIBLE_DURATION);
     // Interval for updating progress
