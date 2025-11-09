@@ -335,6 +335,59 @@ div.vertical-nav-item button.chris-cole-nav-link h1.chris-cole-nav-heading {
   border-radius: 4px;
 }
 
+/* ============================================
+   PRELOADER - CHRIS COLE INSPIRED
+   Matching hellochriscole.webflow.io design
+   ============================================ */
+
+.loading-indicator {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #000000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  opacity: 1;
+  transition: opacity 0.5s ease-out;
+}
+
+.loading-indicator[style*="display: none"] {
+  opacity: 0;
+}
+
+.loading-text {
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 300;
+  letter-spacing: 2px;
+  text-transform: lowercase;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.loading-bar {
+  width: 100px;
+  height: 2px;
+  background-color: rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.loading-progress {
+  height: 2px;
+  background-color: rgba(255, 255, 255, 0.9);
+  transition: width 0.1s linear;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .saturn-rings {
     animation: none !important;
@@ -342,5 +395,9 @@ div.vertical-nav-item button.chris-cole-nav-link h1.chris-cole-nav-heading {
   
   .flying-letter {
     animation: none !important;
-}
+  }
+
+  .loading-progress {
+    transition: none !important;
+  }
 }
