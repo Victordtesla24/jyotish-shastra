@@ -19,6 +19,7 @@ const HomePage = () => {
   const aboutRef = useRef(null);
   const birthChartRef = useRef(null);
   const analysisRef = useRef(null);
+  const btrRef = useRef(null);
   const contactRef = useRef(null);
   const [hoveredItem, setHoveredItem] = useState(null);
 
@@ -83,7 +84,7 @@ const HomePage = () => {
     });
   };
 
-  // Navigation items matching the image: ABOUT, BIRTH CHART, ANALYSIS, CONTACT
+  // Navigation items matching the image: ABOUT, BIRTH CHART, ANALYSIS, BTR, CONTACT
   const navItems = [
     { 
       ref: aboutRef,
@@ -108,6 +109,14 @@ const HomePage = () => {
       letter: 'A2', 
       position: 'left',
       key: 'analysis'
+    },
+    { 
+      ref: btrRef,
+      id: 'birth-time-rectification',
+      label: 'BTR', 
+      letter: 'R', 
+      position: 'right',
+      key: 'btr'
     },
     { 
       ref: contactRef,
