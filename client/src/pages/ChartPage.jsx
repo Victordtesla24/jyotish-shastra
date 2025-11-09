@@ -1,64 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import VedicLoadingSpinner from '../components/ui';
 import VedicChartDisplay from '../components/charts/VedicChartDisplay.jsx';
 import { useChart } from '../contexts/ChartContext.js';
 import UIDataSaver from '../components/forms/UIDataSaver.js';
 import NotificationToast from '../components/ui/NotificationToast.jsx';
-import PlanetaryAnimations from '../components/ui/PlanetaryAnimations.jsx';
+import HeroSection from '../components/ui/HeroSection.jsx';
 import { initScrollReveals, cleanupScrollTriggers } from '../lib/scroll.js';
-
-// Error Boundary Component for ChartPage
-class ChartPageErrorBoundary extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false, error: null, errorInfo: null };
-  }
-
-  static getDerivedStateFromError(error) {
-    return { hasError: true };
-  }
-
-  componentDidCatch(error, errorInfo) {
-    console.error('🚨 ChartPage Error Boundary caught error:', error);
-    console.error('Error Info:', errorInfo);
-    this.setState({
-      error: error,
-      errorInfo: errorInfo
-    });
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div className="min-h-screen relative overflow-hidden flex items-center justify-center">
-          <PlanetaryAnimations count={8} />
-          <div className="text-center p-8">
-            <h1 className="text-4xl font-cinzel text-gold mb-4">🔮 Cosmic Disturbance Detected</h1>
-            <p className="text-lg text-saffron mb-6">The stars seem to be misaligned. Please refresh the page to restore harmony.</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="btn-primary px-8 py-3 bg-gradient-to-r from-saffron to-gold text-white hover:shadow-celestial hover:-translate-y-1 transition-all duration-300 rounded-xl font-cinzel font-medium"
-            >
-              Restore Cosmic Balance
-            </button>
-            {this.state.error && (
-              <details className="mt-8 text-left max-w-2xl mx-auto">
-                <summary className="cursor-pointer text-saffron">Error Details</summary>
-                <pre className="mt-4 p-4 bg-black bg-opacity-30 rounded text-xs overflow-auto">
-                  {this.state.error.toString()}
-                  {this.state.errorInfo && this.state.errorInfo.componentStack}
-                </pre>
-              </details>
-            )}
-          </div>
-        </div>
-      );
-    }
-
-    return this.props.children;
-  }
-}
 
 const ChartPage = () => {
   const navigate = useNavigate();
@@ -82,7 +29,6 @@ const ChartPage = () => {
     }
   }, [currentChart]);
 
-  // Initialize scroll/parallax effects
   useEffect(() => {
     initScrollReveals();
     
@@ -101,60 +47,25 @@ const ChartPage = () => {
 
     setShowRedirectFallback(false);
 
-    // Extract the actual chart data from the API response
     const apiResponse = currentChart.chartData;
-    console.log('🔍 ChartPage: Full currentChart data:', currentChart);
-    console.log('🔍 ChartPage: API Response:', apiResponse);
 
-    // Production-grade: Verify minimal session requirements
-    const sessionKeys = Object.keys(sessionStorage);
-    const hasGenerated = sessionKeys.includes('jyotish_chart_generated');
-    
-    console.log('🔍 ChartPage: Session verification:', {
-      hasGenerated,
-      hasCurrentChart: !!currentChart
-    });
-
-    // Check navigation requirements - if no currentChart, redirect
     if (!currentChart || !currentChart.chartData) {
-      console.warn('⚠️ ChartPage: No chart data available, redirecting to home');
       navigate('/');
       return;
     }
 
-    // Enhanced response extraction with comprehensive fallback checks
     if (apiResponse && apiResponse.success) {
-      // Handle multiple response structure variations
       const chartData = apiResponse.data || apiResponse;
       
       if (chartData) {
-        console.log('✅ ChartPage: Using chart data:', chartData);
-        console.log('📋 Birth Data Available:', !!chartData.birthData);
-        console.log('📋 Birth Data Details:', {
-          name: chartData.birthData?.name,
-          dateOfBirth: chartData.birthData?.dateOfBirth,
-          timeOfBirth: chartData.birthData?.timeOfBirth,
-          latitude: chartData.birthData?.latitude,
-          longitude: chartData.birthData?.longitude,
-          geocodingInfo: chartData.birthData?.geocodingInfo
-        });
-        console.log('⏳ Dasha Info Available:', !!chartData.dashaInfo);
-        console.log('⏳ Dasha Info Details:', {
-          birthDasha: chartData.dashaInfo?.birthDasha,
-          currentDasha: chartData.dashaInfo?.currentDasha
-        });
-
-        // Enhanced chart data extraction with fallback
         const rasiChart = chartData.rasiChart || chartData.chart?.rasiChart || chartData.chart;
         const navamsaChart = chartData.navamsaChart || chartData.chart?.navamsaChart || chartData.navamsa;
         const analysis = chartData.analysis || chartData.chart?.analysis;
 
         if (!rasiChart) {
-          console.error('❌ ChartPage: RasiChart not found in response');
           throw new Error('Chart data is incomplete. RasiChart is missing from API response.');
         }
 
-        // Save chart data to UIDataSaver as backup with enhanced structure
         UIDataSaver.saveApiResponse({
           chart: rasiChart,
           navamsa: navamsaChart,
@@ -167,9 +78,6 @@ const ChartPage = () => {
         const resolvedChartId = chartData?.chartId || chartData?.data?.chartId || currentChart.id;
         UIDataSaver.setLastChart(resolvedChartId, chartData?.birthData || chartData?.data?.birthData || null);
 
-        console.log('💾 ChartPage: Chart data saved to UIDataSaver as backup');
-
-        // Set chart data with validated structure
         setChartData({
           ...chartData,
           rasiChart,
@@ -180,17 +88,9 @@ const ChartPage = () => {
         throw new Error('Invalid API response format. Chart data is missing from response.');
       }
     } else {
-      // Enhanced error message with response structure information
       const errorMsg = apiResponse?.error?.message || 
                        apiResponse?.message || 
                        'Invalid API response format. Expected response.success and response.data structure with rasiChart property.';
-      console.error('❌ ChartPage: Invalid API response:', {
-        success: apiResponse?.success,
-        hasData: !!apiResponse?.data,
-        hasRasiChart: !!(apiResponse?.data?.rasiChart || apiResponse?.rasiChart),
-        error: apiResponse?.error,
-        message: apiResponse?.message
-      });
       throw new Error(errorMsg);
     }
   }, [currentChart, navigate, showRedirectFallback]);
@@ -205,361 +105,195 @@ const ChartPage = () => {
 
   if (!currentChart && showRedirectFallback) {
     return (
-      <div className="min-h-screen relative overflow-hidden flex items-center justify-center">
+      <HeroSection title="Fresh Chart Required" subtitle="Please regenerate your birth chart">
         {toastNode}
-        <PlanetaryAnimations count={8} />
-        <div className="card-cosmic shadow-mandala p-10 rounded-3xl max-w-xl text-center relative z-10" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
-          <div className="text-5xl mb-4">🔄</div>
-          <h2 className="text-3xl font-cinzel font-bold text-gradient-vedic mb-4">Fresh Chart Required</h2>
-          <p className="text-secondary mb-6">
-            We could not find a recent chart in this browser session. Please regenerate your birth chart to explore the analysis features.
-          </p>
-          <button
-            onClick={() => navigate('/')}
-            className="btn-primary px-8 py-3 bg-gradient-to-r from-saffron to-gold text-white hover:shadow-celestial hover:-translate-y-1 transition-all duration-300 rounded-xl font-cinzel font-medium"
-          >
-            <span className="flex items-center justify-center space-x-2">
-              <span>🧭</span>
-              <span>Go to Birth Data Form</span>
-            </span>
-          </button>
+        <div className="chris-cole-page-content">
+          <div className="chris-cole-card">
+            <p className="chris-cole-text">
+              We could not find a recent chart in this browser session. Please regenerate your birth chart to explore the analysis features.
+            </p>
+            <button
+              onClick={() => navigate('/')}
+              className="chris-cole-button"
+            >
+              Go to Birth Data Form
+            </button>
+          </div>
         </div>
-      </div>
+      </HeroSection>
     );
   }
 
   if (isLoading) {
     return (
-      <div className="min-h-screen relative overflow-hidden flex items-center justify-center">
+      <HeroSection title="Loading Chart" subtitle="Please wait...">
         {toastNode}
-        <PlanetaryAnimations count={8} />
-        <div className="relative z-10">
-          <VedicLoadingSpinner />
+        <div className="chris-cole-page-content">
+          <div className="chris-cole-loading">
+            <div className="chris-cole-spinner"></div>
+          </div>
         </div>
-      </div>
+      </HeroSection>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen relative overflow-hidden flex items-center justify-center">
+      <HeroSection title="Error" subtitle="Something went wrong">
         {toastNode}
-        <PlanetaryAnimations count={8} />
-        <div className="card-cosmic shadow-mandala p-8 rounded-3xl max-w-md relative z-10" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
-          <div className="text-red-400 text-5xl mb-4 text-center">⚠️</div>
-          <h2 className="text-2xl font-cinzel font-bold text-gradient-vedic mb-4 text-center">Error</h2>
-          <p className="text-secondary mb-6 text-center font-devanagari">{error.message || error}</p>
-          <button
-            onClick={() => navigate('/')}
-            className="btn-primary w-full"
-          >
-            <span className="flex items-center justify-center space-x-2">
-              <span>🏠</span>
-              <span>Go Back</span>
-            </span>
-          </button>
+        <div className="chris-cole-page-content">
+          <div className="chris-cole-card">
+            <p className="chris-cole-text">{error.message || error}</p>
+            <button
+              onClick={() => navigate('/')}
+              className="chris-cole-button"
+            >
+              Go Back
+            </button>
+          </div>
         </div>
-      </div>
+      </HeroSection>
     );
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <HeroSection title="Your Birth Chart" subtitle="Vedic astrology chart revealing your celestial destiny">
       {toastNode}
-      {/* White Saturn & Planetary Animations (Matching Chris Cole) */}
-      <PlanetaryAnimations count={8} />
+      <div className="chris-cole-page-content">
+        {/* Action Buttons */}
+        <div className="chris-cole-actions">
+          <button
+            onClick={() => navigate('/')}
+            className="chris-cole-button chris-cole-button-secondary"
+          >
+            New Chart
+          </button>
+          <button
+            onClick={() => navigate('/analysis')}
+            className="chris-cole-button"
+          >
+            View Analysis
+          </button>
+          <button
+            onClick={() => {
+              try {
+                const birthDataForBTR = {
+                  name: chartData?.birthData?.name || 'User',
+                  dateOfBirth: chartData?.birthData?.dateOfBirth,
+                  timeOfBirth: chartData?.birthData?.timeOfBirth,
+                  placeOfBirth: chartData?.birthData?.geocodingInfo?.formattedAddress || 'Unknown',
+                  latitude: chartData?.birthData?.latitude,
+                  longitude: chartData?.birthData?.longitude,
+                  timezone: chartData?.birthData?.timezone,
+                  chartId: chartData?.chartId
+                };
+                sessionStorage.setItem('birthDataForBTR', JSON.stringify(birthDataForBTR));
+                navigate('/birth-time-rectification');
+              } catch (error) {
+                navigate('/birth-time-rectification');
+              }
+            }}
+            className="chris-cole-button"
+          >
+            BTR Analysis
+          </button>
+        </div>
 
-      <div className="relative z-10 py-12">
-        <div className="vedic-container max-w-7xl mx-auto">
-
-          {/* Premium Header Section */}
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-cosmic rounded-full shadow-celestial mb-6 animate-sacred-pulse">
-              <span className="text-3xl">📊</span>
-            </div>
-
-            <h1 className="section-title-vedic text-5xl md:text-6xl font-cinzel font-bold mb-6 text-gradient-vedic drop-shadow-2xl">
-              Your Sacred Birth Chart
-            </h1>
-
-            <div className="max-w-3xl mx-auto mb-8">
-              <p className="text-lg md:text-xl text-primary font-devanagari font-medium mb-2">
-                जन्म कुंडली - Cosmic Blueprint of Your Soul
-              </p>
-              <p className="text-secondary">
-                Traditional Vedic astrology chart revealing your celestial destiny
-              </p>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-              <button
-                onClick={() => navigate('/')}
-                className="btn-secondary px-8 py-3 text-primary border-2 transition-all duration-300 rounded-xl font-cinzel font-medium"
-                style={{ borderColor: 'var(--border-color)' }}
-                onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--divine-gold)'; e.currentTarget.style.backgroundColor = 'var(--bg-card-hover)'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border-color)'; e.currentTarget.style.backgroundColor = 'transparent'; }}
-              >
-                <span className="flex items-center justify-center space-x-2">
-                  <span>🏠</span>
-                  <span>New Chart</span>
-                </span>
-              </button>
-              <button
-                onClick={() => navigate('/analysis')}
-                className="btn-primary px-8 py-3 bg-gradient-cosmic text-primary hover:shadow-celestial hover:-translate-y-1 transition-all duration-300 rounded-xl font-cinzel font-medium"
-              >
-                <span className="flex items-center justify-center space-x-2">
-                  <span>🔮</span>
-                  <span>View Analysis</span>
-                </span>
-              </button>
-              <button
-                onClick={() => {
-                  // Save birth data to sessionStorage for BTR page
-                  try {
-                    const birthDataForBTR = {
-                      name: chartData?.birthData?.name || 'User',
-                      dateOfBirth: chartData?.birthData?.dateOfBirth,
-                      timeOfBirth: chartData?.birthData?.timeOfBirth,
-                      placeOfBirth: chartData?.birthData?.geocodingInfo?.formattedAddress || 'Unknown',
-                      latitude: chartData?.birthData?.latitude,
-                      longitude: chartData?.birthData?.longitude,
-                      timezone: chartData?.birthData?.timezone,
-                      chartId: chartData?.chartId
-                    };
-                    sessionStorage.setItem('birthDataForBTR', JSON.stringify(birthDataForBTR));
-                    console.log('💾 ChartPage: Saved birth data for BTR:', birthDataForBTR);
-                    navigate('/birth-time-rectification');
-                  } catch (error) {
-                    console.error('Failed to save data for BTR:', error);
-                    navigate('/birth-time-rectification');
-                  }
-                }}
-                className="btn-primary px-8 py-3 bg-gradient-to-r from-saffron to-gold text-primary hover:shadow-celestial hover:-translate-y-1 transition-all duration-300 rounded-xl font-cinzel font-medium"
-              >
-                <span className="flex items-center justify-center space-x-2">
-                  <span>🕉️</span>
-                  <span>BTR Analysis</span>
-                </span>
-              </button>
-            </div>
-
-            {/* Sacred Divider */}
-            <div className="flex items-center justify-center space-x-4 mb-12">
-              <div className="w-16 h-px bg-gradient-to-r from-transparent to-vedic-gold"></div>
-              <span className="text-vedic-gold text-2xl animate-glow">✦</span>
-              <div className="w-16 h-px bg-gradient-to-r from-vedic-gold to-transparent"></div>
+        {/* Chart Display Grid */}
+        <div className="chris-cole-grid">
+          {/* Main Rasi Chart */}
+          <div className="chris-cole-card">
+            <h2 className="chris-cole-heading">Rasi Chart (D1)</h2>
+            <p className="chris-cole-text-secondary">Primary birth chart showing planetary positions</p>
+            <div className="chris-cole-chart-container">
+              <VedicChartDisplay
+                chartData={chartData?.rasiChart || chartData}
+                chartType="rasi"
+                showDetails={true}
+                useBackendRendering={true}
+                birthData={chartData?.birthData || null}
+              />
             </div>
           </div>
 
-          {/* Premium Chart Display Grid */}
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-12">
-
-            {/* Main Rasi Chart */}
-            <div className="card-cosmic shadow-mandala p-8 rounded-3xl hover-celestial chart-container-shadow reveal stagger-reveal" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
-              <div className="text-center mb-6">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-cosmic rounded-full shadow-celestial mb-4 animate-sacred-pulse">
-                  <span className="text-2xl">🪐</span>
-                </div>
-                <h2 className="text-2xl md:text-3xl font-cinzel font-bold text-gradient-accent mb-2">
-                  Rasi Chart (D1)
-                </h2>
-                <p className="text-secondary font-devanagari">
-                  Primary birth chart showing planetary positions
-                </p>
-              </div>
-
-              <div className="rounded-2xl p-6 border" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
+          {/* Navamsa Chart */}
+          {chartData?.navamsaChart && (
+            <div className="chris-cole-card">
+              <h2 className="chris-cole-heading">Navamsa Chart (D9)</h2>
+              <p className="chris-cole-text-secondary">Marriage and spiritual destiny chart</p>
+              <div className="chris-cole-chart-container">
                 <VedicChartDisplay
-                  chartData={chartData?.rasiChart || chartData}
-                  chartType="rasi"
+                  chartData={chartData.navamsaChart}
+                  chartType="navamsa"
                   showDetails={true}
                   useBackendRendering={true}
                   birthData={chartData?.birthData || null}
                 />
               </div>
             </div>
+          )}
+        </div>
 
-            {/* Navamsa Chart */}
-            {chartData?.navamsaChart && (
-              <div className="card-cosmic shadow-mandala p-8 rounded-3xl hover-celestial chart-container-shadow reveal stagger-reveal" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
-                <div className="text-center mb-6">
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-cosmic rounded-full shadow-celestial mb-4 animate-sacred-pulse">
-                    <span className="text-2xl">🌙</span>
-                  </div>
-                  <h2 className="text-2xl md:text-3xl font-cinzel font-bold text-gradient-accent mb-2">
-                    Navamsa Chart (D9)
-                  </h2>
-                  <p className="text-secondary font-devanagari">
-                    Marriage and spiritual destiny chart
-                  </p>
-                </div>
-
-                <div className="rounded-2xl p-6 border" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
-                  <VedicChartDisplay
-                    chartData={chartData.navamsaChart}
-                    chartType="navamsa"
-                    showDetails={true}
-                    useBackendRendering={true}
-                    birthData={chartData?.birthData || null}
-                  />
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Birth Details Card */}
-          <div className="card-cosmic shadow-mandala p-8 rounded-3xl mb-8 reveal" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
-            <div className="text-center mb-6">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-cosmic rounded-full shadow-celestial mb-4 animate-sacred-pulse">
-                <span className="text-2xl">📋</span>
-              </div>
-              <h3 className="text-2xl md:text-3xl font-cinzel font-bold text-gradient-accent mb-2">
-                Birth Details
-              </h3>
-              <p className="text-secondary font-devanagari">
-                Sacred information used for calculations
-              </p>
+        {/* Birth Details */}
+        <div className="chris-cole-card">
+          <h3 className="chris-cole-heading">Birth Details</h3>
+          <div className="chris-cole-details-grid">
+            <div className="chris-cole-detail-item">
+              <span className="chris-cole-label">Name:</span>
+              <span className="chris-cole-value">{chartData?.birthData?.name || 'N/A'}</span>
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* Name */}
-              <div className="rounded-xl p-4 border shadow-sm" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
-                <div className="flex items-center space-x-3 mb-2">
-                  <span className="text-vedic-gold text-xl">👤</span>
-                  <span className="text-secondary font-devanagari text-sm">Name:</span>
-                </div>
-                <span className="text-primary font-cinzel font-medium text-lg">
-                  {chartData?.birthData?.name || 'N/A'}
-                </span>
-              </div>
-
-              {/* Date */}
-              <div className="rounded-xl p-4 border shadow-sm" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
-                <div className="flex items-center space-x-3 mb-2">
-                  <span className="text-vedic-gold text-xl">📅</span>
-                  <span className="text-secondary font-devanagari text-sm">Date:</span>
-                </div>
-                <span className="text-primary font-cinzel font-medium text-lg">
-                  {chartData?.birthData?.dateOfBirth ?
-                    new Date(chartData.birthData.dateOfBirth).toLocaleDateString() : 'N/A'}
-                </span>
-              </div>
-
-              {/* Time */}
-              <div className="rounded-xl p-4 border shadow-sm" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
-                <div className="flex items-center space-x-3 mb-2">
-                  <span className="text-vedic-gold text-xl">⏰</span>
-                  <span className="text-secondary font-devanagari text-sm">Time:</span>
-                </div>
-                <span className="text-primary font-cinzel font-medium text-lg">
-                  {chartData?.birthData?.timeOfBirth || 'N/A'}
-                </span>
-              </div>
-
-              {/* Place */}
-              <div className="rounded-xl p-4 border lg:col-span-2" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
-                <div className="flex items-center space-x-3 mb-2">
-                  <span className="text-vedic-gold text-xl">🌍</span>
-                  <span className="text-secondary font-devanagari text-sm">Place:</span>
-                </div>
-                <span className="text-primary font-cinzel font-medium text-lg">
-                  {chartData?.birthData?.geocodingInfo?.formattedAddress ||
-                   `${chartData?.birthData?.latitude?.toFixed(4) || 'N/A'}, ${chartData?.birthData?.longitude?.toFixed(4) || 'N/A'}`}
-                </span>
-              </div>
-
-              {/* Coordinates */}
-              <div className="rounded-xl p-4 border shadow-sm" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
-                <div className="flex items-center space-x-3 mb-2">
-                  <span className="text-vedic-gold text-xl">📍</span>
-                  <span className="text-secondary font-devanagari text-sm">Coordinates:</span>
-                </div>
-                <div className="text-primary font-mono text-sm">
-                  <div>{chartData?.birthData?.latitude?.toFixed(4) || 'N/A'}° N</div>
-                  <div>{chartData?.birthData?.longitude?.toFixed(4) || 'N/A'}° E</div>
-                </div>
-              </div>
+            <div className="chris-cole-detail-item">
+              <span className="chris-cole-label">Date:</span>
+              <span className="chris-cole-value">
+                {chartData?.birthData?.dateOfBirth ?
+                  new Date(chartData.birthData.dateOfBirth).toLocaleDateString() : 'N/A'}
+              </span>
+            </div>
+            <div className="chris-cole-detail-item">
+              <span className="chris-cole-label">Time:</span>
+              <span className="chris-cole-value">{chartData?.birthData?.timeOfBirth || 'N/A'}</span>
+            </div>
+            <div className="chris-cole-detail-item">
+              <span className="chris-cole-label">Place:</span>
+              <span className="chris-cole-value">
+                {chartData?.birthData?.geocodingInfo?.formattedAddress ||
+                 `${chartData?.birthData?.latitude?.toFixed(4) || 'N/A'}, ${chartData?.birthData?.longitude?.toFixed(4) || 'N/A'}`}
+              </span>
+            </div>
+            <div className="chris-cole-detail-item">
+              <span className="chris-cole-label">Coordinates:</span>
+              <span className="chris-cole-value">
+                {chartData?.birthData?.latitude?.toFixed(4) || 'N/A'}° N, {chartData?.birthData?.longitude?.toFixed(4) || 'N/A'}° E
+              </span>
             </div>
           </div>
+        </div>
 
-          {/* Dasha Information Card */}
-          {chartData?.dashaInfo && (
-            <div className="card-cosmic shadow-mandala p-8 rounded-3xl reveal" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
-              <div className="text-center mb-6">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-cosmic rounded-full shadow-celestial mb-4 animate-sacred-pulse">
-                  <span className="text-2xl">⏳</span>
-                </div>
-                <h3 className="text-2xl md:text-3xl font-cinzel font-bold text-gradient-accent mb-2">
-                  Dasha Information
-                </h3>
-                <p className="text-secondary font-devanagari">
-                  Planetary time periods governing your life
-                </p>
+        {/* Dasha Information */}
+        {chartData?.dashaInfo && (
+          <div className="chris-cole-card">
+            <h3 className="chris-cole-heading">Dasha Information</h3>
+            <div className="chris-cole-details-grid">
+              <div className="chris-cole-detail-item">
+                <span className="chris-cole-label">Birth Dasha:</span>
+                <span className="chris-cole-value">{chartData.dashaInfo.birthDasha}</span>
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Birth Dasha */}
-                <div className="rounded-xl p-4 border shadow-sm" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
-                  <div className="flex items-center space-x-3 mb-2">
-                    <span className="text-vedic-gold text-xl">🎂</span>
-                    <span className="text-secondary font-devanagari text-sm">Birth Dasha:</span>
-                  </div>
-                  <span className="text-primary font-cinzel font-medium text-lg">
-                    {chartData.dashaInfo.birthDasha}
+              {chartData.dashaInfo.currentDasha && (
+                <div className="chris-cole-detail-item">
+                  <span className="chris-cole-label">Current Dasha:</span>
+                  <span className="chris-cole-value">
+                    {chartData.dashaInfo.currentDasha.planet}
+                    {chartData.dashaInfo.currentDasha.remainingYears && 
+                      ` (${chartData.dashaInfo.currentDasha.remainingYears.toFixed(1)} years remaining)`}
                   </span>
                 </div>
-
-                {/* Current Dasha */}
-                {chartData.dashaInfo.currentDasha && (
-                  <div className="rounded-xl p-4 border shadow-sm" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
-                    <div className="flex items-center space-x-3 mb-2">
-                      <span className="text-vedic-gold text-xl">🔄</span>
-                      <span className="text-secondary font-devanagari text-sm">Current Dasha:</span>
-                    </div>
-                    <div className="text-primary font-cinzel font-medium text-lg">
-                      {chartData.dashaInfo.currentDasha.planet}
-                    </div>
-                    <div className="text-muted text-sm mt-1">
-                      {chartData.dashaInfo.currentDasha.remainingYears?.toFixed(1)} years remaining
-                    </div>
-                  </div>
-                )}
-              </div>
+              )}
             </div>
-          )}
-
-          {/* Sacred Footer */}
-          <div className="text-center pt-12">
-            <div className="flex items-center justify-center space-x-6 mb-6">
-              <span className="symbol-om text-3xl animate-om-rotation">🕉️</span>
-              <div className="flex space-x-2">
-                <div className="w-2 h-2 bg-vedic-gold rounded-full animate-float"></div>
-                <div className="w-2 h-2 bg-lunar-silver rounded-full animate-cosmic-drift"></div>
-                <div className="w-2 h-2 bg-cosmic-purple rounded-full animate-celestial-glow"></div>
-              </div>
-              <span className="symbol-lotus text-3xl animate-lotus-bloom">🪷</span>
-            </div>
-            <p className="text-secondary font-devanagari text-lg">
-              May the stars guide your path to enlightenment
-            </p>
-            <p className="text-muted text-sm mt-2">
-              Generated with Swiss Ephemeris precision
-            </p>
           </div>
-
-        </div>
+        )}
       </div>
-    </div>
+    </HeroSection>
   );
 };
 
-// Export with Error Boundary Wrapper
-const WrappedChartPage = () => (
-  <ChartPageErrorBoundary>
-    <ChartPage />
-  </ChartPageErrorBoundary>
-);
-
-export default WrappedChartPage;
+export default ChartPage;

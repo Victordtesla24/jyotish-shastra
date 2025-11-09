@@ -1,252 +1,165 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ComprehensiveAnalysisDisplay from '../components/reports/ComprehensiveAnalysisDisplay.js';
 import ResponseDataToUIDisplayAnalyser from '../components/analysis/ResponseDataToUIDisplayAnalyser.js';
 import UIDataSaver from '../components/forms/UIDataSaver.js';
-import UIToAPIDataInterpreter from '../components/forms/UIToAPIDataInterpreter.js';
+import HeroSection from '../components/ui/HeroSection.jsx';
+import { initScrollReveals, cleanupScrollTriggers } from '../lib/scroll.js';
+import { getApiUrl } from '../utils/apiConfig.js';
 
 /**
- * Comprehensive Analysis Page with ErrorBoundary protection
- * Displays 8-section comprehensive Vedic astrology analysis
- * Uses componentDidCatch for error handling
+ * ComprehensiveAnalysisPage
+ * Displays comprehensive Vedic astrology analysis with 8 sections
+ * Implementation Plan: @implementation-plan-UI.md
  */
 const ComprehensiveAnalysisPage = () => {
   const [analysisData, setAnalysisData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-  
-  // Data interpreter instance for formatting birth data
-  const dataInterpreter = useMemo(() => new UIToAPIDataInterpreter(), []);
 
   const fetchComprehensiveAnalysis = useCallback(async () => {
-
     try {
-      setLoading(true);
+      setIsLoading(true);
       setError(null);
 
-
-      // First try to get cached data from UIDataSaver
       const cachedData = UIDataSaver.getComprehensiveAnalysis();
       if (cachedData && (cachedData.sections || cachedData.analysis?.sections)) {
         const processedData = ResponseDataToUIDisplayAnalyser.processComprehensiveAnalysis(cachedData);
         setAnalysisData(processedData);
-        setLoading(false);
+        setIsLoading(false);
         return;
       }
 
-      // Get birth data for API call
-      const birthStamp = UIDataSaver.getBirthData();
-      const rawBirthData = birthStamp?.data || null;
-      if (!rawBirthData) {
-        const errorMessage = 'Please generate a chart first.';
+      const birthData = UIDataSaver.getBirthData();
+      if (!birthData) {
+        const errorMessage = 'No birth data found. Please generate your birth chart first.';
         setError(errorMessage);
-        setLoading(false);
+        setIsLoading(false);
         sessionStorage.setItem('analysisRedirectMessage', errorMessage);
-        // CRITICAL FIX: Navigate only once, don't retry
         setTimeout(() => {
           navigate('/chart');
-        }, 500);
+        }, 2000);
         return;
       }
 
-        console.log('Raw birth data from session:', {
-          name: rawBirthData.name,
-          dateOfBirth: rawBirthData.dateOfBirth,
-          timeOfBirth: rawBirthData.timeOfBirth
-        });
-
-      // CRITICAL FIX: Format birth data to meet API validation requirements
-      // Validate and format birth data before sending to API
-      const validationResult = dataInterpreter.validateInput(rawBirthData);
-      if (!validationResult?.isValid) {
-        console.error('❌ [ComprehensiveAnalysisPage] Birth data validation failed:', validationResult?.errors);
-        throw new Error(`Invalid birth data: ${validationResult?.errors?.join(', ') || 'Validation failed'}`);
-      }
-
-      // Format birth data for API using formatForAPI
-      const formattedData = dataInterpreter.formatForAPI(validationResult.validatedData);
-      const apiRequestData = formattedData.apiRequest || formattedData;
-
-        console.log('API request validation:', {
-        hasDate: !!apiRequestData.dateOfBirth,
-        hasTime: !!apiRequestData.timeOfBirth,
-        hasCoordinates: !!(apiRequestData.latitude && apiRequestData.longitude),
-        hasPlaceOfBirth: !!apiRequestData.placeOfBirth
+      const response = await fetch(getApiUrl('/api/v1/analysis/comprehensive'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(birthData),
       });
 
-      // Call comprehensive analysis API with properly formatted data
-      const { getApiUrl } = await import('../utils/apiConfig');
-      const response = await fetch(getApiUrl('/api/v1/analysis/comprehensive'), {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        body: JSON.stringify(apiRequestData) // Required for API calls - not in UI
-        });
-
-        if (!response.ok) {
-        throw new Error(`API error: ${response.status} ${response.statusText}`);
-        }
+      if (!response.ok) {
+        throw new Error(
+          response.status === 400
+            ? 'Invalid birth data. Please verify your birth information and try again.'
+            : response.status === 500
+            ? 'Comprehensive analysis failed. Please verify your birth data and try again.'
+            : `HTTP error! status: ${response.status}`
+        );
+      }
 
       const apiData = await response.json();
-        console.log('API response received:', {
-        success: apiData.success,
-        hasAnalysis: !!apiData.analysis,
-        hasSections: !!apiData.analysis?.sections,
-        sectionCount: apiData.analysis?.sections ? Object.keys(apiData.analysis.sections).length : 0,
-        status: apiData.metadata?.status,
-        error: apiData.error
-      });
 
-      // CRITICAL FIX: Check if API returned an error
-      if (!apiData.success || apiData.metadata?.status === 'failed') {
-        const errorMessage = apiData.error?.message || apiData.error?.details || apiData.message || 
-                            'Comprehensive analysis failed. Please verify your birth data and try again.';
-        throw new Error(errorMessage);
-      }
-
-      // CRITICAL FIX: Validate sections exist in API response
       if (!apiData.analysis || !apiData.analysis.sections || Object.keys(apiData.analysis.sections).length === 0) {
         throw new Error('Sections data is missing from API response. Expected analysis.sections with 8 sections (section1-section8).');
       }
 
-      // Process data with ResponseDataToUIDisplayAnalyser
       const processedData = ResponseDataToUIDisplayAnalyser.processComprehensiveAnalysis(apiData);
-        console.log('Processed data validation:', {
-        processedSuccess: !!processedData,
-        hasSections: !!processedData?.sections,
-        sectionCount: processedData?.sections ? Object.keys(processedData.sections).length : 0
-      });
 
-      if (!processedData) {
-        throw new Error('Failed to process API response');
+      if (!processedData || !processedData.sectionsData || Object.keys(processedData.sectionsData).length === 0) {
+        throw new Error(
+          'Failed to load comprehensive analysis. Please verify your birth data and try again.'
+        );
       }
 
-      // Save to UIDataSaver for future use
       UIDataSaver.saveComprehensiveAnalysis(apiData);
-
       setAnalysisData(processedData);
-
     } catch (err) {
-      console.error('❌ [ComprehensiveAnalysisPage] Error fetching comprehensive analysis:', err);
-      // CRITICAL FIX: Ensure error message is always user-friendly
-      const errorMessage = err.message || err.toString() || 
-                          'Failed to load comprehensive analysis. Please verify your birth data and try again.';
+      const errorMessage = err.message || 'Failed to load comprehensive analysis. Please verify your birth data and try again.';
       setError(errorMessage);
+      console.error('Comprehensive analysis error:', err);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
-  }, [navigate, dataInterpreter]);
+  }, [navigate]);
 
-  // CRITICAL FIX: Prevent infinite retries - only run once on mount
   useEffect(() => {
-    let mounted = true;
-    let hasRun = false;
-    
-    const loadData = async () => {
-      // Prevent multiple concurrent calls
-      if (hasRun || !mounted) {
-        return;
-      }
-      hasRun = true;
-      
-      if (mounted) {
-        await fetchComprehensiveAnalysis();
-      }
-    };
-    
-    loadData();
+    initScrollReveals();
     
     return () => {
-      mounted = false;
+      cleanupScrollTriggers();
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Empty array - only run on mount
+  }, []);
 
-  if (loading) {
+  useEffect(() => {
+    fetchComprehensiveAnalysis();
+  }, [fetchComprehensiveAnalysis]);
+
+  if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-sacred-white via-white to-sacred-cream bg-cosmic-pattern flex items-center justify-center p-4">
-        <div className="text-center">
-          <div className="spinner-mandala mb-6"></div>
-          <h2 className="text-2xl font-bold text-primary mb-3 animate-pulse">
-            Unveiling Cosmic Insights
-          </h2>
-          <p className="text-secondary text-lg">Loading comprehensive analysis...</p>
-          <div className="mt-6 flex items-center justify-center gap-2">
-            <span className="vedic-symbol text-saffron animate-float">🕉️</span>
-            <span className="text-muted">Calculating celestial positions</span>
+      <HeroSection title="Loading Analysis" subtitle="Please wait...">
+        <div className="chris-cole-page-content">
+          <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+            <p style={{ color: 'rgba(255, 255, 255, 0.7)', marginBottom: '30px' }}>
+              Processing your comprehensive Vedic astrology analysis...
+            </p>
+            <button
+              onClick={() => fetchComprehensiveAnalysis()}
+              style={{
+                padding: '12px 24px',
+                background: 'rgba(255, 255, 255, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.3)',
+                color: '#FFFFFF',
+                cursor: 'pointer',
+                borderRadius: '4px'
+              }}
+            >
+              Retry
+            </button>
           </div>
         </div>
-      </div>
+      </HeroSection>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-sacred-white via-white to-sacred-cream bg-cosmic-pattern flex items-center justify-center p-4">
-        <div className="card-cosmic-enhanced max-w-md w-full text-center p-8">
-          <div className="text-6xl mb-6 animate-bounce">⚠️</div>
-          <h2 className="text-2xl font-bold text-primary mb-4">Cosmic Disturbance</h2>
-          <p className="text-secondary mb-6 leading-relaxed">{error}</p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+      <HeroSection title="Analysis Error" subtitle="Unable to load analysis">
+        <div className="chris-cole-page-content">
+          <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+            <p style={{ color: 'rgba(255, 255, 255, 0.7)', marginBottom: '30px' }}>
+              {error}
+            </p>
             <button
-              onClick={() => fetchComprehensiveAnalysis()}
-              className="btn-vedic btn-primary"
+              onClick={() => navigate('/chart')}
+              style={{
+                padding: '12px 24px',
+                background: 'rgba(255, 255, 255, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.3)',
+                color: '#FFFFFF',
+                cursor: 'pointer',
+                borderRadius: '4px'
+              }}
             >
-              <span className="flex items-center justify-center gap-2">
-                <span>🔄</span>
-                <span>Try Again</span>
-              </span>
-            </button>
-            <button
-              onClick={() => navigate('/')}
-              className="btn-vedic btn-secondary"
-            >
-              <span className="flex items-center justify-center gap-2">
-                <span>🏠</span>
-                <span>Back to Home</span>
-              </span>
+              Go to Chart
             </button>
           </div>
         </div>
-      </div>
+      </HeroSection>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sacred-white via-white to-sacred-cream bg-cosmic-pattern">
-      <div className="fixed inset-0 opacity-5 pointer-events-none">
-        <div className="absolute inset-0" style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23FF9933' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-        }}></div>
+    <HeroSection title="Comprehensive Vedic Analysis" subtitle="Complete 8-section astrology analysis with detailed insights">
+      <div className="chris-cole-page-content">
+        {analysisData && <ComprehensiveAnalysisDisplay analysisData={analysisData} />}
       </div>
-
-      <div className="relative z-10">
-        <div className="container mx-auto px-6 py-12">
-          <div className="max-w-7xl mx-auto">
-            {/* Enhanced Header Section */}
-            <div className="text-center mb-12 float-cosmic">
-              <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-vedic-saffron to-vedic-gold rounded-full mb-6 shadow-lg animate-pulse">
-                <span className="text-3xl vedic-symbol symbol-mandala text-cosmic-glow"></span>
-              </div>
-              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-vedic-saffron via-vedic-gold to-vedic-maroon bg-clip-text text-transparent mb-4 text-cosmic-glow">
-                Comprehensive Vedic Analysis
-              </h1>
-              <p className="text-lg text-secondary max-w-2xl mx-auto leading-relaxed">
-                Complete 8-section astrology analysis with detailed insights
-              </p>
-            </div>
-
-            {/* Enhanced Content Container */}
-            <div className="card-cosmic-enhanced">
-              <ComprehensiveAnalysisDisplay analysisData={analysisData} />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    </HeroSection>
   );
 };
 
 export default ComprehensiveAnalysisPage;
+

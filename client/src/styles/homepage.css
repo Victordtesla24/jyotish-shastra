@@ -1,0 +1,420 @@
+/**
+ * Homepage Styles
+ * EXACTLY matching implementation plan specifications
+ */
+
+/* Global Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  background-color: #000000;
+  color: #FFFFFF;
+  overflow-x: hidden;
+}
+
+/* Hero Section - Full viewport height with position: relative */
+.hero-section {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Starfield Canvas - Absolutely positioned; cover entire container; z-index below content */
+.starfield-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Planet Container - Place near the left half */
+.planet-container {
+  position: absolute;
+  left: 27.3%;
+  top: 40.1%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Saturn Rings Animation - Subtle rotation */
+@keyframes saturn-rings-rotate {
+  from {
+    transform: rotate(-15deg);
+  }
+  to {
+    transform: rotate(345deg);
+  }
+}
+
+.saturn-rings {
+  transform-origin: 100px 100px;
+  animation: saturn-rings-rotate 120s linear infinite;
+}
+
+/* Hero Title - Top center in small uppercase font */
+.hero-title {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Roboto Condensed', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  z-index: 10;
+  margin: 0;
+  padding: 0;
+}
+
+/* Menu Container - Right of planet, vertically spaced */
+.menu-container {
+  position: absolute;
+  right: 15%;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+}
+
+/* Vertical Menu - Right of planet, vertically spaced */
+.vertical-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  align-items: flex-end;
+}
+
+/* Menu Item - Clickable element with thin uppercase font */
+.menu-item {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+/* Menu Item Heading - Thin uppercase font and letter spacing */
+.menu-item-heading {
+  font-family: 'Roboto', sans-serif;
+  font-size: 64px;
+  font-weight: 100;
+  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 6px;
+  line-height: 90px;
+  text-transform: uppercase;
+  margin: 0;
+  padding: 0;
+  text-align: right;
+  display: block;
+  position: relative;
+  transition: color 0.3s ease;
+  /* FIX: Ensure no duplicate rendering or ghosting */
+  text-shadow: none;
+  transform: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* FIX: Ensure no pseudo-elements causing duplication */
+.menu-item-heading::before,
+.menu-item-heading::after {
+  display: none;
+  content: none;
+}
+
+/* Menu Item Hover - Lighten the chosen menu item */
+.menu-item:hover .menu-item-heading {
+  color: rgba(255, 255, 255, 1);
+}
+
+/* Flying Letter Animation */
+.flying-letter {
+  display: inline-block;
+  will-change: transform, opacity;
+}
+
+/* Section Styling - Full-screen divs */
+section {
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 40px;
+}
+
+.section-content {
+  max-width: 800px;
+  width: 100%;
+}
+
+/* About Section - Dark background (black); simple text */
+.section-about {
+  background-color: #000000;
+}
+
+.section-about h2 {
+  font-family: 'Roboto', sans-serif;
+  font-size: 48px;
+  font-weight: 300;
+  margin-bottom: 24px;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+}
+
+.section-about p {
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Work Section */
+.section-work {
+  background-color: #000000;
+}
+
+.section-work h2 {
+  font-family: 'Roboto', sans-serif;
+  font-size: 48px;
+  font-weight: 300;
+  margin-bottom: 24px;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+}
+
+.under-construction {
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 40px;
+  font-style: italic;
+}
+
+/* Project Card */
+.project-card {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 40px;
+  margin-top: 40px;
+  background: rgba(26, 26, 26, 0.5);
+}
+
+.project-icon {
+  font-size: 48px;
+  margin-bottom: 20px;
+}
+
+.project-card h3 {
+  font-family: 'Roboto', sans-serif;
+  font-size: 24px;
+  font-weight: 400;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.project-card p {
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 24px;
+}
+
+.view-site-link {
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: color 0.3s ease;
+}
+
+.view-site-link:hover {
+  color: rgba(255, 255, 255, 1);
+}
+
+/* Contact Section */
+.section-contact {
+  background-color: #000000;
+}
+
+.section-contact h2 {
+  font-family: 'Roboto', sans-serif;
+  font-size: 48px;
+  font-weight: 300;
+  margin-bottom: 40px;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+}
+
+/* Contact Form */
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-field label {
+  font-family: 'Roboto', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.form-field input,
+.form-field textarea {
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+  font-weight: 300;
+  padding: 12px 16px;
+  background: rgba(26, 26, 26, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #FFFFFF;
+  width: 100%;
+  transition: border-color 0.3s ease;
+}
+
+.form-field input:focus,
+.form-field textarea:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.send-button {
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  padding: 16px 48px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #FFFFFF;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  align-self: flex-start;
+}
+
+.send-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Sketches Section */
+.section-sketches {
+  background-color: #000000;
+}
+
+.section-sketches h2 {
+  font-family: 'Roboto', sans-serif;
+  font-size: 48px;
+  font-weight: 300;
+  margin-bottom: 40px;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+}
+
+.sketches-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 24px;
+}
+
+.sketches-gallery p {
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .menu-item-heading {
+    font-size: 48px;
+    line-height: 68px;
+  }
+
+  .planet-container {
+    left: 25%;
+  }
+
+  .menu-container {
+    right: 10%;
+  }
+}
+
+@media (max-width: 768px) {
+  .menu-item-heading {
+    font-size: 32px;
+    line-height: 48px;
+  }
+
+  .planet-container {
+    left: 50%;
+    top: 30%;
+  }
+
+  .menu-container {
+    right: 5%;
+  }
+
+  .vertical-menu {
+    gap: 24px;
+  }
+
+  section {
+    padding: 60px 20px;
+  }
+}
+
+/* Accessibility */
+.menu-item:focus {
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+}
+
