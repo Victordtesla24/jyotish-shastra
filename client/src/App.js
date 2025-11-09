@@ -30,7 +30,7 @@ function App() {
           <AnalysisProvider>
             {!isPreloaderComplete && (
               <PreLoader 
-                delay={1500} 
+                delay={2000} 
                 onComplete={handlePreloaderComplete} 
               />
             )}
