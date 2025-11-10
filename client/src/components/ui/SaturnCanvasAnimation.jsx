@@ -279,10 +279,11 @@ const SaturnCanvasAnimation = ({ className = '', style = {} }) => {
       className={`saturn-canvas-container ${className}`.trim()}
       style={{
         position: 'absolute',
-        top: '-25%',
-        left: '-25%',
-        width: '150%',
-        height: '150%',
+        top: '50%',
+        left: '15%',
+        width: '35%',
+        height: '35%',
+        transform: 'translate(-50%, -50%)',
         pointerEvents: 'none',
         overflow: 'visible',
         ...style,
