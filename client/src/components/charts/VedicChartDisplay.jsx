@@ -816,21 +816,25 @@ export default function VedicChartDisplay({
   if (svgContent) {
     return (
       <div
-        className={`rounded-lg p-6 ${className}`}
+        className={`rounded-lg ${className}`}
         style={{
           ...style,
           backgroundColor: '#1A1A1A',
           border: '2px solid #8B4513',
-          minWidth: `${CHART_SIZE + 100}px`,
-          width: 'max-content',
-          display: 'inline-block'
+          padding: 'clamp(12px, 2vw, 24px)',
+          width: '100%',
+          maxWidth: `${CHART_SIZE + 100}px`,
+          margin: '0 auto'
         }}
         role="article"
         aria-label="Traditional Vedic Birth Chart (North Indian Style) - Backend Rendered"
       >
         {/* Chart Title with Sanskrit */}
-        <div className="text-center mb-6">
-          <h2 className="text-xl font-bold" style={{ color: '#2F1B14' }}>
+        <div className="text-center" style={{ marginBottom: 'clamp(12px, 2vw, 24px)' }}>
+          <h2 className="font-bold" style={{ 
+            color: '#FFFFFF',
+            fontSize: 'clamp(14px, 2vw, 20px)'
+          }}>
             {chartType === "navamsa" ?
               "नवांश चक्र (Navamsa Chart) - D9" :
               "राशि चक्र लग्न चक्र (Lagna Chart) - D1"
@@ -838,20 +842,33 @@ export default function VedicChartDisplay({
           </h2>
         </div>
 
-        {/* Backend-rendered SVG Chart */}
+        {/* Backend-rendered SVG Chart - Responsive container */}
         <div 
           className="flex justify-center"
           style={{
-            minWidth: `${CHART_SIZE}px`,
-            minHeight: `${CHART_SIZE}px`,
-            width: `${CHART_SIZE}px`,
-            height: `${CHART_SIZE}px`
+            width: '100%',
+            maxWidth: `${CHART_SIZE}px`,
+            margin: '0 auto',
+            aspectRatio: '1 / 1'
           }}
-          dangerouslySetInnerHTML={{ __html: svgContent }}
-        />
+        >
+          <div
+            style={{
+              width: '100%',
+              height: '100%',
+              maxWidth: `${CHART_SIZE}px`,
+              maxHeight: `${CHART_SIZE}px`
+            }}
+            dangerouslySetInnerHTML={{ __html: svgContent }}
+          />
+        </div>
 
-        {/* Legend with Sanskrit Terms */}
-        <div className="mt-6 text-xs text-center space-y-2" style={{ color: '#5D4037' }}>
+        {/* Legend with Sanskrit Terms - Responsive */}
+        <div className="text-center space-y-2" style={{ 
+          marginTop: 'clamp(12px, 2vw, 24px)',
+          color: '#FFFFFF',
+          fontSize: 'clamp(10px, 1.2vw, 12px)'
+        }}>
           <div>
             <p className="font-medium mb-1">ग्रह (Graha) - Planetary Codes:</p>
             <p>Su=सूर्य(Sun), Mo=चन्द्र(Moon), Ma=मंगल(Mars), Me=बुध(Mercury), Ju=गुरु(Jupiter)</p>

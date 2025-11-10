@@ -6,6 +6,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { getApiUrl } from '../utils/apiConfig.js';
+import CosmicHourglassAnimation from './ui/CosmicHourglassAnimation.jsx';
 import './BirthTimeRectification.css';
 
 const BirthTimeRectification = ({ 
@@ -172,6 +173,11 @@ const BirthTimeRectification = ({
         <p className="btr-description">
           Mathematical birth time correction using Brihat Parashara Hora Shastra methods
         </p>
+      </div>
+
+      {/* Cosmic Hourglass Animation */}
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '30px auto' }}>
+        <CosmicHourglassAnimation />
       </div>
 
       <div className="btr-tabs">

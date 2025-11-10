@@ -20,14 +20,14 @@ const SaturnCanvasAnimation = ({ className = '', style = {} }) => {
   const rotationRef = useRef({ offset: 0, lastTimestamp: 0 });
 
   // Configuration constants
-  const PLANET_RADIUS_RATIO = 0.08;
+  const PLANET_RADIUS_RATIO = 0.12;
   const RING_COUNT = 8;
   const RING_ASPECT_RATIO = 0.4;
-  const STAR_COUNT = 40;
+  const STAR_COUNT = 80;
   const BASE_TILT = Math.PI / 6;
   const TILT_VARIATION = 0.0;
-  const MIN_RING_RADIUS_FACTOR = 2.0;
-  const MAX_RING_RADIUS_FACTOR = 3.5;
+  const MIN_RING_RADIUS_FACTOR = 1.8;
+  const MAX_RING_RADIUS_FACTOR = 3.2;
   const BASE_ROTATION_SPEED = 0.0;    // rings don’t spin
   const BASE_MOON_SPEED = 0.0002;     // moons drift slowly
 
@@ -226,6 +226,7 @@ const SaturnCanvasAnimation = ({ className = '', style = {} }) => {
   }, [drawStars, drawRings, drawPlanet]);
 
   // Resize canvas and initialize stars/rings on mount
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -275,21 +276,26 @@ const SaturnCanvasAnimation = ({ className = '', style = {} }) => {
 
   return (
     <div
-      className={`saturn-canvas-container parallax-bg ${className}`.trim()}
+      className={`saturn-canvas-container ${className}`.trim()}
       style={{
         position: 'absolute',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
+        top: '-25%',
+        left: '-25%',
+        width: '150%',
+        height: '150%',
         pointerEvents: 'none',
+        overflow: 'visible',
         ...style,
       }}
       aria-hidden="true"
     >
       <canvas
         ref={canvasRef}
-        style={{ display: 'block', width: '100%', height: '100%' }}
+        style={{ 
+          display: 'block', 
+          width: '100%', 
+          height: '100%'
+        }}
         aria-hidden="true"
       />
     </div>

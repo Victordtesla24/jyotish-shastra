@@ -322,3 +322,7 @@ Thumbs.db
 # -----------------------------------------------------------------------------
 # Add any project-specific patterns here
 .vercel
+
+# Browser tools MCP (embedded git repository)
+browser-tools-mcp/
+browser-tools-mcp-main/

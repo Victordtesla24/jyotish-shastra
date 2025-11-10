@@ -315,6 +315,10 @@ div.vertical-nav-item button.chris-cole-nav-link h1.chris-cole-nav-heading {
     font-size: 48px !important;
     line-height: 67.2px !important;
   }
+  
+  .menu-container {
+    right: 5% !important;
+  }
 }
 
 @media (max-width: 767px) {
@@ -322,7 +326,193 @@ div.vertical-nav-item button.chris-cole-nav-link h1.chris-cole-nav-heading {
     font-size: 32px !important;
     line-height: 48px !important;
     letter-spacing: 4px !important;
+  }
+  
+  .menu-container {
+    position: relative !important;
+    right: auto !important;
+    top: auto !important;
+    transform: none !important;
+    width: 100% !important;
+    padding: 20px !important;
+    text-align: center !important;
+  }
+  
+  .vertical-navigation-chris-cole {
+    justify-content: center !important;
+    align-items: center !important;
+  }
 }
+
+/* Chart Page Responsive */
+.chris-cole-page-content {
+  padding: clamp(20px, 4vw, 60px) clamp(10px, 2vw, 40px);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.chris-cole-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: clamp(16px, 3vw, 32px);
+  margin-bottom: clamp(16px, 2vw, 24px);
+}
+
+.chris-cole-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(20px, 3vw, 40px);
+  margin-bottom: clamp(20px, 3vw, 40px);
+}
+
+@media (min-width: 1024px) {
+  .chris-cole-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.chris-cole-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(12px, 2vw, 16px);
+  margin-bottom: clamp(20px, 3vw, 40px);
+  justify-content: center;
+}
+
+.chris-cole-button {
+  font-family: 'Roboto', sans-serif;
+  font-size: clamp(11px, 1.2vw, 14px);
+  font-weight: 500;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: clamp(12px, 1.5vw, 16px) clamp(20px, 3vw, 32px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.chris-cole-button:hover {
+  border-color: rgba(255, 215, 0, 0.5);
+  color: rgba(255, 215, 0, 0.9);
+  background: rgba(255, 215, 0, 0.05);
+}
+
+.chris-cole-button-secondary {
+  border-color: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.chris-cole-heading {
+  font-family: 'Roboto', sans-serif;
+  font-size: clamp(18px, 3vw, 24px);
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: clamp(12px, 1.5vw, 16px);
+  letter-spacing: 1px;
+}
+
+.chris-cole-text {
+  font-family: 'Roboto', sans-serif;
+  font-size: clamp(13px, 1.5vw, 14px);
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.6;
+  margin-bottom: clamp(12px, 1.5vw, 16px);
+}
+
+.chris-cole-text-secondary {
+  font-family: 'Roboto', sans-serif;
+  font-size: clamp(12px, 1.3vw, 13px);
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.5;
+  margin-bottom: clamp(8px, 1vw, 12px);
+}
+
+.chris-cole-details-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(12px, 1.5vw, 16px);
+}
+
+@media (min-width: 640px) {
+  .chris-cole-details-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.chris-cole-detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.chris-cole-label {
+  font-family: 'Roboto', sans-serif;
+  font-size: clamp(10px, 1.1vw, 11px);
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.chris-cole-value {
+  font-family: 'Roboto', sans-serif;
+  font-size: clamp(13px, 1.4vw, 14px);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.chris-cole-chart-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  overflow-x: auto;
+  padding: clamp(12px, 2vw, 20px);
+  gap: clamp(20px, 3vw, 40px);
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+/* Responsive Chart Container Layout */
+@media (max-width: 1023px) {
+  .chris-cole-chart-container {
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(20px, 2.5vw, 30px);
+    padding: clamp(10px, 1.5vw, 20px);
+  }
+}
+
+@media (max-width: 767px) {
+  .chris-cole-chart-container {
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(16px, 2vw, 24px);
+    padding: clamp(8px, 1vw, 16px);
+    min-height: auto;
+  }
+}
+
+.chris-cole-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+.chris-cole-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: rgba(255, 215, 0, 0.8);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 /* ============================================
@@ -339,6 +529,31 @@ div.vertical-nav-item button.chris-cole-nav-link h1.chris-cole-nav-heading {
    PRELOADER - CHRIS COLE INSPIRED
    Matching hellochriscole.webflow.io design
    ============================================ */
+
+/* Preloader-First Architecture Support */
+body.preloader-visible {
+  overflow: hidden; /* Prevent scrolling during preload */
+}
+
+body.content-visible {
+  overflow-x: hidden; /* Normal scrolling for content */
+}
+
+/* Homepage smooth fade-in animation */
+body.content-visible .site-container.visible {
+  animation: contentReveal 0.6s ease-out;
+}
+
+@keyframes contentReveal {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
 .loading-indicator {
   position: fixed;
@@ -388,6 +603,27 @@ div.vertical-nav-item button.chris-cole-nav-link h1.chris-cole-nav-heading {
   top: 0;
 }
 
+/* Prevent content flash during transition */
+body.preloader-active {
+  background-color: #000000 !important;
+}
+
+/* Smooth content reveal after preloader */
+body.app-ready #root > :not(.preloader-overlay) {
+  animation: contentReveal 0.5s ease-out;
+}
+
+@keyframes contentReveal {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .saturn-rings {
     animation: none !important;
@@ -399,5 +635,194 @@ div.vertical-nav-item button.chris-cole-nav-link h1.chris-cole-nav-heading {
 
   .loading-progress {
     transition: none !important;
+  }
+  
+  .lunar-phase-shadow {
+    animation: none !important;
+  }
+}
+
+/* ============================================
+   LUNAR PHASE ANIMATION - REDESIGNED
+   Realistic moon phase transitions using radial gradients
+   Chris Cole minimalist aesthetic
+   ============================================ */
+
+.lunar-phase-animation-container {
+  position: relative;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle at center, #1a1a1a 0%, #000000 70%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.lunar-moon-sphere {
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  position: relative;
+  background: #FFFFFF;
+  box-shadow: 
+    0 0 60px rgba(255, 255, 255, 0.3),
+    0 0 100px rgba(255, 255, 255, 0.1),
+    inset 0 0 20px rgba(0, 0, 0, 0.1);
+  animation: lunar-phase-morph 8s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  will-change: background;
+}
+
+.lunar-phase-label {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Roboto Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 3px;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  z-index: 10;
+}
+
+/* Lunar Phase Morphing Animation - Using Radial Gradients */
+@keyframes lunar-phase-morph {
+  /* New Moon - Dark */
+  0%, 100% {
+    background: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #0a0a0a 100%);
+    box-shadow: 
+      0 0 20px rgba(255, 255, 255, 0.05),
+      inset 0 0 30px rgba(0, 0, 0, 0.8);
+  }
+  
+  /* Waxing Crescent - Thin sliver on right */
+  12.5% {
+    background: radial-gradient(ellipse 120% 100% at 85% 50%, #FFFFFF 0%, #FFFFFF 15%, #0a0a0a 15.1%, #0a0a0a 100%);
+    box-shadow: 
+      0 0 40px rgba(255, 255, 255, 0.2),
+      0 0 80px rgba(255, 255, 255, 0.1),
+      inset -10px 0 20px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Waxing Crescent Growing */
+  25% {
+    background: radial-gradient(ellipse 140% 100% at 75% 50%, #FFFFFF 0%, #FFFFFF 35%, #0a0a0a 35.1%, #0a0a0a 100%);
+    box-shadow: 
+      0 0 50px rgba(255, 255, 255, 0.25),
+      0 0 90px rgba(255, 255, 255, 0.12),
+      inset -15px 0 25px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* First Quarter - Half Moon */
+  37.5% {
+    background: linear-gradient(90deg, #0a0a0a 0%, #0a0a0a 50%, #FFFFFF 50%, #FFFFFF 100%);
+    box-shadow: 
+      0 0 60px rgba(255, 255, 255, 0.3),
+      0 0 100px rgba(255, 255, 255, 0.15),
+      inset -10px 0 20px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Waxing Gibbous */
+  47.5% {
+    background: radial-gradient(ellipse 140% 100% at 25% 50%, #0a0a0a 0%, #0a0a0a 25%, #FFFFFF 25.1%, #FFFFFF 100%);
+    box-shadow: 
+      0 0 70px rgba(255, 255, 255, 0.35),
+      0 0 110px rgba(255, 255, 255, 0.18),
+      inset 10px 0 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Full Moon - Peak */
+  50% {
+    background: radial-gradient(circle at 50% 50%, #FFFFFF 0%, #f5f5f5 60%, #e8e8e8 100%);
+    box-shadow: 
+      0 0 80px rgba(255, 255, 255, 0.4),
+      0 0 120px rgba(255, 255, 255, 0.2),
+      inset 0 0 15px rgba(0, 0, 0, 0.05);
+  }
+  
+  /* Waning Gibbous */
+  60% {
+    background: radial-gradient(ellipse 140% 100% at 75% 50%, #0a0a0a 0%, #0a0a0a 25%, #FFFFFF 25.1%, #FFFFFF 100%);
+    box-shadow: 
+      0 0 70px rgba(255, 255, 255, 0.35),
+      0 0 110px rgba(255, 255, 255, 0.18),
+      inset -10px 0 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Last Quarter - Half Moon */
+  72.5% {
+    background: linear-gradient(90deg, #FFFFFF 0%, #FFFFFF 50%, #0a0a0a 50%, #0a0a0a 100%);
+    box-shadow: 
+      0 0 60px rgba(255, 255, 255, 0.3),
+      0 0 100px rgba(255, 255, 255, 0.15),
+      inset 10px 0 20px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Waning Crescent */
+  85% {
+    background: radial-gradient(ellipse 120% 100% at 15% 50%, #FFFFFF 0%, #FFFFFF 15%, #0a0a0a 15.1%, #0a0a0a 100%);
+    box-shadow: 
+      0 0 40px rgba(255, 255, 255, 0.2),
+      0 0 80px rgba(255, 255, 255, 0.1),
+      inset 10px 0 20px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* Chart Container with Lunar Animation - Flexbox Layout */
+.chris-cole-chart-with-lunar {
+  display: flex;
+  flex-direction: row;
+  gap: 40px;
+  align-items: flex-start;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 20px 0;
+}
+
+/* Responsive Design for Lunar Animation */
+@media (max-width: 1023px) {
+  .lunar-phase-animation-container {
+    width: 400px;
+    height: 400px;
+  }
+  
+  .lunar-moon-sphere {
+    width: 220px;
+    height: 220px;
+  }
+  
+  /* Stack chart and lunar animation vertically on tablets */
+  .chris-cole-chart-with-lunar {
+    flex-direction: column;
+    gap: 30px;
+    align-items: center;
+  }
+}
+
+@media (max-width: 767px) {
+  .lunar-phase-animation-container {
+    width: 300px;
+    height: 300px;
+  }
+  
+  .lunar-moon-sphere {
+    width: 160px;
+    height: 160px;
+  }
+  
+  .lunar-phase-label {
+    font-size: 10px;
+    bottom: 20px;
+    letter-spacing: 2px;
+  }
+  
+  /* Stack vertically on mobile with reduced gap */
+  .chris-cole-chart-with-lunar {
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
   }
 }

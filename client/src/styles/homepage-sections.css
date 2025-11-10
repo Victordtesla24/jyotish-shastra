@@ -5,9 +5,12 @@
 
 /* Global Section Styling */
 .homepage-sectioned {
+  position: relative;
   background-color: #000000;
   color: #FFFFFF;
   overflow-x: hidden;
+  min-height: 100vh;
+  /* StarryBackground component provides animated background */
 }
 
 .homepage-sectioned section {
@@ -15,6 +18,10 @@
   width: 100%;
   position: relative;
   scroll-snap-align: start;
+  z-index: 1; /* Ensure sections are above starry background */
+  background: transparent; /* Allow starry background to show through */
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 /* Smooth Scroll Container */
@@ -37,6 +44,7 @@ html {
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: visible; /* Allow Saturn moons to extend beyond section bounds */
 }
 
 /* Vertical Navigation - Chris Cole Style */
@@ -120,6 +128,12 @@ html {
   display: flex;
   align-items: center;
   justify-content: center;
+  transform-style: preserve-3d;
+}
+
+.section-about .section-content-wrapper {
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .chris-cole-biography {

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import VedicChartDisplay from '../components/charts/VedicChartDisplay.jsx';
+import LunarPhaseAnimation from '../components/ui/LunarPhaseAnimation.jsx';
 import { useChart } from '../contexts/ChartContext.js';
 import UIDataSaver from '../components/forms/UIDataSaver.js';
 import BirthDataForm from '../components/forms/BirthDataForm.js';
@@ -264,39 +265,83 @@ const ChartPage = () => {
           </button>
         </div>
 
-        {/* Chart Display Grid */}
-        <div className="chris-cole-grid">
-          {/* Main Rasi Chart */}
-          <div className="chris-cole-card">
-            <h2 className="chris-cole-heading">Rasi Chart (D1)</h2>
-            <p className="chris-cole-text-secondary">Primary birth chart showing planetary positions</p>
-            <div className="chris-cole-chart-container">
-              <VedicChartDisplay
-                chartData={chartData?.rasiChart || chartData}
-                chartType="rasi"
-                showDetails={true}
-                useBackendRendering={true}
-                birthData={chartData?.birthData || null}
-              />
-            </div>
-          </div>
-
-          {/* Navamsa Chart */}
-          {chartData?.navamsaChart && (
+        {/* Chart Display - Responsive Layout: Side-by-side on desktop, stacked on mobile/tablet */}
+        <div 
+          className="chris-cole-chart-container"
+          style={{ 
+            display: 'flex', 
+            gap: '40px', 
+            flexWrap: 'wrap', 
+            justifyContent: 'center', 
+            alignItems: 'flex-start',
+            minHeight: '800px',
+            width: '100%',
+            padding: '20px'
+          }}
+        >
+          {/* Left Side: Both Charts Stacked */}
+          <div 
+            style={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              gap: '30px', 
+              maxWidth: '700px',
+              width: '100%',
+              flex: '1 1 600px'
+            }}
+          >
+            {/* Main Rasi Chart */}
             <div className="chris-cole-card">
-              <h2 className="chris-cole-heading">Navamsa Chart (D9)</h2>
-              <p className="chris-cole-text-secondary">Marriage and spiritual destiny chart</p>
-              <div className="chris-cole-chart-container">
+              <h2 className="chris-cole-heading">Rasi Chart (D1)</h2>
+              <p className="chris-cole-text-secondary">Primary birth chart showing planetary positions</p>
+              <div style={{ display: 'flex', justifyContent: 'center', padding: '20px 0', overflow: 'auto' }}>
                 <VedicChartDisplay
-                  chartData={chartData.navamsaChart}
-                  chartType="navamsa"
+                  chartData={chartData?.rasiChart || chartData}
+                  chartType="rasi"
                   showDetails={true}
                   useBackendRendering={true}
                   birthData={chartData?.birthData || null}
                 />
               </div>
             </div>
-          )}
+
+            {/* Navamsa Chart */}
+            {chartData?.navamsaChart && (
+              <div className="chris-cole-card">
+                <h2 className="chris-cole-heading">Navamsa Chart (D9)</h2>
+                <p className="chris-cole-text-secondary">Marriage and spiritual destiny chart</p>
+                <div style={{ display: 'flex', justifyContent: 'center', padding: '20px 0', overflow: 'auto' }}>
+                  <VedicChartDisplay
+                    chartData={chartData.navamsaChart}
+                    chartType="navamsa"
+                    showDetails={true}
+                    useBackendRendering={true}
+                    birthData={chartData?.birthData || null}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Right Side: Lunar Phase Animation - Responsive sizing */}
+          <div 
+            className="chris-cole-card" 
+            style={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              padding: '30px',
+              minHeight: '600px',
+              width: '100%',
+              maxWidth: '500px',
+              flex: '0 1 500px'
+            }}
+          >
+            <h2 className="chris-cole-heading">Lunar Phases</h2>
+            <p className="chris-cole-text-secondary" style={{ marginBottom: '30px', textAlign: 'center' }}>Celestial moon cycle animation</p>
+            <LunarPhaseAnimation />
+          </div>
         </div>
 
         {/* Birth Details */}

@@ -28,11 +28,203 @@
         color: #FFFFFF;
         overflow-x: hidden;
       }
-      #root {
-        min-height: 100vh;
-        width: 100%;
+      
+      /* Preloader-First Architecture */
+      .chris-cole-preloader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: #000000;
+        z-index: 9999;
+        opacity: 1;
+        transition: opacity 0.8s ease-out;
+        display: flex;
       }
-      /* Loading state */
+      
+      .chris-cole-preloader.fade-out {
+        opacity: 0;
+      }
+      
+      /* Saturn positioned for preloader phase - using CSS variables */
+      .chris-cole-preloader .preloader-saturn .saturn-canvas-container {
+        position: absolute !important;
+        top: 40.1% !important;
+        left: 27.3% !important;
+        width: var(--chris-cole-saturn-size) !important;
+        height: var(--chris-cole-saturn-size) !important;
+        transform: translate(-50%, -50%) !important;
+        z-index: 2 !important;
+        pointer-events: none !important;
+      }
+      
+      /* Loading content centered */
+      .loading-content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 101;
+      }
+      
+      /* Saturn positioned for homepage phase - using CSS variables */
+      .hero-section .saturn-canvas-container {
+        position: absolute !important;
+        top: 40.1% !important;
+        left: 27.3% !important;
+        width: var(--chris-cole-saturn-size) !important;
+        height: var(--chris-cole-saturn-size) !important;
+        transform: translate(-50%, -50%) !important;
+        z-index: 2;
+        pointer-events: none;
+      }
+      
+      .loading-text {
+        color: rgba(255, 255, 255, 0.6);
+        font-family: 'Roboto Condensed', sans-serif;
+        font-size: 10px;
+        font-weight: 300;
+        letter-spacing: 4px;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+      }
+      
+      .loading-progress-bar {
+        width: 92px;
+        height: 2px;
+        background-color: rgba(255, 255, 255, 0.12);
+        overflow: hidden;
+      }
+      
+      .loading-progress-fill {
+        width: 0%;
+        height: 100%;
+        background-color: #ffffff;
+        animation: progressFill 3.5s ease-in-out forwards;
+      }
+      
+      @keyframes progressFill {
+        from { width: 0%; }
+        to { width: 100%; }
+      }
+      
+      /* Responsive Saturn positioning for both Saturn instances */
+      @media (max-width: 1024px) {
+        .chris-cole-preloader .preloader-saturn .saturn-canvas-container,
+        .hero-section .saturn-canvas-container {
+          width: 400px !important;
+          height: 400px !important;
+          top: 38% !important;
+          left: 25% !important;
+          transform: translate(-50%, -50%) !important;
+        }
+      }
+      
+      @media (max-width: 768px) {
+        .chris-cole-preloader .preloader-saturn .saturn-canvas-container,
+        .hero-section .saturn-canvas-container {
+          width: 300px !important;
+          height: 300px !important;
+          top: 30% !important;
+          left: 50% !important;
+          transform: translate(-50%, -50%) !important;
+        }
+        
+        .loading-text {
+          font-size: 8px;
+        }
+        
+        .loading-progress-bar {
+          width: 76px;
+        }
+      }
+      
+      /* Site container animation */
+      .site-container {
+        opacity: 0;
+        transition: opacity 0.5s ease-out;
+      }
+      
+      .site-container.visible {
+        opacity: 1;
+      }
+      
+      /* Body class states and content transitions */
+      body.preloader-visible .site-container {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+      }
+      
+      body.content-visible .chris-cole-preloader {
+        display: none;
+      }
+      
+      body.content-visible .site-container {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+        transition: opacity 0.5s ease-out;
+      }
+      
+      /* Fade-in animations for content reveal */
+      .fade-in-nav {
+        opacity: 0;
+        transform: translateX(20px);
+        animation: navSlideIn 0.6s ease-out forwards;
+      }
+      
+      @keyframes navSlideIn {
+        from {
+          opacity: 0;
+          transform: translateX(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+      
+      .fade-in-section {
+        opacity: 0;
+        transform: translateY(30px);
+        animation: sectionFadeIn 0.8s ease-out forwards;
+      }
+      
+      @keyframes sectionFadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      
+      /* Stagger animations */
+      body:not(.content-visible) .fade-in-nav,
+      body:not(.content-visible) .fade-in-section {
+        animation-play-state: paused;
+      }
+      
+      body.content-visible .fade-in-nav,
+      body.content-visible .fade-in-section {
+        animation-play-state: running;
+      }
+
+      /* Enhanced Saturn Variables - Chris Cole Template */
+      :root {
+        --chris-cole-saturn-size: 600px;
+        --chris-cole-saturn-planet-ratio: 0.12;
+      }
+      
+      /* Legacy loading screen fallback */
       .loading-screen {
         position: fixed;
         top: 0;

@@ -1,0 +1,18 @@
+{
+  "short_name": "Jyotish Shastra",
+  "name": "Jyotish Shastra - Vedic Astrology Platform",
+  "description": "Professional Vedic astrology software for accurate birth chart generation and comprehensive astrological analysis",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#000000",
+  "orientation": "portrait-primary"
+}
+

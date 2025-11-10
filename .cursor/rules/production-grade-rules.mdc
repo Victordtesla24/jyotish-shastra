@@ -36,5 +36,3 @@ alwaysApply: true
 - Do **not** declare “complete” until **all** failures from the current test summary are resolved,
   **and** verification gates pass.
 
-
-

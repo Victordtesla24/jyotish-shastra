@@ -29,6 +29,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: visible; /* Allow Saturn moons to extend beyond section bounds */
 }
 
 /* Starfield Canvas - Absolutely positioned; cover entire container; z-index below content */
