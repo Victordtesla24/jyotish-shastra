@@ -170,23 +170,23 @@ const HomePage = () => {
         <div className="section-content-wrapper">
           <div className="chris-cole-biography reveal" style={{
             border: '1px solid rgba(255, 255, 255, 0.35)',
-            padding: '60px 80px',
+            padding: 'clamp(30px, 5vw, 60px) clamp(20px, 6vw, 80px)',
             maxWidth: '700px',
-            margin: '0 auto 120px',
+            margin: '0 auto clamp(60px, 10vw, 120px)',
             background: 'transparent',
             textAlign: 'center'
           }}>
             <h5 style={{
               fontFamily: "'Roboto Condensed', sans-serif",
-              fontSize: '16px',
+              fontSize: 'clamp(13px, 2vw, 16px)',
               fontWeight: 300,
               color: 'rgb(255, 255, 255)',
               textTransform: 'uppercase',
-              letterSpacing: '2px',
-              lineHeight: '24px',
-              marginBottom: '48px',
+              letterSpacing: 'clamp(1px, 0.2vw, 2px)',
+              lineHeight: 'clamp(20px, 3vw, 24px)',
+              marginBottom: 'clamp(24px, 4vw, 48px)',
               maxWidth: '600px',
-              margin: '0 auto 48px'
+              margin: '0 auto clamp(24px, 4vw, 48px)'
             }}>
               WE'VE CREATED VEDIC ASTROLOGY SOFTWARE FOR SEEKERS WORLDWIDE, helping people discover their cosmic blueprint.
               <br /><br />
@@ -201,17 +201,17 @@ const HomePage = () => {
         <div className="section-content-wrapper">
           <div className="chris-cole-work-section reveal" style={{
             textAlign: 'center',
-            marginTop: '80px',
-            marginBottom: '40px'
+            marginTop: 'clamp(40px, 8vw, 80px)',
+            marginBottom: 'clamp(20px, 4vw, 40px)'
           }}>
             <h1 style={{
               fontFamily: "'Roboto', sans-serif",
-              fontSize: '63.968px',
+              fontSize: 'clamp(28px, 7vw, 64px)',
               fontWeight: 100,
               color: 'rgba(255, 255, 255, 0.6)',
-              letterSpacing: '6px',
+              letterSpacing: 'clamp(2px, 0.6vw, 6px)',
               textTransform: 'uppercase',
-              marginBottom: '24px',
+              marginBottom: 'clamp(12px, 2vw, 24px)',
               cursor: 'pointer'
             }}
             onClick={() => navigate('/chart')}
@@ -220,12 +220,12 @@ const HomePage = () => {
             </h1>
             <h5 style={{
               fontFamily: "'Roboto Condensed', sans-serif",
-              fontSize: '16px',
+              fontSize: 'clamp(12px, 1.8vw, 16px)',
               fontWeight: 300,
               color: 'rgba(255, 255, 255, 0.5)',
-              letterSpacing: '2px',
+              letterSpacing: 'clamp(1px, 0.2vw, 2px)',
               textTransform: 'uppercase',
-              marginBottom: '60px'
+              marginBottom: 'clamp(30px, 5vw, 60px)'
             }}>
               (START YOUR JOURNEY)
             </h5>
@@ -238,17 +238,17 @@ const HomePage = () => {
         <div className="section-content-wrapper">
           <div className="chris-cole-work-section reveal" style={{
             textAlign: 'center',
-            marginTop: '80px',
-            marginBottom: '40px'
+            marginTop: 'clamp(40px, 8vw, 80px)',
+            marginBottom: 'clamp(20px, 4vw, 40px)'
           }}>
             <h1 style={{
               fontFamily: "'Roboto', sans-serif",
-              fontSize: '63.968px',
+              fontSize: 'clamp(28px, 7vw, 64px)',
               fontWeight: 100,
               color: 'rgba(255, 255, 255, 0.6)',
-              letterSpacing: '6px',
+              letterSpacing: 'clamp(2px, 0.6vw, 6px)',
               textTransform: 'uppercase',
-              marginBottom: '24px',
+              marginBottom: 'clamp(12px, 2vw, 24px)',
               cursor: 'pointer'
             }}
             onClick={() => navigate('/analysis')}
@@ -257,12 +257,12 @@ const HomePage = () => {
             </h1>
             <h5 style={{
               fontFamily: "'Roboto Condensed', sans-serif",
-              fontSize: '16px',
+              fontSize: 'clamp(12px, 1.8vw, 16px)',
               fontWeight: 300,
               color: 'rgba(255, 255, 255, 0.5)',
-              letterSpacing: '2px',
+              letterSpacing: 'clamp(1px, 0.2vw, 2px)',
               textTransform: 'uppercase',
-              marginBottom: '60px'
+              marginBottom: 'clamp(30px, 5vw, 60px)'
             }}>
               (COMPREHENSIVE INSIGHTS)
             </h5>
@@ -275,17 +275,17 @@ const HomePage = () => {
         <div className="section-content-wrapper">
           <div className="chris-cole-work-section reveal" style={{
             textAlign: 'center',
-            marginTop: '80px',
-            marginBottom: '40px'
+            marginTop: 'clamp(40px, 8vw, 80px)',
+            marginBottom: 'clamp(20px, 4vw, 40px)'
           }}>
             <h1 style={{
               fontFamily: "'Roboto', sans-serif",
-              fontSize: '63.968px',
+              fontSize: 'clamp(28px, 7vw, 64px)',
               fontWeight: 100,
               color: 'rgba(255, 255, 255, 0.6)',
-              letterSpacing: '6px',
+              letterSpacing: 'clamp(2px, 0.6vw, 6px)',
               textTransform: 'uppercase',
-              marginBottom: '24px',
+              marginBottom: 'clamp(12px, 2vw, 24px)',
               cursor: 'pointer'
             }}
             onClick={() => navigate('/birth-time-rectification')}
@@ -294,12 +294,12 @@ const HomePage = () => {
             </h1>
             <h5 style={{
               fontFamily: "'Roboto Condensed', sans-serif",
-              fontSize: '16px',
+              fontSize: 'clamp(12px, 1.8vw, 16px)',
               fontWeight: 300,
               color: 'rgba(255, 255, 255, 0.5)',
-              letterSpacing: '2px',
+              letterSpacing: 'clamp(1px, 0.2vw, 2px)',
               textTransform: 'uppercase',
-              marginBottom: '60px'
+              marginBottom: 'clamp(30px, 5vw, 60px)'
             }}>
               (BIRTH TIME RECTIFICATION)
             </h5>
@@ -313,28 +313,28 @@ const HomePage = () => {
           <div className="reveal" style={{
             maxWidth: '600px',
             margin: '0 auto',
-            padding: '80px 40px'
+            padding: 'clamp(40px, 8vw, 80px) clamp(20px, 4vw, 40px)'
           }}>
             <h1 style={{
               fontFamily: "'Roboto', sans-serif",
-              fontSize: '63.968px',
+              fontSize: 'clamp(28px, 7vw, 64px)',
               fontWeight: 100,
               color: 'rgba(255, 255, 255, 0.6)',
-              letterSpacing: '6px',
+              letterSpacing: 'clamp(2px, 0.6vw, 6px)',
               textTransform: 'uppercase',
-              marginBottom: '24px',
+              marginBottom: 'clamp(12px, 2vw, 24px)',
               textAlign: 'center'
             }}>
               CONTACT
             </h1>
             <h5 style={{
               fontFamily: "'Roboto Condensed', sans-serif",
-              fontSize: '16px',
+              fontSize: 'clamp(12px, 1.8vw, 16px)',
               fontWeight: 300,
               color: 'rgba(255, 255, 255, 0.5)',
-              letterSpacing: '2px',
+              letterSpacing: 'clamp(1px, 0.2vw, 2px)',
               textTransform: 'uppercase',
-              marginBottom: '60px',
+              marginBottom: 'clamp(30px, 5vw, 60px)',
               textAlign: 'center'
             }}>
               (GET IN TOUCH)
@@ -343,18 +343,18 @@ const HomePage = () => {
             <form style={{
               display: 'flex',
               flexDirection: 'column',
-              gap: '24px'
+              gap: 'clamp(16px, 2vw, 24px)'
             }}>
               <div>
                 <label style={{
                   fontFamily: "'Roboto', sans-serif",
-                  fontSize: '12px',
+                  fontSize: 'clamp(11px, 1.2vw, 12px)',
                   fontWeight: 500,
                   color: 'rgba(255, 255, 255, 0.7)',
                   textTransform: 'uppercase',
                   letterSpacing: '1px',
                   display: 'block',
-                  marginBottom: '8px'
+                  marginBottom: 'clamp(6px, 0.8vw, 8px)'
                 }}>
                   Name
                 </label>
@@ -363,13 +363,13 @@ const HomePage = () => {
                   className="form-input-vedic"
                   style={{
                     width: '100%',
-                    padding: '12px 16px',
+                    padding: 'clamp(10px, 1.2vw, 12px) clamp(12px, 1.5vw, 16px)',
                     background: '#1A1A1A',
                     border: '1px solid #505050',
                     borderRadius: '4px',
                     color: '#FFFFFF',
                     fontFamily: "'Roboto', sans-serif",
-                    fontSize: '14px'
+                    fontSize: 'clamp(13px, 1.5vw, 14px)'
                   }}
                 />
               </div>

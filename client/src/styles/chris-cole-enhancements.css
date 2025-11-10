@@ -315,6 +315,10 @@ div.vertical-nav-item button.chris-cole-nav-link h1.chris-cole-nav-heading {
     font-size: 48px !important;
     line-height: 67.2px !important;
   }
+  
+  .menu-container {
+    right: 5% !important;
+  }
 }
 
 @media (max-width: 767px) {
@@ -322,7 +326,170 @@ div.vertical-nav-item button.chris-cole-nav-link h1.chris-cole-nav-heading {
     font-size: 32px !important;
     line-height: 48px !important;
     letter-spacing: 4px !important;
+  }
+  
+  .menu-container {
+    position: relative !important;
+    right: auto !important;
+    top: auto !important;
+    transform: none !important;
+    width: 100% !important;
+    padding: 20px !important;
+    text-align: center !important;
+  }
+  
+  .vertical-navigation-chris-cole {
+    justify-content: center !important;
+    align-items: center !important;
+  }
 }
+
+/* Chart Page Responsive */
+.chris-cole-page-content {
+  padding: clamp(20px, 4vw, 60px) clamp(10px, 2vw, 40px);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.chris-cole-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: clamp(16px, 3vw, 32px);
+  margin-bottom: clamp(16px, 2vw, 24px);
+}
+
+.chris-cole-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(20px, 3vw, 40px);
+  margin-bottom: clamp(20px, 3vw, 40px);
+}
+
+@media (min-width: 1024px) {
+  .chris-cole-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.chris-cole-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(12px, 2vw, 16px);
+  margin-bottom: clamp(20px, 3vw, 40px);
+  justify-content: center;
+}
+
+.chris-cole-button {
+  font-family: 'Roboto', sans-serif;
+  font-size: clamp(11px, 1.2vw, 14px);
+  font-weight: 500;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: clamp(12px, 1.5vw, 16px) clamp(20px, 3vw, 32px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.chris-cole-button:hover {
+  border-color: rgba(255, 215, 0, 0.5);
+  color: rgba(255, 215, 0, 0.9);
+  background: rgba(255, 215, 0, 0.05);
+}
+
+.chris-cole-button-secondary {
+  border-color: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.chris-cole-heading {
+  font-family: 'Roboto', sans-serif;
+  font-size: clamp(18px, 3vw, 24px);
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: clamp(12px, 1.5vw, 16px);
+  letter-spacing: 1px;
+}
+
+.chris-cole-text {
+  font-family: 'Roboto', sans-serif;
+  font-size: clamp(13px, 1.5vw, 14px);
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.6;
+  margin-bottom: clamp(12px, 1.5vw, 16px);
+}
+
+.chris-cole-text-secondary {
+  font-family: 'Roboto', sans-serif;
+  font-size: clamp(12px, 1.3vw, 13px);
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.5;
+  margin-bottom: clamp(8px, 1vw, 12px);
+}
+
+.chris-cole-details-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(12px, 1.5vw, 16px);
+}
+
+@media (min-width: 640px) {
+  .chris-cole-details-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.chris-cole-detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.chris-cole-label {
+  font-family: 'Roboto', sans-serif;
+  font-size: clamp(10px, 1.1vw, 11px);
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.chris-cole-value {
+  font-family: 'Roboto', sans-serif;
+  font-size: clamp(13px, 1.4vw, 14px);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.chris-cole-chart-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-x: auto;
+  padding: clamp(12px, 2vw, 20px) 0;
+}
+
+.chris-cole-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+.chris-cole-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: rgba(255, 215, 0, 0.8);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 /* ============================================

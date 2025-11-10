@@ -21,30 +21,34 @@ const HeroSection = ({ children, title = 'JYOTISH SHASTRA' }) => {
       {title && (
         <h6 className="hero-title" style={{
           position: 'absolute',
-          top: '20px',
+          top: 'clamp(12px, 2vw, 20px)',
           left: '50%',
           transform: 'translateX(-50%)',
           fontFamily: "'Roboto Condensed', sans-serif",
-          fontSize: '14px',
+          fontSize: 'clamp(11px, 1.5vw, 14px)',
           fontWeight: 400,
-          letterSpacing: '2px',
+          letterSpacing: 'clamp(1px, 0.2vw, 2px)',
           color: 'rgba(255, 255, 255, 0.6)',
           textTransform: 'uppercase',
           zIndex: 10,
           margin: 0,
-          padding: 0
+          padding: '0 20px',
+          textAlign: 'center',
+          maxWidth: '100%'
         }}>
           {title}
         </h6>
       )}
 
-      {/* Menu Items Container - Right of planet, vertically spaced */}
+      {/* Menu Items Container - Responsive positioning */}
       <div className="menu-container" style={{
         position: 'absolute',
-        right: '15%',
+        right: 'clamp(5%, 10vw, 15%)',
         top: '50%',
         transform: 'translateY(-50%)',
-        zIndex: 10
+        zIndex: 10,
+        maxWidth: '90%',
+        paddingLeft: 'clamp(10px, 2vw, 20px)'
       }}>
         {children}
       </div>

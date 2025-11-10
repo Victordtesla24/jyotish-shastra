@@ -387,6 +387,17 @@
 }
 
 /* Responsive Design */
+@media (max-width: 1024px) {
+  .comprehensive-analysis-display {
+    padding: clamp(12px, 2vw, 20px);
+    max-width: 100%;
+  }
+
+  .main-title {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+  }
+}
+
 @media (max-width: 768px) {
   .comprehensive-analysis-display {
     padding: 10px;
@@ -406,6 +417,51 @@
 
   .section-content {
     padding: 1rem;
+  }
+
+  .grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .grid-cols-1.lg\:grid-cols-2,
+  .grid-cols-1.md\:grid-cols-2 {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .comprehensive-analysis-display {
+    padding: 8px;
+  }
+
+  .main-title {
+    font-size: 1.25rem;
+  }
+
+  .section-header {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .section-header h2 {
+    font-size: 1rem;
+  }
+
+  .section-content {
+    padding: 0.75rem;
+  }
+
+  .questions-container h3,
+  .analyses-container h3,
+  .houses-container h3,
+  .aspects-container h3 {
+    font-size: 1rem;
+  }
+
+  .question-item,
+  .analysis-item,
+  .house-item,
+  .aspect-item {
+    padding: 0.75rem;
   }
 }
 
